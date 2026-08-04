@@ -1,3 +1,174 @@
+## 0.57.0
+
+A breaking release. The export surface was trimmed, eleven components were added, and the default theme was brought in line with shadcn/ui's own values.
+
+### Breaking (visual): the default theme now matches shadcn/ui
+
+Values taken from shadcn/ui's `new-york-v4` registry and `globals.css` rather than approximated.
+
+- **Focus ring.** Was a 2px fully-opaque `ring`-coloured outline floating 4px away from the element, which read as a hard outline with a gap. It is now `focus-visible:ring-[3px] ring-ring/50`: 3px, at 50% opacity, sitting flush against the element with no gap, and concentric with its corner radius. `ShadOutwardBorderPainter` strokes *inside* a rect inflated by `offset`, so `offset == width` is what removes the gap.
+- **Default radius `6` → `8`.** shadcn's `--radius` is `0.625rem` and `--radius-md` — what button, input, checkbox and most components use via `rounded-md` — is `calc(var(--radius) * 0.8)`, i.e. 8px.
+- **Button sizes** now match `h-9 px-4 py-2` / `h-8 px-3` / `h-10 px-6` / `size-9`: default height `40 → 36`, sm `36 → 32`, lg `44 → 40` with horizontal padding `32 → 24`, and icon `40 → 36`.
+- `ShadDefaultThemeNoSecondaryBorderVariant` keeps its inset focus border by design, but no longer hardcodes the old 6px radius — it follows `ShadThemeData.radius`.
+
+Pass `radius:` and `buttonSizesTheme:` to `ShadThemeData` to keep the previous look.
+
+### Breaking: the public barrel no longer re-exports unrelated packages
+
+`import 'package:shadcn_ui/shadcn_ui.dart'` used to pull in several hundred symbols that have nothing to do with this package. Only what appears in a `Shad*` signature is re-exported now. If you were relying on one of these transitively, add the package to your own `pubspec.yaml` and import it directly:
+
+| Dropped | What to do |
+| --- | --- |
+| `boxy` (all 8 libraries) | add `boxy` to your pubspec — nothing in this package's API uses it |
+| `flutter_svg` | add `flutter_svg` |
+| `universal_image` | add `universal_image` |
+| `intl` — everything but `DateFormat` and `NumberFormat` | add `intl` |
+| `two_dimensional_scrollables` — everything but the `TableSpan*`/`TableView*` types `ShadTable` needs | add `two_dimensional_scrollables` |
+
+`flutter_animate` and `lucide_icons_flutter` are still re-exported: both appear in the public API (`effects:` parameters and icon constants respectively).
+
+### Breaking: extensions on core types are no longer exported
+
+`double`, `Duration`, `List`, `Map`, `Set`, `TextStyle` and `TapDownDetails` all silently gained methods — and `Duration` gained `+ - * /` operator overloads — in every file that imported this package. Those extensions are now internal. `ShadBreakpointsExt on BuildContext` and `ShadDateTime on DateTime` are still exported.
+
+### Breaking: render objects and painters are no longer exported
+
+`MouseAreaRegistry`, `MouseAreaSurfaceRenderBox`, `ShadMouseAreaRenderBox`, `RenderSheetLayoutWithSizeListener`, `SonnerBoxy`, `ShadOutwardBorderPainter`, `ShadResizeGripPainter` and `ShadPositionDelegate` were implementation details.
+
+### Breaking (with deprecated aliases): un-prefixed public names
+
+Each old name still works and is deprecated; all will be removed in v1.0.0.
+
+`ToastInfo` → `ShadToastInfo` · `SizeEffect` → `ShadSizeEffect` · `PaddingEffect` → `ShadPaddingEffect` · `AnimEffect` → `ShadAnimEffect` · `UpperCaseTextInputFormatter` → `ShadUpperCaseTextInputFormatter` · `LowerCaseTextInputFormatter` → `ShadLowerCaseTextInputFormatter` · `SheetDragStartHandler` → `ShadSheetDragStartHandler` · `SheetDragEndHandler` → `ShadSheetDragEndHandler` · `SizeChangeCallback` → `ShadSizeChangeCallback` · `ToValueTransformer` → `ShadToValueTransformer` · `FromValueTransformer` → `ShadFromValueTransformer` · `FocusWidgetBuilder` → `ShadFocusWidgetBuilder` · `ResponsiveWidgetBuilder` → `ShadResponsiveWidgetBuilder` · `PasteFilesCallback` → `ShadPasteFilesCallback` · `PasteFilesErrorCallback` → `ShadPasteFilesErrorCallback` · `RestorableShadTabsController` → `ShadRestorableTabsController` · `DateTime.isSameDayOrGreatier` → `isSameDayOrGreater`
+
+### New components
+
+- **FEAT**: `ShadSkeleton` (+ `.circle`) — a pulsing loading placeholder.
+- **FEAT**: `ShadSpinner` — an indeterminate circular indicator. Hand-painted, since nothing under `lib/` may import `material.dart`.
+- **FEAT**: `ShadKbd` (+ `.group`) — keyboard key caps for documenting shortcuts.
+- **FEAT**: `ShadToggle` and `ShadToggleGroup` (+ `.multiple`) with `ShadToggleGroupController`.
+- **FEAT**: `ShadCollapsible` with `ShadCollapsibleController` — the single-section primitive under an accordion.
+- **FEAT**: `ShadEmpty` — an empty state with icon, title, description and actions.
+- **FEAT**: `ShadPagination` and `ShadPaginationCompact`. The page-window algorithm is exposed as `ShadPagination.buildPageWindow` so it can be tested and reused.
+- **FEAT**: `ShadCommand` and `showShadCommandDialog` — a searchable, keyboard-navigable command palette with grouped items, keyword matching and a pluggable filter.
+- **FEAT**: `ShadDataTable` with `ShadDataTableController` and `ShadDataTableColumn` — sorting, filtering, paging and key-based row selection composed over `ShadTable`. `ShadTable` itself is unchanged.
+- **FEAT**: `ShadRovingFocus` and `ShadRovingFocusController` — the shared arrow-key/Home/End/typeahead substrate the WAI-ARIA roving-tabindex pattern needs. Used by `ShadCommand`.
+- Each new component ships with a `ShadXTheme` wired into `ShadThemeData`.
+
+### Breaking (visual): the neutral, stone and zinc palettes are shadcn v4's
+
+They were still the v3 values. Regenerated from `registry/themes.ts`, which moves several tokens:
+
+- **Dark `--border` and `--input` are translucent whites** (`oklch(1 0 0 / 10%)` and `/ 15%`) rather than opaque greys. A hairline now lightens whatever it sits on, instead of disappearing against a card of the same value — which is why a checkbox or radio outline was hard to make out in dark mode. `ShadSlateColorScheme` and `ShadGrayColorScheme` are not in shadcn v4; they keep their own palette but adopt these two.
+- **The dark card and popover are a step lighter than the page** (`oklch(0.205)`), so a card reads as raised rather than as a bordered region of the background.
+- Dark `primary`, `ring`, `muted-foreground` and `destructive` move to their v4 values.
+
+### Design tokens: radius scale, styles and spacing
+
+shadcn/ui derives every corner radius and every padding from two CSS variables. This release does the same, which is what makes a single setting move the whole UI in proportion instead of only the components that happened to read it.
+
+- **FIX (visual)**: the default component sizes now match the current shadcn registry rather than an older snapshot of it. Button horizontal padding `16 → 10` (`px-2.5`), icon/label gap `8 → 6`, input padding `12/8 → 10/4` with a 36px minimum height, popover padding `12/6 → 16`, slider track `8 → 6` and thumb `20 → 16`, switch `44×24 → 32×18.4`, progress `16 → 6`, table cell padding `16 → 8` horizontally, and a 3px inset on the tab strip.
+- **FEAT**: `ShadRadii` — the `none`/`sm`/`md`/`lg`/`xl`/`2xl`/`4xl`/`full` scale, derived from `ShadThemeData.radius` (the `md` step). At the default 8 it reproduces shadcn's scale exactly: sm 6, md 8, lg 10, xl 14, 2xl 16, 4xl 32. Available as `ShadThemeData.radii`.
+- **FIX (visual)**: components now pick a *token* rather than a number, so the theme radius reaches all of them. `ShadCardTheme.radius` was hardcoded to 8 and ignored `ShadThemeData.radius` entirely; the dialogs, progress, kbd and the select/command item rows had the same problem. Cards are `rounded-xl`, dialogs and sheets `rounded-lg`, controls `rounded-md` and menu rows `rounded-sm`, matching the reference. **A card at the default radius is now 14px round rather than 8px.**
+- **FEAT**: `ShadStyleTokens` — shadcn/ui's eight named styles (`vega`, `nova`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`) as `ShadThemeData(style:)`. Previously only two looks were reachable, through `disableSecondaryBorder`.
+
+  A style is a full design set, not a colour variation — 243 of shadcn's 407 component classes differ in geometry between the eight. Everything here was read from `registry/styles/style-*.css`, converting Tailwind's scale at 4px per unit.
+
+  *Sizes.* A `mira` button is 28px tall with 8px of horizontal padding; a `sera` one is 40px with 24px. Card padding runs 16 → 32 across the eight; slider tracks 2 → 12; switches 28×16.6 → 44×20; focus rings 1px at 50% → 3px at 30%.
+
+  *Radii,* per surface class — controls, cards, dialogs, popovers and menu rows each pick their own token, which is why `nova` has `rounded-lg` buttons inside `rounded-xl` cards.
+
+  *Type.* Each style redefines six `ShadTextRole`s — `title`, `label`, `body`, `caption`, `overline` and `field` — carrying size, weight, tracking, line height and case. `lyra` sets body copy at 12px, `mira` puts it on a 1.625 line, `sera` sets labels in 12px semibold uppercase tracked to 1.2px and titles at 18px. Every component theme's text style is derived from a role, so a style switch retypes the whole UI.
+
+  *Shadows.* `nova`, `maia`, `lyra` and `mira` drop the card shadow entirely; `luma` gives it `md`; `maia` puts a `2xl` under popovers; `luma` and `rhea` an `xl` under dialogs.
+
+  *Borders.* `sera` underlines its text fields rather than boxing them (`underlinedFields`), matching its `border-transparent border-b-input`.
+
+  Metrics shadcn expresses in spacing units (`h-9`, `px-2.5`) are stored in the pixels they render at the default 4px step and rescale with `ShadThemeData.spacing`; its bracketed literals (`h-[18.4px]`, `rounded-[4px]`, `p-[3px]`) do not, matching Tailwind.
+- **FEAT**: `ShadSpacing` — the spacing scale, shadcn's `--spacing`. `ShadThemeData(spacing:)` sets the step (4 by default); `theme.spacing(6)` is 24. Every padding in both shipped theme variants is now expressed in steps, so changing the step rescales the whole UI. Values are unchanged at the default step.
+- **FEAT**: `ShadTextRole` — the typographic treatment of one role in a style: size, weight, tracking (in logical pixels, not ems), line height and case. `ShadTextRole.apply(base)` layers it onto a text style while keeping that style's colour and family, so it composes with a custom `ShadTextTheme` or a Google font. `uppercase` cannot be expressed in a `TextStyle`, so components that take a caller's widget leave the text alone; use `role.applyCase(text)` where you build the string.
+- **FEAT**: new theme fields for text that components previously hardcoded — `ShadCardTheme.titleStyle`/`descriptionStyle`/`gap`, `ShadBadgeTheme.textStyle`, `ShadPopoverTheme.textStyle`, plus the matching widget parameters. `ShadCard` used `textTheme.h3` for its title and `ShadBadge` a hardcoded 12px/w600, neither of which a style could reach.
+- **FEAT**: `Shadows.xs` and `Shadows.none`, completing Tailwind's set.
+- **FEAT**: `ShadGap`, `ShadPadding`, `ShadColumn` and `ShadRow` — layout widgets measured in steps on that scale, so app layout lines up with component padding exactly. `ShadGap` sizes itself along whichever axis its enclosing flex runs.
+- **FEAT**: `ShadThemeVariant.rebuild(...)`, plus `colorScheme`/`radius`/`effectiveTextTheme`/`style`/`spacing`/`radii` on the variant interface. A variant bakes its inputs into its component themes, so `ShadThemeData(variant: v, radius: r)` now rebuilds `v` at `r` instead of leaving the theme's radius and its components disagreeing. Where no explicit value is given, the variant's own wins — so the two can no longer be inconsistent.
+
+### API
+
+- **FIX**: `ShadThemeData.textTheme` is now produced by the theme variant, so a style's text roles reach it. It was taken straight from the merged input, which meant a style change resized the components but left `theme.textTheme.small` — and therefore any app text written against it — untouched. Prose entries (`h1`..`h4`, `lead`, `blockquote`, `table`) are the typography scale and are deliberately unaffected.
+- **FIX (visual)**: a textarea has its own radius token, `ShadStyleTokens.textareaRadius`. It followed the button radius, so `maia`'s `rounded-4xl` put a 32px curve on a tall box and clipped the text; shadcn gives it `rounded-xl`.
+- **FIX (visual)**: `ShadInputOTP` slots follow the control radius and the style's field treatment — rounded only at the ends of the strip, sized like a control, and underlined rather than boxed in `sera`.
+- **FIX (visual)**: components outline with the token shadcn uses: fields, checkboxes, radios and OTP slots with `--input`, and cards, popovers, dialogs, menus and toasts with a wash of their own foreground (`ring-foreground/10`, or `/5` in `luma`, `sera` and `rhea`) rather than the full-strength `--border`. `ShadStyleTokens.cardBorderOpacity` and `surfaceBorderOpacity` carry the per-style values.
+- **FIX**: `ShadOption`'s label follows its *background*, not just its selected state. Hovering an unselected row painted the highlight behind unchanged text, so a theme whose highlight is a strong fill left the label unreadable.
+- **FIX**: popover content gets an `IconTheme` matching `popoverForeground`. Icons inherited the page's icon colour, which is wrong the moment the menu surface differs from the page — an inverted menu drew its icons in the surface colour.
+- **FIX**: `ShadBorderSide.toBorderSide()` keeps its colour at zero width instead of returning `BorderSide.none`. `Border` asserts that every side shares a colour before it will paint a radius, so a component drawing only some of its sides — the OTP strip shares its vertical edges — crashed in paint.
+- **FIX (visual)**: `ShadTabs` sizes its tabs to their labels, matching shadcn's `w-fit` list. Every tab was stretched across the bar, which read as enormous padding inside it. `ShadTabs.expandTabs` / `ShadTabsTheme.expandTabs` restores the old behaviour.
+- **FIX (visual)**: `ShadInputOTP` draws its focus ring inside the focused slot. Slots share their vertical edges and Flutter has no z-index, so an outward ring was painted over by the next slot in the row and the strip looked broken.
+- **FEAT**: `ShadInputOTP` slots scale with the ambient text scaler, so a larger accessibility text size no longer clips the digit.
+- **FEAT**: `ShadContextMenuItem.selectedTextStyle` and the matching theme field. A menu whose selection is a strong fill needs its label to change with it; the item's text style was fixed regardless of state.
+- **FIX**: `ShadTextarea` reads `ShadTextareaTheme` rather than `ShadInputTheme` for padding, alignment, gap and placeholder styling. Every textarea-specific value in its own theme was dead, so a multi-line field was padded like a single-line one — which is why its text sat hard against the top edge.
+- **FIX (visual)**: a single-line field centres its text vertically. It is laid out at a fixed height now, and its content column was top-aligned, so short text rode high in the box. A multi-line field still grows from the top.
+- **FIX (visual)**: overlays match shadcn's `bg-black/10` + `backdrop-blur-xs` instead of an opaque 80% black. `ShadDialogTheme` gained `barrierColor` and `barrierBlurSigma`, `showShadDialog` and `showShadSheet` resolve both from it, and `ShadDialogRoute` fades the blur in with the route. The blur is what lets the tint stay light enough to keep the palette recognisable in either mode.
+- **FIX (visual)**: a checkbox and a radio share their unchecked look — `border-input` with the same fill (transparent in light, `input/30` in dark). The checkbox filled itself with `input` and outlined itself in `primary`, so the two read as different families.
+- **FIX**: `ShadSlider`'s ring stays up for the whole gesture, including when the pointer leaves the slider, and appears on press as well as hover and focus.
+- **FIX (visual)**: `ShadInputOTP`'s ring no longer collapses onto the slot's border. `ShadBorder.merge` takes the other's offset unconditionally, so the per-slot radius merge was silently dropping it and the neighbouring slots painted over the ring.
+- **FEAT**: `ShadCard.action` — shadcn/ui's `CardAction`, a widget pinned to the end of the *header* row. `trailing` sits beside the card's whole content column, so using it for a dismiss button narrowed the entire card, not just the header.
+- **FIX (visual)**: every focus ring is now concentric with the element it rings. The ring was built once from the control radius, so a textarea — which has a radius of its own — was ringed in the wrong shape. Both variants build rings through a `ringFor(radius)` helper.
+- **FIX (visual)**: `ShadInputOTP` slots ring like any other field: a hairline border in the ring colour plus the theme's translucent ring outside it, instead of an opaque 2px box with the ring suppressed.
+- **FIX (visual)**: `ShadSlider`'s thumb ring is the theme's — same colour, opacity and width as a focused field — and appears on hover as well as focus, matching shadcn's `hover:ring-4 focus-visible:ring-4`. It is painted outside the thumb, so it no longer resizes anything when it appears.
+- **FIX (visual)**: textarea vertical padding is two pixels above shadcn's `py-2`. A browser textarea carries an intrinsic inset that `EditableText` does not, and matching the CSS exactly put the first line visibly close to the top edge.
+- **FIX (visual)**: `ShadKbd` has a height of its own (`ShadKbdTheme.height`, shadcn's `h-5`) and no longer stretches to fill a row that sizes its children — inside a button, it grew to the button's full height.
+- **FIX (visual)**: `ShadSlider` reserves room for its thumb. The thumb was positioned with a negative offset, so a slider laid out at track height — 6px — while painting a 16px thumb, and overlapped whatever sat above and below it. It now takes `max(track, thumb)`; the focus ring still overflows deliberately, so focusing never reflows the layout.
+- **FIX**: `ShadPopover` no longer forces `TextAlign.center` on its content. Everything built on it — select options, menu items, popover forms — was centred; shadcn aligns all of it to the start. Wrap content in a `Center` or set `textAlign` yourself for the old behaviour.
+
+- **FEAT**: `ShadThemeScope` applies a `ShadThemeData` to a *subtree*, including the Material theme it implies — the ambient `DefaultTextStyle` and `IconTheme`. Plain `ShadTheme` publishes only the Shad half, so a deliberately dark panel inside a light app rendered dark text on a dark surface. `ShadApp` now derives its Material theme through the same `shadMaterialThemeFrom` helper, so the two cannot drift.
+- **FIX**: `showShadDialog` republishes the ambient `ShadTheme` inside the route. A route is built under the Navigator, so a dialog opened from a re-themed panel used to fall back to the app theme.
+- **FIX**: A mouse click no longer clears a button's hover state. The default `hoverStrategies` list `onTapUp` under `unhover`; those exist to synthesise hover on touch devices, but they fired for mouse clicks too, so the highlight vanished mid-click while the cursor sat still. `ShadGestureDetector` now ignores the strategies whenever a mouse is inside it — which is what its own class doc already promised.
+- **FEAT**: Buttons shift down one pixel while pressed, matching shadcn/ui's `active:translate-y-px`. Tunable via `ShadButton.pressedOffset` / `pressAnimationDuration` and the matching `ShadButtonTheme` fields; `Offset.zero` disables it. A button with no `onPressed`, or an explicitly disabled one, does not shift.
+
+- **FEAT**: `ShadAccentScheme` — shadcn/ui's seventeen accent themes (amber, blue, cyan, emerald, fuchsia, green, indigo, lime, orange, pink, purple, red, rose, sky, teal, violet, yellow) in light and dark, applied with `ShadColorScheme.applyAccentScheme(...)`. shadcn splits a theme into a neutral *base colour* and an *accent* that overrides only the hue-carrying tokens; its accent entries define exactly `primary`, `secondary`, `chart-*` and `sidebar-primary`, which is what this type carries.
+- **FEAT**: Four new base colour schemes matching shadcn's remaining neutrals — `ShadMauveColorScheme`, `ShadOliveColorScheme`, `ShadMistColorScheme`, `ShadTaupeColorScheme`. All values converted from the OKLCH literals in shadcn's `registry/themes.ts`.
+- **FEAT**: `ShadColorScheme` gained shadcn's `--chart-1`..`--chart-5` and `--sidebar-*` tokens (`chart1`…`chart5`, `charts`, `sidebar`, `sidebarForeground`, `sidebarPrimary`, `sidebarPrimaryForeground`, `sidebarAccent`, `sidebarAccentForeground`, `sidebarBorder`, `sidebarRing`). They are optional and fall back to the closest existing token, so every existing scheme — including hand-written ones — keeps working unchanged.
+- **FEAT**: `ShadColorScheme.applyAccent(color)` layers an arbitrary accent hue onto a neutral palette, re-tinting `primary`, `ring` and `selection` while leaving backgrounds, borders and muted tones alone. shadcn/ui's theme editor treats the neutral *base colour* and the *accent* as independent choices; a `ShadColorScheme` bundles both, so this is what makes that split expressible. `primaryForeground` is derived from the accent's relative luminance unless supplied.
+- **FEAT**: `ShadButtonSize.icon`, matching shadcn/ui's `<Button size="icon">`. `ShadButtonSizesTheme` already carried the metrics; the enum could not express them.
+- **FEAT**: `ShadIconButton.size` — icon buttons can now be `sm`/`lg`, not just the fixed icon size. Non-icon sizes fall back to a square derived from the height.
+- **FEAT**: `ShadIconButton.semanticLabel`. An icon-only button has no text, so without it a screen reader announced nothing at all.
+- **FEAT**: `ShadDialog.semanticLabel`, plus `scopesRoute`/`namesRoute`/`explicitChildNodes` semantics matching Flutter's own `AlertDialog`. (The focus trap was already provided by `PopupRoute`.)
+- **FEAT**: `autofocus` and `onFocusChange` on `ShadCheckbox`, `ShadSwitch`, `ShadRadio` and `ShadSelect`; `onFocusChange` on `ShadSlider`.
+- **FEAT**: `ShadBadge.enabled`.
+- **FEAT**: `ShadTooltip` dismisses on Escape.
+- **FEAT**: `ShadDisabled` and `ShadDefaultThemeNoSecondaryBorderVariant` are now exported. The latter was accepted by `ShadThemeData(variant:)` but unreachable.
+- **CHORE**: All 23 existing `@Deprecated` annotations now state a removal version.
+
+## 0.56.2
+
+Performance. No API changes, and every golden is unchanged.
+
+- **PERF**: `ShadSelect` no longer materializes its options on every layout pass. The `LayoutBuilder` wraps the whole select — anchor included — so it re-runs whenever the *closed* select is laid out, and `options` is a lazy `Iterable` that was being `toList()`ed each time. The options are now built inside the `popover:` builder.
+- **PERF**: `ShadCalendar` memoizes its `DateFormat`s. Combined with the above, `captionLayout: dropdown` was constructing 201 `DateFormat`s — one per selectable year, each a pattern parse plus locale lookup — on every layout pass of a closed calendar.
+- **PERF**: `ShadInput`/`ShadTextarea` rebuild only the placeholder when the text changes, instead of rebuilding `EditableText`, the decorator, the scrollbar and the leading/trailing row on every keystroke. Because `TextEditingController` also notifies on selection changes, this previously fired on every cursor move too.
+- **PERF**: `ShadTable` builds its cell matrix once per build instead of once per hover tick. The hover `ValueListenableBuilder` wrapped the entire `TableView` and reallocated one `List` per row every time the pointer crossed a row boundary.
+- **PERF**: `ShadPopover` rebuilds `ShadPortal` only when its visibility actually flips, rather than on every animation frame via an `AnimatedBuilder` reading `!isDismissed`.
+- **PERF**: `ShadPortal` routes all reposition requests through its existing dedup guard. Three call sites scheduled raw post-frame callbacks that bypassed it, so a portal rebuilding N times in a frame queued N repositions.
+- **PERF**: `ShadTooltip` no longer allocates a new `onHoverChange` closure per build. `ShadHoverStrategies` compares that closure in `==`, so the theme handed to `ShadTooltip.child` was never equal to the previous one and the entire child subtree rebuilt on every tooltip rebuild. `ShadSonner` memoizes its toast subtree theme for the same reason — both called `ShadThemeData.copyWith`, which re-runs all 54 component-theme merges.
+- **FIX**: `ShadAnimationBuilder` now honours a changed `duration`; it captured the initial value and had no `didUpdateWidget`.
+- **FIX**: `ShadStatesController.update` emits a new `Set` rather than mutating the one held by the `ValueNotifier`, so listeners can diff old against new.
+- **CHORE**: `ShadPopover` and `ShadTooltip` no longer mutate their `AnimationController` durations from `build()`.
+
+## 0.56.1
+
+Value-equality and lifecycle fixes. No API changes.
+
+- **FIX**: `ShadThemeData` is a value type again. `ShadBorder` had no `operator ==`/`hashCode` and `ShadBorderSide`'s compared the `merge` *method tear-off* instead of the `canMerge` field, so two identically-configured `ShadThemeData` instances were never equal. Because `ShadApp` wraps its child in a `ShadAnimatedTheme`, that made every `ShadApp` rebuild start a fresh 200ms lerp across all 54 component themes and republish a new theme every frame, rebuilding every `ShadTheme.of` dependent at frame rate. Apps that construct their theme inline — `ShadApp(theme: ShadThemeData(...))` — were affected on every rebuild. Theme changes are now applied instantly unless the theme actually changed; this is visible but intended.
+- **FIX**: `ShadBreakpoints` and `ShadBreakpoint` gained `operator ==`/`hashCode`. The `ShadThemeData` factory allocates a fresh `ShadBreakpoints()` per construction, so this was a second, independent cause of the above.
+- **FIX**: `ShadThemeData.copyWith` no longer discards a custom `variant`. `variant` was constructor-only and never stored, so `copyWith` silently reset it to `ShadDefaultThemeVariant` — and `ShadDialog`, `ShadTooltip` and `ShadSonner` all call `copyWith` in `build()`, meaning opening a dialog reverted a custom variant for its entire subtree. `ShadThemeData.variant` is now a public field.
+- **FIX**: `ShadRoundedSuperellipseBorder.hashCode` only hashed `side`, ignoring `radius` and `canMerge` that `==` compares. `ShadBorder.copyWith` and `ShadColorScheme.copyWith`/`lerp` dropped `canMerge`, making the "replace, don't merge" opt-out unrecoverable.
+- **FIX**: `ShadColorScheme.hashCode` was a chain of `^`, which is commutative — swapping any two colors produced an identical hash. It also hashed `MapEntry` objects (identity-hashed) for `custom` while `==` used `mapEquals`. Same `custom` issue in `ShadTextTheme.hashCode`.
+- **FIX**: `ShadTextTheme` included `canMerge` in `hashCode` but not in `==`, violating the hashCode/`==` contract; `lerp` dropped `canMerge` and threw when both arguments were null.
+- **FIX**: `ShadSonner` leaked an `AnimationController` and a `Timer` for every toast queued beyond `visibleToastsAmount` — `dispose()` drained `_toasts` but never `_temporarelyHiddenToasts`. It also called `setState` and `dispose` after `await`ing an animation with no `mounted` guard, which could double-dispose a controller.
+- **FIX**: `ShadTooltip` could call `AnimationController.reverse()` on a disposed controller when the widget was disposed during `waitDuration`/`showDuration`.
+- **FIX**: `ShadMenubarItem` removed its listener from the *new* controller instead of the old one when `ShadMenubar.controller` was swapped, leaving the listener attached to the old controller permanently.
+- **BREAKING (minor)**: `ShadBreadcrumbTheme.ellipsis` no longer defaults to an `Icon`. The field was never read — `ShadBreadcrumbEllipsis` builds the same icon itself from `ellipsisSize` and `colorScheme.mutedForeground` — and a non-const `Widget` default gave `ShadBreadcrumbTheme` identity equality, which propagated up and defeated all of the above. There is no visual change.
+
 ## 0.56.0
 
 - **BREAKING**: `slang` 4.18 renames the generated localization classes: `ShadLocalizationsDataTimePickerEn`, `ShadLocalizationsDataDatePickerEn`, `ShadLocalizationsDataInputEn` and `ShadLocalizationsDataKeyboardToolbarEn` are now `ShadLocalizationsData$timePicker$en`, `ShadLocalizationsData$datePicker$en`, `ShadLocalizationsData$input$en` and `ShadLocalizationsData$keyboardToolbar$en`.

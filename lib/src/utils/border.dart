@@ -5,7 +5,17 @@ import 'package:flutter/widgets.dart';
 
 extension ShadBorderSideToBorderSide on ShadBorderSide {
   BorderSide toBorderSide() {
-    if (width == null || width == 0) return BorderSide.none;
+    if (width == null || width == 0) {
+      // Deliberately not `BorderSide.none`: that carries an opaque black, and
+      // `Border` asserts that every side shares a colour before it will paint
+      // a radius. A component that draws only some of its sides — the OTP
+      // strip shares its vertical edges — would crash on that assertion.
+      return BorderSide(
+        color: color ?? const Color(0x00000000),
+        width: 0,
+        style: BorderStyle.none,
+      );
+    }
     return BorderSide(
       color: color ?? const Color(0x00000000),
       width: width ?? 1,
@@ -29,6 +39,7 @@ extension ShadBorderToBorder on ShadBorder {
 /// {@template ShadBorder}
 /// A wrapper around the [Border] class with a reasonable merge.
 /// {@endtemplate}
+@immutable
 class ShadBorder {
   /// {@macro ShadBorder}
   const ShadBorder({
@@ -152,6 +163,10 @@ class ShadBorder {
       );
     }
     return copyWith(
+      // The merged result is always mergeable again: [other] opted into the
+      // merge (checked above), so the combination stays open to further
+      // overrides regardless of this border's own [canMerge].
+      canMerge: true,
       top: top?.merge(other.top) ?? other.top,
       right: right?.merge(other.right) ?? other.right,
       bottom: bottom?.merge(other.bottom) ?? other.bottom,
@@ -163,6 +178,7 @@ class ShadBorder {
   }
 
   ShadBorder copyWith({
+    bool? canMerge,
     EdgeInsetsGeometry? padding,
     ShadBorderSide? top,
     ShadBorderSide? right,
@@ -172,6 +188,7 @@ class ShadBorder {
     double? offset,
   }) {
     return ShadBorder(
+      canMerge: canMerge ?? this.canMerge,
       top: top ?? this.top,
       right: right ?? this.right,
       bottom: bottom ?? this.bottom,
@@ -210,8 +227,37 @@ class ShadBorder {
 
   @override
   String toString() {
-    return '''ShadBorder(merge: $merge, padding: $padding, radius: $radius, top: $top, right: $right, bottom: $bottom, left: $left, offset: $offset)''';
+    return '''ShadBorder(canMerge: $canMerge, padding: $padding, radius: $radius, top: $top, right: $right, bottom: $bottom, left: $left, offset: $offset)''';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    // Guards against a base [ShadBorder] comparing equal to a subclass
+    // instance, keeping `==` symmetric with [ShadRoundedSuperellipseBorder].
+    if (other.runtimeType != runtimeType) return false;
+    return other is ShadBorder &&
+        other.canMerge == canMerge &&
+        other.padding == padding &&
+        other.radius == radius &&
+        other.top == top &&
+        other.right == right &&
+        other.bottom == bottom &&
+        other.left == left &&
+        other.offset == offset;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    canMerge,
+    padding,
+    radius,
+    top,
+    right,
+    bottom,
+    left,
+    offset,
+  );
 }
 
 /// Creates the side of a border.
@@ -325,7 +371,7 @@ class ShadBorderSide with Diagnosticable {
       return false;
     }
     return other is ShadBorderSide &&
-        other.merge == merge &&
+        other.canMerge == canMerge &&
         other.color == color &&
         other.width == width &&
         other.style == style &&
@@ -333,7 +379,7 @@ class ShadBorderSide with Diagnosticable {
   }
 
   @override
-  int get hashCode => Object.hash(merge, color, width, style, strokeAlign);
+  int get hashCode => Object.hash(canMerge, color, width, style, strokeAlign);
 
   @override
   String toStringShort() => 'ShadBorderSide';
@@ -404,18 +450,19 @@ class ShadRoundedSuperellipseBorder extends ShadBorder {
 
   @override
   String toString() {
-    return '''ShadRoundedSuperellipseBorder(merge: $merge, side: $side, radius: $radius)''';
+    return '''ShadRoundedSuperellipseBorder(canMerge: $canMerge, side: $side, radius: $radius)''';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
     return other is ShadRoundedSuperellipseBorder &&
-        other.merge == merge &&
+        other.canMerge == canMerge &&
         other.side == side &&
         other.radius == radius;
   }
 
   @override
-  int get hashCode => side.hashCode;
+  int get hashCode => Object.hash(canMerge, side, radius);
 }

@@ -558,6 +558,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.buttonVariant,
     this.decoration,
     this.textStyle,
+    this.selectedTextStyle,
     this.trailingTextStyle,
     this.constraints,
     this.subMenuPadding,
@@ -587,6 +588,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.buttonVariant,
     this.decoration,
     this.textStyle,
+    this.selectedTextStyle,
     this.trailingTextStyle,
     this.constraints,
     this.subMenuPadding,
@@ -614,6 +616,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.buttonVariant,
     this.decoration,
     this.textStyle,
+    this.selectedTextStyle,
     this.trailingTextStyle,
     this.constraints,
     this.subMenuPadding,
@@ -727,6 +730,14 @@ class ShadContextMenuItem extends StatefulWidget {
   /// `small.copyWith(fontWeight: FontWeight.normal)`.
   /// {@endtemplate}
   final TextStyle? textStyle;
+
+  /// {@template ShadContextMenuItem.selectedTextStyle}
+  /// The text style of the item while it is selected or hovered.
+  ///
+  /// Defaults to [textStyle]. It exists because a menu whose selection is a
+  /// strong fill needs its label to change with it.
+  /// {@endtemplate}
+  final TextStyle? selectedTextStyle;
 
   /// {@template ShadContextMenuItem.trailingTextStyle}
   /// The text style of the trailing widget, defaults to
@@ -854,6 +865,12 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
                 theme.textTheme.small.copyWith(fontWeight: FontWeight.normal))
             .fallback(color: theme.colorScheme.foreground);
 
+    final effectiveSelectedTextStyle =
+        (widget.selectedTextStyle ??
+                theme.contextMenuTheme.selectedTextStyle ??
+                effectiveTextStyle)
+            .fallback(color: theme.colorScheme.foreground);
+
     final effectiveTrailingTextStyle =
         widget.trailingTextStyle ??
         theme.contextMenuTheme.trailingTextStyle ??
@@ -917,7 +934,12 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
                 widget.onPressed?.call();
                 if (effectiveCloseOnTap) contextMenu.setVisible(false);
               },
-              child: child,
+              child: DefaultTextStyle(
+                style: controller.selected
+                    ? effectiveSelectedTextStyle
+                    : effectiveTextStyle,
+                child: child!,
+              ),
             ),
           ),
         );
@@ -930,12 +952,7 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
                 padding: effectiveLeadingPadding,
                 child: widget.leading,
               ),
-            Expanded(
-              child: DefaultTextStyle(
-                style: effectiveTextStyle,
-                child: widget.child,
-              ),
-            ),
+            Expanded(child: widget.child),
             if (widget.trailing != null)
               Padding(
                 padding: effectiveTrailingPadding,

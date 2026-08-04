@@ -213,6 +213,8 @@ class ShadRadio<T> extends StatefulWidget {
     required this.value,
     this.enabled = true,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.decoration,
     this.size,
     this.circleSize,
@@ -239,6 +241,17 @@ class ShadRadio<T> extends StatefulWidget {
   /// The focus node of the radio.
   /// {@endtemplate}
   final FocusNode? focusNode;
+
+  /// {@template ShadWidget.autofocus}
+  /// Whether this widget should be focused when first shown.
+  /// Defaults to `false`.
+  /// {@endtemplate}
+  final bool autofocus;
+
+  /// {@template ShadWidget.onFocusChange}
+  /// Called when the focus state of this widget changes.
+  /// {@endtemplate}
+  final ValueChanged<bool>? onFocusChange;
 
   /// {@template ShadRadio.decoration}
   /// The decoration of the radio.
@@ -376,6 +389,8 @@ class _ShadRadioState<T> extends State<ShadRadio<T>> {
                   },
               },
               child: ShadFocusable(
+                autofocus: widget.autofocus,
+                onFocusChange: widget.onFocusChange,
                 focusNode: focusNode,
                 builder: (context, focused, child) {
                   return ShadDecorator(

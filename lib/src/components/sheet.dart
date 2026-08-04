@@ -21,7 +21,13 @@ Future<T?> showShadSheet<T>({
   Color? backgroundColor,
   String barrierLabel = '',
   ShapeBorder? shape,
-  Color barrierColor = const Color(0xcc000000),
+
+  /// Defaults to `ShadDialogTheme.barrierColor` — shadcn gives a sheet the
+  /// same `bg-black/10` overlay as a dialog.
+  Color? barrierColor,
+
+  /// The gaussian blur applied behind the barrier.
+  double? barrierBlurSigma,
   bool useRootNavigator = false,
   bool isDismissible = true,
   RouteSettings? routeSettings,
@@ -127,6 +133,7 @@ Future<T?> showShadSheet<T>({
       );
     },
     barrierColor: barrierColor,
+    barrierBlurSigma: barrierBlurSigma,
     barrierLabel: barrierLabel,
     barrierDismissible: isDismissible,
     useRootNavigator: useRootNavigator,
@@ -233,12 +240,12 @@ typedef ShadSheetDragHandleBuilder =
 /// A callback for when the user begins dragging the sheet.
 ///
 /// Used by [ShadSheet.onDragStart].
-typedef SheetDragStartHandler = void Function(DragStartDetails details);
+typedef ShadSheetDragStartHandler = void Function(DragStartDetails details);
 
 /// A callback for when the user stops dragging the sheet.
 ///
 /// Used by [ShadSheet.onDragEnd].
-typedef SheetDragEndHandler =
+typedef ShadSheetDragEndHandler =
     void Function(
       DragEndDetails details, {
       required bool isClosing,
@@ -587,7 +594,7 @@ class ShadSheet extends StatefulWidget {
   /// Would typically be used to change the sheet animation curve so
   /// that it tracks the user's finger accurately.
   /// {@endtemplate}
-  final SheetDragStartHandler? onDragStart;
+  final ShadSheetDragStartHandler? onDragStart;
 
   /// {@template ShadSheet.onDragEnd}
   /// Called when the user stops dragging the sheet, if [draggable]
@@ -597,7 +604,7 @@ class ShadSheet extends StatefulWidget {
   /// that it animates non-linearly. Called before [onClosing] if the
   /// sheet is closing.
   /// {@endtemplate}
-  final SheetDragEndHandler? onDragEnd;
+  final ShadSheetDragEndHandler? onDragEnd;
 
   /// {@template ShadSheet.animationController}
   /// The animation controller that controls the sheet's entrance and
@@ -1816,7 +1823,7 @@ class ShadSheetResizeHandle extends StatelessWidget {
 }
 
 /// Callback for when the size of a widget changes.
-typedef SizeChangeCallback<Size> = void Function(Size size);
+typedef ShadSizeChangeCallback<Size> = void Function(Size size);
 
 /// A [SingleChildRenderObjectWidget] that listens for size changes in its child
 /// and applies layout transformations for [ShadSheet] animations.
@@ -1834,7 +1841,7 @@ class ShadSheetLayoutWithSizeListener extends SingleChildRenderObjectWidget {
   /// {@template ShadSheetLayoutWithSizeListener.onChildSizeChanged}
   /// Callback when the child widget's size changes.
   /// {@endtemplate}
-  final SizeChangeCallback<Size> onChildSizeChanged;
+  final ShadSizeChangeCallback<Size> onChildSizeChanged;
 
   /// {@template ShadSheetLayoutWithSizeListener.animationValue}
   /// The current animation value (0.0 to 1.0) for the sheet's animation.
@@ -1890,7 +1897,7 @@ class RenderSheetLayoutWithSizeListener extends RenderShiftedBox {
   RenderSheetLayoutWithSizeListener({
     RenderBox? child,
     required this.side,
-    required SizeChangeCallback<Size> onChildSizeChanged,
+    required ShadSizeChangeCallback<Size> onChildSizeChanged,
     required double animationValue,
     required bool isScrollControlled,
     required double scrollControlDisabledMaxRatio,
@@ -1909,9 +1916,9 @@ class RenderSheetLayoutWithSizeListener extends RenderShiftedBox {
   Size _lastSize = Size.zero;
 
   /// Callback when the child widget's size changes.
-  SizeChangeCallback<Size> get onChildSizeChanged => _onChildSizeChanged;
-  SizeChangeCallback<Size> _onChildSizeChanged;
-  set onChildSizeChanged(SizeChangeCallback<Size> newCallback) {
+  ShadSizeChangeCallback<Size> get onChildSizeChanged => _onChildSizeChanged;
+  ShadSizeChangeCallback<Size> _onChildSizeChanged;
+  set onChildSizeChanged(ShadSizeChangeCallback<Size> newCallback) {
     if (_onChildSizeChanged == newCallback) {
       return;
     }
@@ -2061,3 +2068,19 @@ class RenderSheetLayoutWithSizeListener extends RenderShiftedBox {
     }
   }
 }
+
+@Deprecated(
+  'Renamed to ShadSheetDragStartHandler. '
+  'This name will be removed in v1.0.0.',
+)
+typedef SheetDragStartHandler = ShadSheetDragStartHandler;
+
+@Deprecated(
+  'Renamed to ShadSheetDragEndHandler. This name will be removed in v1.0.0.',
+)
+typedef SheetDragEndHandler = ShadSheetDragEndHandler;
+
+@Deprecated(
+  'Renamed to ShadSizeChangeCallback. This name will be removed in v1.0.0.',
+)
+typedef SizeChangeCallback<Size> = ShadSizeChangeCallback<Size>;

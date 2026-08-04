@@ -35,7 +35,11 @@ class ShadForm extends StatefulWidget {
     required this.child,
     this.onChanged,
     this.canPop,
-    @Deprecated('Use onPopInvokedWithResult instead') this.onPopInvoked,
+    @Deprecated(
+      'Use onPopInvokedWithResult instead. '
+      'This parameter will be removed in v1.0.0.',
+    )
+    this.onPopInvoked,
     this.onPopInvokedWithResult,
     this.autovalidateMode = ShadAutovalidateMode.alwaysAfterFirstValidation,
     this.initialValue = const {},
@@ -50,7 +54,10 @@ class ShadForm extends StatefulWidget {
 
   /// Whether the form can be popped from navigation
   final bool? canPop;
-  @Deprecated('Use onPopInvokedWithResult instead')
+  @Deprecated(
+    'Use onPopInvokedWithResult instead. '
+    'This parameter will be removed in v1.0.0.',
+  )
   final void Function(bool)? onPopInvoked;
 
   /// Callback when form is popped with a result

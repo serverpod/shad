@@ -38,6 +38,8 @@ class ShadButtonTheme with _$ShadButtonTheme {
     this.textDirection,
     this.gap,
     this.expands,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.textStyle,
   }) : _canMerge = canMerge;
 
@@ -115,6 +117,20 @@ class ShadButtonTheme with _$ShadButtonTheme {
 
   /// {@macro ShadButton.expands}
   final bool? expands;
+
+  /// {@template ShadButtonTheme.pressedOffset}
+  /// How far the button shifts while pressed.
+  ///
+  /// shadcn/ui nudges a button down by one pixel on `:active`
+  /// (`active:translate-y-px`); this is the same effect. Defaults to
+  /// `Offset(0, 1)`. Use [Offset.zero] to disable it.
+  /// {@endtemplate}
+  final Offset? pressedOffset;
+
+  /// {@template ShadButtonTheme.pressAnimationDuration}
+  /// How long the [pressedOffset] shift takes, defaults to 100ms.
+  /// {@endtemplate}
+  final Duration? pressAnimationDuration;
 
   /// {@macro ShadButton.textStyle}
   final TextStyle? textStyle;

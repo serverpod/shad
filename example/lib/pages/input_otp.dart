@@ -57,7 +57,7 @@ class _InputOTPPageState extends State<InputOTPPage> {
             keyboardType: digitsOnly ? TextInputType.number : null,
             inputFormatters: [
               if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
-              if (uppercase) const UpperCaseTextInputFormatter(),
+              if (uppercase) const ShadUpperCaseTextInputFormatter(),
             ],
             children: const [
               ShadInputOTPGroup(

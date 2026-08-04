@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:boxy/flex.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shadcn_ui/src/components/icon_button.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shadcn_ui/src/theme/theme_scope.dart';
 import 'package:shadcn_ui/src/theme/themes/shadows.dart';
 import 'package:shadcn_ui/src/utils/animate.dart';
 import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
@@ -23,7 +26,8 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
     required this.pageBuilder,
     this.barrierDismissible = true,
     this.barrierLabel,
-    this.barrierColor = const Color(0x80000000),
+    this.barrierColor = const Color(0x1a000000),
+    this.barrierBlurSigma = 2,
     this.transitionDuration = const Duration(milliseconds: 200),
     this.reverseTransitionDuration = const Duration(milliseconds: 200),
     this.transitionBuilder,
@@ -42,6 +46,15 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
 
   @override
   final Color? barrierColor;
+
+  /// {@template ShadDialog.barrierBlurSigma}
+  /// The gaussian blur applied to whatever is behind the barrier, shadcn/ui's
+  /// `backdrop-blur-xs`.
+  ///
+  /// Zero disables it. A blurred barrier is what lets the colour stay as light
+  /// as `black/10` and still separate the dialog from the page.
+  /// {@endtemplate}
+  final double barrierBlurSigma;
 
   @override
   final Duration transitionDuration;
@@ -72,12 +85,30 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    if (transitionBuilder != null) {
-      return transitionBuilder!(context, animation, secondaryAnimation, child);
-    }
-    return FadeTransition(
-      opacity: animation,
-      child: child,
+    final content = transitionBuilder != null
+        ? transitionBuilder!(context, animation, secondaryAnimation, child)
+        : FadeTransition(opacity: animation, child: child);
+
+    if (barrierBlurSigma <= 0) return content;
+
+    // The filter sits above the barrier and below the dialog, and fades with
+    // the route so the page does not snap out of focus.
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: FadeTransition(
+            opacity: animation,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: barrierBlurSigma,
+                sigmaY: barrierBlurSigma,
+              ),
+              child: const ColoredBox(color: Color(0x00000000)),
+            ),
+          ),
+        ),
+        content,
+      ],
     );
   }
 }
@@ -98,8 +129,15 @@ Future<T?> showShadDialog<T>({
   bool barrierDismissible = true,
 
   /// The color of the barrier behind the dialog.
-  /// Defaults to a semi-transparent black (0xcc000000).
-  Color barrierColor = const Color(0xcc000000),
+  ///
+  /// Defaults to `ShadDialogTheme.barrierColor` — shadcn's `bg-black/10`,
+  /// which works because the barrier is also blurred.
+  Color? barrierColor,
+
+  /// The gaussian blur applied behind the barrier.
+  ///
+  /// Defaults to `ShadDialogTheme.barrierBlurSigma`.
+  double? barrierBlurSigma,
 
   /// The accessibility label for the barrier.
   /// Defaults to an empty string.
@@ -171,10 +209,26 @@ Future<T?> showShadDialog<T>({
     );
   }
 
+  // A route is built under the Navigator, so it does not see a ShadTheme that
+  // was applied to a subtree — only the app-level one. Capture the theme at
+  // the call site and republish it inside the route, so a dialog opened from a
+  // re-themed panel (see ShadThemeScope) matches its surroundings.
+  final ambientTheme = ShadTheme.of(context, listen: false);
+
   return Navigator.of(context, rootNavigator: useRootNavigator).push(
     ShadDialogRoute(
-      pageBuilder: builder,
-      barrierColor: barrierColor,
+      pageBuilder: (context) => ShadThemeScope(
+        data: ambientTheme,
+        child: Builder(builder: builder),
+      ),
+      barrierColor:
+          barrierColor ??
+          ambientTheme.primaryDialogTheme.barrierColor ??
+          const Color(0x1a000000),
+      barrierBlurSigma:
+          barrierBlurSigma ??
+          ambientTheme.primaryDialogTheme.barrierBlurSigma ??
+          2,
       barrierDismissible: barrierDismissible,
       barrierLabel: barrierLabel,
       anchorPoint: anchorPoint,
@@ -219,6 +273,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.semanticLabel,
     this.closeIconPosition,
     this.radius,
     this.backgroundColor,
@@ -259,6 +314,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.semanticLabel,
     this.closeIconPosition,
     this.radius,
     this.backgroundColor,
@@ -300,6 +356,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.semanticLabel,
     this.closeIconPosition,
     this.radius,
     this.backgroundColor,
@@ -374,6 +431,14 @@ class ShadDialog extends StatelessWidget {
   /// Used if [closeIcon] is null; defaults to [LucideIcons.x] if not specified.
   /// {@endtemplate}
   final IconData? closeIconData;
+
+  /// {@template ShadDialog.semanticLabel}
+  /// The accessible name of the dialog, announced when it opens.
+  ///
+  /// Defaults to null, in which case screen readers fall back to reading the
+  /// dialog's contents.
+  /// {@endtemplate}
+  final String? semanticLabel;
 
   /// {@template ShadDialog.closeIconPosition}
   /// The position of the close icon within the dialog.
@@ -616,7 +681,7 @@ class ShadDialog extends StatelessWidget {
         Border.all(color: theme.colorScheme.border);
 
     final effectiveShadows =
-        shadows ?? effectiveDialogTheme.shadows ?? ShadShadows.lg;
+        shadows ?? effectiveDialogTheme.shadows ?? Shadows.lg;
 
     final effectiveRemoveBorderRadiusWhenTiny =
         removeBorderRadiusWhenTiny ??
@@ -852,11 +917,21 @@ class ShadDialog extends StatelessWidget {
     // Get the current view padding
     final viewPadding = MediaQuery.viewInsetsOf(context);
 
-    return Align(
-      alignment: effectiveAlignment,
-      child: Padding(
-        padding: viewPadding,
-        child: dialog,
+    return Semantics(
+      // Matches what Flutter's own AlertDialog publishes: the dialog names the
+      // route it scopes, and its children are described explicitly rather than
+      // being flattened into one label. ShadDialogRoute extends PopupRoute, so
+      // the focus trap and focus restoration already come from ModalRoute.
+      scopesRoute: true,
+      explicitChildNodes: true,
+      namesRoute: semanticLabel != null,
+      label: semanticLabel,
+      child: Align(
+        alignment: effectiveAlignment,
+        child: Padding(
+          padding: viewPadding,
+          child: dialog,
+        ),
       ),
     );
   }

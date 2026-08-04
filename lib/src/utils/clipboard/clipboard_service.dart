@@ -8,10 +8,10 @@ import 'package:shadcn_ui/src/utils/clipboard/clipboard_service_stub.dart'
 typedef ShadClipboardItem = ({String mimeType, Uint8List bytes});
 
 /// Callback for receiving pasted file items.
-typedef PasteFilesCallback = void Function(List<ShadClipboardItem> files);
+typedef ShadPasteFilesCallback = void Function(List<ShadClipboardItem> files);
 
 /// Callback for receiving errors during paste file extraction.
-typedef PasteFilesErrorCallback = void Function(Object error);
+typedef ShadPasteFilesErrorCallback = void Function(Object error);
 
 /// Registers a listener for paste events containing file data.
 ///
@@ -19,17 +19,28 @@ typedef PasteFilesErrorCallback = void Function(Object error);
 /// from the clipboard data. On other platforms, this is a no-op.
 ///
 /// The [callback] is invoked only when the paste contains file items.
-void addPasteFilesListener(PasteFilesCallback callback) =>
+void addPasteFilesListener(ShadPasteFilesCallback callback) =>
     impl.addPasteFilesListener(callback);
 
 /// Removes a previously registered paste files listener.
-void removePasteFilesListener(PasteFilesCallback callback) =>
+void removePasteFilesListener(ShadPasteFilesCallback callback) =>
     impl.removePasteFilesListener(callback);
 
 /// Registers a listener for errors that occur during paste file extraction.
-void addPasteFilesErrorListener(PasteFilesErrorCallback callback) =>
+void addPasteFilesErrorListener(ShadPasteFilesErrorCallback callback) =>
     impl.addPasteFilesErrorListener(callback);
 
 /// Removes a previously registered paste files error listener.
-void removePasteFilesErrorListener(PasteFilesErrorCallback callback) =>
+void removePasteFilesErrorListener(ShadPasteFilesErrorCallback callback) =>
     impl.removePasteFilesErrorListener(callback);
+
+@Deprecated(
+  'Renamed to ShadPasteFilesCallback. This name will be removed in v1.0.0.',
+)
+typedef PasteFilesCallback = ShadPasteFilesCallback;
+
+@Deprecated(
+  'Renamed to ShadPasteFilesErrorCallback. '
+  'This name will be removed in v1.0.0.',
+)
+typedef PasteFilesErrorCallback = ShadPasteFilesErrorCallback;

@@ -37,6 +37,7 @@ mixin _$ShadPopoverTheme {
       anchor: t < 0.5 ? a.anchor : b.anchor,
       filter: t < 0.5 ? a.filter : b.filter,
       reverseDuration: lerpDuration$(a.reverseDuration, b.reverseDuration, t),
+      textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
     );
   }
 
@@ -48,6 +49,7 @@ mixin _$ShadPopoverTheme {
     ShadAnchorBase? anchor,
     ImageFilter? filter,
     Duration? reverseDuration,
+    TextStyle? textStyle,
   }) {
     final _this = (this as ShadPopoverTheme);
 
@@ -59,6 +61,7 @@ mixin _$ShadPopoverTheme {
       anchor: anchor ?? _this.anchor,
       filter: filter ?? _this.filter,
       reverseDuration: reverseDuration ?? _this.reverseDuration,
+      textStyle: textStyle ?? _this.textStyle,
     );
   }
 
@@ -81,6 +84,7 @@ mixin _$ShadPopoverTheme {
       anchor: other.anchor,
       filter: other.filter,
       reverseDuration: other.reverseDuration,
+      textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
     );
   }
 
@@ -103,7 +107,8 @@ mixin _$ShadPopoverTheme {
         _other.decoration == _this.decoration &&
         _other.anchor == _this.anchor &&
         _other.filter == _this.filter &&
-        _other.reverseDuration == _this.reverseDuration;
+        _other.reverseDuration == _this.reverseDuration &&
+        _other.textStyle == _this.textStyle;
   }
 
   @override
@@ -119,6 +124,7 @@ mixin _$ShadPopoverTheme {
       _this.anchor,
       _this.filter,
       _this.reverseDuration,
+      _this.textStyle,
     );
   }
 }

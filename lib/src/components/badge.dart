@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:shadcn_ui/src/components/disabled.dart';
 import 'package:shadcn_ui/src/theme/components/badge.dart';
 import 'package:shadcn_ui/src/theme/data.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
@@ -32,7 +33,9 @@ class ShadBadge extends StatefulWidget {
     this.foregroundColor,
     this.padding,
     this.onPressed,
+    this.enabled = true,
     this.cursor,
+    this.textStyle,
   }) : variant = ShadBadgeVariant.primary;
 
   /// Creates a secondary variant badge widget, typically for less prominent
@@ -46,7 +49,9 @@ class ShadBadge extends StatefulWidget {
     this.foregroundColor,
     this.padding,
     this.onPressed,
+    this.enabled = true,
     this.cursor,
+    this.textStyle,
   }) : variant = ShadBadgeVariant.secondary;
 
   /// Creates an outline variant badge widget, typically with a bordered
@@ -60,7 +65,9 @@ class ShadBadge extends StatefulWidget {
     this.foregroundColor,
     this.padding,
     this.onPressed,
+    this.enabled = true,
     this.cursor,
+    this.textStyle,
   }) : variant = ShadBadgeVariant.outline;
 
   /// Creates a destructive variant badge widget, typically for error or warning
@@ -74,7 +81,9 @@ class ShadBadge extends StatefulWidget {
     this.foregroundColor,
     this.padding,
     this.onPressed,
+    this.enabled = true,
     this.cursor,
+    this.textStyle,
   }) : variant = ShadBadgeVariant.destructive;
 
   /// Creates a badge widget with a specified [variant], allowing full control
@@ -89,7 +98,9 @@ class ShadBadge extends StatefulWidget {
     this.foregroundColor,
     this.padding,
     this.onPressed,
+    this.enabled = true,
     this.cursor,
+    this.textStyle,
   });
 
   /// {@template ShadBadge.variant}
@@ -141,12 +152,25 @@ class ShadBadge extends StatefulWidget {
   /// {@endtemplate}
   final EdgeInsetsGeometry? padding;
 
+  /// {@template ShadBadge.textStyle}
+  /// The text style of the badge's label.
+  /// {@endtemplate}
+  final TextStyle? textStyle;
+
   /// {@template ShadBadge.onPressed}
   /// The callback invoked when the badge is tapped, making it interactive if
   /// provided.
   /// If null, the badge remains non-interactive.
   /// {@endtemplate}
   final VoidCallback? onPressed;
+
+  /// {@template ShadBadge.enabled}
+  /// Whether the badge is interactive, defaults to `true`.
+  ///
+  /// When `false` the badge is dimmed and [onPressed] is not called. Has no
+  /// visible effect on a badge without an [onPressed].
+  /// {@endtemplate}
+  final bool enabled;
 
   /// {@template ShadBadge.cursor}
   /// The cursor displayed when hovering over the badge, providing feedback
@@ -198,6 +222,12 @@ class _ShadBadgeState extends State<ShadBadge> {
     return widget.padding ?? badgeTheme(theme).padding;
   }
 
+  TextStyle textStyle(ShadThemeData theme) {
+    return widget.textStyle ??
+        badgeTheme(theme).textStyle ??
+        theme.textTheme.small;
+  }
+
   MouseCursor cursor(ShadThemeData theme) {
     final defaultCursor = widget.onPressed != null
         ? SystemMouseCursors.click
@@ -237,12 +267,7 @@ class _ShadBadgeState extends State<ShadBadge> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DefaultTextStyle(
-                style: theme.textTheme.small.copyWith(
-                  color: foreground(theme),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                  height: 16 / 12,
-                ),
+                style: textStyle(theme).copyWith(color: foreground(theme)),
                 textAlign: TextAlign.center,
                 child: widget.child,
               ),
@@ -254,9 +279,12 @@ class _ShadBadgeState extends State<ShadBadge> {
 
     if (widget.onPressed != null) {
       badge = ShadGestureDetector(
-        onTap: widget.onPressed,
+        onTap: widget.enabled ? widget.onPressed : null,
         child: badge,
       );
+    }
+    if (!widget.enabled) {
+      badge = ShadDisabled(disabled: true, child: badge);
     }
     return badge;
   }

@@ -484,15 +484,20 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
 
     final effectivePadding = widget.padding ?? theme.inputOTPTheme.padding;
 
-    final effectiveWidth = widget.width ?? theme.inputOTPTheme.width ?? 40.0;
-    final effectiveHeight = widget.height ?? theme.inputOTPTheme.height ?? 40.0;
+    // A slot is a fixed box around a single glyph, so it has to grow with the
+    // text scale or the digit is clipped.
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+    final effectiveWidth =
+        (widget.width ?? theme.inputOTPTheme.width ?? 40.0) * textScale;
+    final effectiveHeight =
+        (widget.height ?? theme.inputOTPTheme.height ?? 40.0) * textScale;
 
+    // A focused slot is treated like any other focused field: the border
+    // takes the ring colour and the ring itself sits outside it, at the
+    // theme's width and opacity. It used to be an opaque 2px border with no
+    // ring at all, which read as a different component.
     final defaultDecoration = ShadDecoration(
-      disableSecondaryBorder: true,
-      focusedBorder: ShadBorder.all(
-        color: theme.colorScheme.ring,
-        width: 2,
-      ),
+      focusedBorder: ShadBorder.all(color: theme.colorScheme.ring, width: 1),
       border: ShadBorder(
         top: ShadBorderSide(color: theme.colorScheme.border, width: 1),
         bottom: ShadBorderSide(color: theme.colorScheme.border, width: 1),
@@ -500,20 +505,33 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
         padding: const EdgeInsets.all(1),
       ),
     );
-    final effectiveDecoration = defaultDecoration
+    final mergedDecoration = defaultDecoration
         .merge(theme.inputOTPTheme.decoration)
-        .merge(widget.decoration)
-        .merge(
-          ShadDecoration(
-            border: ShadBorder(
-              radius: effectiveRadius,
-              left: isFirstInGroup
-                  ? ShadBorderSide(color: theme.colorScheme.border, width: 1)
-                  : ShadBorderSide.none,
-            ),
-            focusedBorder: ShadBorder(radius: effectiveRadius),
+        .merge(widget.decoration);
+
+    final effectiveDecoration = mergedDecoration.merge(
+      ShadDecoration(
+        border: ShadBorder(
+          radius: effectiveRadius,
+          // Same colour whether or not it is drawn: `Border` requires
+          // colour-uniform sides before it will paint a radius, and only the
+          // ends of the strip are rounded.
+          left: ShadBorderSide(
+            color: theme.colorScheme.input,
+            width: isFirstInGroup ? 1 : 0,
           ),
-        );
+        ),
+        focusedBorder: ShadBorder(radius: effectiveRadius),
+        // Drawn inside the slot rather than around it. Slots share their
+        // vertical edges and Flutter has no z-index, so an outward ring is
+        // painted over by the next slot in the row — the strip ends up looking
+        // broken. `offset: 0` keeps the whole ring within the focused slot.
+        secondaryFocusedBorder: ShadBorder(
+          radius: effectiveRadius,
+          offset: 0,
+        ),
+      ),
+    );
 
     return SizedBox(
       width: effectiveWidth,

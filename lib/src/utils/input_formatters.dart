@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
-class UpperCaseTextInputFormatter extends TextInputFormatter {
-  const UpperCaseTextInputFormatter();
+class ShadUpperCaseTextInputFormatter extends TextInputFormatter {
+  const ShadUpperCaseTextInputFormatter();
 
   @override
   TextEditingValue formatEditUpdate(
@@ -15,8 +15,8 @@ class UpperCaseTextInputFormatter extends TextInputFormatter {
   }
 }
 
-class LowerCaseTextInputFormatter extends TextInputFormatter {
-  const LowerCaseTextInputFormatter();
+class ShadLowerCaseTextInputFormatter extends TextInputFormatter {
+  const ShadLowerCaseTextInputFormatter();
 
   @override
   TextEditingValue formatEditUpdate(
@@ -29,3 +29,15 @@ class LowerCaseTextInputFormatter extends TextInputFormatter {
     );
   }
 }
+
+@Deprecated(
+  'Renamed to ShadUpperCaseTextInputFormatter. '
+  'This name will be removed in v1.0.0.',
+)
+typedef UpperCaseTextInputFormatter = ShadUpperCaseTextInputFormatter;
+
+@Deprecated(
+  'Renamed to ShadLowerCaseTextInputFormatter. '
+  'This name will be removed in v1.0.0.',
+)
+typedef LowerCaseTextInputFormatter = ShadLowerCaseTextInputFormatter;

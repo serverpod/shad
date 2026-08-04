@@ -701,10 +701,23 @@ class _ShadTableState extends State<ShadTable> {
 
     final textDirection = Directionality.of(context);
 
+    // Materialised once per build rather than once per hover tick. The
+    // ValueListenableBuilder below re-runs on every pointer move that crosses
+    // a row boundary, and this allocates one List per row plus the outer list
+    // — pathological on a large table. Only the row-span decoration actually
+    // depends on the hovered index.
+    final cells = widget.children == null
+        ? null
+        : <List<ShadTableCell>>[
+            if (widget.header != null) widget.header!.toList(),
+            ...widget.children!.map((row) => row.toList()),
+            if (widget.footer != null) widget.footer!.toList(),
+          ];
+
     return ValueListenableBuilder(
       valueListenable: hoveredRowIndex,
       builder: (context, value, child) {
-        if (widget.children != null) {
+        if (cells != null) {
           return TableView.list(
             primary: effectivePrimary,
             diagonalDragBehavior: effectiveDiagonalDragBehavior,
@@ -721,11 +734,7 @@ class _ShadTableState extends State<ShadTable> {
               physics: widget.horizontalScrollPhysics,
               reverse: textDirection == TextDirection.rtl,
             ),
-            cells: [
-              if (widget.header != null) widget.header!.toList(),
-              ...widget.children!.map((e) => e.toList()),
-              if (widget.footer != null) widget.footer!.toList(),
-            ],
+            cells: cells,
             pinnedRowCount: effectivePinnedRowCount,
             pinnedColumnCount: effectivePinnedColumnCount,
           );

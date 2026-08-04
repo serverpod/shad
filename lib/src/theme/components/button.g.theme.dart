@@ -75,6 +75,12 @@ mixin _$ShadButtonTheme {
       textDirection: t < 0.5 ? a.textDirection : b.textDirection,
       gap: lerpDouble$(a.gap, b.gap, t),
       expands: t < 0.5 ? a.expands : b.expands,
+      pressedOffset: Offset.lerp(a.pressedOffset, b.pressedOffset, t),
+      pressAnimationDuration: lerpDuration$(
+        a.pressAnimationDuration,
+        b.pressAnimationDuration,
+        t,
+      ),
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
     );
   }
@@ -103,6 +109,8 @@ mixin _$ShadButtonTheme {
     TextDirection? textDirection,
     double? gap,
     bool? expands,
+    Offset? pressedOffset,
+    Duration? pressAnimationDuration,
     TextStyle? textStyle,
   }) {
     final _this = (this as ShadButtonTheme);
@@ -133,6 +141,9 @@ mixin _$ShadButtonTheme {
       textDirection: textDirection ?? _this.textDirection,
       gap: gap ?? _this.gap,
       expands: expands ?? _this.expands,
+      pressedOffset: pressedOffset ?? _this.pressedOffset,
+      pressAnimationDuration:
+          pressAnimationDuration ?? _this.pressAnimationDuration,
       textStyle: textStyle ?? _this.textStyle,
     );
   }
@@ -172,6 +183,8 @@ mixin _$ShadButtonTheme {
       textDirection: other.textDirection,
       gap: other.gap,
       expands: other.expands,
+      pressedOffset: other.pressedOffset,
+      pressAnimationDuration: other.pressAnimationDuration,
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
     );
   }
@@ -212,6 +225,8 @@ mixin _$ShadButtonTheme {
         _other.textDirection == _this.textDirection &&
         _other.gap == _this.gap &&
         _other.expands == _this.expands &&
+        _other.pressedOffset == _this.pressedOffset &&
+        _other.pressAnimationDuration == _this.pressAnimationDuration &&
         _other.textStyle == _this.textStyle;
   }
 
@@ -244,6 +259,8 @@ mixin _$ShadButtonTheme {
       _this.textDirection,
       _this.gap,
       _this.expands,
+      _this.pressedOffset,
+      _this.pressAnimationDuration,
       _this.textStyle,
     ]);
   }

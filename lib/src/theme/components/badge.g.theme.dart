@@ -36,6 +36,7 @@ mixin _$ShadBadgeTheme {
       foregroundColor: Color.lerp(a.foregroundColor, b.foregroundColor, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       cursor: t < 0.5 ? a.cursor : b.cursor,
+      textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
     );
   }
 
@@ -46,6 +47,7 @@ mixin _$ShadBadgeTheme {
     Color? foregroundColor,
     EdgeInsetsGeometry? padding,
     MouseCursor? cursor,
+    TextStyle? textStyle,
   }) {
     final _this = (this as ShadBadgeTheme);
 
@@ -56,6 +58,7 @@ mixin _$ShadBadgeTheme {
       foregroundColor: foregroundColor ?? _this.foregroundColor,
       padding: padding ?? _this.padding,
       cursor: cursor ?? _this.cursor,
+      textStyle: textStyle ?? _this.textStyle,
     );
   }
 
@@ -77,6 +80,7 @@ mixin _$ShadBadgeTheme {
       foregroundColor: other.foregroundColor,
       padding: other.padding,
       cursor: other.cursor,
+      textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
     );
   }
 
@@ -98,7 +102,8 @@ mixin _$ShadBadgeTheme {
         _other.hoverBackgroundColor == _this.hoverBackgroundColor &&
         _other.foregroundColor == _this.foregroundColor &&
         _other.padding == _this.padding &&
-        _other.cursor == _this.cursor;
+        _other.cursor == _this.cursor &&
+        _other.textStyle == _this.textStyle;
   }
 
   @override
@@ -113,6 +118,7 @@ mixin _$ShadBadgeTheme {
       _this.foregroundColor,
       _this.padding,
       _this.cursor,
+      _this.textStyle,
     );
   }
 }

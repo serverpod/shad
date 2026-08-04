@@ -23,6 +23,9 @@ class ShadCardTheme with _$ShadCardTheme {
     this.rowMainAxisSize,
     this.columnMainAxisSize,
     this.clipBehavior,
+    this.titleStyle,
+    this.descriptionStyle,
+    this.gap,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -72,6 +75,15 @@ class ShadCardTheme with _$ShadCardTheme {
 
   /// {@macro ShadCard.clipBehavior}
   final Clip? clipBehavior;
+
+  /// {@macro ShadCard.titleStyle}
+  final TextStyle? titleStyle;
+
+  /// {@macro ShadCard.descriptionStyle}
+  final TextStyle? descriptionStyle;
+
+  /// {@macro ShadCard.gap}
+  final double? gap;
 
   static ShadCardTheme? lerp(
     ShadCardTheme? a,

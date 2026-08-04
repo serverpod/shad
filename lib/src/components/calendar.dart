@@ -933,7 +933,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
         if (widget.min != null && startRange != null) {
           // only the dates after min are enabled
           final minDate = startRange!.addDays(widget.min!);
-          return date.isSameDayOrGreatier(minDate) ||
+          return date.isSameDayOrGreater(minDate) ||
               date.isSameDay(startRange!);
         }
         return true;
@@ -949,7 +949,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
       }
 
       bool isInRange() {
-        return (startRange != null && date.isSameDayOrGreatier(startRange!)) &&
+        return (startRange != null && date.isSameDayOrGreater(startRange!)) &&
             (endRange != null && date.isSameDayOrLower(endRange!));
       }
 
@@ -1101,24 +1101,40 @@ class _ShadCalendarState extends State<ShadCalendar> {
     }
   }
 
+  /// Memoized [DateFormat]s, keyed by pattern and language tag.
+  ///
+  /// Constructing a DateFormat parses the pattern and resolves locale data,
+  /// which is far from free. The caption dropdowns format one label per
+  /// selectable year — 201 by default — so building them without a cache cost
+  /// 201 pattern parses every time the options were materialised.
+  final _dateFormats = <String, DateFormat>{};
+
+  DateFormat _dateFormat(String pattern, Locale locale) {
+    final languageTag = locale.toLanguageTag();
+    return _dateFormats.putIfAbsent(
+      '$pattern $languageTag',
+      () => DateFormat(pattern, languageTag),
+    );
+  }
+
   String defaultFormatMonthYear(DateTime date, Locale locale) {
-    return DateFormat('LLLL y', locale.toLanguageTag()).format(date);
+    return _dateFormat('LLLL y', locale).format(date);
   }
 
   String defaultFormatYear(DateTime date, Locale locale) {
-    return DateFormat('y', locale.toLanguageTag()).format(date);
+    return _dateFormat('y', locale).format(date);
   }
 
   String defaultFormatMonth(DateTime date, Locale locale) {
-    return DateFormat('LLLL', locale.toLanguageTag()).format(date);
+    return _dateFormat('LLLL', locale).format(date);
   }
 
   String defaultDropdownFormatMonth(DateTime date, Locale locale) {
-    return DateFormat('MMM', locale.toLanguageTag()).format(date);
+    return _dateFormat('MMM', locale).format(date);
   }
 
   String defaultDropdownFormatYear(DateTime date, Locale locale) {
-    return DateFormat('y', locale.toLanguageTag()).format(date);
+    return _dateFormat('y', locale).format(date);
   }
 
   String defaultFormatWeekday(DateTime date, Locale locale) {
@@ -1711,7 +1727,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
                         final isInRange = switch (widget.variant) {
                           ShadCalendarVariant.range =>
                             (startRange != null &&
-                                    date.isSameDayOrGreatier(startRange!)) &&
+                                    date.isSameDayOrGreater(startRange!)) &&
                                 (endRange != null &&
                                     date.isSameDayOrLower(endRange!)),
                           ShadCalendarVariant.single ||

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
 
+@immutable
 class ShadBreakpoints {
   ShadBreakpoints({
     double tn = 0,
@@ -48,8 +49,25 @@ class ShadBreakpoints {
       xxl: ShadBreakpoint.lerp(a.xxl, b.xxl, t),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is ShadBreakpoints &&
+        other.tn == tn &&
+        other.sm == sm &&
+        other.md == md &&
+        other.lg == lg &&
+        other.xl == xl &&
+        other.xxl == xxl;
+  }
+
+  @override
+  int get hashCode => Object.hash(tn, sm, md, lg, xl, xxl);
 }
 
+@immutable
 sealed class ShadBreakpoint {
   const ShadBreakpoint(this.value);
 
@@ -74,6 +92,19 @@ sealed class ShadBreakpoint {
   static double lerp(ShadBreakpoint a, ShadBreakpoint b, double t) {
     return lerpDouble(a.value, b.value, t)!;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    // The subclasses add no fields, so comparing [runtimeType] and [value] is
+    // enough to keep e.g. `ShadBreakpointSM(0) != ShadBreakpointMD(0)`.
+    return other is ShadBreakpoint &&
+        other.runtimeType == runtimeType &&
+        other.value == value;
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, value);
 }
 
 class ShadBreakpointTN extends ShadBreakpoint {
@@ -100,7 +131,7 @@ class ShadBreakpointXXL extends ShadBreakpoint {
   const ShadBreakpointXXL(super.value);
 }
 
-typedef ResponsiveWidgetBuilder =
+typedef ShadResponsiveWidgetBuilder =
     Widget Function(
       BuildContext context,
       ShadBreakpoint breakpoint,
@@ -112,7 +143,7 @@ class ShadResponsiveBuilder extends StatelessWidget {
     required this.builder,
   });
 
-  final ResponsiveWidgetBuilder builder;
+  final ShadResponsiveWidgetBuilder builder;
 
   @override
   Widget build(BuildContext context) {
@@ -122,3 +153,9 @@ class ShadResponsiveBuilder extends StatelessWidget {
     return builder(context, breakpoint);
   }
 }
+
+@Deprecated(
+  'Renamed to ShadResponsiveWidgetBuilder. '
+  'This name will be removed in v1.0.0.',
+)
+typedef ResponsiveWidgetBuilder = ShadResponsiveWidgetBuilder;

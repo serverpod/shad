@@ -37,14 +37,14 @@ class ShadTabsController<T> extends ChangeNotifier {
 ///
 /// Useful for maintaining tab selection across widget rebuilds and state
 /// restoration.
-class RestorableShadTabsController<T>
+class ShadRestorableTabsController<T>
     extends RestorableChangeNotifier<ShadTabsController<T>> {
-  /// Creates a [RestorableShadTabsController].
-  factory RestorableShadTabsController({required T value}) =>
-      RestorableShadTabsController.fromValue(value);
+  /// Creates a [ShadRestorableTabsController].
+  factory ShadRestorableTabsController({required T value}) =>
+      ShadRestorableTabsController.fromValue(value);
 
-  /// Creates a [RestorableShadTabsController] from a given value.
-  RestorableShadTabsController.fromValue(T value) : selected = value;
+  /// Creates a [ShadRestorableTabsController] from a given value.
+  ShadRestorableTabsController.fromValue(T value) : selected = value;
 
   T selected;
 
@@ -79,6 +79,7 @@ class ShadTabs<T> extends StatefulWidget implements PreferredSizeWidget {
     this.controller,
     this.tabBarAlignment,
     this.tabsGap,
+    this.expandTabs,
     this.gap,
     this.scrollable,
     this.dragStartBehavior,
@@ -109,6 +110,14 @@ class ShadTabs<T> extends StatefulWidget implements PreferredSizeWidget {
   /// The controller of the tabs.
   /// {@endtemplate}
   final ShadTabsController<T>? controller;
+
+  /// {@template ShadTabs.expandTabs}
+  /// Whether the tabs share the full width of the bar.
+  ///
+  /// Defaults to false, matching shadcn/ui's `w-fit` list: a tab is as wide as
+  /// its label plus its padding, and the bar is as wide as its tabs.
+  /// {@endtemplate}
+  final bool? expandTabs;
 
   /// {@template ShadTabs.tabsGap}
   /// The horizontal gap between the tabs in the tabBar.
@@ -195,12 +204,16 @@ class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
 
   late List<T> orderedValues;
 
-  RestorableShadTabsController<T>? _controller;
+  ShadRestorableTabsController<T>? _controller;
 
   ShadTabsController<T> get controller =>
       widget.controller ?? _controller!.value;
 
   late final scrollController = ScrollController();
+
+  /// Whether the tabs share the full width of the bar.
+  bool expandTabs(BuildContext context) =>
+      widget.expandTabs ?? ShadTheme.of(context).tabsTheme.expandTabs ?? false;
 
   bool get scrollable => widget.scrollable ?? false;
 
@@ -258,7 +271,7 @@ class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
 
   void _createLocalController(T value) {
     assert(_controller == null);
-    _controller = RestorableShadTabsController<T>.fromValue(value);
+    _controller = ShadRestorableTabsController<T>.fromValue(value);
     if (!restorePending) {
       _registerController();
     }
@@ -299,8 +312,10 @@ class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
         widget.contentConstraints ?? tabsTheme.contentConstraints;
 
     final effectiveMaintainState = widget.maintainState ?? true;
+    final expandTabs = this.expandTabs(context);
 
     Widget tabBar = Row(
+      mainAxisSize: expandTabs ? MainAxisSize.max : MainAxisSize.min,
       spacing: widget.tabsGap ?? tabsTheme.tabsGap ?? 0,
       children: widget.tabs,
     );
@@ -330,7 +345,11 @@ class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
     }
 
     final effectiveTabBarAlignment =
-        widget.tabBarAlignment ?? tabsTheme.tabBarAlignment;
+        widget.tabBarAlignment ??
+        tabsTheme.tabBarAlignment ??
+        // A `w-fit` bar has to be told where to sit, or a stretching parent
+        // pulls the decoration out to the full width behind the tabs.
+        (expandTabs ? null : AlignmentDirectional.centerStart);
     if (effectiveTabBarAlignment != null) {
       tabBar = Align(alignment: effectiveTabBarAlignment, child: tabBar);
     }
@@ -584,14 +603,14 @@ class ShadTab<T> extends StatefulWidget implements PreferredSizeWidget {
   /// {@template ShadTab.shadows}
   /// Shadows for the tab when unselected.
   ///
-  /// Defaults to small shadows ([ShadShadows.sm]).
+  /// Defaults to small shadows ([Shadows.sm]).
   /// {@endtemplate}
   final List<BoxShadow>? shadows;
 
   /// {@template ShadTab.selectedShadows}
   /// Shadows for the tab when selected.
   ///
-  /// Defaults to small shadows ([ShadShadows.sm]).
+  /// Defaults to small shadows ([Shadows.sm]).
   /// {@endtemplate}
   final List<BoxShadow>? selectedShadows;
 
@@ -789,7 +808,10 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
 
     final tabsTheme = theme.tabsTheme;
 
-    final defaultWidth = inherited.scrollable ? null : double.infinity;
+    final expandTabs = inherited.expandTabs(context);
+    final defaultWidth = inherited.scrollable || !expandTabs
+        ? null
+        : double.infinity;
     final effectiveWidth = widget.width ?? tabsTheme.tabWidth ?? defaultWidth;
     final effectiveBackgroundColor =
         widget.backgroundColor ??
@@ -828,9 +850,7 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
 
     final effectiveShadows = widget.shadows ?? tabsTheme.tabShadows;
     final effectiveSelectedShadows =
-        widget.selectedShadows ??
-        tabsTheme.tabSelectedShadows ??
-        ShadShadows.sm;
+        widget.selectedShadows ?? tabsTheme.tabSelectedShadows ?? Shadows.sm;
 
     final effectiveMainAxisAlignment =
         widget.mainAxisAlignment ?? tabsTheme.tabMainAxisAlignment;
@@ -972,10 +992,16 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
       },
     );
 
-    if (!inherited.scrollable) {
+    if (!inherited.scrollable && expandTabs) {
       tab = Expanded(flex: widget.flex, child: tab);
     }
 
     return tab;
   }
 }
+
+@Deprecated(
+  'Renamed to ShadRestorableTabsController. '
+  'This name will be removed in v1.0.0.',
+)
+typedef RestorableShadTabsController<T> = ShadRestorableTabsController<T>;

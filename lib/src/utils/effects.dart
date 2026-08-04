@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-typedef AnimEffect<T> = Effect<T>;
+typedef ShadAnimEffect<T> = Effect<T>;
 
 @immutable
-class SizeEffect extends Effect<double> {
-  const SizeEffect({
+class ShadSizeEffect extends Effect<double> {
+  const ShadSizeEffect({
     super.delay,
     super.duration,
     super.curve,
@@ -34,8 +34,8 @@ class SizeEffect extends Effect<double> {
 }
 
 @immutable
-class PaddingEffect extends Effect<double> {
-  const PaddingEffect({
+class ShadPaddingEffect extends Effect<double> {
+  const ShadPaddingEffect({
     required this.padding,
     super.delay,
     super.duration,
@@ -66,3 +66,14 @@ class PaddingEffect extends Effect<double> {
   static const neutralValue = 1.0;
   static const defaultValue = 0.0;
 }
+
+@Deprecated('Renamed to ShadAnimEffect. This name will be removed in v1.0.0.')
+typedef AnimEffect<T> = ShadAnimEffect<T>;
+
+@Deprecated('Renamed to ShadSizeEffect. This name will be removed in v1.0.0.')
+typedef SizeEffect = ShadSizeEffect;
+
+@Deprecated(
+  'Renamed to ShadPaddingEffect. This name will be removed in v1.0.0.',
+)
+typedef PaddingEffect = ShadPaddingEffect;

@@ -10,15 +10,20 @@ import 'package:shadcn_ui/src/theme/components/button_sizes.dart';
 import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
+import 'package:shadcn_ui/src/theme/components/collapsible.dart';
+import 'package:shadcn_ui/src/theme/components/command.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
 import 'package:shadcn_ui/src/theme/components/default_keyboard_toolbar.dart';
 import 'package:shadcn_ui/src/theme/components/dialog.dart';
+import 'package:shadcn_ui/src/theme/components/empty.dart';
 import 'package:shadcn_ui/src/theme/components/input.dart';
 import 'package:shadcn_ui/src/theme/components/input_otp.dart';
+import 'package:shadcn_ui/src/theme/components/kbd.dart';
 import 'package:shadcn_ui/src/theme/components/menubar.dart';
 import 'package:shadcn_ui/src/theme/components/option.dart';
+import 'package:shadcn_ui/src/theme/components/pagination.dart';
 import 'package:shadcn_ui/src/theme/components/popover.dart';
 import 'package:shadcn_ui/src/theme/components/progress.dart';
 import 'package:shadcn_ui/src/theme/components/radio.dart';
@@ -26,15 +31,21 @@ import 'package:shadcn_ui/src/theme/components/resizable.dart';
 import 'package:shadcn_ui/src/theme/components/select.dart';
 import 'package:shadcn_ui/src/theme/components/separator.dart';
 import 'package:shadcn_ui/src/theme/components/sheet.dart';
+import 'package:shadcn_ui/src/theme/components/skeleton.dart';
 import 'package:shadcn_ui/src/theme/components/slider.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
+import 'package:shadcn_ui/src/theme/components/spinner.dart';
 import 'package:shadcn_ui/src/theme/components/switch.dart';
 import 'package:shadcn_ui/src/theme/components/table.dart';
 import 'package:shadcn_ui/src/theme/components/tabs.dart';
 import 'package:shadcn_ui/src/theme/components/textarea.dart';
 import 'package:shadcn_ui/src/theme/components/time_picker.dart';
 import 'package:shadcn_ui/src/theme/components/toast.dart';
+import 'package:shadcn_ui/src/theme/components/toggle.dart';
 import 'package:shadcn_ui/src/theme/components/tooltip.dart';
+import 'package:shadcn_ui/src/theme/radii.dart';
+import 'package:shadcn_ui/src/theme/spacing.dart';
+import 'package:shadcn_ui/src/theme/style.dart';
 import 'package:shadcn_ui/src/theme/text_theme/theme.dart';
 import 'package:shadcn_ui/src/utils/gesture_detector.dart';
 import 'package:shadcn_ui/src/utils/responsive.dart';
@@ -96,7 +107,32 @@ abstract class ShadBaseTheme {
     required this.sonnerTheme,
     required this.textareaTheme,
     required this.defaultKeyboardToolbarTheme,
+    required this.skeletonTheme,
+    required this.kbdTheme,
+    required this.spinnerTheme,
+    required this.toggleTheme,
+    required this.emptyTheme,
+    required this.paginationTheme,
+    required this.collapsibleTheme,
+    required this.commandTheme,
+    required this.variant,
   });
+
+  /// The variant that produced the component theme defaults below.
+  ///
+  /// Stored so that `ShadThemeData.copyWith` re-derives from the same variant
+  /// instead of silently falling back to the default one.
+  final ShadThemeVariant variant;
+
+  final ShadCommandTheme commandTheme;
+
+  final ShadSkeletonTheme skeletonTheme;
+  final ShadKbdTheme kbdTheme;
+  final ShadSpinnerTheme spinnerTheme;
+  final ShadToggleTheme toggleTheme;
+  final ShadEmptyTheme emptyTheme;
+  final ShadPaginationTheme paginationTheme;
+  final ShadCollapsibleTheme collapsibleTheme;
 
   final ShadColorScheme colorScheme;
   final Brightness brightness;
@@ -156,6 +192,40 @@ abstract class ShadBaseTheme {
 
 @immutable
 abstract class ShadThemeVariant {
+  /// The palette every component theme is built from.
+  ShadColorScheme get colorScheme;
+
+  /// The base ("md") radius the rest of the scale derives from.
+  BorderRadius get radius;
+
+  /// The already-merged text theme.
+  ShadTextTheme get effectiveTextTheme;
+
+  /// Returns a variant of the same kind with the given inputs replaced.
+  ///
+  /// A variant bakes its inputs into the component themes when it is
+  /// constructed, so changing one of them means building a new variant.
+  /// `ShadThemeData.copyWith` relies on this: without it, `copyWith(radius:)`
+  /// on a theme that carries a variant would update the theme's `radius` field
+  /// and leave every component at the old one.
+  ShadThemeVariant rebuild({
+    ShadColorScheme? colorScheme,
+    BorderRadius? radius,
+    ShadTextTheme? effectiveTextTheme,
+    ShadStyleTokens? style,
+    ShadSpacing? spacing,
+  });
+
+  /// The shadcn/ui style this variant renders — the radius, focus-ring and
+  /// label knobs that distinguish one style from another.
+  ShadStyleTokens get style;
+
+  /// The corner-radius scale, derived from the variant's base radius.
+  ShadRadii get radii;
+
+  /// The spacing scale every padding and gap is a multiple of.
+  ShadSpacing get spacing;
+
   ShadButtonTheme primaryButtonTheme();
   ShadButtonTheme secondaryButtonTheme();
   ShadButtonTheme destructiveButtonTheme();
@@ -204,4 +274,12 @@ abstract class ShadThemeVariant {
   ShadSonnerTheme sonnerTheme();
   ShadTextareaTheme textareaTheme();
   ShadDefaultKeyboardToolbarTheme defaultKeyboardToolbarTheme();
+  ShadCommandTheme commandTheme();
+  ShadSkeletonTheme skeletonTheme();
+  ShadKbdTheme kbdTheme();
+  ShadSpinnerTheme spinnerTheme();
+  ShadToggleTheme toggleTheme();
+  ShadEmptyTheme emptyTheme();
+  ShadPaginationTheme paginationTheme();
+  ShadCollapsibleTheme collapsibleTheme();
 }

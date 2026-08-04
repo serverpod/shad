@@ -15,6 +15,7 @@ class ShadTabsTheme with _$ShadTabsTheme {
     bool canMerge = true,
     this.gap,
     this.tabsGap,
+    this.expandTabs,
     this.tabBarAlignment,
     this.dragStartBehavior,
     this.physics,
@@ -61,6 +62,9 @@ class ShadTabsTheme with _$ShadTabsTheme {
 
   /// {@macro ShadTabs.tabsGap}
   final double? tabsGap;
+
+  /// {@macro ShadTabs.expandTabs}
+  final bool? expandTabs;
 
   /// {@macro ShadTabs.tabBarAlignment}
   final Alignment? tabBarAlignment;

@@ -3,8 +3,8 @@ import 'dart:js_interop';
 import 'package:shadcn_ui/src/utils/clipboard/clipboard_service.dart';
 import 'package:web/web.dart' as web;
 
-final _listeners = <PasteFilesCallback>{};
-final _errorListeners = <PasteFilesErrorCallback>{};
+final _listeners = <ShadPasteFilesCallback>{};
+final _errorListeners = <ShadPasteFilesErrorCallback>{};
 bool _initialized = false;
 
 void _ensureInitialized() {
@@ -57,20 +57,20 @@ Future<List<ShadClipboardItem>> _extractFiles(web.DataTransfer data) async {
   return results;
 }
 
-void addPasteFilesListener(PasteFilesCallback callback) {
+void addPasteFilesListener(ShadPasteFilesCallback callback) {
   _ensureInitialized();
   _listeners.add(callback);
 }
 
-void removePasteFilesListener(PasteFilesCallback callback) {
+void removePasteFilesListener(ShadPasteFilesCallback callback) {
   _listeners.remove(callback);
 }
 
-void addPasteFilesErrorListener(PasteFilesErrorCallback callback) {
+void addPasteFilesErrorListener(ShadPasteFilesErrorCallback callback) {
   _ensureInitialized();
   _errorListeners.add(callback);
 }
 
-void removePasteFilesErrorListener(PasteFilesErrorCallback callback) {
+void removePasteFilesErrorListener(ShadPasteFilesErrorCallback callback) {
   _errorListeners.remove(callback);
 }

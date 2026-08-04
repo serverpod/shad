@@ -42,11 +42,12 @@ npx skills add nank1ro/flutter-shadcn-ui
 - [x] [Card](https://mariuti.com/flutter-shadcn-ui/components/card/)
 - [ ] Carousel
 - [x] [Checkbox](https://mariuti.com/flutter-shadcn-ui/components/checkbox/)
-- [ ] Collapsible
+- [x] Collapsible
+- [x] Empty
 - [x] [Combobox](https://mariuti.com/flutter-shadcn-ui/components/select/#with-search)
-- [ ] Command
+- [x] Command
 - [x] [Context Menu](https://mariuti.com/flutter-shadcn-ui/components/context-menu/)
-- [ ] Data Table
+- [x] Data Table
 - [x] [Date Picker](https://mariuti.com/flutter-shadcn-ui/components/date-picker/)
 - [ ] Drawer
 - [x] <strike>Dropdown Menu</strike> Use Context Menu instead
@@ -57,7 +58,7 @@ npx skills add nank1ro/flutter-shadcn-ui
 - [x] <strike>Label</strike> Use Text instead
 - [x] [Menubar](https://mariuti.com/flutter-shadcn-ui/components/menubar/)
 - [ ] Navigation Menu
-- [ ] Pagination
+- [x] Pagination
 - [x] [Popover](https://mariuti.com/flutter-shadcn-ui/components/popover/)
 - [x] [Progress](https://mariuti.com/flutter-shadcn-ui/components/progress/)
 - [x] [RadioGroup](https://mariuti.com/flutter-shadcn-ui/components/radio-group/)
@@ -66,7 +67,9 @@ npx skills add nank1ro/flutter-shadcn-ui
 - [x] [Select](https://mariuti.com/flutter-shadcn-ui/components/select/)
 - [x] [Separator](https://mariuti.com/flutter-shadcn-ui/components/separator/)
 - [x] [Sheet](https://mariuti.com/flutter-shadcn-ui/components/sheet/)
-- [ ] Skeleton
+- [x] Kbd
+- [x] Skeleton
+- [x] Spinner
 - [x] [Slider](https://mariuti.com/flutter-shadcn-ui/components/slider/)
 - [x] [Sonner](https://mariuti.com/flutter-shadcn-ui/components/sonner/)
 - [x] [Switch](https://mariuti.com/flutter-shadcn-ui/components/switch/)
@@ -75,8 +78,8 @@ npx skills add nank1ro/flutter-shadcn-ui
 - [x] [TextArea](https://mariuti.com/flutter-shadcn-ui/components/text-area/)
 - [x] [Time Picker](https://mariuti.com/flutter-shadcn-ui/components/time-picker/)
 - [x] [Toast](https://mariuti.com/flutter-shadcn-ui/components/toast/)
-- [ ] Toggle
-- [ ] ToggleGroup
+- [x] Toggle
+- [x] ToggleGroup
 - [x] [Tooltip](https://mariuti.com/flutter-shadcn-ui/components/tooltip/)
 
 ## FAQs

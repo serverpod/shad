@@ -256,6 +256,16 @@ class ShadGestureDetector extends StatefulWidget {
 class _ShadGestureDetectorState extends State<ShadGestureDetector> {
   bool hovered = false;
 
+  /// Whether a mouse pointer is currently inside this detector.
+  ///
+  /// [ShadHoverStrategies] exists for devices with no real hover: it
+  /// synthesises a hover state from tap/long-press gestures. On a device that
+  /// *does* hover, applying them fights the MouseRegion — `unhover:
+  /// {onTapUp, ...}` would clear the highlight the moment a click completes,
+  /// even though the cursor has not moved. The class doc already promised the
+  /// strategies are ignored when a mouse is present; this enforces it.
+  bool mouseInside = false;
+
   // See https://github.com/nank1ro/flutter-shadcn-ui/issues/319
   Offset correctGlobalPosition(BuildContext context, Offset globalPosition) {
     // Get the root navigator's overlay (screen coordinates)
@@ -292,6 +302,9 @@ class _ShadGestureDetectorState extends State<ShadGestureDetector> {
     final gestureSettings = MediaQuery.maybeGestureSettingsOf(context);
 
     void setHover(ShadHoverStrategy strategy) {
+      // A real hover is already being tracked by the MouseRegion below.
+      if (mouseInside) return;
+
       final presentInHover = effectiveHoverStrategies.hover.contains(strategy);
       final presentInUnhover = effectiveHoverStrategies.unhover.contains(
         strategy,
@@ -569,11 +582,13 @@ class _ShadGestureDetectorState extends State<ShadGestureDetector> {
       child: MouseRegion(
         cursor: widget.cursor,
         onEnter: (_) {
+          mouseInside = true;
           hovered = true;
           widget.onHoverChange?.call(true);
           effectiveHoverStrategies.onHoverChange?.call(true);
         },
         onExit: (_) {
+          mouseInside = false;
           hovered = false;
           widget.onHoverChange?.call(false);
           effectiveHoverStrategies.onHoverChange?.call(false);

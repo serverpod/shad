@@ -11,15 +11,20 @@ import 'package:shadcn_ui/src/theme/components/button_sizes.dart';
 import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
+import 'package:shadcn_ui/src/theme/components/collapsible.dart';
+import 'package:shadcn_ui/src/theme/components/command.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
 import 'package:shadcn_ui/src/theme/components/default_keyboard_toolbar.dart';
 import 'package:shadcn_ui/src/theme/components/dialog.dart';
+import 'package:shadcn_ui/src/theme/components/empty.dart';
 import 'package:shadcn_ui/src/theme/components/input.dart';
 import 'package:shadcn_ui/src/theme/components/input_otp.dart';
+import 'package:shadcn_ui/src/theme/components/kbd.dart';
 import 'package:shadcn_ui/src/theme/components/menubar.dart';
 import 'package:shadcn_ui/src/theme/components/option.dart';
+import 'package:shadcn_ui/src/theme/components/pagination.dart';
 import 'package:shadcn_ui/src/theme/components/popover.dart';
 import 'package:shadcn_ui/src/theme/components/progress.dart';
 import 'package:shadcn_ui/src/theme/components/radio.dart';
@@ -27,15 +32,21 @@ import 'package:shadcn_ui/src/theme/components/resizable.dart';
 import 'package:shadcn_ui/src/theme/components/select.dart';
 import 'package:shadcn_ui/src/theme/components/separator.dart';
 import 'package:shadcn_ui/src/theme/components/sheet.dart';
+import 'package:shadcn_ui/src/theme/components/skeleton.dart';
 import 'package:shadcn_ui/src/theme/components/slider.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
+import 'package:shadcn_ui/src/theme/components/spinner.dart';
 import 'package:shadcn_ui/src/theme/components/switch.dart';
 import 'package:shadcn_ui/src/theme/components/table.dart';
 import 'package:shadcn_ui/src/theme/components/tabs.dart';
 import 'package:shadcn_ui/src/theme/components/textarea.dart';
 import 'package:shadcn_ui/src/theme/components/time_picker.dart';
 import 'package:shadcn_ui/src/theme/components/toast.dart';
+import 'package:shadcn_ui/src/theme/components/toggle.dart';
 import 'package:shadcn_ui/src/theme/components/tooltip.dart';
+import 'package:shadcn_ui/src/theme/radii.dart';
+import 'package:shadcn_ui/src/theme/spacing.dart';
+import 'package:shadcn_ui/src/theme/style.dart';
 import 'package:shadcn_ui/src/theme/text_theme/theme.dart';
 import 'package:shadcn_ui/src/theme/themes/base.dart';
 import 'package:shadcn_ui/src/theme/themes/default_theme_no_secondary_border_variant.dart';
@@ -98,6 +109,14 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ShadHoverStrategies? hoverStrategies,
     bool? disableSecondaryBorder,
     ShadTabsTheme? tabsTheme,
+    ShadSkeletonTheme? skeletonTheme,
+    ShadKbdTheme? kbdTheme,
+    ShadSpinnerTheme? spinnerTheme,
+    ShadToggleTheme? toggleTheme,
+    ShadEmptyTheme? emptyTheme,
+    ShadPaginationTheme? paginationTheme,
+    ShadCollapsibleTheme? collapsibleTheme,
+    ShadCommandTheme? commandTheme,
     ShadThemeVariant? variant,
     ShadContextMenuTheme? contextMenuTheme,
     ShadCalendarTheme? calendarTheme,
@@ -109,35 +128,87 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ShadSonnerTheme? sonnerTheme,
     ShadTextareaTheme? textareaTheme,
     ShadDefaultKeyboardToolbarTheme? defaultKeyboardToolbarTheme,
-  }) {
-    final effectiveRadius =
-        radius ?? const BorderRadius.all(Radius.circular(6));
 
-    final effectiveTextTheme = ShadDefaultThemeVariant.defaultTextTheme.merge(
-      textTheme,
-    );
+    /// The shadcn/ui style: the radius, focus-ring and label treatment shared
+    /// by every component. Defaults to [ShadStyleTokens.vega].
+    ///
+    /// When a [variant] is also given, the variant is rebuilt with this style.
+    ShadStyleTokens? style,
+
+    /// The spacing scale every padding and gap is a multiple of.
+    ///
+    /// When a [variant] is also given, the variant is rebuilt with this scale.
+    ShadSpacing? spacing,
+  }) {
+    // A variant is built from a colour scheme, a radius and a text theme, and
+    // bakes all three into its component themes. Where the caller gives one
+    // explicitly it wins and the variant is rebuilt below; where they don't,
+    // the variant's own value becomes the theme's, so the two never disagree.
+    //
+    // shadcn/ui's `--radius` is 0.625rem and `--radius-md` — what button,
+    // input, checkbox and most other components use via `rounded-md` — is
+    // `calc(var(--radius) * 0.8)`, i.e. 8px.
+    final effectiveRadius =
+        radius ?? variant?.radius ?? const BorderRadius.all(Radius.circular(8));
+
+    final effectiveTextTheme = textTheme == null
+        ? (variant?.effectiveTextTheme ??
+              ShadDefaultThemeVariant.defaultTextTheme)
+        : ShadDefaultThemeVariant.defaultTextTheme.merge(textTheme);
 
     final effectiveDisableSecondaryBorder = disableSecondaryBorder ?? false;
     final effectiveBrightness = brightness ?? Brightness.light;
     final effectiveColorScheme =
         colorScheme ??
+        variant?.colorScheme ??
         switch (effectiveBrightness) {
           Brightness.light => const ShadSlateColorScheme.light(),
           Brightness.dark => const ShadSlateColorScheme.dark(),
         };
 
+    // A supplied variant already baked the colour scheme, radius and text
+    // theme into its component themes, so any of those that arrived separately
+    // — which is what `copyWith(radius: …)` does — has to be pushed back into
+    // it. Without this, `copyWith` would move the theme's own `radius` field
+    // and leave every component rendering the old one.
+    final rebuiltVariant = variant == null
+        ? null
+        : (variant.colorScheme == effectiveColorScheme &&
+                  variant.radius == effectiveRadius &&
+                  // Either form counts as unchanged: the variant is built
+                  // from a raw text theme but publishes one with the style's
+                  // roles applied, and `copyWith` hands the published one
+                  // back. Comparing only the raw form rebuilt the variant on
+                  // every copy.
+                  (variant.effectiveTextTheme == effectiveTextTheme ||
+                      variant.textTheme() == effectiveTextTheme) &&
+                  (style == null || style == variant.style) &&
+                  (spacing == null || spacing == variant.spacing)
+              ? variant
+              : variant.rebuild(
+                  colorScheme: effectiveColorScheme,
+                  radius: effectiveRadius,
+                  effectiveTextTheme: effectiveTextTheme,
+                  style: style,
+                  spacing: spacing,
+                ));
+
     final effectiveVariant =
-        variant ??
+        rebuiltVariant ??
         switch (effectiveDisableSecondaryBorder) {
           false => ShadDefaultThemeVariant(
             colorScheme: effectiveColorScheme,
             radius: effectiveRadius,
             effectiveTextTheme: effectiveTextTheme,
+            style: style ?? ShadStyleTokens.vega,
+            spacing: spacing ?? const ShadSpacing(),
           ),
           true => ShadDefaultThemeNoSecondaryBorderVariant(
             colorScheme: effectiveColorScheme,
             radius: effectiveRadius,
             effectiveTextTheme: effectiveTextTheme,
+            style: style ?? ShadStyleTokens.vega,
+            spacing: spacing ?? const ShadSpacing(),
           ),
         };
 
@@ -185,7 +256,10 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
       tooltipTheme: effectiveVariant.tooltipTheme().merge(tooltipTheme),
       popoverTheme: effectiveVariant.popoverTheme().merge(popoverTheme),
       decoration: effectiveVariant.decorationTheme().merge(decoration),
-      textTheme: effectiveTextTheme,
+      // Through the variant, so the style's text roles are applied to the UI
+      // entries. Reading `effectiveTextTheme` directly here is what used to
+      // make a style change leave every font size untouched.
+      textTheme: effectiveVariant.textTheme(),
       disabledOpacity: disabledOpacity ?? .5,
       selectTheme: effectiveVariant.selectTheme().merge(selectTheme),
       optionTheme: effectiveVariant.optionTheme().merge(optionTheme),
@@ -240,6 +314,19 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
       defaultKeyboardToolbarTheme: effectiveVariant
           .defaultKeyboardToolbarTheme()
           .merge(defaultKeyboardToolbarTheme),
+      skeletonTheme: effectiveVariant.skeletonTheme().merge(skeletonTheme),
+      kbdTheme: effectiveVariant.kbdTheme().merge(kbdTheme),
+      spinnerTheme: effectiveVariant.spinnerTheme().merge(spinnerTheme),
+      toggleTheme: effectiveVariant.toggleTheme().merge(toggleTheme),
+      emptyTheme: effectiveVariant.emptyTheme().merge(emptyTheme),
+      paginationTheme: effectiveVariant.paginationTheme().merge(
+        paginationTheme,
+      ),
+      collapsibleTheme: effectiveVariant.collapsibleTheme().merge(
+        collapsibleTheme,
+      ),
+      commandTheme: effectiveVariant.commandTheme().merge(commandTheme),
+      variant: effectiveVariant,
     );
   }
 
@@ -298,7 +385,33 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     required super.sonnerTheme,
     required super.textareaTheme,
     required super.defaultKeyboardToolbarTheme,
+    required super.skeletonTheme,
+    required super.kbdTheme,
+    required super.spinnerTheme,
+    required super.toggleTheme,
+    required super.emptyTheme,
+    required super.paginationTheme,
+    required super.collapsibleTheme,
+    required super.commandTheme,
+    required super.variant,
   });
+
+  /// The corner-radius scale derived from [radius].
+  ///
+  /// [radius] is the `md` step — what buttons and inputs use — and the other
+  /// steps scale from it, so one setting keeps cards, dialogs and menu rows in
+  /// proportion.
+  ShadRadii get radii => variant.radii;
+
+  /// The shadcn/ui style this theme renders.
+  ShadStyleTokens get style => variant.style;
+
+  /// The spacing scale every padding and gap is a multiple of.
+  ///
+  /// Call it to convert steps to logical pixels: `theme.spacing(6)` is `24`
+  /// with the default step. See `ShadGap` and `ShadPadding` for laying out
+  /// against the scale directly.
+  ShadSpacing get spacing => variant.spacing;
 
   static ShadThemeData? lerp(
     ShadThemeData? a,

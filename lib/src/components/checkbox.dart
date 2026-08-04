@@ -23,6 +23,8 @@ class ShadCheckbox extends StatefulWidget {
     this.enabled = true,
     this.onChanged,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.decoration,
     this.size,
     this.duration,
@@ -60,6 +62,17 @@ class ShadCheckbox extends StatefulWidget {
   /// If null, an internal focus node is created.
   /// {@endtemplate}
   final FocusNode? focusNode;
+
+  /// {@template ShadWidget.autofocus}
+  /// Whether this widget should be focused when first shown.
+  /// Defaults to `false`.
+  /// {@endtemplate}
+  final bool autofocus;
+
+  /// {@template ShadWidget.onFocusChange}
+  /// Called when the focus state of this widget changes.
+  /// {@endtemplate}
+  final ValueChanged<bool>? onFocusChange;
 
   /// {@template ShadCheckbox.decoration}
   /// The decoration applied to the checkbox box.
@@ -226,6 +239,8 @@ class _ShadCheckboxState extends State<ShadCheckbox> {
               },
           },
           child: ShadFocusable(
+            autofocus: widget.autofocus,
+            onFocusChange: widget.onFocusChange,
             focusNode: focusNode,
             builder: (context, focused, child) {
               return ShadDecorator(

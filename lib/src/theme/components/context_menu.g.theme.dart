@@ -59,6 +59,11 @@ mixin _$ShadContextMenuTheme {
         t,
       ),
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
+      selectedTextStyle: TextStyle.lerp(
+        a.selectedTextStyle,
+        b.selectedTextStyle,
+        t,
+      ),
       trailingTextStyle: TextStyle.lerp(
         a.trailingTextStyle,
         b.trailingTextStyle,
@@ -102,6 +107,7 @@ mixin _$ShadContextMenuTheme {
     ShadButtonVariant? buttonVariant,
     ShadDecoration? itemDecoration,
     TextStyle? textStyle,
+    TextStyle? selectedTextStyle,
     TextStyle? trailingTextStyle,
     BoxConstraints? itemConstraints,
     EdgeInsetsGeometry? subMenuPadding,
@@ -130,6 +136,7 @@ mixin _$ShadContextMenuTheme {
       buttonVariant: buttonVariant ?? _this.buttonVariant,
       itemDecoration: itemDecoration ?? _this.itemDecoration,
       textStyle: textStyle ?? _this.textStyle,
+      selectedTextStyle: selectedTextStyle ?? _this.selectedTextStyle,
       trailingTextStyle: trailingTextStyle ?? _this.trailingTextStyle,
       itemConstraints: itemConstraints ?? _this.itemConstraints,
       subMenuPadding: subMenuPadding ?? _this.subMenuPadding,
@@ -171,6 +178,9 @@ mixin _$ShadContextMenuTheme {
           _this.itemDecoration?.merge(other.itemDecoration) ??
           other.itemDecoration,
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
+      selectedTextStyle:
+          _this.selectedTextStyle?.merge(other.selectedTextStyle) ??
+          other.selectedTextStyle,
       trailingTextStyle:
           _this.trailingTextStyle?.merge(other.trailingTextStyle) ??
           other.trailingTextStyle,
@@ -212,6 +222,7 @@ mixin _$ShadContextMenuTheme {
         _other.buttonVariant == _this.buttonVariant &&
         _other.itemDecoration == _this.itemDecoration &&
         _other.textStyle == _this.textStyle &&
+        _other.selectedTextStyle == _this.selectedTextStyle &&
         _other.trailingTextStyle == _this.trailingTextStyle &&
         _other.itemConstraints == _this.itemConstraints &&
         _other.subMenuPadding == _this.subMenuPadding &&
@@ -243,6 +254,7 @@ mixin _$ShadContextMenuTheme {
       _this.buttonVariant,
       _this.itemDecoration,
       _this.textStyle,
+      _this.selectedTextStyle,
       _this.trailingTextStyle,
       _this.itemConstraints,
       _this.subMenuPadding,

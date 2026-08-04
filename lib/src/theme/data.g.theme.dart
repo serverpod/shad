@@ -26,6 +26,27 @@ mixin _$ShadThemeData {
     }
 
     return ShadThemeData(
+      variant: t < 0.5 ? a.variant : b.variant,
+      commandTheme: ShadCommandTheme.lerp(a.commandTheme, b.commandTheme, t)!,
+      skeletonTheme: ShadSkeletonTheme.lerp(
+        a.skeletonTheme,
+        b.skeletonTheme,
+        t,
+      )!,
+      kbdTheme: ShadKbdTheme.lerp(a.kbdTheme, b.kbdTheme, t)!,
+      spinnerTheme: ShadSpinnerTheme.lerp(a.spinnerTheme, b.spinnerTheme, t)!,
+      toggleTheme: ShadToggleTheme.lerp(a.toggleTheme, b.toggleTheme, t)!,
+      emptyTheme: ShadEmptyTheme.lerp(a.emptyTheme, b.emptyTheme, t)!,
+      paginationTheme: ShadPaginationTheme.lerp(
+        a.paginationTheme,
+        b.paginationTheme,
+        t,
+      )!,
+      collapsibleTheme: ShadCollapsibleTheme.lerp(
+        a.collapsibleTheme,
+        b.collapsibleTheme,
+        t,
+      )!,
       colorScheme: ShadColorScheme.lerp(a.colorScheme, b.colorScheme, t),
       brightness: t < 0.5 ? a.brightness : b.brightness,
       primaryButtonTheme: ShadButtonTheme.lerp(
@@ -206,6 +227,15 @@ mixin _$ShadThemeData {
   }
 
   ShadThemeData copyWith({
+    ShadThemeVariant? variant,
+    ShadCommandTheme? commandTheme,
+    ShadSkeletonTheme? skeletonTheme,
+    ShadKbdTheme? kbdTheme,
+    ShadSpinnerTheme? spinnerTheme,
+    ShadToggleTheme? toggleTheme,
+    ShadEmptyTheme? emptyTheme,
+    ShadPaginationTheme? paginationTheme,
+    ShadCollapsibleTheme? collapsibleTheme,
     ShadColorScheme? colorScheme,
     Brightness? brightness,
     ShadButtonTheme? primaryButtonTheme,
@@ -264,6 +294,15 @@ mixin _$ShadThemeData {
     final _this = (this as ShadThemeData);
 
     return ShadThemeData(
+      variant: variant ?? _this.variant,
+      commandTheme: commandTheme ?? _this.commandTheme,
+      skeletonTheme: skeletonTheme ?? _this.skeletonTheme,
+      kbdTheme: kbdTheme ?? _this.kbdTheme,
+      spinnerTheme: spinnerTheme ?? _this.spinnerTheme,
+      toggleTheme: toggleTheme ?? _this.toggleTheme,
+      emptyTheme: emptyTheme ?? _this.emptyTheme,
+      paginationTheme: paginationTheme ?? _this.paginationTheme,
+      collapsibleTheme: collapsibleTheme ?? _this.collapsibleTheme,
       colorScheme: colorScheme ?? _this.colorScheme,
       brightness: brightness ?? _this.brightness,
       primaryButtonTheme: primaryButtonTheme ?? _this.primaryButtonTheme,
@@ -339,6 +378,15 @@ mixin _$ShadThemeData {
     }
 
     return copyWith(
+      variant: other.variant,
+      commandTheme: _this.commandTheme.merge(other.commandTheme),
+      skeletonTheme: _this.skeletonTheme.merge(other.skeletonTheme),
+      kbdTheme: _this.kbdTheme.merge(other.kbdTheme),
+      spinnerTheme: _this.spinnerTheme.merge(other.spinnerTheme),
+      toggleTheme: _this.toggleTheme.merge(other.toggleTheme),
+      emptyTheme: _this.emptyTheme.merge(other.emptyTheme),
+      paginationTheme: _this.paginationTheme.merge(other.paginationTheme),
+      collapsibleTheme: _this.collapsibleTheme.merge(other.collapsibleTheme),
       colorScheme: _this.colorScheme.merge(other.colorScheme),
       brightness: other.brightness,
       primaryButtonTheme: _this.primaryButtonTheme.merge(
@@ -429,7 +477,16 @@ mixin _$ShadThemeData {
     final _this = (this as ShadThemeData);
     final _other = (other as ShadThemeData);
 
-    return _other.colorScheme == _this.colorScheme &&
+    return _other.variant == _this.variant &&
+        _other.commandTheme == _this.commandTheme &&
+        _other.skeletonTheme == _this.skeletonTheme &&
+        _other.kbdTheme == _this.kbdTheme &&
+        _other.spinnerTheme == _this.spinnerTheme &&
+        _other.toggleTheme == _this.toggleTheme &&
+        _other.emptyTheme == _this.emptyTheme &&
+        _other.paginationTheme == _this.paginationTheme &&
+        _other.collapsibleTheme == _this.collapsibleTheme &&
+        _other.colorScheme == _this.colorScheme &&
         _other.brightness == _this.brightness &&
         _other.primaryButtonTheme == _this.primaryButtonTheme &&
         _other.secondaryButtonTheme == _this.secondaryButtonTheme &&
@@ -491,6 +548,15 @@ mixin _$ShadThemeData {
 
     return Object.hashAll([
       runtimeType,
+      _this.variant,
+      _this.commandTheme,
+      _this.skeletonTheme,
+      _this.kbdTheme,
+      _this.spinnerTheme,
+      _this.toggleTheme,
+      _this.emptyTheme,
+      _this.paginationTheme,
+      _this.collapsibleTheme,
       _this.colorScheme,
       _this.brightness,
       _this.primaryButtonTheme,

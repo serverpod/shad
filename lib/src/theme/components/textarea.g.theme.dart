@@ -43,6 +43,7 @@ mixin _$ShadTextareaTheme {
         b.placeholderAlignment,
         t,
       ),
+      alignment: AlignmentGeometry.lerp(a.alignment, b.alignment, t),
       inputPadding: EdgeInsetsGeometry.lerp(a.inputPadding, b.inputPadding, t),
       mainAxisAlignment: t < 0.5 ? a.mainAxisAlignment : b.mainAxisAlignment,
       crossAxisAlignment: t < 0.5 ? a.crossAxisAlignment : b.crossAxisAlignment,
@@ -68,6 +69,7 @@ mixin _$ShadTextareaTheme {
     TextStyle? style,
     TextStyle? placeholderStyle,
     AlignmentGeometry? placeholderAlignment,
+    AlignmentGeometry? alignment,
     EdgeInsetsGeometry? inputPadding,
     MainAxisAlignment? mainAxisAlignment,
     CrossAxisAlignment? crossAxisAlignment,
@@ -87,6 +89,7 @@ mixin _$ShadTextareaTheme {
       style: style ?? _this.style,
       placeholderStyle: placeholderStyle ?? _this.placeholderStyle,
       placeholderAlignment: placeholderAlignment ?? _this.placeholderAlignment,
+      alignment: alignment ?? _this.alignment,
       inputPadding: inputPadding ?? _this.inputPadding,
       mainAxisAlignment: mainAxisAlignment ?? _this.mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment ?? _this.crossAxisAlignment,
@@ -119,6 +122,7 @@ mixin _$ShadTextareaTheme {
           _this.placeholderStyle?.merge(other.placeholderStyle) ??
           other.placeholderStyle,
       placeholderAlignment: other.placeholderAlignment,
+      alignment: other.alignment,
       inputPadding: other.inputPadding,
       mainAxisAlignment: other.mainAxisAlignment,
       crossAxisAlignment: other.crossAxisAlignment,
@@ -150,6 +154,7 @@ mixin _$ShadTextareaTheme {
         _other.style == _this.style &&
         _other.placeholderStyle == _this.placeholderStyle &&
         _other.placeholderAlignment == _this.placeholderAlignment &&
+        _other.alignment == _this.alignment &&
         _other.inputPadding == _this.inputPadding &&
         _other.mainAxisAlignment == _this.mainAxisAlignment &&
         _other.crossAxisAlignment == _this.crossAxisAlignment &&
@@ -173,6 +178,7 @@ mixin _$ShadTextareaTheme {
       _this.style,
       _this.placeholderStyle,
       _this.placeholderAlignment,
+      _this.alignment,
       _this.inputPadding,
       _this.mainAxisAlignment,
       _this.crossAxisAlignment,

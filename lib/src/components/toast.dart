@@ -621,7 +621,7 @@ class _ShadToastState extends State<ShadToast> {
     final effectiveBorderRadius =
         widget.radius ?? effectiveToastTheme.radius ?? theme.radius;
     final effectiveShadows =
-        widget.shadows ?? effectiveToastTheme.shadows ?? ShadShadows.lg;
+        widget.shadows ?? effectiveToastTheme.shadows ?? Shadows.lg;
     final effectiveBackgroundColor =
         widget.backgroundColor ??
         effectiveToastTheme.backgroundColor ??

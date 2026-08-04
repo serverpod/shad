@@ -28,6 +28,7 @@ mixin _$ShadTabsTheme {
     return ShadTabsTheme(
       gap: lerpDouble$(a.gap, b.gap, t),
       tabsGap: lerpDouble$(a.tabsGap, b.tabsGap, t),
+      expandTabs: t < 0.5 ? a.expandTabs : b.expandTabs,
       tabBarAlignment: Alignment.lerp(a.tabBarAlignment, b.tabBarAlignment, t),
       dragStartBehavior: t < 0.5 ? a.dragStartBehavior : b.dragStartBehavior,
       physics: t < 0.5 ? a.physics : b.physics,
@@ -125,6 +126,7 @@ mixin _$ShadTabsTheme {
   ShadTabsTheme copyWith({
     double? gap,
     double? tabsGap,
+    bool? expandTabs,
     Alignment? tabBarAlignment,
     DragStartBehavior? dragStartBehavior,
     ScrollPhysics? physics,
@@ -164,6 +166,7 @@ mixin _$ShadTabsTheme {
     return ShadTabsTheme(
       gap: gap ?? _this.gap,
       tabsGap: tabsGap ?? _this.tabsGap,
+      expandTabs: expandTabs ?? _this.expandTabs,
       tabBarAlignment: tabBarAlignment ?? _this.tabBarAlignment,
       dragStartBehavior: dragStartBehavior ?? _this.dragStartBehavior,
       physics: physics ?? _this.physics,
@@ -225,6 +228,7 @@ mixin _$ShadTabsTheme {
     return copyWith(
       gap: other.gap,
       tabsGap: other.tabsGap,
+      expandTabs: other.expandTabs,
       tabBarAlignment: other.tabBarAlignment,
       dragStartBehavior: other.dragStartBehavior,
       physics: other.physics,
@@ -281,6 +285,7 @@ mixin _$ShadTabsTheme {
 
     return _other.gap == _this.gap &&
         _other.tabsGap == _this.tabsGap &&
+        _other.expandTabs == _this.expandTabs &&
         _other.tabBarAlignment == _this.tabBarAlignment &&
         _other.dragStartBehavior == _this.dragStartBehavior &&
         _other.physics == _this.physics &&
@@ -325,6 +330,7 @@ mixin _$ShadTabsTheme {
       runtimeType,
       _this.gap,
       _this.tabsGap,
+      _this.expandTabs,
       _this.tabBarAlignment,
       _this.dragStartBehavior,
       _this.physics,

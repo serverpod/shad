@@ -14,6 +14,7 @@ import 'package:shadcn_ui/src/theme/color_scheme/slate.dart';
 import 'package:shadcn_ui/src/theme/data.dart';
 import 'package:shadcn_ui/src/theme/text_theme/theme.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shadcn_ui/src/theme/theme_scope.dart';
 import 'package:shadcn_ui/src/utils/mouse_area.dart';
 import 'package:shadcn_ui/src/utils/mouse_cursor_provider.dart';
 
@@ -511,42 +512,9 @@ class _ShadAppState extends State<ShadApp> {
 
   ThemeData materialTheme(BuildContext context) {
     final themeData = theme(context);
-    var mTheme = ThemeData(
-      fontFamily: themeData.textTheme.family,
-      colorScheme: ColorScheme(
-        brightness: themeData.brightness,
-        primary: themeData.colorScheme.primary,
-        onPrimary: themeData.colorScheme.primaryForeground,
-        secondary: themeData.colorScheme.secondary,
-        onSecondary: themeData.colorScheme.secondaryForeground,
-        error: themeData.colorScheme.destructive,
-        onError: themeData.colorScheme.destructiveForeground,
-        surface: themeData.colorScheme.background,
-        onSurface: themeData.colorScheme.foreground,
-      ),
-      scaffoldBackgroundColor: themeData.colorScheme.background,
-      brightness: themeData.brightness,
-      dividerTheme: DividerThemeData(
-        color: themeData.separatorTheme.color ?? themeData.colorScheme.border,
-        thickness: themeData.separatorTheme.thickness ?? 1,
-      ),
-      textSelectionTheme: TextSelectionThemeData(
-        cursorColor: themeData.colorScheme.primary,
-        selectionColor: themeData.colorScheme.selection,
-        selectionHandleColor: themeData.colorScheme.primary,
-      ),
-      iconTheme: IconThemeData(
-        size: 16,
-        color: themeData.colorScheme.foreground,
-      ),
-      scrollbarTheme: ScrollbarThemeData(
-        crossAxisMargin: 1,
-        mainAxisMargin: 1,
-        thickness: const WidgetStatePropertyAll(8),
-        radius: const Radius.circular(999),
-        thumbColor: WidgetStatePropertyAll(themeData.colorScheme.border),
-      ),
-    );
+    // Shared with ShadThemeScope so the root theme and any re-themed subtree
+    // derive their Material theme the same way.
+    var mTheme = shadMaterialThemeFrom(themeData);
     mTheme = mTheme.copyWith(
       textTheme: applyGoogleFontToTextTheme(
         mTheme.textTheme,

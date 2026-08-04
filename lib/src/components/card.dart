@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
 import 'package:shadcn_ui/src/utils/border.dart';
 import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
+import 'package:shadcn_ui/src/utils/separated_iterable.dart';
 
 // A customizable card widget for displaying structured content.
 ///
@@ -33,6 +34,10 @@ class ShadCard extends StatelessWidget {
     this.rowMainAxisSize,
     this.columnMainAxisSize,
     this.clipBehavior,
+    this.titleStyle,
+    this.descriptionStyle,
+    this.gap,
+    this.action,
   });
 
   /// {@template ShadCard.title}
@@ -155,9 +160,34 @@ class ShadCard extends StatelessWidget {
   /// {@endtemplate}
   final Clip? clipBehavior;
 
+  /// {@template ShadCard.titleStyle}
+  /// The text style of [title].
+  /// {@endtemplate}
+  final TextStyle? titleStyle;
+
+  /// {@template ShadCard.descriptionStyle}
+  /// The text style of [description].
+  /// {@endtemplate}
+  final TextStyle? descriptionStyle;
+
+  /// {@template ShadCard.gap}
+  /// The vertical space between the title, description, content and footer.
+  /// {@endtemplate}
+  final double? gap;
+
+  /// {@template ShadCard.action}
+  /// A widget pinned to the end of the header row, shadcn/ui's `CardAction` —
+  /// typically a dismiss or overflow button.
+  ///
+  /// Unlike [trailing], which sits beside the card's whole content column,
+  /// this occupies only the header, so the body keeps the card's full width.
+  /// {@endtemplate}
+  final Widget? action;
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final effectiveGap = gap ?? theme.cardTheme.gap ?? 0;
 
     final effectivePadding =
         padding ?? theme.cardTheme.padding ?? const EdgeInsets.all(24);
@@ -226,23 +256,48 @@ class ShadCard extends StatelessWidget {
               crossAxisAlignment: effectiveColumnCrossAxisAlignment,
               mainAxisAlignment: effectiveColumnMainAxisAlignment,
               children: [
-                if (title != null)
-                  DefaultTextStyle(
-                    style: theme.textTheme.h3.copyWith(
-                      color: theme.colorScheme.cardForeground,
-                    ),
-                    child: title!,
-                  ),
-                if (description != null)
-                  DefaultTextStyle(
-                    style: theme.textTheme.muted.fallback(
-                      color: theme.colorScheme.mutedForeground,
-                    ),
-                    child: description!,
+                if (title != null || description != null)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: effectiveColumnCrossAxisAlignment,
+                          children: [
+                            if (title != null)
+                              DefaultTextStyle(
+                                style:
+                                    (titleStyle ??
+                                            theme.cardTheme.titleStyle ??
+                                            theme.textTheme.h3)
+                                        .copyWith(
+                                          color:
+                                              theme.colorScheme.cardForeground,
+                                        ),
+                                child: title!,
+                              ),
+                            if (description != null)
+                              DefaultTextStyle(
+                                style:
+                                    (descriptionStyle ??
+                                            theme.cardTheme.descriptionStyle ??
+                                            theme.textTheme.muted)
+                                        .fallback(
+                                          color:
+                                              theme.colorScheme.mutedForeground,
+                                        ),
+                                child: description!,
+                              ),
+                          ].separatedBy(SizedBox(height: effectiveGap)),
+                        ),
+                      ),
+                      ?action,
+                    ],
                   ),
                 if (child != null) Flexible(child: child!),
                 ?footer,
-              ],
+              ].separatedBy(SizedBox(height: effectiveGap)),
             ),
           ),
           ?trailing,

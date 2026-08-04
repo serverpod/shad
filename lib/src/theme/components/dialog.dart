@@ -42,6 +42,8 @@ class ShadDialogTheme with _$ShadDialogTheme {
     this.titlePinned,
     this.descriptionPinned,
     this.actionsPinned,
+    this.barrierColor,
+    this.barrierBlurSigma,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -142,6 +144,12 @@ class ShadDialogTheme with _$ShadDialogTheme {
 
   /// {@macro ShadDialog.actionsPinned}
   final bool? actionsPinned;
+
+  /// {@macro ShadDialog.barrierColor}
+  final Color? barrierColor;
+
+  /// {@macro ShadDialog.barrierBlurSigma}
+  final double? barrierBlurSigma;
 
   static ShadDialogTheme? lerp(
     ShadDialogTheme? a,

@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shadcn_ui/src/components/toast.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
+import 'package:shadcn_ui/src/theme/data.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
 import 'package:shadcn_ui/src/utils/animate.dart';
 import 'package:shadcn_ui/src/utils/mouse_area.dart';
@@ -145,8 +146,8 @@ class ShadSonner extends StatefulWidget {
   }
 }
 
-class ToastInfo {
-  ToastInfo({
+class ShadToastInfo {
+  ShadToastInfo({
     required this.id,
     required this.toast,
     required this.controller,
@@ -169,8 +170,8 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
   int get visibleToastsAmount =>
       widget.visibleToastsAmount ?? sonnerTheme.visibleToastsAmount ?? 3;
 
-  final _temporarelyHiddenToasts = <ToastInfo>[];
-  final _toasts = <ToastInfo>[];
+  final _temporarelyHiddenToasts = <ShadToastInfo>[];
+  final _toasts = <ShadToastInfo>[];
 
   Duration get animationDuration =>
       widget.animationDuration ??
@@ -192,6 +193,40 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
 
   final hovered = ValueNotifier(false);
 
+  /// The theme published to the toast subtree, memoized on the ambient theme.
+  ///
+  /// `ShadThemeData.copyWith` re-runs all 54 component-theme merges, and this
+  /// wraps the entire app, so recomputing it on every build was wasteful.
+  ShadThemeData? _ambientTheme;
+  late ShadThemeData _toastSubtreeTheme;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final theme = ShadTheme.of(context);
+    if (identical(theme, _ambientTheme)) return;
+    _ambientTheme = theme;
+    _toastSubtreeTheme = theme.copyWith(
+      primaryToastTheme: theme.primaryToastTheme.copyWith(
+        closeIcon: const SizedBox.shrink(),
+        padding: const EdgeInsets.all(16),
+        titleStyle: theme.primaryToastTheme.titleStyle?.copyWith(fontSize: 13),
+        descriptionStyle: theme.primaryToastTheme.descriptionStyle?.copyWith(
+          fontSize: 13,
+        ),
+      ),
+      destructiveToastTheme: theme.destructiveToastTheme.copyWith(
+        closeIcon: const SizedBox.shrink(),
+        padding: const EdgeInsets.all(16),
+        titleStyle: theme.destructiveToastTheme.titleStyle?.copyWith(
+          fontSize: 13,
+        ),
+        descriptionStyle: theme.destructiveToastTheme.descriptionStyle
+            ?.copyWith(fontSize: 13),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -207,11 +242,17 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
   @override
   void dispose() {
     animationController.dispose();
-    for (final toast in _toasts) {
+    // Toasts queued beyond [visibleToastsAmount] live in
+    // [_temporarelyHiddenToasts], not [_toasts]. Draining only the latter
+    // leaked an AnimationController (and its ticker) plus a Timer per queued
+    // toast.
+    for (final toast in [..._toasts, ..._temporarelyHiddenToasts]) {
       toast.timer?.cancel();
       toast.timer = null;
       toast.controller.dispose();
     }
+    _toasts.clear();
+    _temporarelyHiddenToasts.clear();
     hovered.dispose();
     super.dispose();
   }
@@ -231,7 +272,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
       duration: animationDuration,
     );
     final effectiveId = toast.id ?? UniqueKey();
-    final toastInfo = ToastInfo(
+    final toastInfo = ShadToastInfo(
       id: effectiveId,
       toast: toast,
       controller: controller,
@@ -265,6 +306,10 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     toastInfo.timer = null;
 
     await toastInfo.controller.reverse();
+    // The widget can be disposed while the exit animation runs; dispose() has
+    // already cancelled the timer and disposed the controller by then, so
+    // continuing here would double-dispose and setState after dispose.
+    if (!mounted) return;
     toastInfo.controller.dispose();
     setState(() {
       _toasts.remove(toastInfo);
@@ -285,6 +330,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
 
     toastInfo.controller.reset();
     await toastInfo.controller.forward();
+    if (!mounted) return;
     setState(() {
       toastInfo.temporarelyHide = true;
       _toasts.remove(toastInfo);
@@ -335,30 +381,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     return ShadSonnerScope(
       shadMessengerState: this,
       child: ShadTheme(
-        data: theme.copyWith(
-          primaryToastTheme: theme.primaryToastTheme.copyWith(
-            closeIcon: const SizedBox.shrink(),
-            padding: const EdgeInsets.all(16),
-            titleStyle: theme.primaryToastTheme.titleStyle?.copyWith(
-              fontSize: 13,
-            ),
-            descriptionStyle: theme.primaryToastTheme.descriptionStyle
-                ?.copyWith(
-                  fontSize: 13,
-                ),
-          ),
-          destructiveToastTheme: theme.destructiveToastTheme.copyWith(
-            closeIcon: const SizedBox.shrink(),
-            padding: const EdgeInsets.all(16),
-            titleStyle: theme.destructiveToastTheme.titleStyle?.copyWith(
-              fontSize: 13,
-            ),
-            descriptionStyle: theme.destructiveToastTheme.descriptionStyle
-                ?.copyWith(
-                  fontSize: 13,
-                ),
-          ),
-        ),
+        data: _toastSubtreeTheme,
         child: ValueListenableBuilder(
           valueListenable: hovered,
           builder: (context, isHovered, child) {
@@ -387,7 +410,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
                           child: ColoredBox(
                             color: const Color(0x00000000),
                             child: CustomBoxy(
-                              delegate: SonnerBoxy(
+                              delegate: _SonnerBoxy(
                                 animation: animation,
                                 collapsedGap: effectiveCollapsedGap,
                                 expandedGap: effectiveExpandedGap,
@@ -559,8 +582,8 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
 ///
 /// The [collapsedGap] is the gap between toasts when they are stacked, and the
 /// [expandedGap] is the gap between toasts when they expanded.
-class SonnerBoxy extends BoxyDelegate {
-  SonnerBoxy({
+class _SonnerBoxy extends BoxyDelegate {
+  _SonnerBoxy({
     required this.animation,
     this.collapsedGap = 16,
     this.expandedGap = 8,
@@ -655,3 +678,6 @@ class SonnerBoxy extends BoxyDelegate {
     return Size(maxWidth, currentHeight);
   }
 }
+
+@Deprecated('Renamed to ShadToastInfo. This name will be removed in v1.0.0.')
+typedef ToastInfo = ShadToastInfo;

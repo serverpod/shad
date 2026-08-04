@@ -605,11 +605,15 @@ class ShadTextTheme {
     ShadTextTheme? b,
     double t,
   ) {
-    if (identical(a, b) && a != null) {
+    if (identical(a, b)) {
       return a;
     }
+    if (a == null || b == null) {
+      return t < 0.5 ? a : b;
+    }
     return ShadTextTheme.custom(
-      h1Large: TextStyle.lerp(a!.h1Large, b!.h1Large, t)!,
+      canMerge: t < 0.5 ? a.canMerge : b.canMerge,
+      h1Large: TextStyle.lerp(a.h1Large, b.h1Large, t)!,
       h1: TextStyle.lerp(a.h1, b.h1, t)!,
       h2: TextStyle.lerp(a.h2, b.h2, t)!,
       h3: TextStyle.lerp(a.h3, b.h3, t)!,
@@ -660,6 +664,10 @@ class ShadTextTheme {
 
   @override
   int get hashCode {
+    // [canMerge] is deliberately absent: `==` does not compare it either, and
+    // including it here would violate the hashCode/== contract. `custom` is
+    // hashed per entry because MapEntry hashes by identity, which would
+    // disagree with the mapEquals used by `==`.
     return Object.hash(
       h1Large,
       h1,
@@ -675,9 +683,10 @@ class ShadTextTheme {
       small,
       muted,
       family,
-      canMerge,
       googleFontBuilder,
-      Object.hashAllUnordered(custom.entries),
+      Object.hashAllUnordered([
+        for (final entry in custom.entries) Object.hash(entry.key, entry.value),
+      ]),
     );
   }
 }

@@ -27,6 +27,7 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
     this.buttonVariant,
     this.decoration,
     this.textStyle,
+    this.selectedTextStyle,
     this.trailingTextStyle,
     this.itemConstraints,
     this.subMenuPadding,
@@ -84,6 +85,9 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
 
   /// {@macro ShadContextMenuItem.textStyle}
   final TextStyle? textStyle;
+
+  /// {@macro ShadContextMenuItem.selectedTextStyle}
+  final TextStyle? selectedTextStyle;
 
   /// {@macro ShadContextMenuItem.trailingTextStyle}
   final TextStyle? trailingTextStyle;

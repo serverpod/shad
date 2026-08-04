@@ -1,6 +1,18 @@
 import 'package:flutter/widgets.dart';
 
-abstract class ShadShadows {
+abstract class Shadows {
+  /// Tailwind's `shadow-none`.
+  static const none = <BoxShadow>[];
+
+  /// Tailwind's `shadow-xs`.
+  static const xs = [
+    BoxShadow(
+      color: Color(0x0d000000),
+      offset: Offset(0, 1),
+      blurRadius: 1,
+    ),
+  ];
+
   static const sm = [
     BoxShadow(
       color: Color(0x0d000000),

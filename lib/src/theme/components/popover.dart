@@ -16,6 +16,7 @@ class ShadPopoverTheme with _$ShadPopoverTheme {
     this.effects,
     this.shadows,
     this.reverseDuration,
+    this.textStyle,
     this.padding,
     this.decoration,
     this.anchor,
@@ -48,6 +49,9 @@ class ShadPopoverTheme with _$ShadPopoverTheme {
 
   /// {@macro ShadPopover.reverseDuration}
   final Duration? reverseDuration;
+
+  /// {@macro ShadPopover.textStyle}
+  final TextStyle? textStyle;
 
   static ShadPopoverTheme? lerp(
     ShadPopoverTheme? a,

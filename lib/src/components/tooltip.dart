@@ -1,8 +1,10 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shadcn_ui/src/components/popover.dart';
 import 'package:shadcn_ui/src/raw_components/portal.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
+import 'package:shadcn_ui/src/theme/data.dart';
 import 'package:shadcn_ui/src/theme/theme.dart';
 import 'package:shadcn_ui/src/utils/animate.dart';
 import 'package:shadcn_ui/src/utils/gesture_detector.dart';
@@ -183,12 +185,66 @@ class _ShadTooltipState extends State<ShadTooltip>
     super.dispose();
   }
 
+  /// The hover strategies this tooltip was configured with, before the
+  /// tooltip's own onHoverChange is layered on top.
+  ShadHoverStrategies? _baseHoverStrategies;
+
+  /// The theme handed to [ShadTooltip.child], with the merged hover strategies
+  /// applied.
+  ///
+  /// Computed here rather than in build(). Building it per build allocated a
+  /// fresh `onHoverChange` closure, and ShadHoverStrategies compares that
+  /// closure in `==`, so the copied theme was never equal to the previous one.
+  /// ShadInheritedTheme then reported a change and rebuilt the tooltip's entire
+  /// child subtree on every tooltip rebuild — and `ShadThemeData.copyWith`
+  /// re-runs all 54 component-theme merges each time.
+  late ShadThemeData _childTheme;
+
+  void _handleHoverChange(bool value) {
+    _baseHoverStrategies?.onHoverChange?.call(value);
+    onHoverChange(value);
+  }
+
+  void _syncEffectiveTheme() {
+    final theme = ShadTheme.of(context);
+    final base =
+        widget.hoverStrategies ??
+        theme.tooltipTheme.hoverStrategies ??
+        theme.hoverStrategies;
+    _baseHoverStrategies = base;
+    _childTheme = theme.copyWith(
+      hoverStrategies: base.copyWith(
+        // A tear-off of an instance method is canonicalized per receiver, so
+        // this keeps a stable identity across rebuilds.
+        onHoverChange: _handleHoverChange,
+        longPressDuration:
+            widget.longPressDuration ?? theme.tooltipTheme.longPressDuration,
+      ),
+    );
+    animationController
+      ..duration = widget.duration ?? theme.tooltipTheme.duration
+      ..reverseDuration =
+          widget.reverseDuration ?? theme.tooltipTheme.reverseDuration;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncEffectiveTheme();
+  }
+
   @override
   void didUpdateWidget(ShadTooltip oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.focusNode != oldWidget.focusNode) {
       oldWidget.focusNode?.removeListener(onFocusChange);
       widget.focusNode?.addListener(onFocusChange);
+    }
+    if (widget.hoverStrategies != oldWidget.hoverStrategies ||
+        widget.longPressDuration != oldWidget.longPressDuration ||
+        widget.duration != oldWidget.duration ||
+        widget.reverseDuration != oldWidget.reverseDuration) {
+      _syncEffectiveTheme();
     }
   }
 
@@ -199,9 +255,12 @@ class _ShadTooltipState extends State<ShadTooltip>
   Future<void> onHoverChange(bool value) async {
     if (hovered == value) return;
     hovered = value;
+    // Every await below can outlive the widget: the pointer leaves, the route
+    // is popped, and the delay completes against a disposed controller.
     if (value) {
       if (widget.waitDuration != null) {
         await Future<void>.delayed(widget.waitDuration!);
+        if (!mounted) return;
       }
       if (hovered) {
         controller.show();
@@ -209,9 +268,11 @@ class _ShadTooltipState extends State<ShadTooltip>
     } else {
       if (widget.showDuration != null) {
         await Future<void>.delayed(widget.showDuration!);
+        if (!mounted) return;
       }
       if (!hovered && !hasFocus) {
         await animationController.reverse();
+        if (!mounted) return;
         controller.hide();
       }
     }
@@ -240,64 +301,50 @@ class _ShadTooltipState extends State<ShadTooltip>
           ),
         );
 
-    final hoverStrategies =
-        widget.hoverStrategies ??
-        theme.tooltipTheme.hoverStrategies ??
-        theme.hoverStrategies;
-
-    final effectiveLongPressDuration =
-        widget.longPressDuration ?? theme.tooltipTheme.longPressDuration;
-
-    final effectiveHoverStrategies = hoverStrategies.copyWith(
-      onHoverChange: (value) {
-        hoverStrategies.onHoverChange?.call(value);
-        onHoverChange(value);
-      },
-      longPressDuration: effectiveLongPressDuration,
-    );
-
-    final effectiveDuration = widget.duration ?? theme.tooltipTheme.duration;
-    final effectiveReverseDuration =
-        widget.reverseDuration ?? theme.tooltipTheme.reverseDuration;
-
-    // Update the animation controller with the new durations.
-    animationController.duration = effectiveDuration;
-    animationController.reverseDuration = effectiveReverseDuration;
-
     return ListenableBuilder(
       listenable: controller,
       builder: (context, child) {
-        return ShadPortal(
-          visible: controller.isOpen,
-          anchor: effectiveAnchor,
-          portalBuilder: (context) {
-            Widget tooltip = ShadDecorator(
-              decoration: effectiveDecoration,
-              child: Padding(
-                padding: effectivePadding ?? EdgeInsets.zero,
-                child: DefaultTextStyle(
-                  style: theme.textTheme.muted.copyWith(
-                    color: theme.colorScheme.popoverForeground,
-                  ),
-                  child: widget.builder(context),
-                ),
-              ),
-            );
-
-            if (effectiveEffects.isNotEmpty) {
-              tooltip = ShadAnimate(
-                controller: animationController,
-                effects: effectiveEffects,
-                child: tooltip,
-              );
-            }
-            return ShadMouseArea(groupId: 'tooltip', child: tooltip);
+        return CallbackShortcuts(
+          // Radix dismisses a tooltip on Escape; without this a keyboard user
+          // who focused the trigger had no way to get rid of it.
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.escape): () {
+              hovered = false;
+              controller.hide();
+            },
           },
-          child: ShadMouseArea(
-            groupId: 'tooltip',
-            child: ShadTheme(
-              data: theme.copyWith(hoverStrategies: effectiveHoverStrategies),
-              child: widget.child,
+          child: ShadPortal(
+            visible: controller.isOpen,
+            anchor: effectiveAnchor,
+            portalBuilder: (context) {
+              Widget tooltip = ShadDecorator(
+                decoration: effectiveDecoration,
+                child: Padding(
+                  padding: effectivePadding ?? EdgeInsets.zero,
+                  child: DefaultTextStyle(
+                    style: theme.textTheme.muted.copyWith(
+                      color: theme.colorScheme.popoverForeground,
+                    ),
+                    child: widget.builder(context),
+                  ),
+                ),
+              );
+
+              if (effectiveEffects.isNotEmpty) {
+                tooltip = ShadAnimate(
+                  controller: animationController,
+                  effects: effectiveEffects,
+                  child: tooltip,
+                );
+              }
+              return ShadMouseArea(groupId: 'tooltip', child: tooltip);
+            },
+            child: ShadMouseArea(
+              groupId: 'tooltip',
+              child: ShadTheme(
+                data: _childTheme,
+                child: widget.child,
+              ),
             ),
           ),
         );

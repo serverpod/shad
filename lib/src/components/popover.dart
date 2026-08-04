@@ -63,6 +63,7 @@ class ShadPopover extends StatefulWidget {
     this.groupId,
     this.areaGroupId,
     this.useSameGroupIdForChild = true,
+    this.textStyle,
   }) : assert(
          (controller != null) ^ (visible != null),
          'Either controller or visible must be provided',
@@ -115,7 +116,7 @@ class ShadPopover extends StatefulWidget {
 
   /// {@template ShadPopover.shadows}
   /// The shadows applied to the [popover], defaults to
-  /// [ShadShadows.md].
+  /// [Shadows.md].
   /// {@endtemplate}
   final List<BoxShadow>? shadows;
 
@@ -151,6 +152,11 @@ class ShadPopover extends StatefulWidget {
   /// the popover.
   /// {@endtemplate}
   final bool useSameGroupIdForChild;
+
+  /// {@template ShadPopover.textStyle}
+  /// The default text style of the popover's content.
+  /// {@endtemplate}
+  final TextStyle? textStyle;
 
   /// {@template ShadPopover.reverseDuration}
   /// The duration of the popover's exit animation.
@@ -192,13 +198,43 @@ class _ShadPopoverState extends State<ShadPopover>
       // by the [Animate] widget based on the effects.
       duration: Animate.defaultDuration,
     );
+    animationController.addStatusListener(_onAnimationStatusChanged);
     controller.addListener(_onPopoverToggle);
     _onPopoverToggle();
+    _portalVisible.value = !animationController.isDismissed;
+  }
+
+  /// Whether [ShadPortal] should be showing its overlay.
+  ///
+  /// This flips at most twice per open/close. Reading
+  /// `!animationController.isDismissed` through an AnimatedBuilder instead
+  /// rebuilt ShadPortal on every animation frame, and each of those rebuilds
+  /// scheduled another post-frame reposition.
+  final _portalVisible = ValueNotifier(false);
+
+  void _onAnimationStatusChanged(AnimationStatus status) {
+    _portalVisible.value = status != AnimationStatus.dismissed;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncReverseDuration();
+  }
+
+  /// Mutating the controller belongs in a lifecycle callback, not in build().
+  void _syncReverseDuration() {
+    animationController.reverseDuration =
+        widget.reverseDuration ??
+        ShadTheme.of(context).popoverTheme.reverseDuration;
   }
 
   @override
   void didUpdateWidget(covariant ShadPopover oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.reverseDuration != oldWidget.reverseDuration) {
+      _syncReverseDuration();
+    }
     if (widget.controller != null &&
         widget.controller != oldWidget.controller) {
       oldWidget.controller?.removeListener(_onPopoverToggle);
@@ -220,7 +256,10 @@ class _ShadPopoverState extends State<ShadPopover>
     // or our internal controller.
     controller.removeListener(_onPopoverToggle);
 
-    animationController.dispose();
+    animationController
+      ..removeStatusListener(_onAnimationStatusChanged)
+      ..dispose();
+    _portalVisible.dispose();
     _popoverFocusNode.dispose();
     _controller?.dispose();
     super.dispose();
@@ -240,11 +279,6 @@ class _ShadPopoverState extends State<ShadPopover>
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-
-    final effectiveReverseDuration =
-        widget.reverseDuration ?? theme.popoverTheme.reverseDuration;
-
-    animationController.reverseDuration = effectiveReverseDuration;
 
     final effectiveEffects = widget.effects ?? theme.popoverTheme.effects ?? [];
 
@@ -290,13 +324,26 @@ class _ShadPopoverState extends State<ShadPopover>
         decoration: effectiveDecoration,
         child: Padding(
           padding: effectivePadding,
-          child: DefaultTextStyle(
-            style: TextStyle(
-              color: ShadTheme.of(context).colorScheme.popoverForeground,
-            ),
-            textAlign: TextAlign.center,
-            child: Builder(
-              builder: widget.popover,
+          child: IconTheme.merge(
+            // Icons follow the popover's own foreground. They used to inherit
+            // the page's, which is the wrong colour the moment the menu
+            // surface differs from the page — an inverted menu rendered its
+            // icons in the surface colour, i.e. invisibly.
+            data: IconThemeData(color: theme.colorScheme.popoverForeground),
+            child: DefaultTextStyle(
+              style:
+                  (widget.textStyle ??
+                          theme.popoverTheme.textStyle ??
+                          const TextStyle())
+                      .copyWith(color: theme.colorScheme.popoverForeground),
+              // Deliberately not centred. A popover is mostly a menu or a
+              // form, and shadcn/ui aligns that content to the start; forcing
+              // TextAlign.center centred every select option and menu item.
+              // Callers wanting centred content can wrap it themselves.
+              textAlign: TextAlign.start,
+              child: Builder(
+                builder: widget.popover,
+              ),
             ),
           ),
         ),
@@ -337,9 +384,9 @@ class _ShadPopoverState extends State<ShadPopover>
           controller.hide();
         },
       },
-      child: AnimatedBuilder(
-        animation: animationController,
-        builder: (context, _) {
+      child: ValueListenableBuilder(
+        valueListenable: _portalVisible,
+        builder: (context, visible, _) {
           return ShadPortal(
             portalBuilder: (_) {
               // used to trap the focus inside the popover.
@@ -351,7 +398,7 @@ class _ShadPopoverState extends State<ShadPopover>
                 ),
               );
             },
-            visible: !animationController.isDismissed,
+            visible: visible,
             anchor: effectiveAnchor,
             child: widget.child,
           );

@@ -23,10 +23,21 @@ enum ShadButtonVariant {
 }
 
 /// Size options available for the [ShadButton] widget.
+///
+/// Maps onto shadcn/ui's `size` prop: [regular] is `default`, plus `sm`, `lg`
+/// and `icon`.
+///
+/// The concrete metrics for each size come from `ShadButtonSizesTheme`.
 enum ShadButtonSize {
   regular,
   sm,
   lg,
+
+  /// A square button sized for a single icon, matching
+  /// `<Button size="icon">`.
+  ///
+  /// This is the size `ShadIconButton` uses by default.
+  icon,
 }
 
 /// A highly customizable button widget with variant and size options.
@@ -88,6 +99,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -145,6 +158,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -201,6 +216,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -257,6 +274,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -313,6 +332,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -368,6 +389,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.textStyle,
     this.canRequestFocus,
@@ -421,6 +444,8 @@ class ShadButton extends StatefulWidget {
     this.textDirection,
     this.gap,
     this.onFocusChange,
+    this.pressedOffset,
+    this.pressAnimationDuration,
     this.expands,
     this.leading,
     this.trailing,
@@ -729,6 +754,12 @@ class ShadButton extends StatefulWidget {
   /// {@endtemplate}
   final ValueChanged<bool>? onFocusChange;
 
+  /// {@macro ShadButtonTheme.pressedOffset}
+  final Offset? pressedOffset;
+
+  /// {@macro ShadButtonTheme.pressAnimationDuration}
+  final Duration? pressAnimationDuration;
+
   /// {@template ShadButton.expands}
   /// Whether the [child] expands to fill available space along the main axis.
   /// Defaults to false if not specified.
@@ -818,6 +849,9 @@ class _ShadButtonState extends State<ShadButton> {
         return buttonTheme(theme).sizesTheme?.sm ?? theme.buttonSizesTheme.sm!;
       case ShadButtonSize.lg:
         return buttonTheme(theme).sizesTheme?.lg ?? theme.buttonSizesTheme.lg!;
+      case ShadButtonSize.icon:
+        return buttonTheme(theme).sizesTheme?.icon ??
+            theme.buttonSizesTheme.icon!;
       case ShadButtonSize.regular:
         return buttonTheme(theme).sizesTheme?.regular ??
             theme.buttonSizesTheme.regular!;
@@ -1051,108 +1085,137 @@ class _ShadButtonState extends State<ShadButton> {
             child = Expanded(child: widget.child!);
           }
 
-          return IconTheme(
-            data: iconTheme.copyWith(color: effectiveForegroundColor),
-            child: DefaultTextStyle(
-              style: effectiveTextStyle.copyWith(
-                color: effectiveForegroundColor,
-                decoration: textDecoration(
-                  theme,
-                  hovered: hovered,
+          // shadcn/ui nudges a button down a pixel while active
+          // (`active:translate-y-px`), animated by its `transition-all`.
+          final effectivePressedOffset =
+              widget.pressedOffset ??
+              buttonTheme(theme).pressedOffset ??
+              const Offset(0, 1);
+          final effectivePressDuration =
+              widget.pressAnimationDuration ??
+              buttonTheme(theme).pressAnimationDuration ??
+              const Duration(milliseconds: 100);
+
+          return AnimatedSlide(
+            // AnimatedSlide takes a fraction of the child's size, so convert
+            // the pixel offset once the height is known.
+            // Requires a real handler as well as the enabled state: a button
+            // with no onPressed does nothing, so it should not appear to
+            // depress. `enabled` here tracks ShadButton.enabled, which is
+            // independent of whether a callback was supplied.
+            offset: pressed && enabled && widget.onPressed != null
+                ? Offset(
+                    effectivePressedOffset.dx / 100,
+                    effectivePressedOffset.dy / effectiveHeight,
+                  )
+                : Offset.zero,
+            duration: effectivePressDuration,
+            curve: Curves.easeOut,
+            child: IconTheme(
+              data: iconTheme.copyWith(color: effectiveForegroundColor),
+              child: DefaultTextStyle(
+                style: effectiveTextStyle.copyWith(
+                  color: effectiveForegroundColor,
+                  decoration: textDecoration(
+                    theme,
+                    hovered: hovered,
+                  ),
+                  decorationColor: foreground(theme),
+                  decorationStyle: TextDecorationStyle.solid,
                 ),
-                decorationColor: foreground(theme),
-                decorationStyle: TextDecorationStyle.solid,
-              ),
-              textAlign: TextAlign.center,
-              child: Semantics(
-                container: true,
-                button: true,
-                focusable: enabled,
-                enabled: enabled,
-                child: Opacity(
-                  opacity: enabled ? 1 : .5,
-                  child: AbsorbPointer(
-                    absorbing: !enabled,
-                    child: ShadFocusable(
-                      canRequestFocus: effectiveCanRequestFocus,
-                      autofocus: widget.autofocus,
-                      focusNode: focusNode,
-                      onFocusChange: widget.onFocusChange,
-                      builder: (context, focused, child) => ShadDecorator(
-                        decoration: updatedDecoration,
-                        focused: focused,
-                        child: child,
-                      ),
-                      child: ShadGestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onHoverChange: (value) {
-                          statesController.update(ShadState.hovered, value);
-                          widget.onHoverChange?.call(value);
-                        },
-                        hoverStrategies: effectiveHoverStrategies,
-                        cursor: cursor(theme),
-                        onLongPress: widget.onLongPress,
-                        onTap: widget.onPressed == null ? null : onTap,
-                        onTapDown: (details) {
-                          statesController.update(ShadState.pressed, true);
-                          widget.onTapDown?.call(details);
-                        },
-                        onTapUp: (details) {
-                          statesController.update(ShadState.pressed, false);
-                          widget.onTapUp?.call(details);
-                        },
-                        onTapCancel: () {
-                          statesController.update(ShadState.pressed, false);
-                          widget.onTapCancel?.call();
-                        },
-                        onSecondaryTapDown: (details) {
-                          widget.onSecondaryTapDown?.call(details);
-                        },
-                        onSecondaryTapUp: (details) {
-                          widget.onSecondaryTapUp?.call(details);
-                        },
-                        onSecondaryTapCancel: () {
-                          widget.onSecondaryTapCancel?.call();
-                        },
-                        onDoubleTap: widget.onDoubleTap,
-                        onDoubleTapDown: widget.onDoubleTapDown,
-                        onDoubleTapCancel: widget.onDoubleTapCancel,
-                        onLongPressCancel: widget.onLongPressCancel,
-                        onLongPressEnd: widget.onLongPressEnd,
-                        onLongPressUp: widget.onLongPressUp,
-                        onLongPressDown: widget.onLongPressDown,
-                        onLongPressStart: widget.onLongPressStart,
-                        longPressDuration: effectiveLongPressDuration,
-                        child: SelectionContainer.disabled(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minWidth: effectiveWidth,
-                              // When the width is 0 or null, we set maxWidth to
-                              // infinity to allow the button to size itself
-                              // based on its child.
-                              maxWidth: effectiveWidth == 0
-                                  ? double.infinity
-                                  : effectiveWidth,
-                              minHeight: effectiveHeight,
-                              // When the height is 0, we set maxHeight to
-                              // infinity to allow the button to size itself
-                              // based on its child.
-                              maxHeight: effectiveHeight == 0
-                                  ? double.infinity
-                                  : effectiveHeight,
-                            ),
-                            child: Padding(
-                              padding: padding(theme),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: effectiveCrossAxisAlignment,
-                                mainAxisAlignment: effectiveMainAxisAlignment,
-                                textDirection: effectiveTextDirection,
-                                children: [
-                                  if (widget.leading != null) widget.leading!,
-                                  if (widget.child != null) child!,
-                                  if (widget.trailing != null) widget.trailing!,
-                                ].separatedBy(SizedBox(width: effectiveGap)),
+                textAlign: TextAlign.center,
+                child: Semantics(
+                  container: true,
+                  button: true,
+                  focusable: enabled,
+                  enabled: enabled,
+                  child: Opacity(
+                    opacity: enabled ? 1 : .5,
+                    child: AbsorbPointer(
+                      absorbing: !enabled,
+                      child: ShadFocusable(
+                        canRequestFocus: effectiveCanRequestFocus,
+                        autofocus: widget.autofocus,
+                        focusNode: focusNode,
+                        onFocusChange: widget.onFocusChange,
+                        builder: (context, focused, child) => ShadDecorator(
+                          decoration: updatedDecoration,
+                          focused: focused,
+                          child: child,
+                        ),
+                        child: ShadGestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onHoverChange: (value) {
+                            statesController.update(ShadState.hovered, value);
+                            widget.onHoverChange?.call(value);
+                          },
+                          hoverStrategies: effectiveHoverStrategies,
+                          cursor: cursor(theme),
+                          onLongPress: widget.onLongPress,
+                          onTap: widget.onPressed == null ? null : onTap,
+                          onTapDown: (details) {
+                            statesController.update(ShadState.pressed, true);
+                            widget.onTapDown?.call(details);
+                          },
+                          onTapUp: (details) {
+                            statesController.update(ShadState.pressed, false);
+                            widget.onTapUp?.call(details);
+                          },
+                          onTapCancel: () {
+                            statesController.update(ShadState.pressed, false);
+                            widget.onTapCancel?.call();
+                          },
+                          onSecondaryTapDown: (details) {
+                            widget.onSecondaryTapDown?.call(details);
+                          },
+                          onSecondaryTapUp: (details) {
+                            widget.onSecondaryTapUp?.call(details);
+                          },
+                          onSecondaryTapCancel: () {
+                            widget.onSecondaryTapCancel?.call();
+                          },
+                          onDoubleTap: widget.onDoubleTap,
+                          onDoubleTapDown: widget.onDoubleTapDown,
+                          onDoubleTapCancel: widget.onDoubleTapCancel,
+                          onLongPressCancel: widget.onLongPressCancel,
+                          onLongPressEnd: widget.onLongPressEnd,
+                          onLongPressUp: widget.onLongPressUp,
+                          onLongPressDown: widget.onLongPressDown,
+                          onLongPressStart: widget.onLongPressStart,
+                          longPressDuration: effectiveLongPressDuration,
+                          child: SelectionContainer.disabled(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: effectiveWidth,
+                                // When the width is 0 or null, maxWidth goes
+                                // to infinity so the button sizes itself
+                                // from its child.
+                                maxWidth: effectiveWidth == 0
+                                    ? double.infinity
+                                    : effectiveWidth,
+                                minHeight: effectiveHeight,
+                                // When the height is 0, we set maxHeight to
+                                // infinity to allow the button to size itself
+                                // based on its child.
+                                maxHeight: effectiveHeight == 0
+                                    ? double.infinity
+                                    : effectiveHeight,
+                              ),
+                              child: Padding(
+                                padding: padding(theme),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      effectiveCrossAxisAlignment,
+                                  mainAxisAlignment: effectiveMainAxisAlignment,
+                                  textDirection: effectiveTextDirection,
+                                  children: [
+                                    if (widget.leading != null) widget.leading!,
+                                    if (widget.child != null) child!,
+                                    if (widget.trailing != null)
+                                      widget.trailing!,
+                                  ].separatedBy(SizedBox(width: effectiveGap)),
+                                ),
                               ),
                             ),
                           ),

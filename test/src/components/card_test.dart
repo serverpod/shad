@@ -33,13 +33,13 @@ void main() {
       expect(find.text('Card Content'), findsOneWidget);
       expect(find.text('Card Footer'), findsOneWidget);
 
-      // Check basic layout (Container with Row)
+      // Check basic layout (Container with Row). The card is an outer Row —
+      // leading, content, trailing — wrapping a Column, and the title and
+      // description sit in a header Row of their own inside that Column.
       final containerFinder = find.byType(Container);
       expect(containerFinder, findsOneWidget);
-      final rowFinder = find.byType(Row);
-      expect(rowFinder, findsOneWidget);
-      final columnFinder = find.byType(Column);
-      expect(columnFinder, findsOneWidget);
+      expect(find.byType(Row), findsNWidgets(2));
+      expect(find.byType(Column), findsNWidgets(2));
     });
 
     testWidgets('renders with leading and trailing widgets', (
@@ -156,7 +156,7 @@ void main() {
       // Check Row applies custom alignments
       final rowFinder = find.byType(Row);
       expect(rowFinder, findsOneWidget);
-      final row = tester.widget<Row>(rowFinder);
+      final row = tester.widget<Row>(rowFinder.first);
       expect(row.mainAxisAlignment, MainAxisAlignment.center);
       expect(row.crossAxisAlignment, CrossAxisAlignment.center);
     });
@@ -175,12 +175,14 @@ void main() {
         ),
       );
 
-      // Check Column applies custom alignments
-      final columnFinder = find.byType(Column);
-      expect(columnFinder, findsOneWidget);
-      final column = tester.widget<Column>(columnFinder);
+      // The outer Column is the card's content stack; the inner one holds the
+      // title and description inside the header row.
+      final column = tester.widget<Column>(find.byType(Column).first);
       expect(column.mainAxisAlignment, MainAxisAlignment.center);
       expect(column.crossAxisAlignment, CrossAxisAlignment.center);
+
+      final header = tester.widget<Column>(find.byType(Column).last);
+      expect(header.crossAxisAlignment, CrossAxisAlignment.center);
     });
 
     testWidgets('renders without optional content', (

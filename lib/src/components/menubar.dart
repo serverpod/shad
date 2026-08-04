@@ -120,10 +120,12 @@ class _ShadMenubarState extends State<ShadMenubar> {
     ).merge(theme.menubarTheme.border).merge(widget.border);
 
     return ShadProvider(
+      // No notifyUpdate: `data` is this State, whose identity never changes,
+      // so any predicate over it is constant. Items rebuild through the normal
+      // parent-to-child path instead. The previous
+      // `(oldState) => oldState.data != this` was always false, i.e. exactly
+      // ShadProvider's default.
       data: this,
-      notifyUpdate: (oldState) {
-        return oldState.data != this;
-      },
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: effectiveBackgroundColor,
@@ -422,7 +424,10 @@ class _ShadMenubarItemState extends State<ShadMenubarItem> {
   ShadPopoverController get popoverController =>
       widget.controller ?? _popoverController!;
 
-  late ShadMenubarController menubarController;
+  ShadMenubarController? _menubarController;
+
+  ShadMenubarController get menubarController => _menubarController!;
+
   late int index;
 
   @override
@@ -441,16 +446,24 @@ class _ShadMenubarItemState extends State<ShadMenubarItem> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    menubarController = context.watch<_ShadMenubarState>().controller;
+    final newController = context.watch<_ShadMenubarState>().controller;
     index = context.watch<ShadProviderIndex>().index;
 
-    menubarController.removeListener(onSelectedIndexChange);
-    menubarController.addListener(onSelectedIndexChange);
+    // Detach from the previous controller before adopting the new one. The
+    // old code reassigned the field first and then removed the listener from
+    // the *new* controller, so swapping ShadMenubar.controller left the
+    // listener attached to the old one forever — and it would later call
+    // setOpen on a disposed popover controller.
+    if (!identical(newController, _menubarController)) {
+      _menubarController?.removeListener(onSelectedIndexChange);
+      _menubarController = newController;
+      newController.addListener(onSelectedIndexChange);
+    }
   }
 
   @override
   void dispose() {
-    menubarController.removeListener(onSelectedIndexChange);
+    _menubarController?.removeListener(onSelectedIndexChange);
     _popoverController?.dispose();
     super.dispose();
   }

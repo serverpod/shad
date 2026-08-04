@@ -552,39 +552,41 @@ class _ShadTextareaState extends State<ShadTextarea> {
 
     final effectivePadding =
         widget.padding ??
-        theme.inputTheme.padding ??
+        theme.textareaTheme.padding ??
         const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
     final effectiveInputPadding =
-        widget.inputPadding ?? theme.inputTheme.inputPadding ?? EdgeInsets.zero;
+        widget.inputPadding ??
+        theme.textareaTheme.inputPadding ??
+        EdgeInsets.zero;
 
     final effectivePlaceholderStyle = theme.textTheme.muted
-        .merge(theme.inputTheme.placeholderStyle)
+        .merge(theme.textareaTheme.placeholderStyle)
         .merge(widget.placeholderStyle);
 
     final effectivePlaceholderAlignment =
         widget.placeholderAlignment ??
-        theme.inputTheme.placeholderAlignment ??
+        theme.textareaTheme.placeholderAlignment ??
         AlignmentDirectional.topStart;
 
     final effectiveAlignment =
         widget.alignment ??
-        theme.inputTheme.alignment ??
+        theme.textareaTheme.alignment ??
         AlignmentDirectional.topStart;
 
     final effectiveMainAxisAlignment =
         widget.mainAxisAlignment ??
-        theme.inputTheme.mainAxisAlignment ??
+        theme.textareaTheme.mainAxisAlignment ??
         MainAxisAlignment.start;
 
     final effectiveCrossAxisAlignment =
         widget.crossAxisAlignment ??
-        theme.inputTheme.crossAxisAlignment ??
+        theme.textareaTheme.crossAxisAlignment ??
         CrossAxisAlignment.center;
     final effectiveMouseCursor =
         widget.mouseCursor ?? WidgetStateMouseCursor.textable;
 
-    final effectiveGap = widget.gap ?? theme.inputTheme.gap ?? 8.0;
+    final effectiveGap = widget.gap ?? theme.textareaTheme.gap ?? 8.0;
 
     final textScaler = MediaQuery.textScalerOf(context);
 

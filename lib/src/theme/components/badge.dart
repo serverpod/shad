@@ -14,6 +14,7 @@ class ShadBadgeTheme with _$ShadBadgeTheme {
     this.foregroundColor,
     this.padding,
     this.cursor,
+    this.textStyle,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -39,6 +40,9 @@ class ShadBadgeTheme with _$ShadBadgeTheme {
 
   /// {@macro ShadBadge.cursor}
   final MouseCursor? cursor;
+
+  /// {@macro ShadBadge.textStyle}
+  final TextStyle? textStyle;
 
   static ShadBadgeTheme? lerp(
     ShadBadgeTheme? a,

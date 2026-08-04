@@ -48,6 +48,13 @@ mixin _$ShadCardTheme {
       rowMainAxisSize: t < 0.5 ? a.rowMainAxisSize : b.rowMainAxisSize,
       columnMainAxisSize: t < 0.5 ? a.columnMainAxisSize : b.columnMainAxisSize,
       clipBehavior: t < 0.5 ? a.clipBehavior : b.clipBehavior,
+      titleStyle: TextStyle.lerp(a.titleStyle, b.titleStyle, t),
+      descriptionStyle: TextStyle.lerp(
+        a.descriptionStyle,
+        b.descriptionStyle,
+        t,
+      ),
+      gap: lerpDouble$(a.gap, b.gap, t),
     );
   }
 
@@ -66,6 +73,9 @@ mixin _$ShadCardTheme {
     MainAxisSize? rowMainAxisSize,
     MainAxisSize? columnMainAxisSize,
     Clip? clipBehavior,
+    TextStyle? titleStyle,
+    TextStyle? descriptionStyle,
+    double? gap,
   }) {
     final _this = (this as ShadCardTheme);
 
@@ -87,6 +97,9 @@ mixin _$ShadCardTheme {
       rowMainAxisSize: rowMainAxisSize ?? _this.rowMainAxisSize,
       columnMainAxisSize: columnMainAxisSize ?? _this.columnMainAxisSize,
       clipBehavior: clipBehavior ?? _this.clipBehavior,
+      titleStyle: titleStyle ?? _this.titleStyle,
+      descriptionStyle: descriptionStyle ?? _this.descriptionStyle,
+      gap: gap ?? _this.gap,
     );
   }
 
@@ -116,6 +129,11 @@ mixin _$ShadCardTheme {
       rowMainAxisSize: other.rowMainAxisSize,
       columnMainAxisSize: other.columnMainAxisSize,
       clipBehavior: other.clipBehavior,
+      titleStyle: _this.titleStyle?.merge(other.titleStyle) ?? other.titleStyle,
+      descriptionStyle:
+          _this.descriptionStyle?.merge(other.descriptionStyle) ??
+          other.descriptionStyle,
+      gap: other.gap,
     );
   }
 
@@ -145,7 +163,10 @@ mixin _$ShadCardTheme {
         _other.columnCrossAxisAlignment == _this.columnCrossAxisAlignment &&
         _other.rowMainAxisSize == _this.rowMainAxisSize &&
         _other.columnMainAxisSize == _this.columnMainAxisSize &&
-        _other.clipBehavior == _this.clipBehavior;
+        _other.clipBehavior == _this.clipBehavior &&
+        _other.titleStyle == _this.titleStyle &&
+        _other.descriptionStyle == _this.descriptionStyle &&
+        _other.gap == _this.gap;
   }
 
   @override
@@ -168,6 +189,9 @@ mixin _$ShadCardTheme {
       _this.rowMainAxisSize,
       _this.columnMainAxisSize,
       _this.clipBehavior,
+      _this.titleStyle,
+      _this.descriptionStyle,
+      _this.gap,
     );
   }
 }

@@ -23,6 +23,8 @@ class ShadSwitch extends StatefulWidget {
     this.enabled = true,
     this.onChanged,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.thumbColor,
     this.uncheckedTrackColor,
     this.checkedTrackColor,
@@ -66,6 +68,17 @@ class ShadSwitch extends StatefulWidget {
   /// If not provided, an internal [FocusNode] is created.
   /// {@endtemplate}
   final FocusNode? focusNode;
+
+  /// {@template ShadWidget.autofocus}
+  /// Whether this widget should be focused when first shown.
+  /// Defaults to `false`.
+  /// {@endtemplate}
+  final bool autofocus;
+
+  /// {@template ShadWidget.onFocusChange}
+  /// Called when the focus state of this widget changes.
+  /// {@endtemplate}
+  final ValueChanged<bool>? onFocusChange;
 
   /// {@template ShadSwitch.thumbColor}
   /// Color of the switch's thumb (the draggable part).
@@ -278,6 +291,8 @@ class _ShadSwitchState extends State<ShadSwitch>
               },
           },
           child: ShadFocusable(
+            autofocus: widget.autofocus,
+            onFocusChange: widget.onFocusChange,
             focusNode: focusNode,
             builder: (context, focused, child) {
               return ShadDecorator(

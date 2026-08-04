@@ -56,3 +56,7 @@ entities.json
 
 # Golden test failure artifacts (regenerated per test run)
 test/**/failures/
+
+# The shadcn/ui checkout used as a visual reference (see CLAUDE.md).
+# Large, and not ours to vendor.
+reference/

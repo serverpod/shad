@@ -220,11 +220,18 @@ class _ShadPortalState extends State<ShadPortal> {
     _scrollNotificationObserver?.addListener(_handleScrollNotification);
   }
 
+  /// Queues a single reposition for the next frame.
+  ///
+  /// Every caller must go through here. The ad-hoc
+  /// `addPostFrameCallback(_calculatePosition)` calls that used to live in
+  /// [buildAutoPosition] and [_calculatePosition] bypassed this guard, so a
+  /// portal that rebuilt N times in a frame queued N repositions.
   void _scheduleAutoPositionUpdate() {
     if (_autoPositionUpdateScheduled) return;
     _autoPositionUpdateScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _autoPositionUpdateScheduled = false;
+      if (!mounted) return;
       _calculatePosition();
     });
   }
@@ -382,9 +389,7 @@ class _ShadPortalState extends State<ShadPortal> {
         });
       }
     } else if (overlay == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _calculatePosition();
-      });
+      _scheduleAutoPositionUpdate();
     } else {
       // The target is unchanged but the overlay render object now exists.
       // Force a rebuild so that the overlay becomes visible (it was initially
@@ -405,7 +410,7 @@ class _ShadPortalState extends State<ShadPortal> {
     }
 
     if (_calculatedTarget == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _calculatePosition());
+      _scheduleAutoPositionUpdate();
       return const SizedBox.shrink();
     }
 
@@ -414,9 +419,7 @@ class _ShadPortalState extends State<ShadPortal> {
     final overlay = overlayKey.currentContext?.findRenderObject() as RenderBox?;
 
     if (overlay == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _calculatePosition();
-      });
+      _scheduleAutoPositionUpdate();
     }
 
     return CustomSingleChildLayout(

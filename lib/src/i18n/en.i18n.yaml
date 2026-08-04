@@ -16,3 +16,12 @@ input:
 
 keyboardToolbar:
   done: "Done"
+
+empty:
+  title: "No results"
+
+pagination:
+  previous: "Previous"
+  next: "Next"
+  morePages: "More pages"
+  page: "Page"

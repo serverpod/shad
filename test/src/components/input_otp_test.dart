@@ -43,4 +43,33 @@ void main() {
       );
     });
   });
+
+  testWidgets('slots grow with the text scale', (tester) async {
+    // A slot is a fixed box around one glyph, so it has to follow the text
+    // scaler or the digit is clipped.
+    Future<Size> slotSize(double scale) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+          child: createTestWidget(
+            const ShadInputOTP(
+              maxLength: 2,
+              children: [
+                ShadInputOTPGroup(
+                  children: [ShadInputOTPSlot(), ShadInputOTPSlot()],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      return tester.getSize(find.byType(ShadInputOTPSlot).first);
+    }
+
+    final normal = await slotSize(1);
+    final large = await slotSize(2);
+
+    expect(large.width, normal.width * 2);
+    expect(large.height, normal.height * 2);
+  });
 }

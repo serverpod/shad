@@ -13,8 +13,13 @@ extension ShadDateTime on DateTime {
   bool isSameDay(DateTime other) =>
       year == other.year && month == other.month && day == other.day;
 
-  bool isSameDayOrGreatier(DateTime other) =>
-      isSameDay(other) || isAfter(other);
+  bool isSameDayOrGreater(DateTime other) => isSameDay(other) || isAfter(other);
+
+  @Deprecated(
+    'Spelling fix: use isSameDayOrGreater. '
+    'This name will be removed in v1.0.0.',
+  )
+  bool isSameDayOrGreatier(DateTime other) => isSameDayOrGreater(other);
 
   bool isSameDayOrLower(DateTime other) => isSameDay(other) || isBefore(other);
 

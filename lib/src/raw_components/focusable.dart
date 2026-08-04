@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-typedef FocusWidgetBuilder =
+typedef ShadFocusWidgetBuilder =
     Widget Function(
       BuildContext context,
       bool focused,
@@ -27,7 +27,7 @@ class ShadFocusable extends StatefulWidget {
   final bool canRequestFocus;
   final bool autofocus;
   final FocusNode? focusNode;
-  final FocusWidgetBuilder builder;
+  final ShadFocusWidgetBuilder builder;
   final Widget? child;
   final ValueChanged<bool>? onFocusChange;
   final FocusOnKeyEventCallback? onKeyEvent;
@@ -91,3 +91,8 @@ class _ShadFocusableState extends State<ShadFocusable> {
     );
   }
 }
+
+@Deprecated(
+  'Renamed to ShadFocusWidgetBuilder. This name will be removed in v1.0.0.',
+)
+typedef FocusWidgetBuilder = ShadFocusWidgetBuilder;

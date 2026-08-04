@@ -14,6 +14,7 @@ class ShadTextareaTheme with _$ShadTextareaTheme {
     this.style,
     this.placeholderStyle,
     this.placeholderAlignment,
+    this.alignment,
     this.inputPadding,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
@@ -46,6 +47,9 @@ class ShadTextareaTheme with _$ShadTextareaTheme {
 
   /// {@macro ShadTextarea.placeholderAlignment}
   final AlignmentGeometry? placeholderAlignment;
+
+  /// {@macro ShadTextarea.alignment}
+  final AlignmentGeometry? alignment;
 
   /// {@macro ShadTextarea.inputPadding}
   final EdgeInsetsGeometry? inputPadding;

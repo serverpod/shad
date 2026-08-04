@@ -23,6 +23,16 @@ class _ShadAnimationBuilderState extends State<ShadAnimationBuilder>
   );
 
   @override
+  void didUpdateWidget(ShadAnimationBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The controller is created once with the initial duration, so without
+    // this a later duration change was silently ignored.
+    if (widget.duration != oldWidget.duration) {
+      controller.duration = widget.duration;
+    }
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();

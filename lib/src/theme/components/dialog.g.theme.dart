@@ -85,6 +85,8 @@ mixin _$ShadDialogTheme {
       titlePinned: t < 0.5 ? a.titlePinned : b.titlePinned,
       descriptionPinned: t < 0.5 ? a.descriptionPinned : b.descriptionPinned,
       actionsPinned: t < 0.5 ? a.actionsPinned : b.actionsPinned,
+      barrierColor: Color.lerp(a.barrierColor, b.barrierColor, t),
+      barrierBlurSigma: lerpDouble$(a.barrierBlurSigma, b.barrierBlurSigma, t),
     );
   }
 
@@ -120,6 +122,8 @@ mixin _$ShadDialogTheme {
     bool? titlePinned,
     bool? descriptionPinned,
     bool? actionsPinned,
+    Color? barrierColor,
+    double? barrierBlurSigma,
   }) {
     final _this = (this as ShadDialogTheme);
 
@@ -159,6 +163,8 @@ mixin _$ShadDialogTheme {
       titlePinned: titlePinned ?? _this.titlePinned,
       descriptionPinned: descriptionPinned ?? _this.descriptionPinned,
       actionsPinned: actionsPinned ?? _this.actionsPinned,
+      barrierColor: barrierColor ?? _this.barrierColor,
+      barrierBlurSigma: barrierBlurSigma ?? _this.barrierBlurSigma,
     );
   }
 
@@ -207,6 +213,8 @@ mixin _$ShadDialogTheme {
       titlePinned: other.titlePinned,
       descriptionPinned: other.descriptionPinned,
       actionsPinned: other.actionsPinned,
+      barrierColor: other.barrierColor,
+      barrierBlurSigma: other.barrierBlurSigma,
     );
   }
 
@@ -253,7 +261,9 @@ mixin _$ShadDialogTheme {
         _other.useSafeArea == _this.useSafeArea &&
         _other.titlePinned == _this.titlePinned &&
         _other.descriptionPinned == _this.descriptionPinned &&
-        _other.actionsPinned == _this.actionsPinned;
+        _other.actionsPinned == _this.actionsPinned &&
+        _other.barrierColor == _this.barrierColor &&
+        _other.barrierBlurSigma == _this.barrierBlurSigma;
   }
 
   @override
@@ -293,6 +303,8 @@ mixin _$ShadDialogTheme {
       _this.titlePinned,
       _this.descriptionPinned,
       _this.actionsPinned,
+      _this.barrierColor,
+      _this.barrierBlurSigma,
     ]);
   }
 }

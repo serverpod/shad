@@ -56,6 +56,8 @@ class ShadSelect<T> extends StatefulWidget {
     this.initialValue,
     this.onChanged,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -120,6 +122,8 @@ class ShadSelect<T> extends StatefulWidget {
     this.placeholderStyle,
     this.initialValue,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -174,6 +178,8 @@ class ShadSelect<T> extends StatefulWidget {
     this.initialValues = const {},
     ValueChanged<Set<T>>? onChanged,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -239,6 +245,8 @@ class ShadSelect<T> extends StatefulWidget {
     this.placeholderStyle,
     this.initialValues = const {},
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -305,6 +313,8 @@ class ShadSelect<T> extends StatefulWidget {
     this.onChanged,
     this.onMultipleChanged,
     this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
     this.closeOnTapOutside = true,
     this.minWidth,
     this.maxWidth,
@@ -452,6 +462,17 @@ class ShadSelect<T> extends StatefulWidget {
   /// If null, a default [FocusNode] will be created internally.
   /// {@endtemplate}
   final FocusNode? focusNode;
+
+  /// {@template ShadWidget.autofocus}
+  /// Whether this widget should be focused when first shown.
+  /// Defaults to `false`.
+  /// {@endtemplate}
+  final bool autofocus;
+
+  /// {@template ShadWidget.onFocusChange}
+  /// Called when the focus state of this widget changes.
+  /// {@endtemplate}
+  final ValueChanged<bool>? onFocusChange;
 
   /// {@template ShadSelect.closeOnTapOutside}
   /// Whether to close the select popover when tapping outside of it.
@@ -722,6 +743,11 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
 
   final showScrollToBottom = ValueNotifier(false);
   final showScrollToTop = ValueNotifier(false);
+
+  /// Guards the post-frame callback that seeds [showScrollToTop] and
+  /// [showScrollToBottom], so a rebuilt popover does not queue one per build.
+  bool _scrollChevronSyncScheduled = false;
+
   bool shouldAnimateToTop = false;
   bool shouldAnimateToBottom = false;
 
@@ -1086,20 +1112,26 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
               maxWidth: effectiveMaxWidth,
             );
 
-            late final Widget effectiveChild;
-
-            if (widget.options != null) {
-              effectiveChild = SingleChildScrollView(
-                padding: effectiveOptionsPadding,
-                controller: scrollController,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: widget.options!.toList(),
-                ),
-              );
-            } else {
-              effectiveChild = ListView.builder(
+            // Built lazily inside the `popover:` builder below rather than
+            // here. This LayoutBuilder wraps the whole select — anchor
+            // included — so it re-runs on every layout pass of the *closed*
+            // select. `widget.options` is a lazy Iterable, so materialising it
+            // eagerly meant constructing every option widget on each of those
+            // passes. ShadCalendar's year dropdown passes 201 options, each
+            // building a DateFormat.
+            Widget buildOptions() {
+              if (widget.options != null) {
+                return SingleChildScrollView(
+                  padding: effectiveOptionsPadding,
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: widget.options!.toList(),
+                  ),
+                );
+              }
+              return ListView.builder(
                 padding: effectiveOptionsPadding,
                 controller: scrollController,
                 itemCount: widget.itemCount,
@@ -1113,6 +1145,8 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
             final Widget select = ShadDisabled(
               disabled: !widget.enabled,
               child: ShadFocusable(
+                autofocus: widget.autofocus,
+                onFocusChange: widget.onFocusChange,
                 canRequestFocus: widget.enabled,
                 focusNode: focusNode,
                 builder: (context, focused, child) {
@@ -1231,16 +1265,23 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                 shadows: effectiveShadows,
                 filter: effectiveFilter,
                 popover: (_) {
-                  // set the initial value for showScrollToBottom and
-                  // showScrollToTop, after the popover is rendered
-                  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-                    if (scrollController.hasClients) {
-                      showScrollToBottom.value =
-                          scrollController.offset <
-                          scrollController.position.maxScrollExtent;
-                      showScrollToTop.value = scrollController.offset > 0;
-                    }
-                  });
+                  // Seed showScrollToBottom/showScrollToTop once the popover
+                  // has been laid out. Guarded: this builder can run many
+                  // times per open, and an unguarded callback queued one
+                  // closure per build.
+                  if (!_scrollChevronSyncScheduled) {
+                    _scrollChevronSyncScheduled = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollChevronSyncScheduled = false;
+                      if (!mounted) return;
+                      if (scrollController.hasClients) {
+                        showScrollToBottom.value =
+                            scrollController.offset <
+                            scrollController.position.maxScrollExtent;
+                        showScrollToTop.value = scrollController.offset > 0;
+                      }
+                    });
+                  }
 
                   Widget effectiveColumn = Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1250,7 +1291,7 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                       if (widget.header != null)
                         Flexible(child: widget.header!),
                       ?scrollToTopChild,
-                      Flexible(child: effectiveChild),
+                      Flexible(child: buildOptions()),
                       ?scrollToBottomChild,
                       if (widget.footer != null)
                         Flexible(child: widget.footer!),
@@ -1463,20 +1504,22 @@ class _ShadOptionState<T> extends State<ShadOption<T>> {
                   color: resolvedBackgroundColor,
                   borderRadius: effectiveRadius,
                 ),
-                child: child,
+                // The label follows the *background*, not just the selection:
+                // hovering an unselected row paints the highlight behind it,
+                // so a theme whose highlight is a strong fill needs the text
+                // to invert there too.
+                child: DefaultTextStyle(
+                  style: hovered || selected
+                      ? effectiveSelectedTextStyle
+                      : effectiveTextStyle,
+                  child: child!,
+                ),
               );
             },
             child: Row(
               textDirection: widget.direction,
               children: [
-                Expanded(
-                  child: DefaultTextStyle(
-                    style: selected
-                        ? effectiveSelectedTextStyle
-                        : effectiveTextStyle,
-                    child: widget.child,
-                  ),
-                ),
+                Expanded(child: widget.child),
                 effectiveSelectedIcon,
               ],
             ),

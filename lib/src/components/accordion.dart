@@ -439,7 +439,7 @@ class _ShadAccordionItemState<T> extends State<ShadAccordionItem<T>>
             widget.effects ??
             theme.accordionTheme.effects ??
             [
-              PaddingEffect(
+              ShadPaddingEffect(
                 padding: const EdgeInsets.only(bottom: 8),
                 curve: effectiveCurve,
                 duration: effectiveDuration,
@@ -450,7 +450,7 @@ class _ShadAccordionItemState<T> extends State<ShadAccordionItem<T>>
                 end: Offset.zero,
                 duration: effectiveDuration,
               ),
-              SizeEffect(
+              ShadSizeEffect(
                 curve: effectiveCurve,
                 duration: effectiveDuration,
               ),

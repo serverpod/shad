@@ -684,6 +684,17 @@ class ShadInputState extends State<ShadInput>
       widget.focusNode ??
       (_focusNode ??= FocusNode(canRequestFocus: !widget.readOnly));
   final hasFocus = ValueNotifier(false);
+
+  /// Whether the field is empty, i.e. whether the placeholder should show.
+  ///
+  /// Derived from [effectiveController] so that only the placeholder rebuilds
+  /// when the text changes. Listening to the controller directly around the
+  /// whole field rebuilt EditableText, the decorator, the scrollbar and the
+  /// leading/trailing row on every keystroke — and on every cursor move, since
+  /// TextEditingController also notifies on selection changes.
+  final _isEmpty = ValueNotifier(true);
+  TextEditingController? _isEmptySource;
+
   RestorableTextEditingController? _controller;
 
   TextEditingController get effectiveController =>
@@ -718,6 +729,25 @@ class ShadInputState extends State<ShadInput>
     if (widget.onPasteFilesError != null && kIsWeb) {
       addPasteFilesErrorListener(_onPasteFilesError);
     }
+    // NOTE: _syncIsEmptySource is deliberately not called here. For the local
+    // controller, `effectiveController` reads RestorableTextEditingController
+    // .value, which asserts the property is registered — and registration
+    // happens in restoreState, after initState. It is called from restoreState
+    // instead.
+  }
+
+  /// Points [_isEmpty] at the current [effectiveController], which can change
+  /// when the caller swaps `controller` or when the local one is created.
+  void _syncIsEmptySource() {
+    final controller = effectiveController;
+    if (identical(controller, _isEmptySource)) return;
+    _isEmptySource?.removeListener(_updateIsEmpty);
+    _isEmptySource = controller..addListener(_updateIsEmpty);
+    _updateIsEmpty();
+  }
+
+  void _updateIsEmpty() {
+    _isEmpty.value = effectiveController.text.isEmpty;
   }
 
   @override
@@ -760,10 +790,14 @@ class ShadInputState extends State<ShadInput>
         _showSelectionHandles = !widget.readOnly;
       }
     }
+
+    _syncIsEmptySource();
   }
 
   @override
   void dispose() {
+    _isEmptySource?.removeListener(_updateIsEmpty);
+    _isEmpty.dispose();
     effectiveFocusNode.removeListener(onFocusChange);
     if (kIsWeb && widget.onPasteFiles != null) {
       removePasteFilesListener(_onPasteFiles);
@@ -824,6 +858,9 @@ class ShadInputState extends State<ShadInput>
   @override
   void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
     if (_controller != null) _registerController();
+    // Runs before the first build and after any restoration, and by this point
+    // the restorable controller is registered so effectiveController is safe.
+    _syncIsEmptySource();
   }
 
   void _handleSelectionChanged(
@@ -1133,9 +1170,8 @@ class ShadInputState extends State<ShadInput>
             child: ValueListenableBuilder(
               valueListenable: hasFocus,
               builder: (context, focused, _) {
-                return ValueListenableBuilder(
-                  valueListenable: effectiveController,
-                  builder: (context, textEditingValue, child) {
+                return Builder(
+                  builder: (context) {
                     final Widget editableText;
                     final rawEditableText = SizedBox(
                       width: widget.editableTextSize?.width,
@@ -1262,6 +1298,12 @@ class ShadInputState extends State<ShadInput>
                       focused: focused,
                       child: BoxyColumn(
                         mainAxisSize: MainAxisSize.min,
+                        // A single-line field is laid out at a fixed height,
+                        // so its content sits in the middle of it. A
+                        // multi-line one grows downwards from the top.
+                        mainAxisAlignment: isMultiline
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.center,
                         children: [
                           if (widget.top != null) widget.top!,
                           RawScrollbar(
@@ -1289,18 +1331,28 @@ class ShadInputState extends State<ShadInput>
                                         padding: effectiveInputPadding,
                                         child: Stack(
                                           children: [
-                                            // placeholder
-                                            if (textEditingValue.text.isEmpty &&
-                                                widget.placeholder != null)
+                                            // placeholder. Scoped to its own
+                                            // listener so typing rebuilds only
+                                            // this subtree.
+                                            if (widget.placeholder != null)
                                               Positioned.fill(
-                                                child: Align(
-                                                  alignment:
-                                                      effectivePlaceholderAlignment,
-                                                  child: DefaultTextStyle(
-                                                    style:
-                                                        effectivePlaceholderStyle,
-                                                    child: widget.placeholder!,
-                                                  ),
+                                                child: ValueListenableBuilder(
+                                                  valueListenable: _isEmpty,
+                                                  builder: (context, isEmpty, _) {
+                                                    if (!isEmpty) {
+                                                      return const SizedBox.shrink();
+                                                    }
+                                                    return Align(
+                                                      alignment:
+                                                          effectivePlaceholderAlignment,
+                                                      child: DefaultTextStyle(
+                                                        style:
+                                                            effectivePlaceholderStyle,
+                                                        child:
+                                                            widget.placeholder!,
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                             RepaintBoundary(
@@ -1389,7 +1441,7 @@ class _InputSelectionGestureDetectorBuilder
 /// with [ShadTheme]. Used as the default [ShadInput.contextMenuBuilder].
 @Deprecated(
   'Use ShadContextMenu with ShadContextMenuItem instead. '
-  'This widget will be removed in a future release.',
+  'This widget was deprecated after v0.51.0 and will be removed in v1.0.0.',
 )
 class ShadTextSelectionToolbar extends StatelessWidget {
   // ignore: deprecated_consistency
@@ -1415,7 +1467,7 @@ class ShadTextSelectionToolbar extends StatelessWidget {
   /// Border radius of the toolbar. Defaults to [ShadThemeData.radius].
   final BorderRadiusGeometry? borderRadius;
 
-  /// Shadows of the toolbar. Defaults to [ShadShadows.md].
+  /// Shadows of the toolbar. Defaults to [Shadows.md].
   final List<BoxShadow>? shadows;
 
   @override
@@ -1428,7 +1480,7 @@ class ShadTextSelectionToolbar extends StatelessWidget {
     final effectiveBorder =
         border ?? Border.all(color: theme.colorScheme.border);
     final effectiveBorderRadius = borderRadius ?? theme.radius;
-    final effectiveShadows = shadows ?? ShadShadows.md;
+    final effectiveShadows = shadows ?? Shadows.md;
 
     return CustomSingleChildLayout(
       delegate: DesktopTextSelectionToolbarLayoutDelegate(anchor: anchor),
@@ -1467,7 +1519,7 @@ class ShadTextSelectionToolbar extends StatelessWidget {
 /// plain [Text] widgets pick up the effective style automatically.
 @Deprecated(
   'Use ShadContextMenuItem instead. '
-  'This widget will be removed in a future release.',
+  'This widget was deprecated after v0.51.0 and will be removed in v1.0.0.',
 )
 class ShadToolbarButton extends StatefulWidget {
   // ignore: deprecated_consistency

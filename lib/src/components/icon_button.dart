@@ -23,6 +23,8 @@ class ShadIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -69,6 +71,8 @@ class ShadIconButton extends StatelessWidget {
     required this.variant,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -117,6 +121,8 @@ class ShadIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -162,6 +168,8 @@ class ShadIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -207,6 +215,8 @@ class ShadIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -252,6 +262,8 @@ class ShadIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.iconSize,
+    this.size,
+    this.semanticLabel,
     this.onPressed,
     this.cursor,
     this.width,
@@ -311,6 +323,24 @@ class ShadIconButton extends StatelessWidget {
   /// Defaults to the [IconThemeData.size] if not specified.
   /// {@endtemplate}
   final double? iconSize;
+
+  /// {@template ShadIconButton.size}
+  /// The button size to resolve metrics from.
+  ///
+  /// Defaults to [ShadButtonSize.icon] — the square icon size matching
+  /// shadcn/ui's `<Button size="icon">`. Pass [ShadButtonSize.sm] or
+  /// [ShadButtonSize.lg] for the smaller/larger icon buttons.
+  /// {@endtemplate}
+  final ShadButtonSize? size;
+
+  /// {@template ShadIconButton.semanticLabel}
+  /// The accessible name announced by screen readers.
+  ///
+  /// An icon-only button has no text for assistive technology to read, so
+  /// this should almost always be provided — it is the equivalent of the
+  /// `sr-only` span shadcn/ui puts inside `<Button size="icon">`.
+  /// {@endtemplate}
+  final String? semanticLabel;
 
   /// {@macro ShadButton.cursor}
   final MouseCursor? cursor;
@@ -434,15 +464,23 @@ class ShadIconButton extends StatelessWidget {
 
     final theme = ShadTheme.of(context);
 
-    final defaultSize =
-        buttonTheme(theme).sizesTheme?.icon ?? theme.buttonSizesTheme.icon!;
+    final sizesTheme = buttonTheme(theme).sizesTheme;
+    final defaultSize = switch (size ?? ShadButtonSize.icon) {
+      ShadButtonSize.icon => sizesTheme?.icon ?? theme.buttonSizesTheme.icon!,
+      ShadButtonSize.sm => sizesTheme?.sm ?? theme.buttonSizesTheme.sm!,
+      ShadButtonSize.lg => sizesTheme?.lg ?? theme.buttonSizesTheme.lg!,
+      ShadButtonSize.regular =>
+        sizesTheme?.regular ?? theme.buttonSizesTheme.regular!,
+    };
 
     final effectivePadding = padding ?? defaultSize.padding;
 
-    final effectiveWidth = width ?? defaultSize.width;
     final effectiveHeight = height ?? defaultSize.height;
+    // Only the `icon` size carries an explicit width. For sm/lg/regular fall
+    // back to the height so an icon button stays square at every size.
+    final effectiveWidth = width ?? defaultSize.width ?? effectiveHeight;
 
-    return IconTheme(
+    Widget button = IconTheme(
       data: IconThemeData(size: iconSize),
       child: ShadButton.raw(
         variant: variant,
@@ -486,5 +524,19 @@ class ShadIconButton extends StatelessWidget {
         child: icon,
       ),
     );
+
+    if (semanticLabel != null) {
+      // An icon-only button carries no text, so without this a screen reader
+      // announces nothing at all.
+      button = Semantics(
+        label: semanticLabel,
+        button: true,
+        enabled: enabled,
+        container: true,
+        child: ExcludeSemantics(child: button),
+      );
+    }
+
+    return button;
   }
 }

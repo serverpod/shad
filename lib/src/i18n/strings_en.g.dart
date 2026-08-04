@@ -38,6 +38,8 @@ class ShadLocalizationsData with BaseTranslations<ShadLocale, ShadLocalizationsD
 	late final ShadLocalizationsData$datePicker$en datePicker = ShadLocalizationsData$datePicker$en.internal(_root);
 	late final ShadLocalizationsData$input$en input = ShadLocalizationsData$input$en.internal(_root);
 	late final ShadLocalizationsData$keyboardToolbar$en keyboardToolbar = ShadLocalizationsData$keyboardToolbar$en.internal(_root);
+	late final ShadLocalizationsData$empty$en empty = ShadLocalizationsData$empty$en.internal(_root);
+	late final ShadLocalizationsData$pagination$en pagination = ShadLocalizationsData$pagination$en.internal(_root);
 }
 
 // Path: timePicker
@@ -109,6 +111,39 @@ class ShadLocalizationsData$keyboardToolbar$en {
 	String get done => 'Done';
 }
 
+// Path: empty
+class ShadLocalizationsData$empty$en {
+	ShadLocalizationsData$empty$en.internal(this._root);
+
+	final ShadLocalizationsData _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No results'
+	String get title => 'No results';
+}
+
+// Path: pagination
+class ShadLocalizationsData$pagination$en {
+	ShadLocalizationsData$pagination$en.internal(this._root);
+
+	final ShadLocalizationsData _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Previous'
+	String get previous => 'Previous';
+
+	/// en: 'Next'
+	String get next => 'Next';
+
+	/// en: 'More pages'
+	String get morePages => 'More pages';
+
+	/// en: 'Page'
+	String get page => 'Page';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -128,6 +163,11 @@ extension on ShadLocalizationsData {
 			'input.paste' => 'Paste',
 			'input.selectAll' => 'Select All',
 			'keyboardToolbar.done' => 'Done',
+			'empty.title' => 'No results',
+			'pagination.previous' => 'Previous',
+			'pagination.next' => 'Next',
+			'pagination.morePages' => 'More pages',
+			'pagination.page' => 'Page',
 			_ => null,
 		};
 	}

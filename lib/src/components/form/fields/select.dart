@@ -18,7 +18,11 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -163,7 +167,11 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.description,
     super.onChanged,
     super.forceErrorText,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -293,7 +301,11 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -480,7 +492,11 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -580,7 +596,11 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -702,7 +722,11 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated('Use toValueTransformer instead') super.valueTransformer,
+    @Deprecated(
+      'Use toValueTransformer instead. This parameter was deprecated '
+      'after v0.44.0 and will be removed in v1.0.0.',
+    )
+    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
