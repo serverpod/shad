@@ -78,7 +78,12 @@ class ShadMenubar extends StatefulWidget {
   final ShadBorder? border;
 
   /// {@template ShadMenubar.selectOnHover}
-  /// Whether to select the item when hovered, defaults to `true`
+  /// Whether hovering a trigger moves the selection *while a menu is already
+  /// open*, defaults to `true`.
+  ///
+  /// Matching the reference menubar: a closed menubar only opens on tap (or
+  /// keyboard), but once one menu is open, pointing at another trigger
+  /// switches to its menu.
   /// {@endtemplate}
   final bool? selectOnHover;
 
@@ -131,6 +136,12 @@ class _ShadMenubarState extends State<ShadMenubar> {
           color: effectiveBackgroundColor,
           border: effectiveBorder.toBorder(),
           borderRadius: effectiveRadius,
+          // The strip's `shadow-xs`; only styles that shadow their controls
+          // keep it. `ShadMenubarTheme.shadows` belongs to the item popovers,
+          // so the strip reads the token directly.
+          boxShadow: theme.style.controlShadow.isEmpty
+              ? null
+              : theme.style.controlShadow,
         ),
         child: Padding(
           padding: effectivePadding,
@@ -540,6 +551,9 @@ class _ShadMenubarItemState extends State<ShadMenubarItem> {
               widget.onHoverChange?.call(hovered);
               if (!hovered) return;
               if (!effectiveSelectOnHover) return;
+              // Hover only *switches* menus: a closed menubar opens on tap,
+              // like the reference (`radix`'s menubar), not on pointer-over.
+              if (menubarController.selectedIndex == null) return;
               menubarController.selectedIndex = index;
             },
             onPressed: () {

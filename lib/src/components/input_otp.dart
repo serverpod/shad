@@ -371,6 +371,21 @@ class ShadInputOTPSlot extends StatefulWidget {
 class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
   late final otpProvider = context.read<ShadInputOTPState>();
 
+  /// Grows each rounded corner of [radius] by [delta], leaving square
+  /// corners square — what keeps an outward ring concentric with a box that
+  /// is only rounded on some corners, like the ends of the OTP strip.
+  static BorderRadius _inflateCorners(BorderRadius radius, double delta) {
+    Radius inflate(Radius corner) => corner == Radius.zero
+        ? Radius.zero
+        : Radius.elliptical(corner.x + delta, corner.y + delta);
+    return BorderRadius.only(
+      topLeft: inflate(radius.topLeft),
+      topRight: inflate(radius.topRight),
+      bottomLeft: inflate(radius.bottomLeft),
+      bottomRight: inflate(radius.bottomRight),
+    );
+  }
+
   FocusNode? _focusNode;
   FocusNode get focusNode => widget.focusNode ?? _focusNode!;
   ShadTextEditingController? _controller;
@@ -522,13 +537,24 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
           ),
         ),
         focusedBorder: ShadBorder(radius: effectiveRadius),
-        // Drawn inside the slot rather than around it. Slots share their
-        // vertical edges and Flutter has no z-index, so an outward ring is
-        // painted over by the next slot in the row — the strip ends up looking
-        // broken. `offset: 0` keeps the whole ring within the focused slot.
+        // Outside the slot, flush against it, like every other field
+        // (`data-[active=true]:ring-3`). shadcn lifts the active slot with
+        // `z-10` so its ring overlaps the neighbours; Flutter paints siblings
+        // in order, so the later slot draws over the ring's edge — but a
+        // slot's fill is transparent (a faint `input/30` wash in dark), so
+        // only its hairlines cross the ring, which is close enough to the
+        // reference to be indistinguishable at 50% ring opacity.
+        //
+        // The ring is painted on a rect inflated by the ring width, so each
+        // *rounded* corner grows by the same amount to stay concentric with
+        // the slot's — keeping the slot's radius left a gap at the corners.
+        // Square corners stay square. The offset is restated because
+        // `ShadBorder.merge` takes the other's radius *and* offset
+        // unconditionally: supplying only the radius here would silently
+        // collapse the ring onto the slot's own border.
         secondaryFocusedBorder: ShadBorder(
-          radius: effectiveRadius,
-          offset: 0,
+          radius: _inflateCorners(effectiveRadius, theme.style.ringWidth),
+          offset: theme.style.ringWidth,
         ),
       ),
     );

@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -51,6 +54,7 @@ import 'package:shadcn_ui/src/theme/components/tooltip.dart';
 import 'package:shadcn_ui/src/theme/radii.dart';
 import 'package:shadcn_ui/src/theme/spacing.dart';
 import 'package:shadcn_ui/src/theme/style.dart';
+import 'package:shadcn_ui/src/theme/text_role.dart';
 import 'package:shadcn_ui/src/theme/text_theme/text_styles_default.dart';
 import 'package:shadcn_ui/src/theme/text_theme/theme.dart';
 import 'package:shadcn_ui/src/theme/themes/base.dart';
@@ -66,6 +70,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     required this.effectiveTextTheme,
     this.style = ShadStyleTokens.vega,
     this.spacing = const ShadSpacing(),
+    this.menuColorScheme,
+    this.menuTranslucent = false,
   });
 
   @override
@@ -86,6 +92,21 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   @override
   final ShadSpacing spacing;
 
+  /// The palette menu surfaces draw from, when it differs from the page's.
+  ///
+  /// shadcn's theme editor offers an "Inverted" menu colour, implemented by
+  /// giving every menu surface — select, dropdown, context menu, menubar —
+  /// the `dark` class, i.e. the *whole* opposite-brightness token set. Pass
+  /// that scheme here and the menu component themes are derived from it while
+  /// everything else keeps using [colorScheme]. Null means menus follow the
+  /// page.
+  final ShadColorScheme? menuColorScheme;
+
+  /// Whether menu surfaces are translucent, shadcn's "Translucent" finish:
+  /// the popover colour at 70% over a backdrop blur, with row highlights as a
+  /// `foreground/10` wash so they read through the glass.
+  final bool menuTranslucent;
+
   /// The radius scale derived from [radius].
   @override
   ShadRadii get radii => ShadRadii(radius);
@@ -97,6 +118,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     ShadTextTheme? effectiveTextTheme,
     ShadStyleTokens? style,
     ShadSpacing? spacing,
+    Object? menuColorScheme = unsetMenuColorScheme,
+    bool? menuTranslucent,
   }) {
     return ShadDefaultThemeVariant(
       colorScheme: colorScheme ?? this.colorScheme,
@@ -104,8 +127,18 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       effectiveTextTheme: effectiveTextTheme ?? this.effectiveTextTheme,
       style: style ?? this.style,
       spacing: spacing ?? this.spacing,
+      // `null` is meaningful here (menus follow the page), so an explicit
+      // sentinel distinguishes "not passed" from "reset to null".
+      menuColorScheme: identical(menuColorScheme, unsetMenuColorScheme)
+          ? this.menuColorScheme
+          : menuColorScheme as ShadColorScheme?,
+      menuTranslucent: menuTranslucent ?? this.menuTranslucent,
     );
   }
+
+  /// Sentinel for [rebuild]'s `menuColorScheme`: `null` there is meaningful
+  /// ("menus follow the page"), so "leave unchanged" needs its own value.
+  static const Object unsetMenuColorScheme = Object();
 
   /// Scales a metric shadcn expresses in spacing units.
   ///
@@ -133,32 +166,182 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   /// The focus ring for an element with the given corner radius.
   ///
   /// `ShadOutwardBorderPainter` inflates by `offset` and strokes inside it, so
-  /// `offset == width` puts the stroke flush against the element; the outer
-  /// radius is the element's plus the ring width so the two stay concentric.
-  ShadBorder ringFor(BorderRadius elementRadius) => ShadBorder.all(
-    width: style.ringWidth,
-    color: colorScheme.ring.withValues(alpha: style.ringOpacity),
-    radius: elementRadius.add(BorderRadius.circular(style.ringWidth)),
-    offset: style.ringWidth,
-  );
+  /// `offset == width` puts the stroke flush against the element; each
+  /// *rounded* corner grows by the ring width so the two stay concentric,
+  /// while square corners stay square (adding to them would round the ring
+  /// on the square styles).
+  ShadBorder ringFor(BorderRadius elementRadius) {
+    Radius inflate(Radius corner) => corner == Radius.zero
+        ? Radius.zero
+        : Radius.elliptical(
+            corner.x + style.ringWidth,
+            corner.y + style.ringWidth,
+          );
+    return ShadBorder.all(
+      width: style.ringWidth,
+      color: colorScheme.ring.withValues(alpha: style.ringOpacity),
+      radius: BorderRadius.only(
+        topLeft: inflate(elementRadius.topLeft),
+        topRight: inflate(elementRadius.topRight),
+        bottomLeft: inflate(elementRadius.bottomLeft),
+        bottomRight: inflate(elementRadius.bottomRight),
+      ),
+      offset: style.ringWidth,
+    );
+  }
+
+  /// Whether [scheme] is a dark palette.
+  ///
+  /// A variant is built from a scheme, not a [Brightness], so dark-only
+  /// treatments (`dark:bg-input/30`, `dark:ring-foreground/10`) key off the
+  /// background's luminance.
+  static bool _schemeIsDark(ShadColorScheme scheme) =>
+      scheme.background.computeLuminance() < .5;
+
+  bool get _isDark => _schemeIsDark(colorScheme);
+
+  /// A colour at a fraction of its own opacity — Tailwind's `input/30`.
+  ///
+  /// The dark `--input` is already a translucent white, and `bg-input/30`
+  /// multiplies that alpha rather than replacing it, so 15% becomes 4.5%.
+  static Color _wash(Color color, double factor) =>
+      color.withValues(alpha: color.a * factor);
+
+  /// Resolves one of the named washes a style can paint, against [scheme].
+  Color? _fill(ShadSurfaceFill fill, ShadColorScheme scheme) => switch (fill) {
+    ShadSurfaceFill.none => null,
+    ShadSurfaceFill.background => scheme.background,
+    ShadSurfaceFill.muted => scheme.muted,
+    ShadSurfaceFill.muted50 => _wash(scheme.muted, .5),
+    ShadSurfaceFill.input20 => _wash(scheme.input, .2),
+    ShadSurfaceFill.input30 => _wash(scheme.input, .3),
+    ShadSurfaceFill.input50 => _wash(scheme.input, .5),
+    ShadSurfaceFill.input90 => _wash(scheme.input, .9),
+  };
 
   /// A card's hairline outline, shadcn's `ring-foreground/10`.
-  Color get cardBorderColor =>
-      colorScheme.foreground.withValues(alpha: style.cardBorderOpacity);
+  Color get cardBorderColor => _wash(
+    colorScheme.foreground,
+    _isDark
+        ? style.cardBorderOpacityDark ?? style.cardBorderOpacity
+        : style.cardBorderOpacity,
+  );
 
-  /// A popover, menu, dialog or sheet outline.
-  Color get surfaceBorderColor =>
-      colorScheme.foreground.withValues(alpha: style.surfaceBorderOpacity);
+  /// A popover or menu outline on the page palette.
+  Color get surfaceBorderColor => _surfaceBorderColorOf(colorScheme);
+
+  Color _surfaceBorderColorOf(ShadColorScheme scheme) => _wash(
+    scheme.foreground,
+    _schemeIsDark(scheme)
+        ? style.surfaceBorderOpacityDark ?? style.surfaceBorderOpacity
+        : style.surfaceBorderOpacity,
+  );
+
+  /// A dialog or sheet outline, which a few styles keep at a different
+  /// opacity than their menus.
+  Color get dialogBorderColor => _wash(
+    colorScheme.foreground,
+    _isDark
+        ? style.dialogBorderOpacityDark ??
+              style.dialogBorderOpacity ??
+              style.surfaceBorderOpacityDark ??
+              style.surfaceBorderOpacity
+        : style.dialogBorderOpacity ?? style.surfaceBorderOpacity,
+  );
 
   /// The fill an unchecked checkbox or radio carries.
   ///
-  /// shadcn leaves them transparent in light mode and washes them with
-  /// `input/30` in dark; both controls use the same value, which is what keeps
-  /// a checkbox and a radio looking like the same family.
+  /// Most styles leave them transparent in light mode and wash them with
+  /// `input/30` in dark; `luma` and `rhea` fill with `input/90` in both modes,
+  /// and `sera` keeps them transparent everywhere. Both controls use the same
+  /// value, which is what keeps a checkbox and a radio looking like the same
+  /// family.
   Color get uncheckedControlFill =>
-      colorScheme.background.computeLuminance() < .5
-      ? colorScheme.input.withValues(alpha: .3)
-      : const Color(0x00000000);
+      _fill(
+        _isDark ? style.controlFillDark : style.controlFill,
+        colorScheme,
+      ) ??
+      const Color(0x00000000);
+
+  /// The outline of a checkbox or radio: `border-input`, or transparent in
+  /// the styles that fill their controls instead of outlining them.
+  Color get controlBorderColor => style.controlBorderless
+      ? const Color(0x00000000)
+      : colorScheme.input;
+
+  // --- Menus ---------------------------------------------------------------
+
+  /// The palette menu surfaces are derived from; see [menuColorScheme].
+  ShadColorScheme get menuScheme => menuColorScheme ?? colorScheme;
+
+  bool get _menuIsDark => _schemeIsDark(menuScheme);
+
+  /// The surface behind a menu's rows.
+  Color get menuSurfaceColor => menuTranslucent
+      ? _wash(menuScheme.popover, .7)
+      : menuScheme.popover;
+
+  /// A menu surface's hairline outline, on the menu palette.
+  Color get menuSurfaceBorderColor => _surfaceBorderColorOf(menuScheme);
+
+  /// The highlight behind a hovered or open menu row.
+  ///
+  /// `focus:bg-accent` normally; on a translucent surface shadcn switches to
+  /// a `foreground/10` wash so the highlight reads through the glass.
+  Color get menuItemHighlight => menuTranslucent
+      ? _wash(menuScheme.foreground, .1)
+      : menuScheme.accent;
+
+  /// The text and icon colour on [menuItemHighlight],
+  /// `focus:text-accent-foreground`.
+  Color get menuItemHighlightForeground => menuTranslucent
+      ? menuScheme.popoverForeground
+      : menuScheme.accentForeground;
+
+  /// The backdrop filter of a translucent menu,
+  /// `backdrop-blur-2xl backdrop-saturate-150`.
+  ///
+  /// CSS's `blur(40px)` is a Gaussian with sigma 20; the saturation boost is
+  /// the standard luminance-preserving matrix at s = 1.5.
+  static final ImageFilter _menuBackdropFilter = ImageFilter.compose(
+    outer: const ColorFilter.matrix([
+      1.3935, -0.3575, -0.036, 0, 0, //
+      -0.1065, 1.1425, -0.036, 0, 0,
+      -0.1065, -0.3575, 1.464, 0, 0,
+      0, 0, 0, 1, 0,
+    ]),
+    inner: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+  );
+
+  ImageFilter? get menuFilter => menuTranslucent ? _menuBackdropFilter : null;
+
+  /// A menu row's height: its vertical padding around one line of body text.
+  ///
+  /// shadcn sizes rows implicitly (`py-1.5 text-sm` is 6 + 20 + 6 = 32);
+  /// a fixed 32 was only ever correct for the default style.
+  double get menuItemHeight =>
+      2 * scaled(style.itemPaddingY) + _lineHeightOf(style.body);
+
+  /// The rendered line height of [role], following Tailwind's default line
+  /// heights (`text-sm` is 14/20, `text-xs` is 12/16) when the role does not
+  /// set one.
+  double _lineHeightOf(ShadTextRole role) {
+    final ratio = role.height ?? (role.fontSize <= 12 ? 16 / 12 : 20 / 14);
+    return role.fontSize * ratio;
+  }
+
+  /// What a field paints behind itself: `bg-transparent` with a dark
+  /// `input/30` wash by default, a stronger wash in the filled styles.
+  Color? get fieldFillColor => _fill(
+    _isDark ? style.fieldFillDark : style.fieldFill,
+    colorScheme,
+  );
+
+  /// A field's outline colour: `border-input`, or transparent in the styles
+  /// that fill their fields instead of outlining them.
+  Color get fieldBorderColor => style.fieldBorderless
+      ? const Color(0x00000000)
+      : colorScheme.input;
 
   /// The border a multi-line field draws.
   ///
@@ -168,7 +351,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       ? fieldBorder
       : ShadBorder.all(
           width: 1,
-          color: colorScheme.input,
+          color: fieldBorderColor,
           radius: radii.resolve(style.textareaRadius),
         );
 
@@ -179,18 +362,42 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
         )
       : ShadBorder.all(
           width: 1,
-          color: colorScheme.input,
+          color: fieldBorderColor,
           radius: controlRadius,
         );
+
+  /// The inner inset the focus treatment reserves inside a control's border.
+  ///
+  /// This variant shows focus as an outward ring, which needs no room inside
+  /// the control, so there is none. The no-secondary-border variant recolours
+  /// a 2px inner border instead and reserves that thickness here, so focusing
+  /// never shifts the content.
+  @protected
+  EdgeInsetsGeometry? focusReserve(double borderWidth) => null;
 
   /// The radius controls use, per [style].
   BorderRadius get controlRadius => radii.resolve(style.buttonRadius);
 
+  /// Applies [ShadStyleTokens.surfaceRadiusCap] to a resolved radius —
+  /// `rhea`'s `rounded-[min(var(--radius-4xl),24px)]`.
+  BorderRadius _capped(BorderRadius resolved) {
+    final cap = style.surfaceRadiusCap;
+    if (cap == null) return resolved;
+    Radius clamp(Radius r) =>
+        Radius.elliptical(math.min(r.x, cap), math.min(r.y, cap));
+    return BorderRadius.only(
+      topLeft: clamp(resolved.topLeft),
+      topRight: clamp(resolved.topRight),
+      bottomLeft: clamp(resolved.bottomLeft),
+      bottomRight: clamp(resolved.bottomRight),
+    );
+  }
+
   /// The radius cards use, per [style].
-  BorderRadius get cardRadius => radii.resolve(style.cardRadius);
+  BorderRadius get cardRadius => _capped(radii.resolve(style.cardRadius));
 
   /// The radius dialogs and sheets use, per [style].
-  BorderRadius get dialogRadius => radii.resolve(style.dialogRadius);
+  BorderRadius get dialogRadius => _capped(radii.resolve(style.dialogRadius));
 
   /// The radius popovers, select and menu surfaces use, per [style].
   BorderRadius get popoverRadius => radii.resolve(style.popoverRadius);
@@ -203,11 +410,16 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadButtonTheme(
       textStyle: style.label.apply(effectiveTextTheme.small),
       backgroundColor: colorScheme.primary,
-      hoverBackgroundColor: colorScheme.primary.withValues(alpha: .9),
+      // `hover:bg-primary/80`.
+      hoverBackgroundColor: _wash(colorScheme.primary, .8),
       foregroundColor: colorScheme.primaryForeground,
       hoverForegroundColor: colorScheme.primaryForeground,
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: controlRadius, width: 0),
+        border: ShadBorder.all(
+          radius: controlRadius,
+          width: 0,
+          padding: focusReserve(0),
+        ),
       ),
       gap: scaled(style.buttonGap),
       expands: false,
@@ -219,11 +431,22 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadButtonTheme(
       textStyle: style.label.apply(effectiveTextTheme.small),
       backgroundColor: colorScheme.secondary,
-      hoverBackgroundColor: colorScheme.secondary.withValues(alpha: .8),
+      // `hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]`:
+      // a nudge towards the foreground rather than towards transparency, so
+      // the hover reads on any page colour.
+      hoverBackgroundColor: Color.lerp(
+        colorScheme.secondary,
+        colorScheme.foreground,
+        .05,
+      ),
       foregroundColor: colorScheme.secondaryForeground,
       hoverForegroundColor: colorScheme.secondaryForeground,
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: controlRadius, width: 0),
+        border: ShadBorder.all(
+          radius: controlRadius,
+          width: 0,
+          padding: focusReserve(0),
+        ),
       ),
       gap: scaled(style.buttonGap),
       expands: false,
@@ -232,14 +455,28 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadButtonTheme destructiveButtonTheme() {
+    // The destructive button is a *soft* tint, not a solid fill:
+    // `bg-destructive/10 text-destructive hover:bg-destructive/20`, one step
+    // stronger in dark mode (`dark:bg-destructive/20 dark:hover:bg-destructive/30`).
     return ShadButtonTheme(
       textStyle: style.label.apply(effectiveTextTheme.small),
-      backgroundColor: colorScheme.destructive,
-      hoverBackgroundColor: colorScheme.destructive.withValues(alpha: .9),
-      foregroundColor: colorScheme.destructiveForeground,
-      hoverForegroundColor: colorScheme.destructiveForeground,
+      backgroundColor: _wash(colorScheme.destructive, _isDark ? .2 : .1),
+      hoverBackgroundColor: _wash(colorScheme.destructive, _isDark ? .3 : .2),
+      foregroundColor: colorScheme.destructive,
+      hoverForegroundColor: colorScheme.destructive,
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: controlRadius, width: 0),
+        border: ShadBorder.all(
+          radius: controlRadius,
+          width: 0,
+          padding: focusReserve(0),
+        ),
+        // `focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40`.
+        secondaryFocusedBorder: ShadBorder.all(
+          width: style.ringWidth,
+          color: _wash(colorScheme.destructive, _isDark ? .4 : .2),
+          radius: controlRadius.add(BorderRadius.circular(style.ringWidth)),
+          offset: style.ringWidth,
+        ),
       ),
       gap: scaled(style.buttonGap),
       expands: false,
@@ -248,16 +485,32 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadButtonTheme outlineButtonTheme() {
+    // `border-border bg-background hover:bg-muted hover:text-foreground`,
+    // with `dark:bg-input/30 dark:border-input dark:hover:bg-input/50` — and
+    // per-style fills, which is what the [ShadSurfaceFill] tokens carry.
     return ShadButtonTheme(
       textStyle: style.label.apply(effectiveTextTheme.small),
-      hoverBackgroundColor: colorScheme.accent,
-      foregroundColor: colorScheme.primary,
-      hoverForegroundColor: colorScheme.accentForeground,
+      backgroundColor: _fill(
+        _isDark ? style.outlineButtonFillDark : style.outlineButtonFill,
+        colorScheme,
+      ),
+      hoverBackgroundColor: _fill(
+        _isDark
+            ? style.outlineButtonHoverFillDark
+            : style.outlineButtonHoverFill,
+        colorScheme,
+      ),
+      foregroundColor: colorScheme.foreground,
+      hoverForegroundColor: colorScheme.foreground,
+      shadows: style.controlShadow,
       decoration: ShadDecoration(
         border: ShadBorder.all(
           radius: controlRadius,
-          color: colorScheme.input,
+          color: _isDark && style.outlineButtonDarkInputBorder
+              ? colorScheme.input
+              : colorScheme.border,
           width: 1,
+          padding: focusReserve(1),
         ),
       ),
       gap: scaled(style.buttonGap),
@@ -267,13 +520,22 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadButtonTheme ghostButtonTheme() {
+    // `hover:bg-muted hover:text-foreground dark:hover:bg-muted/50`. The rest
+    // colour is simply the inherited body colour — using the primary here
+    // painted ghost content in the accent hue on themed palettes.
     return ShadButtonTheme(
       textStyle: style.label.apply(effectiveTextTheme.small),
-      hoverBackgroundColor: colorScheme.accent,
-      foregroundColor: colorScheme.primary,
-      hoverForegroundColor: colorScheme.accentForeground,
+      hoverBackgroundColor: _isDark
+          ? _wash(colorScheme.muted, .5)
+          : colorScheme.muted,
+      foregroundColor: colorScheme.foreground,
+      hoverForegroundColor: colorScheme.foreground,
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: controlRadius, width: 0),
+        border: ShadBorder.all(
+          radius: controlRadius,
+          width: 0,
+          padding: focusReserve(0),
+        ),
       ),
       gap: scaled(style.buttonGap),
       expands: false,
@@ -286,6 +548,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       textStyle: style.label.apply(effectiveTextTheme.small),
       foregroundColor: colorScheme.primary,
       hoverForegroundColor: colorScheme.primary,
+      // `sera` underlines its links at rest; every style underlines on hover.
+      textDecoration: style.linkUnderline ? TextDecoration.underline : null,
       hoverTextDecoration: TextDecoration.underline,
       gap: scaled(style.buttonGap),
       expands: false,
@@ -323,53 +587,90 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadBadgeTheme primaryBadgeTheme() {
+    if (style.flatBadges) {
+      return _flatBadgeTheme(colorScheme.foreground);
+    }
+    // No hover: the reference only restyles badges rendered as links
+    // (`[a]:hover:bg-primary/80`); a plain badge is inert.
     return ShadBadgeTheme(
       backgroundColor: colorScheme.primary,
-      hoverBackgroundColor: colorScheme.primary.withValues(alpha: .8),
+      hoverBackgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.primaryForeground,
-      shape: const StadiumBorder(),
-      padding: spacing.symmetric(horizontal: 2.5, vertical: 0.5),
+      shape: _badgeShape,
+      padding: _badgePadding,
       textStyle: style.caption.apply(effectiveTextTheme.small),
     );
   }
 
   @override
   ShadBadgeTheme secondaryBadgeTheme() {
+    if (style.flatBadges) {
+      return _flatBadgeTheme(colorScheme.mutedForeground);
+    }
     return ShadBadgeTheme(
       backgroundColor: colorScheme.secondary,
-      hoverBackgroundColor: colorScheme.secondary.withValues(alpha: .8),
+      hoverBackgroundColor: colorScheme.secondary,
       foregroundColor: colorScheme.secondaryForeground,
-      shape: const StadiumBorder(),
-      padding: spacing.symmetric(horizontal: 2.5, vertical: 0.5),
+      shape: _badgeShape,
+      padding: _badgePadding,
       textStyle: style.caption.apply(effectiveTextTheme.small),
     );
   }
 
   @override
   ShadBadgeTheme destructiveBadgeTheme() {
+    if (style.flatBadges) {
+      return _flatBadgeTheme(colorScheme.destructive);
+    }
+    // A soft tint like the destructive button:
+    // `bg-destructive/10 text-destructive dark:bg-destructive/20`.
     return ShadBadgeTheme(
-      backgroundColor: colorScheme.destructive,
-      hoverBackgroundColor: colorScheme.destructive.withValues(alpha: .8),
-      foregroundColor: colorScheme.destructiveForeground,
-      shape: const StadiumBorder(),
-      padding: spacing.symmetric(horizontal: 2.5, vertical: 0.5),
+      backgroundColor: _wash(colorScheme.destructive, _isDark ? .2 : .1),
+      hoverBackgroundColor: _wash(colorScheme.destructive, _isDark ? .2 : .1),
+      foregroundColor: colorScheme.destructive,
+      shape: _badgeShape,
+      padding: _badgePadding,
       textStyle: style.caption.apply(effectiveTextTheme.small),
     );
   }
 
   @override
   ShadBadgeTheme outlineBadgeTheme() {
+    if (style.flatBadges) {
+      return _flatBadgeTheme(colorScheme.foreground);
+    }
     return ShadBadgeTheme(
       foregroundColor: colorScheme.foreground,
-      shape: StadiumBorder(side: BorderSide(color: colorScheme.border)),
-      padding: spacing.symmetric(horizontal: 2.5, vertical: 0.5),
+      shape: _badgeShape is StadiumBorder
+          ? StadiumBorder(side: BorderSide(color: colorScheme.border))
+          : RoundedRectangleBorder(side: BorderSide(color: colorScheme.border)),
+      padding: _badgePadding,
+      textStyle: style.caption.apply(effectiveTextTheme.small),
     );
   }
+
+  /// Badge geometry: `rounded-4xl px-2 py-0.5` — a pill in every style
+  /// except the square ones.
+  ShapeBorder get _badgeShape => style.buttonRadius == ShadRadiusToken.none
+      ? const RoundedRectangleBorder()
+      : const StadiumBorder();
+
+  EdgeInsetsGeometry get _badgePadding =>
+      spacing.symmetric(horizontal: 2, vertical: 0.5);
+
+  /// `sera`'s badges are bare uppercase captions: no fill, border or padding.
+  ShadBadgeTheme _flatBadgeTheme(Color foreground) => ShadBadgeTheme(
+    foregroundColor: foreground,
+    shape: const RoundedRectangleBorder(),
+    padding: EdgeInsets.zero,
+    textStyle: style.caption.apply(effectiveTextTheme.small),
+  );
 
   @override
   ShadAvatarTheme avatarTheme() {
     return ShadAvatarTheme(
-      size: const Size.square(40),
+      // `size-8`, with `size-10` as the large step.
+      size: const Size.square(32),
       shape: const CircleBorder(),
       backgroundColor: colorScheme.muted,
     );
@@ -582,11 +883,11 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
         vertical: scaled(style.selectPaddingY),
       ),
       decoration: ShadDecoration(
-        border: ShadBorder.all(
-          radius: controlRadius,
-          color: colorScheme.input,
-          width: 1,
-        ),
+        color: fieldFillColor,
+        shadows: style.controlShadow,
+        // The same border treatment as a text field — `sera` underlines its
+        // select triggers too (`border-transparent border-b-input px-0`).
+        border: fieldBorder,
       ),
       optionsPadding: EdgeInsets.all(scaled(style.menuPadding)),
       showScrollToTopChevron: true,
@@ -601,18 +902,40 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
         ),
       ),
       searchPadding: EdgeInsets.all(scaled(style.popoverPadding) * .75),
+      // The options list is a menu surface, so it draws from the menu palette
+      // rather than inheriting the page popover's decoration.
+      popoverDecoration: ShadDecoration(
+        color: menuSurfaceColor,
+        shadows: style.popoverShadow,
+        border: ShadBorder.all(
+          radius: popoverRadius,
+          color: menuSurfaceBorderColor,
+          width: 1,
+        ),
+      ),
+      filter: menuFilter,
     );
   }
 
   @override
   ShadOptionTheme optionTheme() {
+    // `focus:bg-accent focus:text-accent-foreground`, with every descendant —
+    // check icon included — following the highlight's foreground.
     return ShadOptionTheme(
       padding: EdgeInsets.symmetric(
         horizontal: scaled(style.itemPaddingX),
         vertical: scaled(style.itemPaddingY),
       ),
-      textStyle: style.body.apply(effectiveTextTheme.small),
-      hoveredBackgroundColor: colorScheme.accent,
+      radius: itemRadius,
+      textStyle: style.body
+          .apply(effectiveTextTheme.small)
+          .copyWith(color: menuScheme.popoverForeground),
+      selectedTextStyle: style.body
+          .apply(effectiveTextTheme.small)
+          .copyWith(color: menuItemHighlightForeground),
+      hoveredBackgroundColor: menuItemHighlight,
+      selectedIconColor: menuScheme.popoverForeground,
+      selectedHoveredIconColor: menuItemHighlightForeground,
     );
   }
 
@@ -625,6 +948,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       radius: cardRadius,
       shadows: style.cardShadow,
       gap: scaled(style.cardGap),
+      // `gap-(--card-spacing)`: sections sit a full card padding apart.
+      sectionGap: scaled(style.cardPadding),
       titleStyle: style.title.apply(effectiveTextTheme.large),
       descriptionStyle: style.body.apply(effectiveTextTheme.muted),
       rowMainAxisSize: MainAxisSize.min,
@@ -650,7 +975,13 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       margin: margin,
       duration: 100.milliseconds,
       thumbColor: colorScheme.background,
-      uncheckedTrackColor: colorScheme.input,
+      // `not-data-selected:bg-input dark:not-data-selected:bg-input/80`;
+      // the filled styles use their control wash instead.
+      uncheckedTrackColor: style.controlBorderless
+          ? _wash(colorScheme.input, .9)
+          : _isDark
+          ? _wash(colorScheme.input, .8)
+          : colorScheme.input,
       checkedTrackColor: colorScheme.primary,
       padding: spacing.directional(start: 2),
       decoration: ShadDecoration(
@@ -672,6 +1003,9 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadCheckboxTheme checkboxTheme() {
+    final checkboxRadius = BorderRadius.all(
+      Radius.circular(style.checkboxRadius),
+    );
     return ShadCheckboxTheme(
       size: scaled(style.checkboxSize),
       duration: 100.milliseconds,
@@ -680,9 +1014,20 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       padding: spacing.directional(start: 2),
       checkboxPadding: spacing.only(top: 0.25),
       decoration: ShadDecoration(
+        shadows: style.controlShadow,
         border: ShadBorder.all(
-          color: colorScheme.input,
-          radius: BorderRadius.all(Radius.circular(style.checkboxRadius)),
+          color: controlBorderColor,
+          radius: checkboxRadius,
+          width: 1,
+        ),
+      ),
+      // `data-checked:border-primary`: the outline follows the fill, so a
+      // checked box has no pale halo around it.
+      checkedDecoration: ShadDecoration(
+        shadows: style.controlShadow,
+        border: ShadBorder.all(
+          color: colorScheme.primary,
+          radius: checkboxRadius,
           width: 1,
         ),
       ),
@@ -695,7 +1040,11 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       style: style.field.apply(effectiveTextTheme.muted),
       placeholderStyle: style.field.apply(effectiveTextTheme.muted),
       inputPadding: EdgeInsets.zero,
-      decoration: ShadDecoration(border: fieldBorder),
+      decoration: ShadDecoration(
+        color: fieldFillColor,
+        shadows: style.controlShadow,
+        border: fieldBorder,
+      ),
       padding: EdgeInsets.symmetric(
         horizontal: scaled(style.inputPaddingX),
         vertical: scaled(style.inputPaddingY),
@@ -712,26 +1061,48 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadRadioTheme radioTheme() {
-    const circleSize = 10.0;
+    // The radio itself is a circle, so its ring is fully rounded too.
+    final focusRing = ShadBorder.all(
+      radius: const BorderRadius.all(Radius.circular(9999)),
+      width: style.ringWidth,
+      color: colorScheme.ring.withValues(alpha: style.ringOpacity),
+      offset: style.ringWidth,
+    );
+    // `sera` keeps the outline form when selected — foreground border and
+    // dot, no fill; every other style fills with the primary and cuts the
+    // dot out of it in the primary foreground.
+    final outlined = style.radioCheckedOutline;
     return ShadRadioTheme(
       size: scaled(style.radioSize),
-      circleSize: circleSize,
+      // The dot is `size-2`; `luma` and `rhea` grow it a step in dark mode,
+      // where their filled controls would otherwise swallow it.
+      circleSize: scaled(
+        _isDark && style.controlBorderless && !outlined ? 10 : 8,
+      ),
       duration: 100.milliseconds,
-      color: colorScheme.primary,
+      color: outlined ? colorScheme.foreground : colorScheme.primaryForeground,
       padding: spacing.directional(start: 2),
       decoration: ShadDecoration(
         shape: BoxShape.circle,
         color: uncheckedControlFill,
         border: ShadBorder.all(
-          color: colorScheme.input,
+          color: controlBorderColor,
           width: 1,
         ),
-        // The radio itself is a circle, so its ring is fully rounded too.
-        secondaryFocusedBorder: ShadBorder.all(
-          radius: const BorderRadius.all(Radius.circular(9999)),
-          width: 3,
-          offset: 3,
+        secondaryFocusedBorder: focusRing,
+      ),
+      checkedDecoration: ShadDecoration(
+        shape: BoxShape.circle,
+        color: outlined ? null : colorScheme.primary,
+        border: ShadBorder.all(
+          color: outlined
+              ? colorScheme.foreground
+              : style.controlBorderless
+              ? const Color(0x00000000)
+              : colorScheme.primary,
+          width: 1,
         ),
+        secondaryFocusedBorder: focusRing,
       ),
       spacing: 4,
       alignment: WrapAlignment.start,
@@ -863,7 +1234,11 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadDialogTheme(
       closeIconData: LucideIcons.x,
       radius: dialogRadius,
-      backgroundColor: colorScheme.background,
+      // A dialog sits on the popover surface (`bg-popover`), which in dark
+      // mode is a step lighter than the page, with the same hairline ring as
+      // the other floating surfaces.
+      backgroundColor: colorScheme.popover,
+      border: Border.all(color: dialogBorderColor),
       removeBorderRadiusWhenTiny: true,
       expandActionsWhenTiny: true,
       animateIn: const [
@@ -895,7 +1270,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   @override
   ShadDialogTheme alertDialogTheme() {
     return ShadDialogTheme(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.popover,
+      border: Border.all(color: dialogBorderColor),
       radius: dialogRadius,
       removeBorderRadiusWhenTiny: true,
       expandActionsWhenTiny: true,
@@ -931,14 +1307,29 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       disabledMouseCursor: SystemMouseCursors.forbidden,
       min: 0,
       max: 1,
-      thumbColor: colorScheme.background,
-      thumbBorderColor: colorScheme.primary,
-      disabledThumbColor: colorScheme.background,
-      disabledThumbBorderColor: colorScheme.primary.withValues(alpha: .5),
+      // The thumb is `bg-white` in both modes, outlined with the primary;
+      // `sera` fills it with the primary instead.
+      thumbColor: style.sliderThumbFilled
+          ? colorScheme.primary
+          : const Color(0xffffffff),
+      thumbBorderColor: style.sliderThumbFilled
+          ? const Color(0x00000000)
+          : colorScheme.primary,
+      disabledThumbColor: style.sliderThumbFilled
+          ? _wash(colorScheme.primary, .5)
+          : const Color(0xffffffff),
+      disabledThumbBorderColor: style.sliderThumbFilled
+          ? const Color(0x00000000)
+          : _wash(colorScheme.primary, .5),
       activeTrackColor: colorScheme.primary,
-      inactiveTrackColor: colorScheme.secondary,
-      disabledActiveTrackColor: colorScheme.primary.withValues(alpha: .5),
-      disabledInactiveTrackColor: colorScheme.secondary.withValues(alpha: .5),
+      // `bg-muted`, not the secondary: an accent theme tints the secondary
+      // pair, and the track must stay neutral.
+      inactiveTrackColor: _fill(style.sliderTrackFill, colorScheme),
+      disabledActiveTrackColor: _wash(colorScheme.primary, .5),
+      disabledInactiveTrackColor: _wash(
+        _fill(style.sliderTrackFill, colorScheme) ?? colorScheme.muted,
+        .5,
+      ),
       trackHeight: scaled(style.sliderTrackHeight),
       thumbRadius: scaled(style.sliderThumbSize) / 2,
     );
@@ -957,7 +1348,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadProgressTheme(
       minHeight: scaled(style.progressHeight),
       color: colorScheme.primary,
-      backgroundColor: colorScheme.secondary,
+      // `bg-muted`, not the secondary, for the same reason as the slider.
+      backgroundColor: colorScheme.muted,
       borderRadius: const BorderRadius.all(Radius.circular(16)),
     );
   }
@@ -1058,17 +1450,19 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadTabsTheme(
       dragStartBehavior: DragStartBehavior.start,
       padding: EdgeInsets.all(style.tabsListPadding),
+      // The strip is `bg-muted rounded-lg p-[3px]`; each tab sits one radius
+      // step inside it (`rounded-md`).
       decoration: ShadDecoration(
         color: colorScheme.muted,
         border: ShadBorder.all(
-          radius: radius,
+          radius: radii.resolve(style.tabsListRadius),
           width: 0,
           color: colorScheme.ring,
         ),
       ),
       tabDecoration: ShadDecoration(
         border: ShadBorder.all(
-          radius: const BorderRadius.all(Radius.circular(4)),
+          radius: radii.resolve(style.tabRadius),
           width: 0,
         ),
       ),
@@ -1085,7 +1479,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       tabTextStyle: style.label.apply(effectiveTextTheme.small),
       tabForegroundColor: colorScheme.foreground,
       tabSelectedForegroundColor: colorScheme.foreground,
-      tabSelectedShadows: Shadows.sm,
+      // `data-active:shadow-sm`; most styles drop it.
+      tabSelectedShadows: style.tabSelectedShadow,
     );
   }
 
@@ -1106,25 +1501,57 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadContextMenuTheme contextMenuTheme() => ShadContextMenuTheme(
-    constraints: const BoxConstraints(minWidth: 128),
-    padding: spacing.symmetric(vertical: 1),
-    itemPadding: spacing.symmetric(horizontal: 1),
+    constraints: BoxConstraints(minWidth: scaled(style.menuMinWidth)),
+    // The surface's `p-1`, split so a row's highlight stops at the padding on
+    // every side: the surface takes the vertical half and each item wraps
+    // itself in the horizontal half.
+    padding: EdgeInsets.symmetric(vertical: scaled(style.menuPadding)),
+    itemPadding: EdgeInsets.symmetric(horizontal: scaled(style.menuPadding)),
     leadingPadding: spacing.directional(end: 2),
     trailingPadding: spacing.directional(start: 2),
     showDelay: const Duration(milliseconds: 100),
-    height: 32,
+    height: menuItemHeight,
     buttonVariant: ShadButtonVariant.ghost,
-    itemDecoration: const ShadDecoration(
+    itemDecoration: ShadDecoration(
+      border: ShadBorder.all(radius: itemRadius, width: 0),
       secondaryBorder: ShadBorder.none,
       secondaryFocusedBorder: ShadBorder.none,
     ),
-    textStyle: style.body.apply(effectiveTextTheme.small),
+    decoration: ShadDecoration(
+      color: menuSurfaceColor,
+      shadows: style.popoverShadow,
+      border: ShadBorder.all(
+        radius: popoverRadius,
+        color: menuSurfaceBorderColor,
+        width: 1,
+      ),
+    ),
+    filter: menuFilter,
+    textStyle: style.body
+        .apply(effectiveTextTheme.small)
+        .copyWith(color: menuScheme.popoverForeground),
+    selectedTextStyle: style.body
+        .apply(effectiveTextTheme.small)
+        .copyWith(color: menuItemHighlightForeground),
     trailingTextStyle: style.caption
         .apply(effectiveTextTheme.muted)
         .copyWith(
           height: 1,
+          color: menuScheme.mutedForeground,
         ),
-    selectedBackgroundColor: colorScheme.accent,
+    selectedTrailingTextStyle: style.caption
+        .apply(effectiveTextTheme.muted)
+        .copyWith(
+          height: 1,
+          color: menuItemHighlightForeground,
+        ),
+    selectedBackgroundColor: menuItemHighlight,
+    destructiveForegroundColor: menuTranslucent
+        ? menuItemHighlightForeground
+        : menuScheme.destructive,
+    destructiveSelectedBackgroundColor: menuTranslucent
+        ? menuItemHighlight
+        : _wash(menuScheme.destructive, _menuIsDark ? .2 : .1),
   );
 
   @override
@@ -1300,19 +1727,30 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadMenubarTheme menubarTheme() {
+    // The strip is `h-9 gap-1 rounded-md border p-1 shadow-xs`; its triggers
+    // highlight with `bg-muted` on hover *and* while their menu is open
+    // (`aria-expanded:bg-muted`) — not with the accent, which belongs to the
+    // rows inside the menus.
     return ShadMenubarTheme(
-      radius: popoverRadius,
-      padding: spacing.all(1),
-      border: ShadBorder.all(color: surfaceBorderColor, width: 1),
+      radius: controlRadius,
+      padding: EdgeInsets.all(style.menubarPadding),
+      border: ShadBorder.all(color: colorScheme.border, width: 1),
       anchor: const ShadAnchor(
         offset: Offset(-4, 8),
         childAlignment: AlignmentDirectional.topStart,
         overlayAlignment: AlignmentDirectional.bottomStart,
       ),
-      buttonHeight: 32,
+      // Border-box: the strip's height minus its padding and hairline.
+      buttonHeight: scaled(style.menubarHeight) - 2 * style.menubarPadding - 2,
       buttonVariant: ShadButtonVariant.ghost,
-      buttonSelectedBackgroundColor: colorScheme.accent,
-      buttonDecoration: const ShadDecoration(disableSecondaryBorder: true),
+      buttonForegroundColor: colorScheme.foreground,
+      buttonHoverForegroundColor: colorScheme.foreground,
+      buttonHoverBackgroundColor: colorScheme.muted,
+      buttonSelectedBackgroundColor: colorScheme.muted,
+      buttonDecoration: ShadDecoration(
+        border: ShadBorder.all(radius: itemRadius, width: 0),
+        disableSecondaryBorder: true,
+      ),
     );
   }
 
@@ -1346,6 +1784,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       placeholderStyle: style.field.apply(effectiveTextTheme.muted),
       inputPadding: EdgeInsets.zero,
       decoration: ShadDecoration(
+        color: fieldFillColor,
         border: textareaBorder,
         // A textarea is rounder or squarer than a control, so its ring has to
         // be built from its own radius rather than the shared one.
@@ -1391,15 +1830,11 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadKbdTheme(
       backgroundColor: colorScheme.muted,
       foregroundColor: colorScheme.mutedForeground,
-      border: ShadBorder.all(
-        color: colorScheme.border,
-        width: 1,
-        radius: itemRadius,
-      ),
+      // No outline: shadcn's kbd is a plain `bg-muted rounded-sm` chip.
+      border: ShadBorder.all(width: 0, radius: itemRadius),
       padding: EdgeInsets.symmetric(horizontal: scaled(style.kbdPaddingX)),
-      textStyle: style.caption
-          .apply(effectiveTextTheme.muted)
-          .copyWith(fontFamily: 'GeistMono', package: 'shadcn_ui'),
+      // `font-sans text-xs font-medium` — a key cap is not code.
+      textStyle: style.caption.apply(effectiveTextTheme.muted),
       gap: 4,
       height: scaled(style.kbdHeight),
       minWidth: scaled(style.kbdHeight),
@@ -1408,31 +1843,36 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadSpinnerTheme spinnerTheme() {
-    return ShadSpinnerTheme(
-      color: colorScheme.primary,
-      trackColor: colorScheme.primary.withValues(alpha: .2),
+    // No colour here: the spinner is `text-current` in the reference, so it
+    // follows the ambient IconTheme — a primary button's spinner spins in
+    // the primary foreground, a plain one in the page foreground. A colour
+    // baked into the theme would override that everywhere.
+    return const ShadSpinnerTheme(
       size: 16,
       strokeWidth: 2,
-      duration: const Duration(milliseconds: 900),
+      duration: Duration(milliseconds: 900),
     );
   }
 
   @override
   ShadToggleTheme toggleTheme() {
+    // `hover:bg-muted hover:text-foreground aria-pressed:bg-muted` — the
+    // pressed state is the muted surface, not the accent, and its size
+    // follows the button metrics (`h-9 min-w-9 px-2.5`).
     return ShadToggleTheme(
       hoverBackgroundColor: colorScheme.muted,
-      selectedBackgroundColor: colorScheme.accent,
-      selectedHoverBackgroundColor: colorScheme.accent,
+      selectedBackgroundColor: colorScheme.muted,
+      selectedHoverBackgroundColor: colorScheme.muted,
       foregroundColor: colorScheme.foreground,
-      hoverForegroundColor: colorScheme.mutedForeground,
-      selectedForegroundColor: colorScheme.accentForeground,
-      padding: spacing.symmetric(horizontal: 3),
+      hoverForegroundColor: colorScheme.foreground,
+      selectedForegroundColor: colorScheme.foreground,
+      padding: EdgeInsets.symmetric(horizontal: scaled(style.buttonPaddingX)),
       decoration: ShadDecoration(
         border: ShadBorder.all(radius: controlRadius, width: 0),
       ),
       textStyle: style.label.apply(effectiveTextTheme.small),
-      gap: 8,
-      height: 40,
+      gap: scaled(style.buttonGap),
+      height: scaled(style.buttonHeight),
     );
   }
 
@@ -1442,7 +1882,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       padding: spacing.symmetric(horizontal: 6, vertical: 12),
       gap: 8,
       iconSize: 40,
-      iconColor: colorScheme.mutedForeground,
+      // The icon chip is `bg-muted text-foreground` (`cn-empty-media-icon`).
+      iconColor: colorScheme.foreground,
       titleStyle: style.title.apply(effectiveTextTheme.large),
       descriptionStyle: style.body.apply(effectiveTextTheme.muted),
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1494,8 +1935,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
           .copyWith(
             fontWeight: FontWeight.normal,
           ),
-      itemSelectedBackgroundColor: colorScheme.accent,
-      itemSelectedForegroundColor: colorScheme.accentForeground,
+      // `data-selected:bg-muted data-selected:text-foreground` — the command
+      // palette highlights with the muted surface, not the accent.
+      itemSelectedBackgroundColor: colorScheme.muted,
+      itemSelectedForegroundColor: colorScheme.foreground,
       itemForegroundColor: colorScheme.popoverForeground,
       itemRadius: itemRadius,
       itemGap: 8,

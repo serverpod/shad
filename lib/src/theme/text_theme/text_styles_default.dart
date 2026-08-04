@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 
-const kDefaultFontFamily = 'packages/shadcn_ui/Geist';
+// Inter, matching shadcn/ui's default (`DEFAULT_CONFIG.font: "inter"`).
+// Geist is still bundled and selectable via `ShadTextTheme(family: 'Geist',
+// package: 'shadcn_ui')`.
+const kDefaultFontFamily = 'packages/shadcn_ui/Inter';
 const kDefaultFontFamilyMono = 'packages/shadcn_ui/GeistMono';
 
 abstract class ShadTextDefaultTheme {

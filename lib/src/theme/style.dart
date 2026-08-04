@@ -4,6 +4,39 @@ import 'package:shadcn_ui/src/theme/radii.dart';
 import 'package:shadcn_ui/src/theme/text_role.dart';
 import 'package:shadcn_ui/src/theme/themes/shadows.dart';
 
+/// A wash of colour a style paints behind a control or an outline button.
+///
+/// shadcn's styles disagree about what sits behind an outline button or an
+/// unchecked checkbox: `vega` uses the page background in light and a 30%
+/// `--input` wash in dark, `maia` uses the wash in both modes, `luma` fills
+/// controls with `--input` at 90%, and `sera` leaves everything transparent.
+/// Each value names the utility it was read from.
+enum ShadSurfaceFill {
+  /// No fill at all, `bg-transparent`.
+  none,
+
+  /// The page background, `bg-background`.
+  background,
+
+  /// The muted surface, `bg-muted`.
+  muted,
+
+  /// Half the muted surface, `bg-muted/50`.
+  muted50,
+
+  /// `bg-input/20`.
+  input20,
+
+  /// `bg-input/30`.
+  input30,
+
+  /// `bg-input/50`.
+  input50,
+
+  /// `bg-input/90`.
+  input90,
+}
+
 /// The metrics that distinguish one shadcn/ui *style* from another.
 ///
 /// shadcn ships eight named styles. They are not colour variations — they are
@@ -53,7 +86,12 @@ class ShadStyleTokens {
     this.checkboxRadius = 4,
     // Focus ring.
     this.cardBorderOpacity = .1,
+    this.cardBorderOpacityDark,
     this.surfaceBorderOpacity = .1,
+    this.surfaceBorderOpacityDark,
+    this.dialogBorderOpacity,
+    this.dialogBorderOpacityDark,
+    this.surfaceRadiusCap,
     this.ringWidth = 3,
     this.ringOpacity = .5,
     // Typography, by role.
@@ -75,6 +113,14 @@ class ShadStyleTokens {
     this.dialogShadow = Shadows.none,
     this.sheetShadow = Shadows.lg,
     // Buttons and toggles.
+    this.outlineButtonFill = ShadSurfaceFill.background,
+    this.outlineButtonFillDark = ShadSurfaceFill.input30,
+    this.outlineButtonHoverFill = ShadSurfaceFill.muted,
+    this.outlineButtonHoverFillDark = ShadSurfaceFill.input50,
+    this.outlineButtonDarkInputBorder = true,
+    this.linkUnderline = false,
+    this.flatBadges = false,
+    this.controlShadow = Shadows.xs,
     this.buttonHeight = 36,
     this.buttonHeightSm = 32,
     this.buttonHeightLg = 40,
@@ -92,13 +138,23 @@ class ShadStyleTokens {
     this.textareaPaddingX = 10,
     this.textareaPaddingY = 10,
     this.underlinedFields = false,
+    this.fieldFill = ShadSurfaceFill.none,
+    this.fieldFillDark = ShadSurfaceFill.input30,
+    this.fieldBorderless = false,
     // Select and menus.
     this.selectPaddingX = 10,
     this.selectPaddingY = 8,
     this.menuPadding = 4,
+    this.menuMinWidth = 128,
     this.itemPaddingX = 8,
     this.itemPaddingY = 6,
+    this.menubarHeight = 36,
+    this.menubarPadding = 4,
     // Selection controls.
+    this.controlFill = ShadSurfaceFill.none,
+    this.controlFillDark = ShadSurfaceFill.input30,
+    this.controlBorderless = false,
+    this.radioCheckedOutline = false,
     this.checkboxSize = 16,
     this.radioSize = 16,
     this.switchWidth = 32,
@@ -106,6 +162,8 @@ class ShadStyleTokens {
     this.switchThumbSize = 16,
     this.sliderTrackHeight = 6,
     this.sliderThumbSize = 16,
+    this.sliderTrackFill = ShadSurfaceFill.muted,
+    this.sliderThumbFilled = false,
     // Surfaces.
     this.cardPadding = 24,
     this.cardGap = 4,
@@ -114,6 +172,9 @@ class ShadStyleTokens {
     this.popoverPadding = 16,
     // Everything else.
     this.tabsListPadding = 3,
+    this.tabsListRadius = ShadRadiusToken.lg,
+    this.tabRadius = ShadRadiusToken.md,
+    this.tabSelectedShadow = Shadows.sm,
     this.tabPaddingX = 8,
     this.tabPaddingY = 4,
     this.accordionTitlePaddingY = 16,
@@ -166,8 +227,31 @@ class ShadStyleTokens {
   /// `--border` token, so the line stays proportionate on any surface.
   final double cardBorderOpacity;
 
-  /// Opacity of a popover, menu, dialog or sheet outline.
+  /// [cardBorderOpacity] in dark mode, where a wash of a light foreground
+  /// needs more alpha to read; `luma` and `rhea` use `/5` light and `/10`
+  /// dark. Null means "same as light".
+  final double? cardBorderOpacityDark;
+
+  /// Opacity of a popover or menu outline.
   final double surfaceBorderOpacity;
+
+  /// [surfaceBorderOpacity] in dark mode. Null means "same as light".
+  final double? surfaceBorderOpacityDark;
+
+  /// Opacity of a dialog or sheet outline, where it differs from
+  /// [surfaceBorderOpacity]; `maia` keeps its dialogs at `/5` in both modes
+  /// while its menus go `/5` light, `/10` dark. Null means "same as surface".
+  final double? dialogBorderOpacity;
+
+  /// [dialogBorderOpacity] in dark mode. Null falls back to
+  /// [dialogBorderOpacity], then the surface pair.
+  final double? dialogBorderOpacityDark;
+
+  /// A ceiling in logical pixels for card and dialog corner radii.
+  ///
+  /// `rhea` writes `rounded-[min(var(--radius-4xl),24px)]`: the 4xl step,
+  /// capped so a large theme radius cannot balloon a card's corners.
+  final double? surfaceRadiusCap;
 
   /// Focus-ring thickness, shadcn's `focus-visible:ring-N`.
   final double ringWidth;
@@ -203,6 +287,41 @@ class ShadStyleTokens {
   final List<BoxShadow> sheetShadow;
 
   // --- Buttons ------------------------------------------------------------
+
+  /// What an outline button paints behind itself in light mode.
+  ///
+  /// `vega` uses the page background, `maia` an `input/30` wash, `sera`
+  /// nothing at all.
+  final ShadSurfaceFill outlineButtonFill;
+
+  /// What an outline button paints behind itself in dark mode,
+  /// shadcn's `dark:bg-input/30`.
+  final ShadSurfaceFill outlineButtonFillDark;
+
+  /// The hover fill of an outline or ghost-adjacent button in light mode,
+  /// shadcn's `hover:bg-muted`.
+  final ShadSurfaceFill outlineButtonHoverFill;
+
+  /// The hover fill of an outline button in dark mode,
+  /// shadcn's `dark:hover:bg-input/50`.
+  final ShadSurfaceFill outlineButtonHoverFillDark;
+
+  /// Whether an outline button's dark-mode border uses `--input` rather than
+  /// `--border` (`dark:border-input`). True in `vega`, `nova` and `lyra`;
+  /// the other styles keep `--border` in both modes.
+  final bool outlineButtonDarkInputBorder;
+
+  /// Whether a link button is underlined at rest rather than only on hover.
+  /// `sera` does this.
+  final bool linkUnderline;
+
+  /// Whether badges are bare text — no fill, border or padding, set in the
+  /// style's uppercase caption. `sera` does this.
+  final bool flatBadges;
+
+  /// The shadow behind outline buttons and unchecked selection controls,
+  /// shadcn's `shadow-xs`. Only `vega` keeps it.
+  final List<BoxShadow> controlShadow;
 
   /// Height of a default-size button, shadcn's `h-9`.
   final double buttonHeight;
@@ -245,6 +364,18 @@ class ShadStyleTokens {
   /// most visible thing about the style after its uppercase labels.
   final bool underlinedFields;
 
+  /// What a text field, textarea or select trigger paints behind itself in
+  /// light mode. `bg-transparent` in most styles; `maia` uses `input/30`,
+  /// `mira` `input/20`, `luma` and `rhea` `input/50`.
+  final ShadSurfaceFill fieldFill;
+
+  /// The field fill in dark mode, shadcn's `dark:bg-input/30`.
+  final ShadSurfaceFill fieldFillDark;
+
+  /// Whether fields drop their `--input` outline (`border-transparent`),
+  /// relying on [fieldFill] instead. `luma` and `rhea` do this.
+  final bool fieldBorderless;
+
   // --- Select and menus ---------------------------------------------------
 
   /// Padding of a select trigger.
@@ -254,11 +385,40 @@ class ShadStyleTokens {
   /// Padding around the rows of a menu surface, shadcn's `p-1`.
   final double menuPadding;
 
+  /// Minimum width of a dropdown or context menu, shadcn's `min-w-32`.
+  final double menuMinWidth;
+
   /// Padding of a single menu or select row.
   final double itemPaddingX;
   final double itemPaddingY;
 
+  /// Height of the menubar strip, shadcn's `h-9`.
+  final double menubarHeight;
+
+  /// Padding inside the menubar strip around its triggers, shadcn's `p-1`.
+  /// A bracketed literal in some styles (`p-[3px]`), so it is not scaled.
+  final double menubarPadding;
+
   // --- Selection controls -------------------------------------------------
+
+  /// The fill of an unchecked checkbox or radio in light mode.
+  ///
+  /// Transparent in most styles; `luma` and `rhea` fill their controls with
+  /// `bg-input/90` instead of outlining them.
+  final ShadSurfaceFill controlFill;
+
+  /// The fill of an unchecked checkbox or radio in dark mode,
+  /// shadcn's `dark:bg-input/30`.
+  final ShadSurfaceFill controlFillDark;
+
+  /// Whether checkboxes and radios draw no outline (`border-transparent`),
+  /// relying on [controlFill] instead. `luma` and `rhea` do this.
+  final bool controlBorderless;
+
+  /// Whether a checked radio keeps its outline form — border recoloured to
+  /// the foreground with a plain dot — rather than filling with the primary.
+  /// `sera` does this (`data-checked:border-foreground`).
+  final bool radioCheckedOutline;
 
   final double checkboxSize;
   final double radioSize;
@@ -272,6 +432,14 @@ class ShadStyleTokens {
 
   final double sliderTrackHeight;
   final double sliderThumbSize;
+
+  /// The slider's inactive track, `bg-muted` (`input/90` in `luma` and
+  /// `rhea`, `input/50` in `sera`).
+  final ShadSurfaceFill sliderTrackFill;
+
+  /// Whether the slider thumb is a solid primary dot rather than a white
+  /// bordered one. `sera` does this.
+  final bool sliderThumbFilled;
 
   // --- Surfaces -----------------------------------------------------------
 
@@ -297,6 +465,18 @@ class ShadStyleTokens {
 
   /// Padding of the strip a tab bar's tabs sit in, shadcn's `p-[3px]`.
   final double tabsListPadding;
+
+  /// Corner radius of the tab strip, shadcn's `rounded-lg`.
+  final ShadRadiusToken tabsListRadius;
+
+  /// Corner radius of a single tab, shadcn's `rounded-md` — one step inside
+  /// the strip's.
+  final ShadRadiusToken tabRadius;
+
+  /// The shadow under the active tab, `data-active:shadow-sm`. Only `vega`
+  /// and `nova` keep it.
+  final List<BoxShadow> tabSelectedShadow;
+
   final double tabPaddingX;
   final double tabPaddingY;
 
@@ -330,6 +510,7 @@ class ShadStyleTokens {
       height: 1.375,
     ),
     cardShadow: Shadows.none,
+    controlShadow: Shadows.none,
     buttonRadius: ShadRadiusToken.lg,
     popoverRadius: ShadRadiusToken.lg,
     textareaRadius: ShadRadiusToken.lg,
@@ -343,6 +524,8 @@ class ShadStyleTokens {
     inputHeight: 32,
     itemPaddingX: 6,
     itemPaddingY: 4,
+    menubarHeight: 32,
+    menubarPadding: 3,
     sliderTrackHeight: 4,
     sliderThumbSize: 12,
     cardPadding: 16,
@@ -360,6 +543,7 @@ class ShadStyleTokens {
   static const maia = ShadStyleTokens(
     name: 'maia',
     cardShadow: Shadows.none,
+    controlShadow: Shadows.none,
     popoverShadow: Shadows.xl2,
     buttonRadius: ShadRadiusToken.xl4,
     cardRadius: ShadRadiusToken.xl2,
@@ -369,6 +553,17 @@ class ShadStyleTokens {
     itemRadius: ShadRadiusToken.xl,
     checkboxRadius: 6,
     surfaceBorderOpacity: .05,
+    surfaceBorderOpacityDark: .1,
+    dialogBorderOpacity: .05,
+    dialogBorderOpacityDark: .05,
+    outlineButtonFill: ShadSurfaceFill.input30,
+    outlineButtonHoverFill: ShadSurfaceFill.input50,
+    outlineButtonDarkInputBorder: false,
+    fieldFill: ShadSurfaceFill.input30,
+    tabsListRadius: ShadRadiusToken.xl4,
+    tabRadius: ShadRadiusToken.xl,
+    tabSelectedShadow: Shadows.none,
+    menuMinWidth: 192,
     buttonPaddingX: 12,
     buttonPaddingXSm: 12,
     buttonPaddingXLg: 16,
@@ -400,6 +595,7 @@ class ShadStyleTokens {
     body: ShadTextRole(fontSize: 12),
     field: ShadTextRole(fontSize: 12),
     cardShadow: Shadows.none,
+    controlShadow: Shadows.none,
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
@@ -409,6 +605,10 @@ class ShadStyleTokens {
     inputHeight: 32,
     menuPadding: 0,
     itemPaddingY: 8,
+    menubarHeight: 32,
+    tabsListRadius: ShadRadiusToken.none,
+    tabRadius: ShadRadiusToken.none,
+    tabSelectedShadow: Shadows.none,
     sliderTrackHeight: 4,
     sliderThumbSize: 12,
     cardPadding: 16,
@@ -442,6 +642,12 @@ class ShadStyleTokens {
     caption: ShadTextRole(fontSize: 10, fontWeight: FontWeight.w500),
     field: ShadTextRole(fontSize: 12, height: 1.625),
     cardShadow: Shadows.none,
+    controlShadow: Shadows.none,
+    outlineButtonFill: ShadSurfaceFill.none,
+    outlineButtonHoverFill: ShadSurfaceFill.input50,
+    outlineButtonDarkInputBorder: false,
+    fieldFill: ShadSurfaceFill.input20,
+    tabSelectedShadow: Shadows.none,
     buttonHeight: 28,
     buttonHeightSm: 24,
     buttonHeightLg: 32,
@@ -487,13 +693,29 @@ class ShadStyleTokens {
     itemRadius: ShadRadiusToken.xl2,
     checkboxRadius: 5,
     cardBorderOpacity: .05,
+    cardBorderOpacityDark: .1,
     surfaceBorderOpacity: .05,
+    surfaceBorderOpacityDark: .1,
     ringOpacity: .3,
     cardGap: 6,
     cardShadow: Shadows.md,
+    controlShadow: Shadows.none,
     popoverShadow: Shadows.lg,
     dialogShadow: Shadows.xl,
     sheetShadow: Shadows.xl,
+    outlineButtonFillDark: ShadSurfaceFill.none,
+    outlineButtonHoverFillDark: ShadSurfaceFill.input30,
+    outlineButtonDarkInputBorder: false,
+    controlFill: ShadSurfaceFill.input90,
+    controlFillDark: ShadSurfaceFill.input90,
+    controlBorderless: true,
+    fieldFill: ShadSurfaceFill.input50,
+    fieldFillDark: ShadSurfaceFill.input50,
+    fieldBorderless: true,
+    sliderTrackFill: ShadSurfaceFill.input90,
+    tabsListRadius: ShadRadiusToken.full,
+    tabRadius: ShadRadiusToken.full,
+    tabSelectedShadow: Shadows.none,
     buttonPaddingX: 12,
     buttonPaddingXSm: 12,
     buttonPaddingXLg: 16,
@@ -502,6 +724,7 @@ class ShadStyleTokens {
     textareaPaddingY: 12,
     selectPaddingX: 12,
     menuPadding: 6,
+    menuMinWidth: 192,
     itemPaddingX: 12,
     itemPaddingY: 8,
     dialogGap: 6,
@@ -557,8 +780,23 @@ class ShadStyleTokens {
       uppercase: true,
     ),
     cardShadow: Shadows.sm,
+    controlShadow: Shadows.none,
     dialogShadow: Shadows.md,
     sheetShadow: Shadows.md,
+    outlineButtonFill: ShadSurfaceFill.none,
+    outlineButtonFillDark: ShadSurfaceFill.none,
+    outlineButtonHoverFillDark: ShadSurfaceFill.input30,
+    outlineButtonDarkInputBorder: false,
+    linkUnderline: true,
+    flatBadges: true,
+    controlFillDark: ShadSurfaceFill.none,
+    fieldFillDark: ShadSurfaceFill.none,
+    radioCheckedOutline: true,
+    sliderTrackFill: ShadSurfaceFill.input50,
+    sliderThumbFilled: true,
+    tabsListRadius: ShadRadiusToken.none,
+    tabRadius: ShadRadiusToken.none,
+    tabSelectedShadow: Shadows.none,
     buttonHeight: 40,
     buttonHeightSm: 36,
     buttonHeightLg: 44,
@@ -577,8 +815,10 @@ class ShadStyleTokens {
     underlinedFields: true,
     selectPaddingX: 0,
     menuPadding: 6,
+    menuMinWidth: 192,
     itemPaddingX: 12,
     itemPaddingY: 8,
+    menubarHeight: 40,
     checkboxSize: 18,
     radioSize: 18,
     switchWidth: 33,
@@ -601,19 +841,38 @@ class ShadStyleTokens {
   static const rhea = ShadStyleTokens(
     name: 'rhea',
     buttonRadius: ShadRadiusToken.xl2,
-    cardRadius: ShadRadiusToken.xl2,
-    dialogRadius: ShadRadiusToken.xl2,
+    // Card and dialog corners are the 4xl step, capped:
+    // `rounded-[min(var(--radius-4xl),24px)]`.
+    cardRadius: ShadRadiusToken.xl4,
+    dialogRadius: ShadRadiusToken.xl4,
+    surfaceRadiusCap: 24,
     popoverRadius: ShadRadiusToken.xl2,
     textareaRadius: ShadRadiusToken.xl2,
     itemRadius: ShadRadiusToken.xl,
     checkboxRadius: 5,
     cardBorderOpacity: .05,
+    cardBorderOpacityDark: .1,
     surfaceBorderOpacity: .05,
+    surfaceBorderOpacityDark: .1,
     ringOpacity: .3,
     cardShadow: Shadows.sm,
+    controlShadow: Shadows.none,
     popoverShadow: Shadows.lg,
     dialogShadow: Shadows.xl,
     sheetShadow: Shadows.xl,
+    outlineButtonFillDark: ShadSurfaceFill.none,
+    outlineButtonHoverFillDark: ShadSurfaceFill.input30,
+    outlineButtonDarkInputBorder: false,
+    controlFill: ShadSurfaceFill.input90,
+    controlFillDark: ShadSurfaceFill.input90,
+    controlBorderless: true,
+    fieldFill: ShadSurfaceFill.input50,
+    fieldFillDark: ShadSurfaceFill.input50,
+    fieldBorderless: true,
+    sliderTrackFill: ShadSurfaceFill.input90,
+    tabsListRadius: ShadRadiusToken.xl2,
+    tabRadius: ShadRadiusToken.xl2,
+    tabSelectedShadow: Shadows.none,
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
@@ -625,6 +884,8 @@ class ShadStyleTokens {
     iconButtonSizeLg: 36,
     inputHeight: 32,
     selectPaddingX: 12,
+    menubarHeight: 32,
+    menubarPadding: 3,
     dialogGap: 6,
     switchHeight: 20,
     sliderTrackHeight: 4,
@@ -662,7 +923,12 @@ class ShadStyleTokens {
     ShadRadiusToken? itemRadius,
     double? checkboxRadius,
     double? cardBorderOpacity,
+    double? cardBorderOpacityDark,
     double? surfaceBorderOpacity,
+    double? surfaceBorderOpacityDark,
+    double? dialogBorderOpacity,
+    double? dialogBorderOpacityDark,
+    double? surfaceRadiusCap,
     double? ringWidth,
     double? ringOpacity,
     ShadTextRole? title,
@@ -675,6 +941,14 @@ class ShadStyleTokens {
     List<BoxShadow>? popoverShadow,
     List<BoxShadow>? dialogShadow,
     List<BoxShadow>? sheetShadow,
+    ShadSurfaceFill? outlineButtonFill,
+    ShadSurfaceFill? outlineButtonFillDark,
+    ShadSurfaceFill? outlineButtonHoverFill,
+    ShadSurfaceFill? outlineButtonHoverFillDark,
+    bool? outlineButtonDarkInputBorder,
+    bool? linkUnderline,
+    bool? flatBadges,
+    List<BoxShadow>? controlShadow,
     double? buttonHeight,
     double? buttonHeightSm,
     double? buttonHeightLg,
@@ -691,11 +965,21 @@ class ShadStyleTokens {
     double? textareaPaddingX,
     double? textareaPaddingY,
     bool? underlinedFields,
+    ShadSurfaceFill? fieldFill,
+    ShadSurfaceFill? fieldFillDark,
+    bool? fieldBorderless,
     double? selectPaddingX,
     double? selectPaddingY,
     double? menuPadding,
+    double? menuMinWidth,
     double? itemPaddingX,
     double? itemPaddingY,
+    double? menubarHeight,
+    double? menubarPadding,
+    ShadSurfaceFill? controlFill,
+    ShadSurfaceFill? controlFillDark,
+    bool? controlBorderless,
+    bool? radioCheckedOutline,
     double? checkboxSize,
     double? radioSize,
     double? switchWidth,
@@ -703,12 +987,17 @@ class ShadStyleTokens {
     double? switchThumbSize,
     double? sliderTrackHeight,
     double? sliderThumbSize,
+    ShadSurfaceFill? sliderTrackFill,
+    bool? sliderThumbFilled,
     double? cardPadding,
     double? cardGap,
     double? dialogPadding,
     double? dialogGap,
     double? popoverPadding,
     double? tabsListPadding,
+    ShadRadiusToken? tabsListRadius,
+    ShadRadiusToken? tabRadius,
+    List<BoxShadow>? tabSelectedShadow,
     double? tabPaddingX,
     double? tabPaddingY,
     double? accordionTitlePaddingY,
@@ -729,7 +1018,15 @@ class ShadStyleTokens {
       itemRadius: itemRadius ?? this.itemRadius,
       checkboxRadius: checkboxRadius ?? this.checkboxRadius,
       cardBorderOpacity: cardBorderOpacity ?? this.cardBorderOpacity,
+      cardBorderOpacityDark:
+          cardBorderOpacityDark ?? this.cardBorderOpacityDark,
       surfaceBorderOpacity: surfaceBorderOpacity ?? this.surfaceBorderOpacity,
+      surfaceBorderOpacityDark:
+          surfaceBorderOpacityDark ?? this.surfaceBorderOpacityDark,
+      dialogBorderOpacity: dialogBorderOpacity ?? this.dialogBorderOpacity,
+      dialogBorderOpacityDark:
+          dialogBorderOpacityDark ?? this.dialogBorderOpacityDark,
+      surfaceRadiusCap: surfaceRadiusCap ?? this.surfaceRadiusCap,
       ringWidth: ringWidth ?? this.ringWidth,
       ringOpacity: ringOpacity ?? this.ringOpacity,
       title: title ?? this.title,
@@ -742,6 +1039,18 @@ class ShadStyleTokens {
       popoverShadow: popoverShadow ?? this.popoverShadow,
       dialogShadow: dialogShadow ?? this.dialogShadow,
       sheetShadow: sheetShadow ?? this.sheetShadow,
+      outlineButtonFill: outlineButtonFill ?? this.outlineButtonFill,
+      outlineButtonFillDark:
+          outlineButtonFillDark ?? this.outlineButtonFillDark,
+      outlineButtonHoverFill:
+          outlineButtonHoverFill ?? this.outlineButtonHoverFill,
+      outlineButtonHoverFillDark:
+          outlineButtonHoverFillDark ?? this.outlineButtonHoverFillDark,
+      outlineButtonDarkInputBorder:
+          outlineButtonDarkInputBorder ?? this.outlineButtonDarkInputBorder,
+      linkUnderline: linkUnderline ?? this.linkUnderline,
+      flatBadges: flatBadges ?? this.flatBadges,
+      controlShadow: controlShadow ?? this.controlShadow,
       buttonHeight: buttonHeight ?? this.buttonHeight,
       buttonHeightSm: buttonHeightSm ?? this.buttonHeightSm,
       buttonHeightLg: buttonHeightLg ?? this.buttonHeightLg,
@@ -758,11 +1067,21 @@ class ShadStyleTokens {
       textareaPaddingX: textareaPaddingX ?? this.textareaPaddingX,
       textareaPaddingY: textareaPaddingY ?? this.textareaPaddingY,
       underlinedFields: underlinedFields ?? this.underlinedFields,
+      fieldFill: fieldFill ?? this.fieldFill,
+      fieldFillDark: fieldFillDark ?? this.fieldFillDark,
+      fieldBorderless: fieldBorderless ?? this.fieldBorderless,
       selectPaddingX: selectPaddingX ?? this.selectPaddingX,
       selectPaddingY: selectPaddingY ?? this.selectPaddingY,
       menuPadding: menuPadding ?? this.menuPadding,
+      menuMinWidth: menuMinWidth ?? this.menuMinWidth,
       itemPaddingX: itemPaddingX ?? this.itemPaddingX,
       itemPaddingY: itemPaddingY ?? this.itemPaddingY,
+      menubarHeight: menubarHeight ?? this.menubarHeight,
+      menubarPadding: menubarPadding ?? this.menubarPadding,
+      controlFill: controlFill ?? this.controlFill,
+      controlFillDark: controlFillDark ?? this.controlFillDark,
+      controlBorderless: controlBorderless ?? this.controlBorderless,
+      radioCheckedOutline: radioCheckedOutline ?? this.radioCheckedOutline,
       checkboxSize: checkboxSize ?? this.checkboxSize,
       radioSize: radioSize ?? this.radioSize,
       switchWidth: switchWidth ?? this.switchWidth,
@@ -770,12 +1089,17 @@ class ShadStyleTokens {
       switchThumbSize: switchThumbSize ?? this.switchThumbSize,
       sliderTrackHeight: sliderTrackHeight ?? this.sliderTrackHeight,
       sliderThumbSize: sliderThumbSize ?? this.sliderThumbSize,
+      sliderTrackFill: sliderTrackFill ?? this.sliderTrackFill,
+      sliderThumbFilled: sliderThumbFilled ?? this.sliderThumbFilled,
       cardPadding: cardPadding ?? this.cardPadding,
       cardGap: cardGap ?? this.cardGap,
       dialogPadding: dialogPadding ?? this.dialogPadding,
       dialogGap: dialogGap ?? this.dialogGap,
       popoverPadding: popoverPadding ?? this.popoverPadding,
       tabsListPadding: tabsListPadding ?? this.tabsListPadding,
+      tabsListRadius: tabsListRadius ?? this.tabsListRadius,
+      tabRadius: tabRadius ?? this.tabRadius,
+      tabSelectedShadow: tabSelectedShadow ?? this.tabSelectedShadow,
       tabPaddingX: tabPaddingX ?? this.tabPaddingX,
       tabPaddingY: tabPaddingY ?? this.tabPaddingY,
       accordionTitlePaddingY:
@@ -800,7 +1124,12 @@ class ShadStyleTokens {
     itemRadius,
     checkboxRadius,
     cardBorderOpacity,
+    cardBorderOpacityDark,
     surfaceBorderOpacity,
+    surfaceBorderOpacityDark,
+    dialogBorderOpacity,
+    dialogBorderOpacityDark,
+    surfaceRadiusCap,
     ringWidth,
     ringOpacity,
     title,
@@ -813,6 +1142,14 @@ class ShadStyleTokens {
     popoverShadow,
     dialogShadow,
     sheetShadow,
+    outlineButtonFill,
+    outlineButtonFillDark,
+    outlineButtonHoverFill,
+    outlineButtonHoverFillDark,
+    outlineButtonDarkInputBorder,
+    linkUnderline,
+    flatBadges,
+    controlShadow,
     buttonHeight,
     buttonHeightSm,
     buttonHeightLg,
@@ -829,11 +1166,21 @@ class ShadStyleTokens {
     textareaPaddingX,
     textareaPaddingY,
     underlinedFields,
+    fieldFill,
+    fieldFillDark,
+    fieldBorderless,
     selectPaddingX,
     selectPaddingY,
     menuPadding,
+    menuMinWidth,
     itemPaddingX,
     itemPaddingY,
+    menubarHeight,
+    menubarPadding,
+    controlFill,
+    controlFillDark,
+    controlBorderless,
+    radioCheckedOutline,
     checkboxSize,
     radioSize,
     switchWidth,
@@ -841,12 +1188,17 @@ class ShadStyleTokens {
     switchThumbSize,
     sliderTrackHeight,
     sliderThumbSize,
+    sliderTrackFill,
+    sliderThumbFilled,
     cardPadding,
     cardGap,
     dialogPadding,
     dialogGap,
     popoverPadding,
     tabsListPadding,
+    tabsListRadius,
+    tabRadius,
+    tabSelectedShadow,
     tabPaddingX,
     tabPaddingY,
     accordionTitlePaddingY,

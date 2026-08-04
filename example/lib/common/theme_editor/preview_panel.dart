@@ -721,7 +721,10 @@ class _DistributeTrackCard extends StatelessWidget {
         actions: [
           ShadButton(onPressed: () {}, child: const Text('Create Release')),
         ],
-        padding: EdgeInsets.zero,
+        // The reference Empty keeps its `p-12` breathing room, which is what
+        // centres the block inside the card; zeroing it pinned the icon to
+        // the top edge.
+        padding: const EdgeInsets.symmetric(vertical: 24),
         titleStyle: theme.textTheme.large,
       ),
     );

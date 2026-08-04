@@ -1,3 +1,65 @@
+## Unreleased
+
+A fidelity pass against shadcn/ui's `/create` registry: colours and states were re-read from `registry/styles/style-*.css` and `registry/config.ts` rather than from the older `new-york-v4` values, and the menu appearance options moved into the theme itself.
+
+### Breaking (visual): button variants match the current reference
+
+- **Ghost and outline** content is the `foreground`, no longer `primary` — on an accent theme, ghost buttons and menu rows stopped being tinted blue. Hover is `bg-muted hover:text-foreground` (`muted/50` in dark), not `bg-accent`.
+- **Destructive** is a soft tint (`bg-destructive/10 text-destructive`, `/20` dark, hover one step stronger) instead of a solid fill, with a destructive focus ring.
+- **Secondary** hover mixes 5% foreground into the surface; **primary** hover is `primary/80`.
+- **Outline** fills follow the style tokens: `bg-background` + `dark:bg-input/30 dark:border-input` in `vega`, washes or transparency in `maia`/`mira`/`luma`/`sera`/`rhea`.
+
+### Menus: reference state fidelity
+
+- Menu rows recolour *all* their content on hover — text, leading/trailing icons and shortcuts — to `accent-foreground` (`focus:**:text-accent-foreground`). Previously a leaf item's hover changed only the background, which could leave white-on-white content in inverted or bold-accent themes.
+- `ShadContextMenuItem.destructive` marks a destructive action: destructive text and icons over a `destructive/10` hover wash.
+- Menubar triggers highlight with `bg-muted` on hover and while open (`aria-expanded:bg-muted`), and the strip follows `h-9 p-1 border shadow-xs` per style.
+- Command items highlight with `bg-muted`/`text-foreground`, not the accent.
+- Menu row height, min-width and surface padding come from the style tokens instead of a fixed 32/128/4.
+
+### Menu appearance options on `ShadThemeData`
+
+`ShadThemeData` now takes `menuColorScheme`, `menuTranslucent` and `menuAccent`, with the same semantics as shadcn's create editor: inverted menus take the whole opposite-brightness palette, translucent ones a blurred `popover/70` surface with `foreground/10` highlights, and a bold accent rewrites the scheme's accent pair with its primary. The example theme editor now uses these instead of hand-derived overrides.
+
+### Selection controls
+
+- A checked checkbox or radio recolours its outline with the fill (`data-checked:border-primary`) — no more pale halo.
+- A selected radio is filled with the primary and its dot cut out in `primary-foreground`, matching the reference (it used to stay an outlined ring with a primary dot).
+- Per-style fills: `luma`/`rhea` controls are `bg-input/90` and borderless; `sera` radios keep the outline form with a `foreground` border and dot.
+- Text fields, textareas and select triggers gained their per-style fills (`dark:bg-input/30`, `maia` `input/30`, `mira` `input/20`, `luma`/`rhea` `input/50` borderless).
+
+### Other reference fixes
+
+- Dialogs sit on `bg-popover` with the foreground-wash hairline, like every floating surface.
+- Slider and progress tracks are `bg-muted` (previously `secondary`, which an accent theme tinted); the slider thumb is white in both modes.
+- Toggles press to `bg-muted` and follow the button metrics.
+- Tabs take their strip and trigger radii from the style (`rounded-lg` / `rounded-md` in `vega`), and only `vega`/`nova` keep the active-tab shadow.
+- Badges: `px-2`, soft destructive tint, square in the square styles, and `sera`'s flat text-only badges.
+- Kbd is a plain `bg-muted` chip in the sans face (no border, no mono).
+- Avatar default is `size-8` (32px).
+- Cards separate their sections by `--card-spacing` (`ShadCardTheme.sectionGap`) while the title/description gap stays small.
+- Surface hairlines are brightness-aware (`ring-foreground/5 dark:ring-foreground/10` in the soft styles); `rhea` cards/dialogs use the capped `min(radius-4xl, 24px)` corner.
+- `ShadDefaultThemeNoSecondaryBorderVariant` is now a subclass of `ShadDefaultThemeVariant`, so every one of these fixes applies to both focus treatments.
+
+### Rendering fixes
+
+- **Outward shadows use `BlurStyle.outer`.** CSS clips a box-shadow to outside the border box; Flutter's default blur painted it behind the whole box, which showed through every transparent or translucent fill as a grey wash — checkboxes, text fields, select triggers, the menubar strip and translucent menus all looked "slightly grey" in light mode.
+- Menu rows are start-aligned again (the item's button centres its text; the row merges `TextAlign.start` back in).
+- `ShadCollapsible` reveals its content top-start instead of centring whatever is narrower than the strip.
+- `ShadEmpty` draws its icon centred in the reference's `size-10 bg-muted rounded-lg` chip at `size-6`, instead of a bare full-size glyph.
+- The focused OTP slot draws its ring *outside* the slot like every other field.
+- `ShadSpinner` follows the ambient `IconTheme` (`text-current`), so it spins in a button's content colour; the theme no longer pins it to the primary.
+- The select trigger's value, chevron, scroll chevrons and search field no longer borrow menu-palette colours — an inverted menu used to make the trigger's text invisible.
+- A translucent menu keeps its drop shadow (it was clipped away with the backdrop filter).
+- **Inter is the default font**, matching the reference's `font: "inter"`; the variable font is bundled. Geist and Geist Mono remain bundled and selectable (`ShadTextTheme(family: 'Geist', package: 'shadcn_ui')`).
+- Focus rings only round the corners that the element itself rounds: a square-cornered element (the `lyra`/`sera` styles, the middle OTP slots) gets a square ring, and rounded corners grow by the ring width so ring and element stay concentric — the OTP ring no longer detaches at the strip's corners.
+- Badges no longer react to hover; the reference only restyles badges rendered as links.
+- Tabs lost the extra 4px gutter around each tab — the strip's `p-[3px]` is the only inset, as in the reference.
+- The `sera` select trigger is underlined like its text fields (`border-transparent border-b-input px-0`) instead of a boxed border with zero padding.
+- The time picker's fields grow with the text scale and centre their digits.
+- The menubar opens on click; hovering another trigger only switches menus while one is already open, matching the reference menubar.
+- `ShadEmpty`'s icon chip is centred, and the example's empty-state card keeps its breathing room.
+
 ## 0.57.0
 
 A breaking release. The export surface was trimmed, eleven components were added, and the default theme was brought in line with shadcn/ui's own values.

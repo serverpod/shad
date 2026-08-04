@@ -132,12 +132,24 @@ class ShadEmpty extends StatelessWidget {
           crossAxisAlignment: effectiveCrossAxisAlignment,
           children: [
             if (icon != null) ...[
-              IconTheme(
-                data: IconThemeData(
-                  size: effectiveIconSize,
-                  color: effectiveIconColor,
+              // shadcn's `EmptyMedia variant="icon"`: the glyph sits centred
+              // in a `size-10 bg-muted rounded-lg` chip at `size-6`, rather
+              // than being blown up to the chip's own size.
+              Container(
+                width: effectiveIconSize,
+                height: effectiveIconSize,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.muted,
+                  borderRadius: theme.radii.lg,
                 ),
-                child: icon!,
+                child: IconTheme(
+                  data: IconThemeData(
+                    size: effectiveIconSize * .6,
+                    color: effectiveIconColor,
+                  ),
+                  child: icon!,
+                ),
               ),
               SizedBox(height: effectiveGap * 2),
             ],

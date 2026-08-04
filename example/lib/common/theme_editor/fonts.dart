@@ -86,11 +86,11 @@ class EditorFont {
     return ShadTextTheme.fromGoogleFont(builder);
   }
 
-  /// shadcn/ui's font list, in its order. The two Geist faces are the ones
-  /// this package bundles; the rest come from Google Fonts.
+  /// shadcn/ui's font list, in its order. Inter and the two Geist faces are
+  /// the ones this package bundles; the rest come from Google Fonts.
   static const all = <EditorFont>[
+    EditorFont(title: 'Inter', family: 'Inter', bundled: true),
     EditorFont(title: 'Geist', family: 'Geist', bundled: true),
-    EditorFont(title: 'Inter', family: 'Inter'),
     EditorFont(title: 'Noto Sans', family: 'Noto Sans'),
     EditorFont(title: 'Nunito Sans', family: 'Nunito Sans'),
     EditorFont(title: 'Figtree', family: 'Figtree'),

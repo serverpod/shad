@@ -224,6 +224,10 @@ class ShadCollapsibleState extends State<ShadCollapsible>
                 return const SizedBox.shrink();
               }
               return Align(
+                // Only the height factor animates; a default (center)
+                // alignment would also centre the revealed content
+                // horizontally whenever it is narrower than the collapsible.
+                alignment: AlignmentDirectional.topStart,
                 heightFactor: _sizeFactor.value.clamp(0.0, 1.0),
                 child: child,
               );

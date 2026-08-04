@@ -55,6 +55,7 @@ mixin _$ShadCardTheme {
         t,
       ),
       gap: lerpDouble$(a.gap, b.gap, t),
+      sectionGap: lerpDouble$(a.sectionGap, b.sectionGap, t),
     );
   }
 
@@ -76,6 +77,7 @@ mixin _$ShadCardTheme {
     TextStyle? titleStyle,
     TextStyle? descriptionStyle,
     double? gap,
+    double? sectionGap,
   }) {
     final _this = (this as ShadCardTheme);
 
@@ -100,6 +102,7 @@ mixin _$ShadCardTheme {
       titleStyle: titleStyle ?? _this.titleStyle,
       descriptionStyle: descriptionStyle ?? _this.descriptionStyle,
       gap: gap ?? _this.gap,
+      sectionGap: sectionGap ?? _this.sectionGap,
     );
   }
 
@@ -134,6 +137,7 @@ mixin _$ShadCardTheme {
           _this.descriptionStyle?.merge(other.descriptionStyle) ??
           other.descriptionStyle,
       gap: other.gap,
+      sectionGap: other.sectionGap,
     );
   }
 
@@ -166,7 +170,8 @@ mixin _$ShadCardTheme {
         _other.clipBehavior == _this.clipBehavior &&
         _other.titleStyle == _this.titleStyle &&
         _other.descriptionStyle == _this.descriptionStyle &&
-        _other.gap == _this.gap;
+        _other.gap == _this.gap &&
+        _other.sectionGap == _this.sectionGap;
   }
 
   @override
@@ -192,6 +197,7 @@ mixin _$ShadCardTheme {
       _this.titleStyle,
       _this.descriptionStyle,
       _this.gap,
+      _this.sectionGap,
     );
   }
 }

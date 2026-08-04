@@ -31,6 +31,7 @@ class ShadSelectTheme with _$ShadSelectTheme {
     this.shadows,
     this.filter,
     this.popoverReverseDuration,
+    this.popoverDecoration,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -80,6 +81,12 @@ class ShadSelectTheme with _$ShadSelectTheme {
 
   /// {@macro ShadPopover.filter}
   final ImageFilter? filter;
+
+  /// The decoration of the options popover, as opposed to [decoration] which
+  /// styles the trigger. Menus can carry their own palette (see
+  /// `ShadThemeData.menuColorScheme`), so the options surface cannot simply
+  /// fall back to the page's `ShadPopoverTheme`.
+  final ShadDecoration? popoverDecoration;
 
   /// {@macro ShadPopover.effects}
   final List<Effect<dynamic>>? effects;

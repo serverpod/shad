@@ -14,6 +14,7 @@ class ShadCheckboxTheme with _$ShadCheckboxTheme {
     this.uncheckedColor,
     this.duration,
     this.decoration,
+    this.checkedDecoration,
     this.size,
     this.padding,
     this.crossAxisAlignment,
@@ -40,6 +41,11 @@ class ShadCheckboxTheme with _$ShadCheckboxTheme {
 
   /// {@macro ShadCheckbox.decoration}
   final ShadDecoration? decoration;
+
+  /// The decoration while checked, when it differs from [decoration] —
+  /// shadcn recolours the outline with the fill (`data-checked:border-primary`)
+  /// so a checked control has no pale halo. Null means "same as [decoration]".
+  final ShadDecoration? checkedDecoration;
 
   /// {@macro ShadCheckbox.padding}
   final EdgeInsetsGeometry? padding;

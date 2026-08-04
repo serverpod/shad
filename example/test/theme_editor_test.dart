@@ -339,39 +339,84 @@ void main() {
   });
 
   group('menu settings', () {
-    test('inverted swaps the popover surface, not just the text', () {
-      // The bug this pins: the variant bakes colorScheme.popover into
-      // popoverTheme.decoration when it is constructed, so overriding the
-      // scheme afterwards changed only the text.
+    // Contrast is judged against what is actually painted: a translucent
+    // surface or highlight is composited before its luminance is read.
+    Color composite(Color over, Color base) => Color.alphaBlend(over, base);
+
+    test('inverted menus take the whole dark palette in light mode', () {
+      // shadcn implements "Inverted" by giving menu surfaces the `dark`
+      // class — every token flips, not just the surface and text.
       const config = ThemeEditorConfig(menuColor: MenuSurfaceColor.inverted);
       final theme = config.build();
-      final plain = const ThemeEditorConfig().build();
+      final dark = const ThemeEditorConfig(
+        brightness: Brightness.dark,
+      ).build();
 
-      expect(theme.colorScheme.popover, plain.colorScheme.foreground);
-      expect(theme.colorScheme.popoverForeground, plain.colorScheme.background);
-      // The surface actually painted by a popover must follow too.
       expect(
-        theme.popoverTheme.decoration!.color,
-        isNot(plain.popoverTheme.decoration!.color),
+        theme.contextMenuTheme.decoration!.color,
+        dark.colorScheme.popover,
+      );
+      expect(
+        theme.contextMenuTheme.textStyle!.color,
+        dark.colorScheme.popoverForeground,
+      );
+      expect(
+        theme.optionTheme.textStyle!.color,
+        dark.colorScheme.popoverForeground,
+      );
+      // The row highlight is the dark accent pair, icons included.
+      expect(
+        theme.optionTheme.hoveredBackgroundColor,
+        dark.colorScheme.accent,
+      );
+      // The page's own popover is untouched: plain popovers do not invert.
+      expect(theme.popoverTheme.decoration!.color, theme.colorScheme.popover);
+    });
+
+    test('inverted is a no-op in dark mode, as in the reference', () {
+      // The reference toggles the `dark` class on menu surfaces; when the
+      // page is already dark that changes nothing.
+      const config = ThemeEditorConfig(
+        brightness: Brightness.dark,
+        menuColor: MenuSurfaceColor.inverted,
+      );
+      final theme = config.build();
+      expect(
+        theme.contextMenuTheme.decoration!.color,
+        theme.colorScheme.popover,
       );
     });
 
-    test('translucent lowers the popover alpha', () {
+    test('translucent lowers the menu surface, not the page popover', () {
       const config = ThemeEditorConfig(
         menuFinish: MenuSurfaceFinish.translucent,
       );
-      expect(config.colorScheme.popover.a, lessThan(1));
+      final theme = config.build();
+      // `bg-popover/70` behind a backdrop blur…
+      expect(theme.contextMenuTheme.decoration!.color!.a, closeTo(.7, .01));
+      expect(theme.selectTheme.popoverDecoration!.color!.a, closeTo(.7, .01));
+      expect(theme.contextMenuTheme.filter, isNotNull);
+      expect(theme.selectTheme.filter, isNotNull);
+      // …with row highlights as a foreground wash so they read through.
+      expect(theme.optionTheme.hoveredBackgroundColor!.a, lessThan(.2));
+      // The page palette itself stays opaque.
+      expect(theme.colorScheme.popover.a, 1);
     });
 
-    test('bold keeps the selected label readable', () {
-      // Bold puts the item on `primary`, so its label has to be
-      // primaryForeground — using one colour for selected and unselected is
-      // what made bold unreadable.
+    test('bold points the accent pair at the primary pair', () {
+      // The reference writes `accent = primary` into the generated theme, so
+      // it is a scheme transformation, and menus pick it up through their
+      // normal accent highlight.
       const config = ThemeEditorConfig(menuAccent: MenuAccent.bold);
       final theme = config.build();
 
+      expect(theme.colorScheme.accent, theme.colorScheme.primary);
       expect(
-        theme.optionTheme.selectedBackgroundColor,
+        theme.colorScheme.accentForeground,
+        theme.colorScheme.primaryForeground,
+      );
+      expect(
+        theme.optionTheme.hoveredBackgroundColor,
         theme.colorScheme.primary,
       );
       expect(
@@ -384,53 +429,10 @@ void main() {
       );
     });
 
-    test('the selection stays visible in every menu mode', () {
-      // The selection is blended from the menu's own surface rather than taken
-      // from the page's `--accent`, which disappeared on an inverted or
-      // translucent menu.
-      for (final color in MenuSurfaceColor.values) {
-        for (final finish in MenuSurfaceFinish.values) {
-          for (final accent in MenuAccent.values) {
-            final config = ThemeEditorConfig(
-              menuColor: color,
-              menuFinish: finish,
-              menuAccent: accent,
-            );
-            final theme = config.build();
-            final selectedBackground =
-                theme.optionTheme.selectedBackgroundColor!;
-            final surface = config.menuOpaqueSurface(theme.colorScheme);
-            final reason = '$color/$finish/$accent';
-
-            expect(
-              selectedBackground,
-              isNot(surface),
-              reason: 'selection invisible: $reason',
-            );
-            // And its label contrasts with it.
-            final label = theme.optionTheme.selectedTextStyle!.color!;
-            expect(
-              (label.computeLuminance() - selectedBackground.computeLuminance())
-                  .abs(),
-              greaterThan(.2),
-              reason: 'unreadable selection: $reason',
-            );
-            // Unselected rows read against the surface too.
-            final text = theme.optionTheme.textStyle!.color!;
-            expect(
-              (text.computeLuminance() - surface.computeLuminance()).abs(),
-              greaterThan(.2),
-              reason: 'unreadable rows: $reason',
-            );
-          }
-        }
-      }
-    });
-
     test('every mode reads correctly in both brightnesses', () {
       // Walks the whole matrix — brightness x surface x finish x accent — and
-      // checks the four states a menu row can be in. Guessing at one
-      // combination is what kept breaking the others.
+      // checks the states a menu row can be in. Guessing at one combination
+      // is what kept breaking the others.
       for (final brightness in Brightness.values) {
         for (final color in MenuSurfaceColor.values) {
           for (final finish in MenuSurfaceFinish.values) {
@@ -442,9 +444,12 @@ void main() {
                 menuAccent: accent,
               );
               final theme = config.build();
-              final scheme = theme.colorScheme;
-              final surface = config.menuOpaqueSurface(scheme);
               final where = '$brightness/$color/$finish/$accent';
+
+              final surface = composite(
+                theme.contextMenuTheme.decoration!.color!,
+                theme.colorScheme.background,
+              );
 
               double contrast(Color a, Color b) =>
                   (a.computeLuminance() - b.computeLuminance()).abs();
@@ -455,23 +460,19 @@ void main() {
                 greaterThan(.2),
                 reason: 'resting row unreadable: $where',
               );
-              // Hovered or selected row: the option and the context menu use
-              // the same pair, so a menu cannot change colour halfway down.
-              final highlight = theme.optionTheme.selectedBackgroundColor!;
-              expect(
-                theme.optionTheme.hoveredBackgroundColor,
-                highlight,
-                reason: 'hover != selection: $where',
-              );
+              // Hovered row: the option and the context menu use the same
+              // pair, so a menu cannot change colour halfway down.
+              final highlight = theme.optionTheme.hoveredBackgroundColor!;
               expect(
                 theme.contextMenuTheme.selectedBackgroundColor,
                 highlight,
                 reason: 'context menu != select: $where',
               );
+              final paintedHighlight = composite(highlight, surface);
               expect(
                 contrast(
                   theme.optionTheme.selectedTextStyle!.color!,
-                  highlight,
+                  paintedHighlight,
                 ),
                 greaterThan(.2),
                 reason: 'highlighted row unreadable: $where',
@@ -479,29 +480,23 @@ void main() {
               expect(
                 contrast(
                   theme.contextMenuTheme.selectedTextStyle!.color!,
-                  highlight,
+                  paintedHighlight,
                 ),
                 greaterThan(.2),
                 reason: 'highlighted menu item unreadable: $where',
               );
-              // And the highlight is distinguishable from the surface itself.
+              // And the highlight is distinguishable from the surface. The
+              // reference's dark accent really is a near-black on near-black
+              // wash, so the bar here is visibility, not drama.
               expect(
-                contrast(highlight, surface),
-                greaterThan(.02),
+                contrast(paintedHighlight, surface),
+                greaterThan(.005),
                 reason: 'highlight invisible: $where',
               );
             }
           }
         }
       }
-    });
-
-    test('translucent forces the subtle accent', () {
-      const config = ThemeEditorConfig(
-        menuFinish: MenuSurfaceFinish.translucent,
-        menuAccent: MenuAccent.bold,
-      );
-      expect(config.effectiveMenuAccent, MenuAccent.subtle);
     });
   });
 
@@ -513,12 +508,15 @@ void main() {
     });
 
     test('bundled fonts use the asset family, Google fonts use a builder', () {
+      // Inter is the package default and is bundled alongside the two Geist
+      // faces; the rest come from Google Fonts.
+      expect(EditorFont.byTitle('Inter').bundled, isTrue);
       expect(EditorFont.byTitle('Geist').bundled, isTrue);
-      expect(EditorFont.byTitle('Inter').bundled, isFalse);
-      // Both must yield a usable text theme.
-      expect(EditorFont.byTitle('Geist').textTheme().family, isNotEmpty);
+      expect(EditorFont.byTitle('Roboto').bundled, isFalse);
+      // Both kinds must yield a usable text theme.
+      expect(EditorFont.byTitle('Inter').textTheme().family, isNotEmpty);
       expect(
-        EditorFont.byTitle('Inter').textTheme().googleFontBuilder,
+        EditorFont.byTitle('Roboto').textTheme().googleFontBuilder,
         isNotNull,
       );
     });
@@ -542,9 +540,9 @@ void main() {
     });
 
     test('picking a font changes the theme text', () {
-      const geist = ThemeEditorConfig();
-      const inter = ThemeEditorConfig(fontTitle: 'Inter');
-      expect(geist.textTheme.family, isNot(inter.textTheme.family));
+      const inter = ThemeEditorConfig();
+      const geist = ThemeEditorConfig(fontTitle: 'Geist');
+      expect(inter.textTheme.family, isNot(geist.textTheme.family));
     });
   });
 }

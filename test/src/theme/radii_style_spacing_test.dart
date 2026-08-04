@@ -540,7 +540,9 @@ void main() {
 
       expect(theme.radius.topLeft.x, 16);
       expect(theme.variant.radius.topLeft.x, 16);
-      expect(theme.cardTheme.radius!.topLeft.x, 32); // rhea: 2xl of 16
+      // rhea cards are `rounded-[min(var(--radius-4xl),24px)]`: the 4xl step
+      // (64 at an md of 16) hits the 24px cap.
+      expect(theme.cardTheme.radius!.topLeft.x, 24);
       // Rebuilding keeps everything the caller did not override.
       expect(theme.style, ShadStyleTokens.rhea);
     });

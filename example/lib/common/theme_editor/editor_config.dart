@@ -144,7 +144,7 @@ class ThemeEditorConfig {
     this.accentColor = AccentColor.base,
     this.chartColor = AccentColor.base,
     this.headingFontTitle,
-    this.fontTitle = 'Geist',
+    this.fontTitle = 'Inter',
     this.radius = RadiusPreset.medium,
     this.customRadius,
     this.menuColor = MenuSurfaceColor.standard,
@@ -189,13 +189,6 @@ class ThemeEditorConfig {
   EditorFont? get headingFont =>
       headingFontTitle == null ? null : EditorFont.byTitle(headingFontTitle!);
 
-  /// shadcn forces the subtle accent while a menu is translucent — a bold
-  /// highlight behind a see-through surface reads as muddy.
-  MenuAccent get effectiveMenuAccent =>
-      menuFinish == MenuSurfaceFinish.translucent
-      ? MenuAccent.subtle
-      : menuAccent;
-
   ThemeEditorConfig copyWith({
     Brightness? brightness,
     StylePreset? style,
@@ -238,21 +231,16 @@ class ThemeEditorConfig {
     );
   }
 
-  /// The palette, fully resolved: base, then accent, then chart, then the
-  /// menu surface overrides.
-  ///
-  /// The menu overrides have to be folded in *here* rather than after the
-  /// theme is built. `ShadThemeVariant` bakes `colorScheme.popover` into
-  /// `popoverTheme.decoration` when it is constructed, so overriding the
-  /// scheme afterwards changed only the text colour and left the surface
-  /// alone — which is exactly the "inverted only inverts the text" bug.
-  ShadColorScheme get colorScheme {
-    var scheme = baseColor.scheme(brightness);
+  /// The palette, fully resolved for [brightness]: base, accent, then chart.
+  ShadColorScheme get colorScheme => _scheme(brightness);
 
-    final accent = accentColor.scheme(brightness);
+  ShadColorScheme _scheme(Brightness b) {
+    var scheme = baseColor.scheme(b);
+
+    final accent = accentColor.scheme(b);
     if (accent != null) scheme = scheme.applyAccentScheme(accent);
 
-    final chart = chartColor.scheme(brightness);
+    final chart = chartColor.scheme(b);
     if (chart != null) {
       scheme = scheme.copyWith(
         chart1: chart.chart1,
@@ -263,68 +251,20 @@ class ThemeEditorConfig {
       );
     }
 
-    return scheme.copyWith(
-      popover: menuSurface(scheme),
-      popoverForeground: menuForeground(scheme),
-    );
+    return scheme;
   }
 
-  /// The menu's surface, before any translucency.
+  /// The palette menus draw from, or null when they follow the page.
   ///
-  /// Kept opaque and separate from the published `popover` so the selection
-  /// colours below can be derived by blending. Blending against a
-  /// half-transparent colour is what made the selected row disappear on a
-  /// translucent menu.
-  Color menuOpaqueSurface(ShadColorScheme scheme) =>
-      menuColor == MenuSurfaceColor.inverted
-      ? scheme.foreground
-      : scheme.popover;
-
-  Color menuSurface(ShadColorScheme scheme) =>
-      menuFinish == MenuSurfaceFinish.translucent
-      ? menuOpaqueSurface(scheme).withValues(alpha: .85)
-      : menuOpaqueSurface(scheme);
-
-  /// Text on the menu surface.
-  Color menuForeground(ShadColorScheme scheme) =>
-      menuColor == MenuSurfaceColor.inverted
-      ? scheme.background
-      : scheme.popoverForeground;
-
-  /// The highlight behind the hovered or selected row.
-  ///
-  /// Subtle blends the surface a little way towards its own text, so it works
-  /// on a light, dark, inverted or translucent menu alike; bold is the primary
-  /// colour. Neither is `--accent`, which belongs to the *page* palette and
-  /// vanishes on an inverted or translucent surface.
-  Color menuSelectedBackground(ShadColorScheme scheme) =>
-      effectiveMenuAccent == MenuAccent.bold
-      ? _boldPair(scheme).$1
-      : Color.lerp(
-          menuOpaqueSurface(scheme),
-          menuForeground(scheme),
-          .14,
-        )!;
-
-  Color menuSelectedForeground(ShadColorScheme scheme) =>
-      effectiveMenuAccent == MenuAccent.bold
-      ? _boldPair(scheme).$2
-      : menuForeground(scheme);
-
-  /// The (background, foreground) a bold highlight uses.
-  ///
-  /// Normally the primary pair. On a menu whose surface is already that
-  /// colour — a neutral palette inverted in light mode puts a near-black
-  /// surface under a near-black primary — the pair is flipped, so the
-  /// highlight is always visible and its label always readable.
-  (Color, Color) _boldPair(ShadColorScheme scheme) {
-    final surface = menuOpaqueSurface(scheme);
-    double distance(Color c) =>
-        (c.computeLuminance() - surface.computeLuminance()).abs();
-    return distance(scheme.primary) >= distance(scheme.primaryForeground)
-        ? (scheme.primary, scheme.primaryForeground)
-        : (scheme.primaryForeground, scheme.primary);
-  }
+  /// shadcn implements "Inverted" by giving every menu surface the `dark`
+  /// class — the whole dark token set, not a couple of recoloured slots — so
+  /// an inverted menu is simply built from the dark counterpart of the same
+  /// configuration. In dark mode that *is* the page palette, which matches
+  /// the reference: inverted menus only differ in light mode.
+  ShadColorScheme? get menuColorScheme =>
+      menuColor == MenuSurfaceColor.inverted && brightness == Brightness.light
+      ? _scheme(Brightness.dark)
+      : null;
 
   /// The body text theme, with the heading styles swapped to the heading font
   /// when one is chosen.
@@ -348,68 +288,25 @@ class ThemeEditorConfig {
   }
 
   ShadThemeData build() {
-    final scheme = colorScheme;
     final borderRadius = BorderRadius.all(Radius.circular(effectiveRadius));
-    final text = textTheme;
 
-    // Built from the final scheme so the popover surface follows the menu
-    // settings, and from the style tokens so every component's radius, ring
-    // and label typography come from one place.
-    final variant = ShadDefaultThemeVariant(
-      colorScheme: scheme,
-      radius: borderRadius,
-      effectiveTextTheme: text,
-      style: style.tokens,
-      spacing: spacing,
-    );
-
-    // Every menu surface — select, context menu, command, menubar — takes its
-    // colours from the same four, so no mode can leave a row unreadable.
-    final menuText = menuForeground(scheme);
-    final selectedBackground = menuSelectedBackground(scheme);
-    final selectedForeground = menuSelectedForeground(scheme);
-
+    // The menu options are the library's own — the same semantics as
+    // shadcn's create editor: inverted menus take the dark palette,
+    // translucent ones the blurred 70% surface, and a bold accent rewrites
+    // the scheme's accent pair with its primary.
     return ShadThemeData(
       brightness: brightness,
-      colorScheme: scheme,
+      colorScheme: colorScheme,
       radius: borderRadius,
-      textTheme: text,
-      variant: variant,
-      optionTheme: ShadOptionTheme(
-        hoveredBackgroundColor: selectedBackground,
-        selectedBackgroundColor: selectedBackground,
-        selectedTextStyle: text.small.copyWith(color: selectedForeground),
-        textStyle: text.small.copyWith(color: menuText),
-        selectedIconColor: selectedForeground,
-      ),
-      contextMenuTheme: ShadContextMenuTheme(
-        selectedBackgroundColor: selectedBackground,
-        textStyle: text.small.copyWith(color: menuText),
-        selectedTextStyle: text.small.copyWith(color: selectedForeground),
-        trailingTextStyle: text.muted.copyWith(
-          color: menuText.withValues(alpha: .7),
-        ),
-      ),
-      commandTheme: ShadCommandTheme(
-        itemTextStyle: text.small.copyWith(color: menuText),
-        groupHeadingStyle: text.muted.copyWith(
-          color: menuText.withValues(alpha: .7),
-        ),
-        itemSelectedBackgroundColor: selectedBackground,
-        itemSelectedForegroundColor: selectedForeground,
-        itemForegroundColor: menuText,
-      ),
-      popoverTheme: ShadPopoverTheme(
-        textStyle: text.small.copyWith(color: menuText),
-      ),
-      // A menubar trigger sits on the page, but its highlight has to be the
-      // menu's, or opening a menu changes colour halfway down.
-      menubarTheme: ShadMenubarTheme(
-        buttonSelectedBackgroundColor: selectedBackground,
-        buttonHoverBackgroundColor: selectedBackground,
-        buttonHoverForegroundColor: selectedForeground,
-        buttonForegroundColor: scheme.foreground,
-      ),
+      textTheme: textTheme,
+      style: style.tokens,
+      spacing: spacing,
+      menuColorScheme: menuColorScheme,
+      menuTranslucent: menuFinish == MenuSurfaceFinish.translucent,
+      menuAccent: switch (menuAccent) {
+        MenuAccent.subtle => ShadMenuAccent.subtle,
+        MenuAccent.bold => ShadMenuAccent.bold,
+      },
     );
   }
 
@@ -454,6 +351,26 @@ class ThemeEditorConfig {
       buffer.writeln(
         '  spacing: ShadSpacing(step: ${spacingStep.toStringAsFixed(1)}),',
       );
+    }
+    if (menuColor == MenuSurfaceColor.inverted &&
+        brightness == Brightness.light) {
+      final cap =
+          '${baseColor.name[0].toUpperCase()}${baseColor.name.substring(1)}';
+      final darkCtor = 'const Shad${cap}ColorScheme.dark()';
+      if (accentColor == AccentColor.base) {
+        buffer.writeln('  menuColorScheme: $darkCtor,');
+      } else {
+        buffer
+          ..writeln('  menuColorScheme: $darkCtor.applyAccentScheme(')
+          ..writeln('    ShadAccentScheme.${accentColor.name}Dark,')
+          ..writeln('  ),');
+      }
+    }
+    if (menuFinish == MenuSurfaceFinish.translucent) {
+      buffer.writeln('  menuTranslucent: true,');
+    }
+    if (menuAccent == MenuAccent.bold) {
+      buffer.writeln('  menuAccent: ShadMenuAccent.bold,');
     }
     buffer.write(')');
     return buffer.toString();

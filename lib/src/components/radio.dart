@@ -347,11 +347,23 @@ class _ShadRadioState<T> extends State<ShadRadio<T>> {
           widget.decoration,
         );
 
+    // While selected the whole decoration swaps: the reference fills the
+    // circle with the primary and recolours the outline with it
+    // (`data-checked:bg-primary data-checked:border-primary`), with the dot
+    // cut out of it in the primary foreground.
+    final effectiveCheckedDecoration =
+        (theme.radioTheme.checkedDecoration ??
+                theme.radioTheme.decoration ??
+                const ShadDecoration())
+            .merge(widget.decoration);
+
     final effectiveSize = widget.size ?? theme.radioTheme.size ?? 16;
     final effectiveCircleSize =
-        widget.circleSize ?? theme.radioTheme.circleSize ?? 10;
+        widget.circleSize ?? theme.radioTheme.circleSize ?? 8;
     final effectiveColor =
-        widget.color ?? theme.radioTheme.color ?? theme.colorScheme.primary;
+        widget.color ??
+        theme.radioTheme.color ??
+        theme.colorScheme.primaryForeground;
     final effectiveDuration =
         widget.duration ?? theme.radioTheme.duration ?? 100.milliseconds;
     final effectivePadding =
@@ -395,7 +407,9 @@ class _ShadRadioState<T> extends State<ShadRadio<T>> {
                 builder: (context, focused, child) {
                   return ShadDecorator(
                     focused: focused,
-                    decoration: effectiveDecoration,
+                    decoration: selected
+                        ? effectiveCheckedDecoration
+                        : effectiveDecoration,
                     child: child,
                   );
                 },

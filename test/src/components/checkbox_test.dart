@@ -229,11 +229,12 @@ void main() {
       expect(sizedBox.width, customSize);
       expect(sizedBox.height, customSize);
 
-      // Check icon uses custom size
+      // Check icon follows the custom size: shadcn's `[&>svg]:size-3.5` puts
+      // the glyph 2px inside its box.
       final iconFinder = find.byType(Icon);
       expect(iconFinder, findsOneWidget);
       final icon = tester.widget<Icon>(iconFinder);
-      expect(icon.size, customSize);
+      expect(icon.size, customSize - 2);
     });
 
     testWidgets('applies custom color correctly', (WidgetTester tester) async {

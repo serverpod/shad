@@ -279,8 +279,12 @@ class _Customizer extends StatelessWidget {
                 ThemePicker<MenuAccent>(
                   label: 'Menu Accent',
                   icon: LucideIcons.highlighter,
-                  value: config.effectiveMenuAccent,
-                  // shadcn locks this to subtle while the menu is translucent.
+                  // A translucent menu highlights with a foreground wash, so
+                  // the accent has no effect there; the picker is locked to
+                  // make that visible, as shadcn's editor does.
+                  value: config.menuFinish == MenuSurfaceFinish.solid
+                      ? config.menuAccent
+                      : MenuAccent.subtle,
                   enabled: config.menuFinish == MenuSurfaceFinish.solid,
                   options: [
                     for (final m in MenuAccent.values)

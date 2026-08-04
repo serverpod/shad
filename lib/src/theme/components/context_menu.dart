@@ -29,6 +29,9 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
     this.textStyle,
     this.selectedTextStyle,
     this.trailingTextStyle,
+    this.selectedTrailingTextStyle,
+    this.destructiveForegroundColor,
+    this.destructiveSelectedBackgroundColor,
     this.itemConstraints,
     this.subMenuPadding,
     this.backgroundColor,
@@ -91,6 +94,20 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
 
   /// {@macro ShadContextMenuItem.trailingTextStyle}
   final TextStyle? trailingTextStyle;
+
+  /// The style of an item's trailing widget while the item is hovered or its
+  /// submenu is open — shadcn's shortcut going
+  /// `group-focus:text-accent-foreground`.
+  final TextStyle? selectedTrailingTextStyle;
+
+  /// The text and icon colour of a destructive item,
+  /// `data-[variant=destructive]:text-destructive`.
+  final Color? destructiveForegroundColor;
+
+  /// The highlight behind a hovered destructive item,
+  /// `data-[variant=destructive]:focus:bg-destructive/10`
+  /// (`/20` in dark mode).
+  final Color? destructiveSelectedBackgroundColor;
 
   /// {@macro ShadContextMenu.constraints}
   final BoxConstraints? itemConstraints;

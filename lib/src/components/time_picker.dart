@@ -1130,7 +1130,10 @@ class _ShadTimePickerFieldState extends State<ShadTimePickerField> {
 
     final defaultLabelStyle = theme.textTheme.small.copyWith(fontSize: 12);
     final effectiveLabelStyle = defaultLabelStyle.merge(widget.labelStyle);
-    final effectiveWidth = widget.width ?? 58;
+    // A time field is a fixed box around two digits, so like an OTP slot it
+    // has to grow with the text scale or the glyphs are clipped.
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
+    final effectiveWidth = (widget.width ?? 58) * textScale;
     final effectivePadding =
         widget.padding ??
         const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
@@ -1161,6 +1164,10 @@ class _ShadTimePickerFieldState extends State<ShadTimePickerField> {
             controller: controller,
             decoration: effectiveDecoration,
             placeholder: widget.placeholder,
+            // The digits sit in the middle of the fixed box, like an OTP
+            // slot; start alignment left them hugging the leading padding.
+            textAlign: TextAlign.center,
+            placeholderAlignment: Alignment.center,
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
             maxLength: 2,

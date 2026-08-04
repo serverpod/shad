@@ -115,12 +115,12 @@ void main() {
         ),
       );
 
-      // Check Container applies default size (40x40)
+      // Check Container applies default size — shadcn's `size-8`.
       final containerFinder = find.byType(Container);
       expect(containerFinder, findsOneWidget);
       final container = tester.widget<Container>(containerFinder);
-      expect(container.constraints?.maxWidth, 40.0);
-      expect(container.constraints?.maxHeight, 40.0);
+      expect(container.constraints?.maxWidth, 32.0);
+      expect(container.constraints?.maxHeight, 32.0);
 
       // Check UniversalImage uses default size
       final universalImageFinder = find.byType(UniversalImage);
@@ -128,8 +128,8 @@ void main() {
       final universalImage = tester.widget<UniversalImage>(
         universalImageFinder,
       );
-      expect(universalImage.width, 40.0);
-      expect(universalImage.height, 40.0);
+      expect(universalImage.width, 32.0);
+      expect(universalImage.height, 32.0);
     });
 
     testWidgets('renders with default circular shape when not specified', (

@@ -188,6 +188,9 @@ class ShadCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final effectiveGap = gap ?? theme.cardTheme.gap ?? 0;
+    // Sections sit `--card-spacing` apart; the small [gap] only separates the
+    // title from its description.
+    final effectiveSectionGap = theme.cardTheme.sectionGap ?? effectiveGap;
 
     final effectivePadding =
         padding ?? theme.cardTheme.padding ?? const EdgeInsets.all(24);
@@ -297,7 +300,7 @@ class ShadCard extends StatelessWidget {
                   ),
                 if (child != null) Flexible(child: child!),
                 ?footer,
-              ].separatedBy(SizedBox(height: effectiveGap)),
+              ].separatedBy(SizedBox(height: effectiveSectionGap)),
             ),
           ),
           ?trailing,

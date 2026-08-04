@@ -358,6 +358,19 @@ class _ShadPopoverState extends State<ShadPopover>
           child: popover,
         ),
       );
+      // The clip that bounds the backdrop filter also cuts off the surface's
+      // own drop shadow (painted outside the box), so it is re-painted
+      // outside the clip.
+      final shadows = effectiveDecoration.shadows;
+      if (shadows != null && shadows.isNotEmpty) {
+        popover = DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: effectiveFilterRadius,
+            boxShadow: shadows,
+          ),
+          child: popover,
+        );
+      }
     }
 
     if (effectiveEffects.isNotEmpty) {

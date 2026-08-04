@@ -45,6 +45,9 @@ dev_dependencies:
 
 flutter:
   fonts:
+    - family: Inter
+      fonts:
+        - asset: "fonts/Inter[opsz,wght].ttf"
     - family: Geist
       fonts:
         - asset: fonts/Geist[wght].ttf

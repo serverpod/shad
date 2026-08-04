@@ -15,6 +15,7 @@ import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
 import 'package:shadcn_ui/src/utils/gesture_detector.dart';
 import 'package:shadcn_ui/src/utils/mouse_area.dart';
 import 'package:shadcn_ui/src/utils/provider.dart';
+import 'package:shadcn_ui/src/utils/states_controller.dart';
 
 const kContextMenuGroupId = ValueKey('context-menu');
 
@@ -565,6 +566,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.backgroundColor,
     this.selectedBackgroundColor,
     this.closeOnTap,
+    this.destructive = false,
   }) : variant = ShadContextMenuItemVariant.primary,
        insetPadding = null;
 
@@ -595,6 +597,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.backgroundColor,
     this.selectedBackgroundColor,
     this.closeOnTap,
+    this.destructive = false,
   });
 
   const ShadContextMenuItem.inset({
@@ -623,6 +626,7 @@ class ShadContextMenuItem extends StatefulWidget {
     this.backgroundColor,
     this.selectedBackgroundColor,
     this.closeOnTap,
+    this.destructive = false,
   }) : variant = ShadContextMenuItemVariant.inset;
 
   /// {@template ShadContextMenuItem.variant}
@@ -774,6 +778,13 @@ class ShadContextMenuItem extends StatefulWidget {
   /// {@endtemplate}
   final List<Widget> items;
 
+  /// {@template ShadContextMenuItem.destructive}
+  /// Whether this is a destructive action, shadcn's
+  /// `data-[variant=destructive]`: the label and icons take the destructive
+  /// colour and the hover highlight becomes a destructive wash.
+  /// {@endtemplate}
+  final bool destructive;
+
   @override
   State<ShadContextMenuItem> createState() => _ShadContextMenuItemState();
 }
@@ -781,6 +792,11 @@ class ShadContextMenuItem extends StatefulWidget {
 class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
   final itemKey = UniqueKey();
   late final controller = ShadContextMenuItemController(itemKey: itemKey);
+
+  /// Shared with the item's button so the trailing widget and text colours
+  /// can follow the button's own hover state — a leaf item is only ever
+  /// hovered, never "selected", so selection alone cannot drive them.
+  final statesController = ShadStatesController();
   // get the parent item controller, if any, meaning this item is a submenu
   late final parentItemController = context
       .maybeRead<ShadContextMenuItemController>();
@@ -798,6 +814,7 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
   void dispose() {
     parentItemController?.unregisterSubItem(controller);
     controller.dispose();
+    statesController.dispose();
     super.dispose();
   }
 
@@ -812,13 +829,18 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
         theme.contextMenuTheme.itemPadding ??
         const EdgeInsets.symmetric(horizontal: 4);
 
+    // The row's own horizontal padding (`px-2`), from the style tokens so a
+    // denser or roomier style moves it. An inset row reserves shadcn's
+    // `pl-8`-style gutter: the base padding plus a 24px icon column.
+    final itemPaddingX =
+        theme.style.itemPaddingX * theme.spacing.step / 4;
     final defaultInsetPadding = switch (widget.variant) {
-      ShadContextMenuItemVariant.primary => const EdgeInsets.symmetric(
-        horizontal: 8,
+      ShadContextMenuItemVariant.primary => EdgeInsets.symmetric(
+        horizontal: itemPaddingX,
       ),
-      ShadContextMenuItemVariant.inset => const EdgeInsetsDirectional.only(
-        start: 32,
-        end: 8,
+      ShadContextMenuItemVariant.inset => EdgeInsetsDirectional.only(
+        start: itemPaddingX + 24,
+        end: itemPaddingX,
       ),
     };
 
@@ -859,33 +881,63 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
       secondaryFocusedBorder: ShadBorder.none,
     ).merge(theme.contextMenuTheme.itemDecoration).merge(widget.decoration);
 
+    // Menu rows draw their colours from the menu palette slots. shadcn's
+    // states, per `cn-dropdown-menu-item`: rest is the popover foreground,
+    // hover/open is `bg-accent text-accent-foreground` with every descendant
+    // (icons included) following, and a destructive row keeps its destructive
+    // text over a `destructive/10` wash (`/20` in dark).
     final effectiveTextStyle =
         (widget.textStyle ??
                 theme.contextMenuTheme.textStyle ??
                 theme.textTheme.small.copyWith(fontWeight: FontWeight.normal))
-            .fallback(color: theme.colorScheme.foreground);
+            .fallback(color: theme.colorScheme.popoverForeground);
 
     final effectiveSelectedTextStyle =
         (widget.selectedTextStyle ??
                 theme.contextMenuTheme.selectedTextStyle ??
                 effectiveTextStyle)
-            .fallback(color: theme.colorScheme.foreground);
+            .fallback(color: theme.colorScheme.accentForeground);
 
     final effectiveTrailingTextStyle =
-        widget.trailingTextStyle ??
-        theme.contextMenuTheme.trailingTextStyle ??
-        theme.textTheme.muted.copyWith(
-          fontSize: 12,
-          height: 1,
+        (widget.trailingTextStyle ??
+                theme.contextMenuTheme.trailingTextStyle ??
+                theme.textTheme.muted.copyWith(
+                  fontSize: 12,
+                  height: 1,
+                ))
+            .fallback(color: theme.colorScheme.mutedForeground);
+
+    final effectiveSelectedTrailingTextStyle =
+        theme.contextMenuTheme.selectedTrailingTextStyle ??
+        effectiveTrailingTextStyle.copyWith(
+          color: effectiveSelectedTextStyle.color,
         );
 
     final effectiveBackgroundColor =
         widget.backgroundColor ?? theme.contextMenuTheme.backgroundColor;
 
-    final effectiveSelectedBackgroundColor =
+    var effectiveSelectedBackgroundColor =
         widget.selectedBackgroundColor ??
         theme.contextMenuTheme.selectedBackgroundColor ??
         theme.colorScheme.accent;
+
+    var foregroundColor = effectiveTextStyle.color!;
+    var selectedForegroundColor = effectiveSelectedTextStyle.color!;
+
+    if (widget.destructive) {
+      final destructive =
+          theme.contextMenuTheme.destructiveForegroundColor ??
+          theme.colorScheme.destructive;
+      foregroundColor = destructive;
+      selectedForegroundColor = destructive;
+      effectiveSelectedBackgroundColor =
+          theme.contextMenuTheme.destructiveSelectedBackgroundColor ??
+          destructive.withValues(
+            alpha:
+                destructive.a *
+                (theme.brightness == Brightness.dark ? .2 : .1),
+          );
+    }
 
     final effectiveCloseOnTap =
         widget.closeOnTap ??
@@ -900,10 +952,16 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
         : parentItemController?.itemKey ?? itemKey;
 
     Widget child = ListenableBuilder(
-      listenable: controller,
-      builder: (context, child) {
+      listenable: Listenable.merge([controller, statesController]),
+      builder: (context, _) {
+        final hovered = statesController.value.contains(ShadState.hovered);
+        final selected = controller.selected;
+        // Rest vs highlight, resolved here because a leaf item's hover lives
+        // in the button's own states — selection alone cannot see it.
+        final highlighted = selected || hovered;
+
         return ShadContextMenu(
-          visible: controller.selected,
+          visible: selected,
           anchor: effectiveAnchor,
           constraints: widget.constraints,
           padding: widget.subMenuPadding,
@@ -919,10 +977,21 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
               decoration: effectiveDecoration,
               width: double.infinity,
               padding: effectiveInsetPadding,
-              backgroundColor: controller.selected
+              statesController: statesController,
+              backgroundColor: selected
                   ? effectiveSelectedBackgroundColor
                   : effectiveBackgroundColor,
               hoverBackgroundColor: effectiveSelectedBackgroundColor,
+              // Through the button rather than a wrapping DefaultTextStyle,
+              // so its IconTheme recolours leading and trailing icons with
+              // the text — shadcn's `focus:**:text-accent-foreground`.
+              foregroundColor: selected
+                  ? selectedForegroundColor
+                  : foregroundColor,
+              hoverForegroundColor: selectedForegroundColor,
+              textStyle: highlighted
+                  ? effectiveSelectedTextStyle
+                  : effectiveTextStyle,
               onFocusChange: controller.setFocused,
               onTapDown: widget.onTapDown != null
                   ? (details) {
@@ -934,36 +1003,39 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
                 widget.onPressed?.call();
                 if (effectiveCloseOnTap) contextMenu.setVisible(false);
               },
-              child: DefaultTextStyle(
-                style: controller.selected
-                    ? effectiveSelectedTextStyle
-                    : effectiveTextStyle,
-                child: child!,
+              child: Expanded(
+                child: Row(
+                  children: [
+                    if (widget.leading != null)
+                      Padding(
+                        padding: effectiveLeadingPadding,
+                        child: widget.leading,
+                      ),
+                    // The button centres its text (`TextAlign.center` in its
+                    // DefaultTextStyle); a menu row is start-aligned.
+                    Expanded(
+                      child: DefaultTextStyle.merge(
+                        textAlign: TextAlign.start,
+                        child: widget.child,
+                      ),
+                    ),
+                    if (widget.trailing != null)
+                      Padding(
+                        padding: effectiveTrailingPadding,
+                        child: DefaultTextStyle(
+                          style: highlighted
+                              ? effectiveSelectedTrailingTextStyle
+                              : effectiveTrailingTextStyle,
+                          child: widget.trailing!,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
-      child: Expanded(
-        child: Row(
-          children: [
-            if (widget.leading != null)
-              Padding(
-                padding: effectiveLeadingPadding,
-                child: widget.leading,
-              ),
-            Expanded(child: widget.child),
-            if (widget.trailing != null)
-              Padding(
-                padding: effectiveTrailingPadding,
-                child: DefaultTextStyle(
-                  style: effectiveTrailingTextStyle,
-                  child: widget.trailing!,
-                ),
-              ),
-          ],
-        ),
-      ),
     );
 
     // if the item has at least one submenu item, wrap it in a provider to

@@ -54,6 +54,11 @@ mixin _$ShadOptionTheme {
         b.selectedIconColor,
         t,
       ),
+      selectedHoveredIconColor: Color.lerp(
+        a.selectedHoveredIconColor,
+        b.selectedHoveredIconColor,
+        t,
+      ),
     );
   }
 
@@ -66,6 +71,7 @@ mixin _$ShadOptionTheme {
     Color? selectedBackgroundColor,
     TextStyle? selectedTextStyle,
     Color? selectedIconColor,
+    Color? selectedHoveredIconColor,
   }) {
     final _this = (this as ShadOptionTheme);
 
@@ -80,6 +86,8 @@ mixin _$ShadOptionTheme {
           selectedBackgroundColor ?? _this.selectedBackgroundColor,
       selectedTextStyle: selectedTextStyle ?? _this.selectedTextStyle,
       selectedIconColor: selectedIconColor ?? _this.selectedIconColor,
+      selectedHoveredIconColor:
+          selectedHoveredIconColor ?? _this.selectedHoveredIconColor,
     );
   }
 
@@ -105,6 +113,7 @@ mixin _$ShadOptionTheme {
           _this.selectedTextStyle?.merge(other.selectedTextStyle) ??
           other.selectedTextStyle,
       selectedIconColor: other.selectedIconColor,
+      selectedHoveredIconColor: other.selectedHoveredIconColor,
     );
   }
 
@@ -128,7 +137,8 @@ mixin _$ShadOptionTheme {
         _other.textStyle == _this.textStyle &&
         _other.selectedBackgroundColor == _this.selectedBackgroundColor &&
         _other.selectedTextStyle == _this.selectedTextStyle &&
-        _other.selectedIconColor == _this.selectedIconColor;
+        _other.selectedIconColor == _this.selectedIconColor &&
+        _other.selectedHoveredIconColor == _this.selectedHoveredIconColor;
   }
 
   @override
@@ -145,6 +155,7 @@ mixin _$ShadOptionTheme {
       _this.selectedBackgroundColor,
       _this.selectedTextStyle,
       _this.selectedIconColor,
+      _this.selectedHoveredIconColor,
     );
   }
 }

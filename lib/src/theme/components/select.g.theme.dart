@@ -64,6 +64,11 @@ mixin _$ShadSelectTheme {
       ),
       clearSearchOnClose: t < 0.5 ? a.clearSearchOnClose : b.clearSearchOnClose,
       filter: t < 0.5 ? a.filter : b.filter,
+      popoverDecoration: ShadDecoration.lerp(
+        a.popoverDecoration,
+        b.popoverDecoration,
+        t,
+      ),
       effects: t < 0.5 ? a.effects : b.effects,
       shadows: t < 0.5 ? a.shadows : b.shadows,
     );
@@ -84,6 +89,7 @@ mixin _$ShadSelectTheme {
     EdgeInsetsGeometry? searchPadding,
     bool? clearSearchOnClose,
     ImageFilter? filter,
+    ShadDecoration? popoverDecoration,
     List<Effect<dynamic>>? effects,
     List<BoxShadow>? shadows,
   }) {
@@ -107,6 +113,7 @@ mixin _$ShadSelectTheme {
       searchPadding: searchPadding ?? _this.searchPadding,
       clearSearchOnClose: clearSearchOnClose ?? _this.clearSearchOnClose,
       filter: filter ?? _this.filter,
+      popoverDecoration: popoverDecoration ?? _this.popoverDecoration,
       effects: effects ?? _this.effects,
       shadows: shadows ?? _this.shadows,
     );
@@ -140,6 +147,9 @@ mixin _$ShadSelectTheme {
       searchPadding: other.searchPadding,
       clearSearchOnClose: other.clearSearchOnClose,
       filter: other.filter,
+      popoverDecoration:
+          _this.popoverDecoration?.merge(other.popoverDecoration) ??
+          other.popoverDecoration,
       effects: other.effects,
       shadows: other.shadows,
     );
@@ -172,6 +182,7 @@ mixin _$ShadSelectTheme {
         _other.searchPadding == _this.searchPadding &&
         _other.clearSearchOnClose == _this.clearSearchOnClose &&
         _other.filter == _this.filter &&
+        _other.popoverDecoration == _this.popoverDecoration &&
         _other.effects == _this.effects &&
         _other.shadows == _this.shadows;
   }
@@ -196,6 +207,7 @@ mixin _$ShadSelectTheme {
       _this.searchPadding,
       _this.clearSearchOnClose,
       _this.filter,
+      _this.popoverDecoration,
       _this.effects,
       _this.shadows,
     );

@@ -57,6 +57,19 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'data.g.theme.dart';
 
+/// How strongly menus highlight their hovered row, shadcn's "Menu Accent".
+///
+/// The reference implements "bold" by pointing `--accent` at `--primary` in
+/// the theme itself, so it is a *scheme* transformation, not a per-menu one:
+/// everything that highlights with the accent follows.
+enum ShadMenuAccent {
+  /// The accent pair as the palette defines it.
+  subtle,
+
+  /// The primary pair takes over the accent slots.
+  bold,
+}
+
 @immutable
 @ThemeGen()
 class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
@@ -139,6 +152,25 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ///
     /// When a [variant] is also given, the variant is rebuilt with this scale.
     ShadSpacing? spacing,
+
+    /// The palette menu surfaces draw from, when it differs from the page's.
+    ///
+    /// This is shadcn's "Inverted" menu colour: the reference gives every
+    /// menu surface the `dark` class — the whole opposite-brightness token
+    /// set — so pass the dark counterpart of [colorScheme] here and select,
+    /// context-menu and menubar surfaces derive their colours from it.
+    ShadColorScheme? menuColorScheme,
+
+    /// Whether menu surfaces are translucent, shadcn's "Translucent" finish:
+    /// the popover colour at 70% over a backdrop blur, with row highlights
+    /// as a `foreground/10` wash.
+    bool? menuTranslucent,
+
+    /// How strongly menus highlight their rows; see [ShadMenuAccent].
+    ///
+    /// Bold rewrites the scheme's accent pair with its primary pair before
+    /// anything is derived from it, exactly as the reference does.
+    ShadMenuAccent? menuAccent,
   }) {
     // A variant is built from a colour scheme, a radius and a text theme, and
     // bakes all three into its component themes. Where the caller gives one
@@ -158,7 +190,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
 
     final effectiveDisableSecondaryBorder = disableSecondaryBorder ?? false;
     final effectiveBrightness = brightness ?? Brightness.light;
-    final effectiveColorScheme =
+    var effectiveColorScheme =
         colorScheme ??
         variant?.colorScheme ??
         switch (effectiveBrightness) {
@@ -166,11 +198,36 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
           Brightness.dark => const ShadSlateColorScheme.dark(),
         };
 
+    // A bold menu accent is a scheme transformation in the reference —
+    // `accent = primary` in the generated theme vars — so it is applied to
+    // the scheme(s) before any component theme is derived.
+    var effectiveMenuColorScheme = menuColorScheme;
+    if (menuAccent == ShadMenuAccent.bold) {
+      effectiveColorScheme = effectiveColorScheme.copyWith(
+        accent: effectiveColorScheme.primary,
+        accentForeground: effectiveColorScheme.primaryForeground,
+      );
+      effectiveMenuColorScheme = effectiveMenuColorScheme?.copyWith(
+        accent: effectiveMenuColorScheme.primary,
+        accentForeground: effectiveMenuColorScheme.primaryForeground,
+      );
+    }
+
     // A supplied variant already baked the colour scheme, radius and text
     // theme into its component themes, so any of those that arrived separately
     // — which is what `copyWith(radius: …)` does — has to be pushed back into
     // it. Without this, `copyWith` would move the theme's own `radius` field
     // and leave every component rendering the old one.
+    // Whether the menu options above require the variant to change; a custom
+    // variant type cannot receive them (its `rebuild` does not know them), so
+    // they only apply to the shipped variants.
+    final menuOptionsChanged =
+        variant is ShadDefaultThemeVariant &&
+        ((menuColorScheme != null &&
+                effectiveMenuColorScheme != variant.menuColorScheme) ||
+            (menuTranslucent != null &&
+                menuTranslucent != variant.menuTranslucent));
+
     final rebuiltVariant = variant == null
         ? null
         : (variant.colorScheme == effectiveColorScheme &&
@@ -183,8 +240,21 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
                   (variant.effectiveTextTheme == effectiveTextTheme ||
                       variant.textTheme() == effectiveTextTheme) &&
                   (style == null || style == variant.style) &&
-                  (spacing == null || spacing == variant.spacing)
+                  (spacing == null || spacing == variant.spacing) &&
+                  !menuOptionsChanged
               ? variant
+              : variant is ShadDefaultThemeVariant
+              ? variant.rebuild(
+                  colorScheme: effectiveColorScheme,
+                  radius: effectiveRadius,
+                  effectiveTextTheme: effectiveTextTheme,
+                  style: style,
+                  spacing: spacing,
+                  menuColorScheme: menuColorScheme != null
+                      ? effectiveMenuColorScheme
+                      : ShadDefaultThemeVariant.unsetMenuColorScheme,
+                  menuTranslucent: menuTranslucent,
+                )
               : variant.rebuild(
                   colorScheme: effectiveColorScheme,
                   radius: effectiveRadius,
@@ -202,6 +272,8 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
             effectiveTextTheme: effectiveTextTheme,
             style: style ?? ShadStyleTokens.vega,
             spacing: spacing ?? const ShadSpacing(),
+            menuColorScheme: effectiveMenuColorScheme,
+            menuTranslucent: menuTranslucent ?? false,
           ),
           true => ShadDefaultThemeNoSecondaryBorderVariant(
             colorScheme: effectiveColorScheme,
@@ -209,6 +281,8 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
             effectiveTextTheme: effectiveTextTheme,
             style: style ?? ShadStyleTokens.vega,
             spacing: spacing ?? const ShadSpacing(),
+            menuColorScheme: effectiveMenuColorScheme,
+            menuTranslucent: menuTranslucent ?? false,
           ),
         };
 

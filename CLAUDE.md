@@ -59,9 +59,20 @@ themes. Understanding this order prevents most theming bugs.
 - `copyWith` forwards the already-resolved component themes, so it **cannot
   re-derive them**. `copyWith(radius: X)` moves the theme's `radius` field but
   not the components'. Rebuild the theme instead.
-- There are **two variants** — `default_theme_variant.dart` and
-  `default_theme_no_secondary_border_variant.dart` — and they are near-copies.
-  Almost every change has to be made in both. Verify with a grep count.
+- There are **two variants**, but no longer two copies:
+  `ShadDefaultThemeNoSecondaryBorderVariant` subclasses
+  `ShadDefaultThemeVariant` and overrides only the focus treatment (a 2px
+  inner `focusedBorder` recolour plus `focusReserve` insets, instead of the
+  outward ring). Fix things in the parent; only touch the subclass when the
+  change is about focus geometry.
+- Menu appearance is a **theme-level** feature: `ShadThemeData` takes
+  `menuColorScheme` (shadcn's "Inverted" — pass the dark counterpart scheme;
+  the reference toggles the `dark` class on menu surfaces, so in dark mode
+  inverted is a no-op), `menuTranslucent` (`popover/70` + backdrop blur,
+  `foreground/10` row highlights) and `menuAccent` (bold = the scheme's
+  accent pair is rewritten with its primary pair *before* derivation). The
+  example editor passes these through; it no longer derives menu colours
+  itself.
 
 ### Theme equality is load-bearing
 
@@ -95,7 +106,16 @@ locks the chain; add to it rather than trusting a local check.
 
 - Fields, checkboxes, radios and OTP slots outline with `--input`; cards,
   popovers, dialogs, menus and toasts with a wash of their own foreground
-  (`ring-foreground/10`, `/5` in `luma`, `sera`, `rhea`). Not `--border`.
+  (`ring-foreground/10`). Not `--border`. The soft styles vary it per surface
+  *and* per brightness — `luma`/`rhea` are `/5` light `/10` dark, `sera` is
+  `/5` on cards but `/10` on menus — which is why the tokens carry
+  light/dark pairs for card, surface and dialog opacities.
+- The `/create` styles changed the button variants from classic shadcn:
+  ghost/outline hover with `bg-muted` + `text-foreground` (not accent),
+  destructive is a soft `/10` tint, secondary hover is a 5% foreground mix,
+  and command items highlight with `bg-muted`. Menu items still use
+  `focus:bg-accent focus:text-accent-foreground` — with **every descendant**
+  (icons, shortcuts) following the foreground.
 - **Dark `--border` and `--input` are translucent whites** (10% and 15%). This
   matters: an opaque grey hairline disappears against a card of the same value.
 - The dark card and popover are a step lighter than the page.
@@ -113,8 +133,19 @@ locks the chain; add to it rather than trusting a local check.
   therefore keeps its colour at zero width. Any component that draws only some
   of its sides (the OTP strip) depends on this.
 - **There is no z-index in a `Row`.** shadcn's focused OTP slot uses `z-10` to
-  let its ring overlap its neighbours; in Flutter the next sibling simply paints
-  over it, so that ring is drawn *inside* the slot instead.
+  let its ring overlap its neighbours; in Flutter the next sibling paints over
+  the ring's edge instead. The ring is still drawn *outside* the slot (slots
+  are transparent, so only their hairlines cross it); don't move it inside —
+  that reads as a different control from every other field.
+- **CSS clips outer box-shadows to outside the border box**; Flutter's default
+  `BlurStyle.normal` paints the shadow behind the whole box, which shows
+  through any transparent or translucent fill as a grey wash. Every outward
+  shadow in `Shadows` therefore uses `BlurStyle.outer`. If a control with a
+  transparent fill ever looks "slightly grey", check for a stray plain
+  `BoxShadow` first.
+- `ShadButton` centres its label (`TextAlign.center` in its DefaultTextStyle).
+  Anything button-based that should read as a row — menu items — must merge
+  `TextAlign.start` back in below the button.
 - `ShadBorder.merge` takes the other's `radius` **and** `offset`
   unconditionally. An override that sets only the radius silently drops the
   offset — which collapses a focus ring onto the element's own border.

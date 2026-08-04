@@ -16,6 +16,7 @@ class ShadOptionTheme with _$ShadOptionTheme {
     this.padding,
     this.radius,
     this.selectedIconColor,
+    this.selectedHoveredIconColor,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -31,7 +32,13 @@ class ShadOptionTheme with _$ShadOptionTheme {
   final TextStyle? textStyle;
   final Color? selectedBackgroundColor;
   final TextStyle? selectedTextStyle;
+
+  /// The colour of the check indicator on a selected row at rest.
   final Color? selectedIconColor;
+
+  /// The colour of the check indicator while the row is hovered, when the
+  /// highlight's own foreground applies (`focus:**:text-accent-foreground`).
+  final Color? selectedHoveredIconColor;
 
   static ShadOptionTheme? lerp(
     ShadOptionTheme? a,

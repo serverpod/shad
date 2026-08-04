@@ -13,6 +13,7 @@ class ShadRadioTheme with _$ShadRadioTheme {
     this.color,
     this.duration,
     this.decoration,
+    this.checkedDecoration,
     this.size,
     this.padding,
     this.circleSize,
@@ -42,6 +43,13 @@ class ShadRadioTheme with _$ShadRadioTheme {
 
   /// {@macro ShadRadio.decoration}
   final ShadDecoration? decoration;
+
+  /// The decoration while selected, when it differs from [decoration]: the
+  /// reference fills the circle with the primary (`data-checked:bg-primary
+  /// data-checked:border-primary`) and draws a primary-foreground dot, so the
+  /// selected radio cannot keep the unchecked outline. Null means "same as
+  /// [decoration]".
+  final ShadDecoration? checkedDecoration;
 
   /// {@macro ShadRadio.padding}
   final EdgeInsetsGeometry? padding;

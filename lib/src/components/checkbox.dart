@@ -191,8 +191,15 @@ class _ShadCheckboxState extends State<ShadCheckbox> {
         theme.checkboxTheme.uncheckedColor ??
         theme.colorScheme.input;
 
+    // A checked box swaps its whole decoration, not just the fill: the
+    // reference recolours the outline with it (`data-checked:border-primary`),
+    // so keeping the unchecked border would leave a pale halo around the fill.
     final effectiveDecoration =
-        (theme.checkboxTheme.decoration ?? const ShadDecoration())
+        ((widget.value
+                    ? theme.checkboxTheme.checkedDecoration ??
+                          theme.checkboxTheme.decoration
+                    : theme.checkboxTheme.decoration) ??
+                const ShadDecoration())
             .merge(widget.decoration)
             .copyWith(
               color: widget.value ? effectiveColor : effectiveUncheckedColor,
@@ -205,7 +212,8 @@ class _ShadCheckboxState extends State<ShadCheckbox> {
         Icon(
           LucideIcons.check,
           color: theme.colorScheme.primaryForeground,
-          size: effectiveSize,
+          // `[&>svg]:size-3.5`: the glyph sits 2px inside its 16px box.
+          size: effectiveSize - 2,
         );
 
     final effectiveDuration =

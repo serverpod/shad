@@ -106,8 +106,14 @@ class _ShadSpinnerState extends State<ShadSpinner>
     final spinnerTheme = theme.spinnerTheme;
 
     final effectiveSize = widget.size ?? spinnerTheme.size ?? 16.0;
+    // shadcn's spinner is an icon in `text-current`: inside a button it spins
+    // in the button's own content colour. The ambient IconTheme carries that,
+    // so it sits between the explicit overrides and the primary fallback.
     final effectiveColor =
-        widget.color ?? spinnerTheme.color ?? theme.colorScheme.primary;
+        widget.color ??
+        spinnerTheme.color ??
+        IconTheme.of(context).color ??
+        theme.colorScheme.primary;
     final effectiveTrackColor =
         widget.trackColor ??
         spinnerTheme.trackColor ??

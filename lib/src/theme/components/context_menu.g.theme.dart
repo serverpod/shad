@@ -69,6 +69,21 @@ mixin _$ShadContextMenuTheme {
         b.trailingTextStyle,
         t,
       ),
+      selectedTrailingTextStyle: TextStyle.lerp(
+        a.selectedTrailingTextStyle,
+        b.selectedTrailingTextStyle,
+        t,
+      ),
+      destructiveForegroundColor: Color.lerp(
+        a.destructiveForegroundColor,
+        b.destructiveForegroundColor,
+        t,
+      ),
+      destructiveSelectedBackgroundColor: Color.lerp(
+        a.destructiveSelectedBackgroundColor,
+        b.destructiveSelectedBackgroundColor,
+        t,
+      ),
       itemConstraints: BoxConstraints.lerp(
         a.itemConstraints,
         b.itemConstraints,
@@ -109,6 +124,9 @@ mixin _$ShadContextMenuTheme {
     TextStyle? textStyle,
     TextStyle? selectedTextStyle,
     TextStyle? trailingTextStyle,
+    TextStyle? selectedTrailingTextStyle,
+    Color? destructiveForegroundColor,
+    Color? destructiveSelectedBackgroundColor,
     BoxConstraints? itemConstraints,
     EdgeInsetsGeometry? subMenuPadding,
     Color? backgroundColor,
@@ -138,6 +156,13 @@ mixin _$ShadContextMenuTheme {
       textStyle: textStyle ?? _this.textStyle,
       selectedTextStyle: selectedTextStyle ?? _this.selectedTextStyle,
       trailingTextStyle: trailingTextStyle ?? _this.trailingTextStyle,
+      selectedTrailingTextStyle:
+          selectedTrailingTextStyle ?? _this.selectedTrailingTextStyle,
+      destructiveForegroundColor:
+          destructiveForegroundColor ?? _this.destructiveForegroundColor,
+      destructiveSelectedBackgroundColor:
+          destructiveSelectedBackgroundColor ??
+          _this.destructiveSelectedBackgroundColor,
       itemConstraints: itemConstraints ?? _this.itemConstraints,
       subMenuPadding: subMenuPadding ?? _this.subMenuPadding,
       backgroundColor: backgroundColor ?? _this.backgroundColor,
@@ -184,6 +209,14 @@ mixin _$ShadContextMenuTheme {
       trailingTextStyle:
           _this.trailingTextStyle?.merge(other.trailingTextStyle) ??
           other.trailingTextStyle,
+      selectedTrailingTextStyle:
+          _this.selectedTrailingTextStyle?.merge(
+            other.selectedTrailingTextStyle,
+          ) ??
+          other.selectedTrailingTextStyle,
+      destructiveForegroundColor: other.destructiveForegroundColor,
+      destructiveSelectedBackgroundColor:
+          other.destructiveSelectedBackgroundColor,
       itemConstraints: other.itemConstraints,
       subMenuPadding: other.subMenuPadding,
       backgroundColor: other.backgroundColor,
@@ -224,6 +257,10 @@ mixin _$ShadContextMenuTheme {
         _other.textStyle == _this.textStyle &&
         _other.selectedTextStyle == _this.selectedTextStyle &&
         _other.trailingTextStyle == _this.trailingTextStyle &&
+        _other.selectedTrailingTextStyle == _this.selectedTrailingTextStyle &&
+        _other.destructiveForegroundColor == _this.destructiveForegroundColor &&
+        _other.destructiveSelectedBackgroundColor ==
+            _this.destructiveSelectedBackgroundColor &&
         _other.itemConstraints == _this.itemConstraints &&
         _other.subMenuPadding == _this.subMenuPadding &&
         _other.backgroundColor == _this.backgroundColor &&
@@ -256,6 +293,9 @@ mixin _$ShadContextMenuTheme {
       _this.textStyle,
       _this.selectedTextStyle,
       _this.trailingTextStyle,
+      _this.selectedTrailingTextStyle,
+      _this.destructiveForegroundColor,
+      _this.destructiveSelectedBackgroundColor,
       _this.itemConstraints,
       _this.subMenuPadding,
       _this.backgroundColor,

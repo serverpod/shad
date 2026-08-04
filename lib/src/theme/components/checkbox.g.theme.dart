@@ -35,6 +35,11 @@ mixin _$ShadCheckboxTheme {
       size: lerpDouble$(a.size, b.size, t),
       duration: lerpDuration$(a.duration, b.duration, t),
       decoration: ShadDecoration.lerp(a.decoration, b.decoration, t),
+      checkedDecoration: ShadDecoration.lerp(
+        a.checkedDecoration,
+        b.checkedDecoration,
+        t,
+      ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       crossAxisAlignment: t < 0.5 ? a.crossAxisAlignment : b.crossAxisAlignment,
       checkboxPadding: EdgeInsetsGeometry.lerp(
@@ -51,6 +56,7 @@ mixin _$ShadCheckboxTheme {
     double? size,
     Duration? duration,
     ShadDecoration? decoration,
+    ShadDecoration? checkedDecoration,
     EdgeInsetsGeometry? padding,
     CrossAxisAlignment? crossAxisAlignment,
     EdgeInsetsGeometry? checkboxPadding,
@@ -63,6 +69,7 @@ mixin _$ShadCheckboxTheme {
       size: size ?? _this.size,
       duration: duration ?? _this.duration,
       decoration: decoration ?? _this.decoration,
+      checkedDecoration: checkedDecoration ?? _this.checkedDecoration,
       padding: padding ?? _this.padding,
       crossAxisAlignment: crossAxisAlignment ?? _this.crossAxisAlignment,
       checkboxPadding: checkboxPadding ?? _this.checkboxPadding,
@@ -86,6 +93,9 @@ mixin _$ShadCheckboxTheme {
       size: other.size,
       duration: other.duration,
       decoration: _this.decoration?.merge(other.decoration) ?? other.decoration,
+      checkedDecoration:
+          _this.checkedDecoration?.merge(other.checkedDecoration) ??
+          other.checkedDecoration,
       padding: other.padding,
       crossAxisAlignment: other.crossAxisAlignment,
       checkboxPadding: other.checkboxPadding,
@@ -110,6 +120,7 @@ mixin _$ShadCheckboxTheme {
         _other.size == _this.size &&
         _other.duration == _this.duration &&
         _other.decoration == _this.decoration &&
+        _other.checkedDecoration == _this.checkedDecoration &&
         _other.padding == _this.padding &&
         _other.crossAxisAlignment == _this.crossAxisAlignment &&
         _other.checkboxPadding == _this.checkboxPadding;
@@ -126,6 +137,7 @@ mixin _$ShadCheckboxTheme {
       _this.size,
       _this.duration,
       _this.decoration,
+      _this.checkedDecoration,
       _this.padding,
       _this.crossAxisAlignment,
       _this.checkboxPadding,

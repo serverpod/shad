@@ -995,11 +995,13 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
         final TextStyle resultDefaultTextStyle;
 
         if (controller.value.isNotEmpty) {
-          resultDefaultTextStyle =
-              theme.optionTheme.selectedTextStyle ??
-              theme.textTheme.muted.fallback(
-                color: theme.colorScheme.foreground,
-              );
+          // The value shown in the trigger belongs to the *page*, not the
+          // menu: `optionTheme.selectedTextStyle` carries the menu palette's
+          // highlight foreground, which is unreadable on the trigger the
+          // moment menus are inverted or bold.
+          resultDefaultTextStyle = theme.textTheme.muted.fallback(
+            color: theme.colorScheme.foreground,
+          );
           switch (isMultiSelect) {
             case true:
               result = widget.selectedOptionsBuilder!(
@@ -1029,12 +1031,13 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
       },
     );
 
+    // `cn-select-trigger-icon`: `text-muted-foreground size-4`.
     final effectiveTrailing =
         widget.trailing ??
         Icon(
           LucideIcons.chevronDown,
           size: 16,
-          color: theme.colorScheme.popoverForeground.withValues(alpha: .5),
+          color: theme.colorScheme.mutedForeground,
         );
 
     final effectiveMinWidth =
@@ -1050,6 +1053,13 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
         theme.selectTheme.optionsPadding ??
         const EdgeInsets.all(4);
 
+    // Everything rendered *inside* the options popover reads in the menu
+    // palette, not the page's: an inverted menu keeps its own foreground.
+    // The option rows' resting colour carries it.
+    final menuForeground =
+        theme.optionTheme.textStyle?.color ??
+        theme.colorScheme.popoverForeground;
+
     final search = switch (widget.variant) {
       ShadSelectVariant.primary || ShadSelectVariant.multiple => null,
       ShadSelectVariant.search ||
@@ -1064,9 +1074,11 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                   child: Icon(
                     LucideIcons.search,
                     size: 16,
-                    color: theme.colorScheme.popoverForeground,
+                    color: menuForeground,
                   ),
                 ),
+                style: (theme.inputTheme.style ?? theme.textTheme.muted)
+                    .copyWith(color: menuForeground),
                 padding:
                     widget.searchPadding ??
                     theme.selectTheme.searchPadding ??
@@ -1210,7 +1222,7 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                                   child: Icon(
                                     LucideIcons.chevronUp,
                                     size: 16,
-                                    color: theme.colorScheme.popoverForeground,
+                                    color: menuForeground,
                                   ),
                                 ),
                               )
@@ -1241,7 +1253,7 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                                   child: Icon(
                                     LucideIcons.chevronDown,
                                     size: 16,
-                                    color: theme.colorScheme.popoverForeground,
+                                    color: menuForeground,
                                   ),
                                 ),
                               )
@@ -1264,6 +1276,10 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                 reverseDuration: effectivePopoverReverseDuration,
                 shadows: effectiveShadows,
                 filter: effectiveFilter,
+                // The options surface is a menu, and menus can carry their
+                // own palette; without this it would inherit the page
+                // popover's decoration.
+                decoration: theme.selectTheme.popoverDecoration,
                 popover: (_) {
                   // Seed showScrollToBottom/showScrollToTop once the popover
                   // has been laid out. Guarded: this builder can run many
@@ -1458,19 +1474,24 @@ class _ShadOptionState<T> extends State<ShadOption<T>> {
     final effectiveRadius =
         widget.radius ?? theme.optionTheme.radius ?? theme.radius;
 
+    final effectiveSelectedIconColor =
+        theme.optionTheme.selectedIconColor ??
+        theme.colorScheme.popoverForeground;
+
+    final effectiveSelectedHoveredIconColor =
+        theme.optionTheme.selectedHoveredIconColor ??
+        theme.colorScheme.accentForeground;
+
+    // No explicit colour here: the icon inherits it from the IconTheme below,
+    // which follows the hover state — shadcn's
+    // `focus:**:text-accent-foreground` recolours the indicator with the row.
     final effectiveSelectedIcon = Visibility.maintain(
       visible: selected,
       child:
           widget.selectedIcon ??
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Icon(
-              LucideIcons.check,
-              size: 16,
-              color:
-                  theme.optionTheme.selectedIconColor ??
-                  theme.colorScheme.popoverForeground,
-            ),
+          const Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: Icon(LucideIcons.check, size: 16),
           ),
     );
 
@@ -1498,21 +1519,36 @@ class _ShadOptionState<T> extends State<ShadOption<T>> {
                   ? effectiveSelectedBackgroundColor
                   : effectiveBackgroundColor;
 
+              // The label follows the *painted* background. A selected row
+              // with no fill of its own (the reference marks selection with
+              // the check alone) keeps the resting style — switching it to
+              // the highlight's foreground would be unreadable the moment
+              // the highlight is a strong colour.
+              final highlighted =
+                  hovered ||
+                  (selected && effectiveSelectedBackgroundColor != null);
+
               return Container(
                 padding: effectivePadding,
                 decoration: BoxDecoration(
                   color: resolvedBackgroundColor,
                   borderRadius: effectiveRadius,
                 ),
-                // The label follows the *background*, not just the selection:
-                // hovering an unselected row paints the highlight behind it,
-                // so a theme whose highlight is a strong fill needs the text
-                // to invert there too.
-                child: DefaultTextStyle(
-                  style: hovered || selected
-                      ? effectiveSelectedTextStyle
-                      : effectiveTextStyle,
-                  child: child!,
+                // The icon theme mirrors the text: the check indicator and
+                // any icons in the row follow the highlight's foreground
+                // while it is painted.
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    color: hovered
+                        ? effectiveSelectedHoveredIconColor
+                        : effectiveSelectedIconColor,
+                  ),
+                  child: DefaultTextStyle(
+                    style: highlighted
+                        ? effectiveSelectedTextStyle
+                        : effectiveTextStyle,
+                    child: child!,
+                  ),
                 ),
               );
             },

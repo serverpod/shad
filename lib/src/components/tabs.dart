@@ -880,8 +880,6 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
       listenable: inherited.controller,
       builder: (context, _) {
         final selected = inherited.controller.selected == widget.value;
-        final isFirstTab = inherited.orderedValues.first == widget.value;
-        final isLastTab = inherited.orderedValues.last == widget.value;
 
         final defaultDecoration = switch (theme.disableSecondaryBorder) {
           true => ShadDecoration(
@@ -898,25 +896,15 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
           ),
           false => ShadDecoration(
             border: ShadBorder.all(radius: BorderRadius.circular(2), width: 0),
-            secondaryBorder: ShadBorder.all(
-              width: 0,
-              radius: BorderRadius.circular(2),
-              padding: EdgeInsetsDirectional.fromSTEB(
-                isFirstTab ? 4 : 2,
-                4,
-                isLastTab ? 4 : 2,
-                4,
-              ),
-            ),
+            // No inner gutter around a tab: the strip's own `p-[3px]` is the
+            // only inset in the reference. The old 4px secondary padding
+            // shrank every tab inside its box, which read as too much space
+            // between the tabs and the strip's border. The focus ring is the
+            // standard outward ring; like shadcn's, it may overlap the strip.
             secondaryFocusedBorder: ShadBorder.all(
               width: 2,
               radius: theme.radius,
-              padding: EdgeInsetsDirectional.fromSTEB(
-                isFirstTab ? 2 : 0,
-                2,
-                isLastTab ? 2 : 0,
-                2,
-              ),
+              offset: 2,
               color: theme.colorScheme.ring,
             ),
           ),

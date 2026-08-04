@@ -26,6 +26,7 @@ class ShadCardTheme with _$ShadCardTheme {
     this.titleStyle,
     this.descriptionStyle,
     this.gap,
+    this.sectionGap,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -84,6 +85,11 @@ class ShadCardTheme with _$ShadCardTheme {
 
   /// {@macro ShadCard.gap}
   final double? gap;
+
+  /// The space between a card's sections — header, content and footer —
+  /// shadcn's `gap-(--card-spacing)`. [gap] stays the small gap between the
+  /// title and its description. Null falls back to [gap].
+  final double? sectionGap;
 
   static ShadCardTheme? lerp(
     ShadCardTheme? a,

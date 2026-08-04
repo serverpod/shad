@@ -30,6 +30,11 @@ mixin _$ShadRadioTheme {
       size: lerpDouble$(a.size, b.size, t),
       duration: lerpDuration$(a.duration, b.duration, t),
       decoration: ShadDecoration.lerp(a.decoration, b.decoration, t),
+      checkedDecoration: ShadDecoration.lerp(
+        a.checkedDecoration,
+        b.checkedDecoration,
+        t,
+      ),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       circleSize: lerpDouble$(a.circleSize, b.circleSize, t),
       axis: t < 0.5 ? a.axis : b.axis,
@@ -47,6 +52,7 @@ mixin _$ShadRadioTheme {
     double? size,
     Duration? duration,
     ShadDecoration? decoration,
+    ShadDecoration? checkedDecoration,
     EdgeInsetsGeometry? padding,
     double? circleSize,
     Axis? axis,
@@ -64,6 +70,7 @@ mixin _$ShadRadioTheme {
       size: size ?? _this.size,
       duration: duration ?? _this.duration,
       decoration: decoration ?? _this.decoration,
+      checkedDecoration: checkedDecoration ?? _this.checkedDecoration,
       padding: padding ?? _this.padding,
       circleSize: circleSize ?? _this.circleSize,
       axis: axis ?? _this.axis,
@@ -92,6 +99,9 @@ mixin _$ShadRadioTheme {
       size: other.size,
       duration: other.duration,
       decoration: _this.decoration?.merge(other.decoration) ?? other.decoration,
+      checkedDecoration:
+          _this.checkedDecoration?.merge(other.checkedDecoration) ??
+          other.checkedDecoration,
       padding: other.padding,
       circleSize: other.circleSize,
       axis: other.axis,
@@ -121,6 +131,7 @@ mixin _$ShadRadioTheme {
         _other.size == _this.size &&
         _other.duration == _this.duration &&
         _other.decoration == _this.decoration &&
+        _other.checkedDecoration == _this.checkedDecoration &&
         _other.padding == _this.padding &&
         _other.circleSize == _this.circleSize &&
         _other.axis == _this.axis &&
@@ -142,6 +153,7 @@ mixin _$ShadRadioTheme {
       _this.size,
       _this.duration,
       _this.decoration,
+      _this.checkedDecoration,
       _this.padding,
       _this.circleSize,
       _this.axis,
