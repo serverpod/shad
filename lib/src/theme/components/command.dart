@@ -30,6 +30,17 @@ class ShadCommandTheme with _$ShadCommandTheme {
     this.height,
     this.width,
     this.emptyPadding,
+    this.emptyTextStyle,
+    this.searchDecoration,
+    this.searchHeight,
+    this.searchIconColor,
+    this.searchIconSize,
+    this.searchGap,
+    this.searchInputPadding,
+    this.listMaxHeight,
+    this.groupPadding,
+    this.dialogItemRadius,
+    this.itemIconSize,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -88,6 +99,46 @@ class ShadCommandTheme with _$ShadCommandTheme {
 
   /// The padding around the empty state.
   final EdgeInsetsGeometry? emptyPadding;
+
+  /// The style of the empty state's text, `.cn-command-empty`'s `text-sm`.
+  final TextStyle? emptyTextStyle;
+
+  /// The decoration of the box around the search field — shadcn's
+  /// `.cn-command-input-group`: an `--input` wash inside a soft outline,
+  /// with no focus ring.
+  final ShadDecoration? searchDecoration;
+
+  /// The height of the search box, `.cn-command-input-group`'s `h-8!`.
+  final double? searchHeight;
+
+  /// The colour of the search icon (`.cn-command-input-icon`'s `opacity-50`
+  /// over the addon's muted foreground).
+  final Color? searchIconColor;
+
+  /// The size of the search icon, `size-4`.
+  final double? searchIconSize;
+
+  /// The gap between the search icon and the input's text.
+  final double? searchGap;
+
+  /// The padding inside the search box, around icon and text.
+  final EdgeInsetsGeometry? searchInputPadding;
+
+  /// The tallest the scrollable list may grow, `.cn-command-list`'s
+  /// `max-h-72`. The palette shrinks below it when the results are shorter.
+  final double? listMaxHeight;
+
+  /// The padding around each group of items, `.cn-command-group`'s `p-1`.
+  final EdgeInsetsGeometry? groupPadding;
+
+  /// The corner radius of an item inside a command *dialog*, where shadcn
+  /// rounds a step past the inline [itemRadius]
+  /// (`in-data-[slot=dialog-content]:rounded-lg!`).
+  final BorderRadiusGeometry? dialogItemRadius;
+
+  /// The size of an item's leading icon,
+  /// `[&_svg:not([class*='size-'])]:size-4`.
+  final double? itemIconSize;
 
   static ShadCommandTheme? lerp(
     ShadCommandTheme? a,

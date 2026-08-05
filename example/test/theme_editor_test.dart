@@ -72,17 +72,22 @@ void main() {
       expect(vega.decoration.secondaryFocusedBorder!.top!.color!.a, .5);
     });
 
-    test('a style changes the text sizes, not just the boxes', () {
+    test('a style retypes the components, not the prose scale', () {
       final vega = const ThemeEditorConfig().build();
       final lyra = const ThemeEditorConfig(style: StylePreset.lyra).build();
       final sera = const ThemeEditorConfig(style: StylePreset.sera).build();
 
+      // The typography entries are a fixed prose scale — a style reaches the
+      // UI through each component's own theme slots, not by rewriting them.
       expect(vega.textTheme.small.fontSize, 14);
-      expect(lyra.textTheme.small.fontSize, 12);
-      expect(sera.textTheme.large.fontSize, 18);
+      expect(lyra.textTheme.small.fontSize, 14);
+      expect(lyra.commandTheme.itemTextStyle!.fontSize, 12);
       expect(sera.cardTheme.titleStyle!.fontWeight, FontWeight.w600);
       // The chosen font survives the style's typography.
-      expect(lyra.textTheme.small.fontFamily, vega.textTheme.small.fontFamily);
+      expect(
+        lyra.commandTheme.itemTextStyle!.fontFamily,
+        vega.textTheme.small.fontFamily,
+      );
     });
 
     test('every style builds, and carries its own radii and ring', () {

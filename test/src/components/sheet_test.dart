@@ -173,6 +173,54 @@ void main() {
       );
       await tester.pumpAndSettle();
     });
+
+    testWidgets('left and right sheets use partial width, not full screen', (
+      tester,
+    ) async {
+      setUpView(tester, size: const Size(800, 600));
+      for (final side in [ShadSheetSide.left, ShadSheetSide.right]) {
+        await tester.pumpWidget(
+          createTestWidget(
+            ShadSheetInheritedWidget(
+              side: side,
+              child: const ShadSheet(
+                title: Text('Title'),
+                child: Text('Content'),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final constrainedBoxFinder = find.descendant(
+          of: find.byType(ShadSheet),
+          matching: find.byType(ConstrainedBox),
+        );
+        final constrainedBox = tester.widget<ConstrainedBox>(
+          constrainedBoxFinder.first,
+        );
+        expect(
+          constrainedBox.constraints.maxWidth,
+          384,
+          reason: '$side sheet max width',
+        );
+        expect(
+          constrainedBox.constraints.minHeight,
+          600,
+          reason: '$side sheet min height',
+        );
+
+        final dialog = tester.renderObject<RenderBox>(
+          constrainedBoxFinder.first,
+        );
+        expect(
+          dialog.size.width,
+          lessThanOrEqualTo(384),
+          reason: '$side sheet layout width',
+        );
+        expect(dialog.size.height, 600, reason: '$side sheet layout height');
+      }
+    });
   });
 
   group('ShadSheet expandable', () {

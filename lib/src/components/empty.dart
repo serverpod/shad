@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/i18n/localizations_delegate.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/extensions/text_style.dart';
 
 /// {@template ShadEmpty}
 /// An empty-state placeholder.
@@ -105,12 +106,16 @@ class ShadEmpty extends StatelessWidget {
     final effectiveIconSize = iconSize ?? emptyTheme.iconSize ?? 40.0;
     final effectiveIconColor =
         iconColor ?? emptyTheme.iconColor ?? theme.colorScheme.mutedForeground;
+    // The text theme's styles carry no colour of their own; without a
+    // fallback the engine paints colourless glyphs white — an invisible
+    // empty state on a light surface.
     final effectiveTitleStyle = (emptyTheme.titleStyle ?? theme.textTheme.large)
-        .merge(titleStyle);
+        .merge(titleStyle)
+        .fallback(color: theme.colorScheme.foreground);
     final effectiveDescriptionStyle =
-        (emptyTheme.descriptionStyle ?? theme.textTheme.muted).merge(
-          descriptionStyle,
-        );
+        (emptyTheme.descriptionStyle ?? theme.textTheme.muted)
+            .merge(descriptionStyle)
+            .fallback(color: theme.colorScheme.mutedForeground);
     final effectiveCrossAxisAlignment =
         crossAxisAlignment ??
         emptyTheme.crossAxisAlignment ??

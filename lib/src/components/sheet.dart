@@ -1,6 +1,7 @@
 // ignore_for_file: cascade_invocations
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
@@ -9,6 +10,26 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/components/dialog.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/position.dart';
+
+/// Tailwind's `max-w-sm` (24rem) — the width cap shadcn applies to left/right
+/// sheets from the `sm` breakpoint up.
+const _sideSheetSmMaxWidth = 384.0;
+
+/// Default constraints for a left/right sheet: full cross-axis height
+/// (`inset-y-0 h-full`) with main-axis width capped at `w-3/4 sm:max-w-sm`.
+BoxConstraints _horizontalSideSheetConstraints(
+  Size screenSize,
+  double smBreakpoint,
+) {
+  final fractionalWidth = screenSize.width * 0.75;
+  final maxWidth = screenSize.width >= smBreakpoint
+      ? math.min(fractionalWidth, _sideSheetSmMaxWidth)
+      : fractionalWidth;
+  return BoxConstraints(
+    minHeight: screenSize.height,
+    maxWidth: maxWidth,
+  );
+}
 
 /// Shows a [ShadSheet], which is a modal bottom sheet implementation.
 ///
@@ -1184,10 +1205,11 @@ class _ShadSheetState extends State<ShadSheet> with TickerProviderStateMixin {
         true;
 
     final defaultConstraints = switch (side) {
-      ShadSheetSide.top ||
-      ShadSheetSide.bottom => BoxConstraints(minWidth: mSize.width),
-      ShadSheetSide.left ||
-      ShadSheetSide.right => BoxConstraints(minHeight: mSize.height),
+      ShadSheetSide.top || ShadSheetSide.bottom => BoxConstraints(
+        minWidth: mSize.width,
+      ),
+      ShadSheetSide.left || ShadSheetSide.right =>
+        _horizontalSideSheetConstraints(mSize, theme.breakpoints.sm.value),
     };
 
     final defaultCrossAxisAlignment = switch (side) {
@@ -1329,7 +1351,9 @@ class _ShadSheetState extends State<ShadSheet> with TickerProviderStateMixin {
       description: widget.description,
       alignment: effectiveExpandable
           ? side.toInnerExpandableAlignment()
-          : side.toAlignment(),
+          : side.isVertical
+          ? side.toAlignment()
+          : side.toEdgeAlignment(),
       constraints: effectiveConstraints,
       actions: widget.actions,
       radius: effectiveExpandable ? BorderRadius.zero : effectiveRadius,

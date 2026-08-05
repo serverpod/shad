@@ -17,6 +17,7 @@ enum ShadRadiusToken {
   lg,
   xl,
   xl2,
+  xl3,
   xl4,
 
   /// Fully rounded, for pills and circles.
@@ -38,7 +39,8 @@ enum ShadRadiusToken {
 /// This package's `ShadThemeData.radius` is the *component* radius — the
 /// `rounded-md` step, since that is what button and input use — so the
 /// multipliers here are expressed relative to `md`. With the default 8px that
-/// reproduces shadcn's scale exactly: sm 6, md 8, lg 10, xl 14, 2xl 16, 4xl 32.
+/// reproduces shadcn's scale exactly: sm 6, md 8, lg 10, xl 14, 2xl 16,
+/// 3xl 24, 4xl 32.
 @immutable
 class ShadRadii {
   /// Creates a scale from the base (`md`) radius.
@@ -57,6 +59,8 @@ class ShadRadii {
 
   BorderRadius get xl2 => _scale(2);
 
+  BorderRadius get xl3 => _scale(3);
+
   BorderRadius get xl4 => _scale(4);
 
   BorderRadius get full => const BorderRadius.all(Radius.circular(9999));
@@ -69,6 +73,7 @@ class ShadRadii {
     ShadRadiusToken.lg => lg,
     ShadRadiusToken.xl => xl,
     ShadRadiusToken.xl2 => xl2,
+    ShadRadiusToken.xl3 => xl3,
     ShadRadiusToken.xl4 => xl4,
     ShadRadiusToken.full => full,
   };

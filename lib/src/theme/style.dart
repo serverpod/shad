@@ -82,6 +82,9 @@ class ShadStyleTokens {
     this.cardRadius = ShadRadiusToken.xl,
     this.dialogRadius = ShadRadiusToken.xl,
     this.popoverRadius = ShadRadiusToken.md,
+    this.commandRadius = ShadRadiusToken.xl,
+    this.commandItemDialogRadius = ShadRadiusToken.lg,
+    this.commandSearchRadius = ShadRadiusToken.lg,
     this.textareaRadius = ShadRadiusToken.md,
     this.itemRadius = ShadRadiusToken.sm,
     this.checkboxRadius = 4,
@@ -157,6 +160,14 @@ class ShadStyleTokens {
     this.itemPaddingY = 6,
     this.menubarHeight = 36,
     this.menubarPadding = 4,
+    // Command palette.
+    this.commandPadding = 4,
+    this.commandGroupPadding = 4,
+    this.commandSearchHeight = 32,
+    this.commandSearchFill = ShadSurfaceFill.input30,
+    this.commandSearchFillDark = ShadSurfaceFill.input30,
+    this.commandSearchBorderOpacity = .3,
+    this.commandSearchUnderline = false,
     // Sidebar.
     this.sidebarItemHeight = 32,
     this.sidebarItemHeightSm = 28,
@@ -221,6 +232,18 @@ class ShadStyleTokens {
 
   /// Corner radius of popovers, select and menu surfaces.
   final ShadRadiusToken popoverRadius;
+
+  /// Corner radius of a command palette (`.cn-command`).
+  final ShadRadiusToken commandRadius;
+
+  /// Corner radius of a command item shown inside a dialog — shadcn rounds
+  /// them a step up there (`in-data-[slot=dialog-content]:rounded-lg!`),
+  /// while inline palettes keep [itemRadius].
+  final ShadRadiusToken commandItemDialogRadius;
+
+  /// Corner radius of the command palette's search box
+  /// (`.cn-command-input-group rounded-lg!`).
+  final ShadRadiusToken commandSearchRadius;
 
   /// Corner radius of a textarea.
   ///
@@ -439,6 +462,34 @@ class ShadStyleTokens {
   /// A bracketed literal in some styles (`p-[3px]`), so it is not scaled.
   final double menubarPadding;
 
+  // --- Command palette ----------------------------------------------------
+
+  /// Padding inside the palette around the search box and the list,
+  /// `.cn-command`'s `p-1`. `lyra` and `sera` run flush.
+  final double commandPadding;
+
+  /// Padding around each group of items, `.cn-command-group`'s `p-1`.
+  final double commandGroupPadding;
+
+  /// Height of the search box, `.cn-command-input-group`'s `h-8!` —
+  /// `h-9` in the roomier styles, `h-10` in `sera`.
+  final double commandSearchHeight;
+
+  /// The wash behind the search box, `bg-input/30` in most styles.
+  final ShadSurfaceFill commandSearchFill;
+
+  /// The dark-mode wash behind the search box, where it differs
+  /// (`mira` is `bg-input/20 dark:bg-input/30`).
+  final ShadSurfaceFill commandSearchFillDark;
+
+  /// Opacity of the search box's `--input` outline, `border-input/30`.
+  /// Zero in the borderless styles.
+  final double commandSearchBorderOpacity;
+
+  /// Whether the search box underlines instead of boxing: `sera` keeps only
+  /// `border-b-input`, and `lyra` puts a `border-b` on the wrapper.
+  final bool commandSearchUnderline;
+
   // --- Sidebar ------------------------------------------------------------
 
   /// Height of a sidebar menu button, shadcn's `h-8` (`h-9` in the roomier
@@ -625,11 +676,16 @@ class ShadStyleTokens {
   /// Pill-shaped and roomy.
   static const maia = ShadStyleTokens(
     name: 'maia',
+    commandItemDialogRadius: ShadRadiusToken.xl2,
+    commandSearchRadius: ShadRadiusToken.xl4,
+    commandSearchHeight: 36,
+    commandSearchBorderOpacity: 1,
     cardShadow: Shadows.none,
     controlShadow: Shadows.none,
     popoverShadow: Shadows.xl2,
     buttonRadius: ShadRadiusToken.xl4,
     cardRadius: ShadRadiusToken.xl2,
+    commandRadius: ShadRadiusToken.xl4,
     dialogRadius: ShadRadiusToken.xl4,
     popoverRadius: ShadRadiusToken.xl2,
     textareaRadius: ShadRadiusToken.xl,
@@ -669,8 +725,15 @@ class ShadStyleTokens {
   /// Square and compact.
   static const lyra = ShadStyleTokens(
     name: 'lyra',
+    commandItemDialogRadius: ShadRadiusToken.none,
+    commandSearchRadius: ShadRadiusToken.none,
+    commandPadding: 0,
+    commandGroupPadding: 0,
+    commandSearchBorderOpacity: 0,
+    commandSearchUnderline: true,
     buttonRadius: ShadRadiusToken.none,
     cardRadius: ShadRadiusToken.none,
+    commandRadius: ShadRadiusToken.none,
     dialogRadius: ShadRadiusToken.none,
     popoverRadius: ShadRadiusToken.none,
     textareaRadius: ShadRadiusToken.none,
@@ -717,6 +780,10 @@ class ShadStyleTokens {
   /// The densest of the eight: 28px controls.
   static const mira = ShadStyleTokens(
     name: 'mira',
+    commandItemDialogRadius: ShadRadiusToken.md,
+    commandSearchRadius: ShadRadiusToken.md,
+    commandSearchFill: ShadSurfaceFill.input20,
+    commandSearchBorderOpacity: 1,
     cardRadius: ShadRadiusToken.lg,
     popoverRadius: ShadRadiusToken.lg,
     itemRadius: ShadRadiusToken.md,
@@ -783,6 +850,14 @@ class ShadStyleTokens {
   /// Soft and pill-shaped, with a wide switch and a thick slider.
   static const luma = ShadStyleTokens(
     name: 'luma',
+    commandRadius: ShadRadiusToken.xl4,
+    commandItemDialogRadius: ShadRadiusToken.xl3,
+    commandSearchRadius: ShadRadiusToken.xl4,
+    commandGroupPadding: 6,
+    commandSearchHeight: 36,
+    commandSearchFill: ShadSurfaceFill.input50,
+    commandSearchFillDark: ShadSurfaceFill.input50,
+    commandSearchBorderOpacity: 0,
     buttonRadius: ShadRadiusToken.xl4,
     cardRadius: ShadRadiusToken.xl4,
     alertRadius: ShadRadiusToken.xl2,
@@ -846,6 +921,16 @@ class ShadStyleTokens {
   /// Editorial: square, uppercase, letter-spaced, and the largest of the eight.
   static const sera = ShadStyleTokens(
     name: 'sera',
+    commandRadius: ShadRadiusToken.none,
+    commandItemDialogRadius: ShadRadiusToken.none,
+    commandSearchRadius: ShadRadiusToken.none,
+    commandPadding: 0,
+    commandGroupPadding: 6,
+    commandSearchHeight: 40,
+    commandSearchFill: ShadSurfaceFill.none,
+    commandSearchFillDark: ShadSurfaceFill.none,
+    commandSearchBorderOpacity: 0,
+    commandSearchUnderline: true,
     buttonRadius: ShadRadiusToken.none,
     cardRadius: ShadRadiusToken.none,
     alertRadius: ShadRadiusToken.none,
@@ -959,6 +1044,12 @@ class ShadStyleTokens {
   /// Rounded and compact.
   static const rhea = ShadStyleTokens(
     name: 'rhea',
+    commandRadius: ShadRadiusToken.xl3,
+    commandItemDialogRadius: ShadRadiusToken.xl2,
+    commandSearchRadius: ShadRadiusToken.xl2,
+    commandSearchFill: ShadSurfaceFill.input50,
+    commandSearchFillDark: ShadSurfaceFill.input50,
+    commandSearchBorderOpacity: 0,
     buttonRadius: ShadRadiusToken.xl2,
     // Card and dialog corners are the 4xl step, capped:
     // `rounded-[min(var(--radius-4xl),24px)]`.
@@ -1041,6 +1132,9 @@ class ShadStyleTokens {
     ShadRadiusToken? cardRadius,
     ShadRadiusToken? dialogRadius,
     ShadRadiusToken? popoverRadius,
+    ShadRadiusToken? commandRadius,
+    ShadRadiusToken? commandItemDialogRadius,
+    ShadRadiusToken? commandSearchRadius,
     ShadRadiusToken? textareaRadius,
     ShadRadiusToken? itemRadius,
     double? checkboxRadius,
@@ -1104,6 +1198,13 @@ class ShadStyleTokens {
     double? itemPaddingY,
     double? menubarHeight,
     double? menubarPadding,
+    double? commandPadding,
+    double? commandGroupPadding,
+    double? commandSearchHeight,
+    ShadSurfaceFill? commandSearchFill,
+    ShadSurfaceFill? commandSearchFillDark,
+    double? commandSearchBorderOpacity,
+    bool? commandSearchUnderline,
     double? sidebarItemHeight,
     double? sidebarItemHeightSm,
     double? sidebarItemHeightLg,
@@ -1153,6 +1254,10 @@ class ShadStyleTokens {
       cardRadius: cardRadius ?? this.cardRadius,
       dialogRadius: dialogRadius ?? this.dialogRadius,
       popoverRadius: popoverRadius ?? this.popoverRadius,
+      commandRadius: commandRadius ?? this.commandRadius,
+      commandItemDialogRadius:
+          commandItemDialogRadius ?? this.commandItemDialogRadius,
+      commandSearchRadius: commandSearchRadius ?? this.commandSearchRadius,
       textareaRadius: textareaRadius ?? this.textareaRadius,
       itemRadius: itemRadius ?? this.itemRadius,
       checkboxRadius: checkboxRadius ?? this.checkboxRadius,
@@ -1225,6 +1330,16 @@ class ShadStyleTokens {
       itemPaddingY: itemPaddingY ?? this.itemPaddingY,
       menubarHeight: menubarHeight ?? this.menubarHeight,
       menubarPadding: menubarPadding ?? this.menubarPadding,
+      commandPadding: commandPadding ?? this.commandPadding,
+      commandGroupPadding: commandGroupPadding ?? this.commandGroupPadding,
+      commandSearchHeight: commandSearchHeight ?? this.commandSearchHeight,
+      commandSearchFill: commandSearchFill ?? this.commandSearchFill,
+      commandSearchFillDark:
+          commandSearchFillDark ?? this.commandSearchFillDark,
+      commandSearchBorderOpacity:
+          commandSearchBorderOpacity ?? this.commandSearchBorderOpacity,
+      commandSearchUnderline:
+          commandSearchUnderline ?? this.commandSearchUnderline,
       sidebarItemHeight: sidebarItemHeight ?? this.sidebarItemHeight,
       sidebarItemHeightSm: sidebarItemHeightSm ?? this.sidebarItemHeightSm,
       sidebarItemHeightLg: sidebarItemHeightLg ?? this.sidebarItemHeightLg,
@@ -1279,6 +1394,9 @@ class ShadStyleTokens {
     cardRadius,
     dialogRadius,
     popoverRadius,
+    commandRadius,
+    commandItemDialogRadius,
+    commandSearchRadius,
     textareaRadius,
     itemRadius,
     checkboxRadius,
@@ -1347,6 +1465,13 @@ class ShadStyleTokens {
     sidebarSubItemPaddingX,
     menubarHeight,
     menubarPadding,
+    commandPadding,
+    commandGroupPadding,
+    commandSearchHeight,
+    commandSearchFill,
+    commandSearchFillDark,
+    commandSearchBorderOpacity,
+    commandSearchUnderline,
     controlFill,
     controlFillDark,
     controlBorderless,

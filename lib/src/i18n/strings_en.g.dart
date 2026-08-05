@@ -39,6 +39,7 @@ class ShadLocalizationsData with BaseTranslations<ShadLocale, ShadLocalizationsD
 	late final ShadLocalizationsData$input$en input = ShadLocalizationsData$input$en.internal(_root);
 	late final ShadLocalizationsData$keyboardToolbar$en keyboardToolbar = ShadLocalizationsData$keyboardToolbar$en.internal(_root);
 	late final ShadLocalizationsData$empty$en empty = ShadLocalizationsData$empty$en.internal(_root);
+	late final ShadLocalizationsData$command$en command = ShadLocalizationsData$command$en.internal(_root);
 	late final ShadLocalizationsData$pagination$en pagination = ShadLocalizationsData$pagination$en.internal(_root);
 }
 
@@ -123,6 +124,18 @@ class ShadLocalizationsData$empty$en {
 	String get title => 'No results';
 }
 
+// Path: command
+class ShadLocalizationsData$command$en {
+	ShadLocalizationsData$command$en.internal(this._root);
+
+	final ShadLocalizationsData _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No results found.'
+	String get noResults => 'No results found.';
+}
+
 // Path: pagination
 class ShadLocalizationsData$pagination$en {
 	ShadLocalizationsData$pagination$en.internal(this._root);
@@ -164,6 +177,7 @@ extension on ShadLocalizationsData {
 			'input.selectAll' => 'Select All',
 			'keyboardToolbar.done' => 'Done',
 			'empty.title' => 'No results',
+			'command.noResults' => 'No results found.',
 			'pagination.previous' => 'Previous',
 			'pagination.next' => 'Next',
 			'pagination.morePages' => 'More pages',

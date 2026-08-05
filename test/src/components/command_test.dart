@@ -109,8 +109,7 @@ void main() {
       await tester.enterText(find.byType(ShadInput), 'zzzz');
       await tester.pumpAndSettle();
 
-      expect(find.byType(ShadEmpty), findsOneWidget);
-      expect(find.text('No results'), findsOneWidget);
+      expect(find.text('No results found.'), findsOneWidget);
     });
 
     testWidgets('a custom emptyBuilder replaces the default', (tester) async {
@@ -145,7 +144,7 @@ void main() {
 
       await tester.enterText(find.byType(ShadInput), 'App');
       await tester.pumpAndSettle();
-      expect(find.byType(ShadEmpty), findsOneWidget);
+      expect(find.text('No results found.'), findsOneWidget);
 
       await tester.enterText(find.byType(ShadInput), 'Apple');
       await tester.pumpAndSettle();
@@ -259,6 +258,115 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Banana'), findsOneWidget);
       expect(find.text('Apple'), findsNothing);
+    });
+  });
+
+  group('showShadCommandDialog', () {
+    Future<void> open(WidgetTester tester) async {
+      await tester.pumpWidget(
+        ShadApp(
+          home: Builder(
+            builder: (context) => Center(
+              child: ShadButton(
+                child: const Text('Open'),
+                onPressed: () => showShadCommandDialog<String>(
+                  context: context,
+                  groups: groups(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    }
+
+    testWidgets('the top edge pins at a third of the screen and stays there '
+        'while filtering', (tester) async {
+      await open(tester);
+
+      final screen = tester.getSize(find.byType(ShadApp));
+      final openRect = tester.getRect(find.byType(ShadCommand));
+      // `.cn-command-dialog top-1/3 translate-y-0`.
+      expect(openRect.top, screen.height / 3);
+
+      await tester.enterText(find.byType(EditableText), 'banana');
+      await tester.pumpAndSettle();
+      final filteredRect = tester.getRect(find.byType(ShadCommand));
+
+      // Fewer results: the palette shrinks from the bottom only.
+      expect(filteredRect.top, openRect.top);
+      expect(filteredRect.bottom, lessThan(openRect.bottom));
+    });
+
+    testWidgets('the palette hugs its content below the list cap', (
+      tester,
+    ) async {
+      await open(tester);
+
+      final rect = tester.getRect(find.byType(ShadCommand));
+      // Well under the old fixed 300 — the three items plus the search box.
+      expect(rect.height, lessThan(250));
+
+      // And the last item's row sits flush against the bottom padding, not
+      // above a run of empty space.
+      final lastItem = tester.getRect(resultText('Cherry').first);
+      expect(rect.bottom - lastItem.bottom, lessThan(30));
+    });
+
+    testWidgets('the search box is the input-group style, not a full-width '
+        'underline', (tester) async {
+      await open(tester);
+
+      final theme = ShadTheme.of(
+        tester.element(find.byType(ShadCommand)),
+      );
+      final input = tester.widget<ShadInput>(
+        find.descendant(
+          of: find.byType(ShadCommand),
+          matching: find.byType(ShadInput),
+        ),
+      );
+      // `bg-input/30` inside an `--input` outline, no focus ring.
+      expect(
+        input.decoration?.color,
+        theme.colorScheme.input.withValues(alpha: .3),
+      );
+      expect(input.decoration?.disableSecondaryBorder, true);
+      expect(
+        input.decoration?.border?.top?.color,
+        theme.colorScheme.input.withValues(
+          alpha: theme.style.commandSearchBorderOpacity,
+        ),
+      );
+      // Inset from the dialog edge (`p-1` + `p-1 pb-0`), not edge-to-edge.
+      final inputRect = tester.getRect(find.byType(ShadInput));
+      final commandRect = tester.getRect(find.byType(ShadCommand));
+      expect(inputRect.left - commandRect.left, greaterThan(0));
+      // `h-8!`.
+      expect(inputRect.height, theme.style.commandSearchHeight);
+    });
+
+    testWidgets('the dialog casts no shadow', (tester) async {
+      await open(tester);
+      final dialog = tester.widget<ShadDialog>(find.byType(ShadDialog));
+      expect(dialog.shadows, Shadows.none);
+    });
+
+    testWidgets('the empty state is a quiet text-sm line, not the ShadEmpty '
+        'hero', (tester) async {
+      await open(tester);
+      await tester.enterText(find.byType(EditableText), 'zzzz');
+      await tester.pumpAndSettle();
+
+      // `.cn-command-empty py-6 text-center text-sm` with shadcn's
+      // `CommandEmpty` copy.
+      final text = tester.widget<Text>(find.text('No results found.'));
+      expect(text.style?.fontSize, 14);
+      expect(text.textAlign, TextAlign.center);
+      expect(find.byType(ShadEmpty), findsNothing);
     });
   });
 }

@@ -399,6 +399,9 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   /// The radius popovers, select and menu surfaces use, per [style].
   BorderRadius get popoverRadius => radii.resolve(style.popoverRadius);
 
+  /// The radius command palettes use, per [style].
+  BorderRadius get commandRadius => _capped(radii.resolve(style.commandRadius));
+
   /// The radius rows inside a surface use, per [style].
   BorderRadius get itemRadius => radii.resolve(style.itemRadius);
 
@@ -2036,22 +2039,74 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadCommandTheme commandTheme() {
+    final pad = scaled(style.commandPadding);
+    // `.cn-command-input-group`: an `--input` wash inside a soft `--input`
+    // outline. The underlined styles keep only the bottom hairline (`sera`'s
+    // `border-b-input`, `lyra`'s wrapper `border-b`). No focus ring — the
+    // command palette's search field is always focused, and shadcn silences
+    // the box's ring and shadow (`shadow-none!`).
+    final searchBorderColor = _wash(
+      colorScheme.input,
+      style.commandSearchBorderOpacity,
+    );
+    final searchRadius = radii.resolve(style.commandSearchRadius);
+    final searchDecoration = ShadDecoration(
+      color: _fill(
+        _isDark ? style.commandSearchFillDark : style.commandSearchFill,
+        colorScheme,
+      ),
+      border: style.commandSearchUnderline
+          ? ShadBorder(
+              radius: searchRadius,
+              bottom: ShadBorderSide(color: colorScheme.input, width: 1),
+            )
+          : ShadBorder.all(
+              radius: searchRadius,
+              color: searchBorderColor,
+              width: 1,
+            ),
+      disableSecondaryBorder: true,
+    );
     return ShadCommandTheme(
       backgroundColor: colorScheme.popover,
+      // `.cn-command` carries the surface hairline; shadow comes from the
+      // inline demo's `shadow-md`, not from the base style block.
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: radius, color: colorScheme.border),
+        border: ShadBorder.all(
+          radius: commandRadius,
+          color: surfaceBorderColor,
+          width: 1,
+        ),
       ),
+      // `.cn-command p-1` around the search wrapper and the list; the
+      // wrapper adds its own `p-1 pb-0`, so the search box sits at 8 and the
+      // list runs to the root padding.
       padding: EdgeInsets.zero,
-      searchPadding: spacing.symmetric(horizontal: 3, vertical: 3),
-      optionsPadding: spacing.all(1),
-      groupHeadingStyle: style.overline
-          .apply(effectiveTextTheme.muted)
-          .copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-      groupHeadingPadding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-      itemPadding: spacing.symmetric(horizontal: 2, vertical: 2),
+      searchPadding: style.underlinedFields
+          ? spacing.all(1)
+          : EdgeInsets.fromLTRB(pad * 2, pad * 2, pad * 2, 0),
+      optionsPadding: EdgeInsets.fromLTRB(pad, 0, pad, pad),
+      searchDecoration: searchDecoration,
+      searchHeight: scaled(style.commandSearchHeight),
+      // The addon is `text-muted-foreground` and the icon `opacity-50`.
+      searchIconColor: _wash(colorScheme.mutedForeground, .5),
+      searchIconSize: scaled(16),
+      // Addon `pl-2`, input `pl-1.5` past it; `sera` boxes with `px-3`.
+      searchInputPadding: style.underlinedFields
+          ? spacing.symmetric(horizontal: 3)
+          : spacing.symmetric(horizontal: 2),
+      searchGap: scaled(6),
+      listMaxHeight: scaled(288),
+      groupPadding: EdgeInsets.all(scaled(style.commandGroupPadding)),
+      groupHeadingStyle: style.overline.apply(effectiveTextTheme.muted),
+      groupHeadingPadding: EdgeInsets.symmetric(
+        horizontal: scaled(style.itemPaddingX),
+        vertical: scaled(style.itemPaddingY),
+      ),
+      itemPadding: EdgeInsets.symmetric(
+        horizontal: scaled(style.itemPaddingX),
+        vertical: scaled(style.itemPaddingY),
+      ),
       itemTextStyle: style.body
           .apply(effectiveTextTheme.small)
           .copyWith(
@@ -2063,10 +2118,21 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       itemSelectedForegroundColor: colorScheme.foreground,
       itemForegroundColor: colorScheme.popoverForeground,
       itemRadius: itemRadius,
+      dialogItemRadius: radii.resolve(style.commandItemDialogRadius),
       itemGap: 8,
-      height: 300,
+      // The base glyph, `size-4` — 3.5 in the two styles whose buttons also
+      // drop to it, which is what [ShadStyleTokens.buttonIconSize] measures.
+      itemIconSize: scaled(style.buttonIconSize),
       width: 400,
+      // `.cn-command-empty py-6 text-center text-sm`, in the palette's own
+      // foreground.
       emptyPadding: spacing.symmetric(vertical: 6),
+      emptyTextStyle: style.body
+          .apply(effectiveTextTheme.small)
+          .copyWith(
+            fontWeight: FontWeight.normal,
+            color: colorScheme.popoverForeground,
+          ),
     );
   }
 

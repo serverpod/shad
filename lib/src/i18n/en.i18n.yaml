@@ -20,6 +20,9 @@ keyboardToolbar:
 empty:
   title: "No results"
 
+command:
+  noResults: "No results found."
+
 pagination:
   previous: "Previous"
   next: "Next"

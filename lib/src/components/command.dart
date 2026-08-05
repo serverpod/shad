@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/components/dialog.dart';
-import 'package:shad/src/components/empty.dart';
 import 'package:shad/src/components/input.dart';
-import 'package:shad/src/components/separator.dart';
+import 'package:shad/src/i18n/localizations_delegate.dart';
 import 'package:shad/src/raw_components/roving_focus.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/theme/themes/shadows.dart';
+import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/debug_check.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 
@@ -122,6 +123,7 @@ class ShadCommand extends StatefulWidget {
     this.width,
     this.showSearch = true,
     this.leadingSearchIcon,
+    this.itemRadius,
   });
 
   /// The grouped items.
@@ -134,7 +136,8 @@ class ShadCommand extends StatefulWidget {
 
   /// Builds the empty state shown when the filter matches nothing.
   ///
-  /// Defaults to a [ShadEmpty] with the localized "No results" title.
+  /// Defaults to a centred line with the localized "No results found." —
+  /// shadcn's `CommandEmpty`.
   final Widget Function(BuildContext context, String query)? emptyBuilder;
 
   /// Called with the chosen item, in addition to its own `onSelected`.
@@ -190,6 +193,12 @@ class ShadCommand extends StatefulWidget {
   /// The icon shown before the search field.
   final Widget? leadingSearchIcon;
 
+  /// The corner radius of an item, overriding the theme's.
+  ///
+  /// [showShadCommandDialog] passes the theme's `dialogItemRadius` here —
+  /// shadcn rounds items a step further inside a dialog than inline.
+  final BorderRadiusGeometry? itemRadius;
+
   /// The default filter: a case-insensitive substring match over the label and
   /// keywords, preserving the declared order.
   ///
@@ -221,6 +230,12 @@ class ShadCommandState extends State<ShadCommand> {
   /// The keys of the currently visible item rows, used to scroll the
   /// highlighted one into view.
   final _itemKeys = <int, GlobalKey>{};
+
+  /// Pointer hover moves the highlight but must not scroll — only keyboard
+  /// navigation should bring items into view.
+  var _scrollHighlightedIntoView = true;
+
+  int? _previousHighlightedIndex;
 
   String _query = '';
 
@@ -277,10 +292,32 @@ class ShadCommandState extends State<ShadCommand> {
 
   void _onHighlightChanged() {
     if (mounted) setState(() {});
-    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureVisible());
+
+    if (!_scrollHighlightedIntoView) {
+      _scrollHighlightedIntoView = true;
+      _previousHighlightedIndex = _rovingController.highlightedIndex;
+      return;
+    }
+
+    final index = _rovingController.highlightedIndex;
+    final movingUp =
+        index != null &&
+        _previousHighlightedIndex != null &&
+        index < _previousHighlightedIndex!;
+    _previousHighlightedIndex = index;
+
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _ensureVisible(preferStart: movingUp),
+    );
   }
 
-  void _ensureVisible() {
+  void _highlightFromPointer(int index) {
+    if (_rovingController.highlightedIndex == index) return;
+    _scrollHighlightedIntoView = false;
+    _rovingController.highlightedIndex = index;
+  }
+
+  void _ensureVisible({required bool preferStart}) {
     final index = _rovingController.highlightedIndex;
     if (index == null || !mounted) return;
     final key = _itemKeys[index];
@@ -288,8 +325,10 @@ class ShadCommandState extends State<ShadCommand> {
     if (context == null) return;
     Scrollable.ensureVisible(
       context,
-      alignment: 0.5,
       duration: const Duration(milliseconds: 100),
+      alignmentPolicy: preferStart
+          ? ScrollPositionAlignmentPolicy.keepVisibleAtStart
+          : ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
     );
   }
 
@@ -339,17 +378,25 @@ class ShadCommandState extends State<ShadCommand> {
     final effectiveHeight = widget.height ?? commandTheme.height;
     final effectiveWidth = widget.width ?? commandTheme.width;
     final effectiveOptionsPadding =
-        commandTheme.optionsPadding ?? const EdgeInsets.all(4);
+        commandTheme.optionsPadding ?? const EdgeInsets.fromLTRB(4, 0, 4, 4);
+    final effectiveGroupPadding =
+        commandTheme.groupPadding ?? const EdgeInsets.all(4);
+    final effectiveItemRadius =
+        widget.itemRadius ??
+        commandTheme.itemRadius ??
+        const BorderRadius.all(Radius.circular(4));
+    final effectiveItemIconSize = commandTheme.itemIconSize ?? 16.0;
 
     var runningIndex = 0;
-    final children = <Widget>[];
+    final groupViews = <Widget>[];
     for (final (group, items) in filteredGroups) {
+      final children = <Widget>[];
       if (group.heading != null) {
         children.add(
           Padding(
             padding:
                 commandTheme.groupHeadingPadding ??
-                const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Text(
               group.heading!,
               style: commandTheme.groupHeadingStyle ?? theme.textTheme.muted,
@@ -365,20 +412,45 @@ class ShadCommandState extends State<ShadCommand> {
             key: key,
             item: item,
             highlighted: _rovingController.highlightedIndex == index,
+            radius: effectiveItemRadius,
+            iconSize: effectiveItemIconSize,
             onTap: () => _select(item),
-            onHover: () => _rovingController.highlightedIndex = index,
+            onHover: () => _highlightFromPointer(index),
           ),
         );
       }
+      // `.cn-command-group p-1`: each group carries its own inset, so items
+      // sit a step in from the list edge.
+      groupViews.add(
+        Padding(
+          padding: effectiveGroupPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: children,
+          ),
+        ),
+      );
     }
 
-    final body = flat.isEmpty
+    // `.cn-command-empty py-6 text-center text-sm`: a single quiet line, not
+    // the ShadEmpty hero.
+    var body = flat.isEmpty
         ? (widget.emptyBuilder?.call(context, _query) ??
               Padding(
                 padding:
                     commandTheme.emptyPadding ??
                     const EdgeInsets.symmetric(vertical: 24),
-                child: const ShadEmpty(padding: EdgeInsets.zero),
+                child: Text(
+                  ShadLocalizations.of(context).command.noResults,
+                  textAlign: TextAlign.center,
+                  style:
+                      commandTheme.emptyTextStyle ??
+                      theme.textTheme.small.copyWith(
+                        fontWeight: FontWeight.normal,
+                        color: theme.colorScheme.popoverForeground,
+                      ),
+                ),
               ))
         : SingleChildScrollView(
             controller: _scrollController,
@@ -386,9 +458,97 @@ class ShadCommandState extends State<ShadCommand> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
-              children: children,
+              children: groupViews,
             ),
           );
+
+    // `.cn-command-list max-h-72`: with no fixed height the palette hugs its
+    // content and the list scrolls past this cap. An explicit height wins.
+    final effectiveListMaxHeight = commandTheme.listMaxHeight ?? 288.0;
+    if (effectiveHeight == null) {
+      body = ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: effectiveListMaxHeight),
+        child: body,
+      );
+    }
+
+    final borderRadius =
+        effectiveDecoration.border?.radius?.resolve(
+          Directionality.of(context),
+        ) ??
+        theme.commandTheme.decoration?.border?.radius?.resolve(
+          Directionality.of(context),
+        ) ??
+        theme.radius;
+
+    final ownsSurface = widget.decoration != ShadDecoration.none;
+
+    // `.cn-command-input-group`: a soft box around the search field — an
+    // `--input` wash and outline, no focus ring — rather than the old
+    // full-width underlined row.
+    final effectiveSearchHeight = commandTheme.searchHeight ?? 32.0;
+    final effectiveSearchDecoration =
+        commandTheme.searchDecoration ??
+        ShadDecoration(
+          color: theme.colorScheme.input.withValues(alpha: .3),
+          border: ShadBorder.all(
+            radius: const BorderRadius.all(Radius.circular(10)),
+            color: theme.colorScheme.input.withValues(alpha: .3),
+            width: 1,
+          ),
+          disableSecondaryBorder: true,
+        );
+
+    final content = SizedBox(
+      height: effectiveHeight,
+      width: effectiveWidth,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.showSearch)
+            Padding(
+              padding:
+                  commandTheme.searchPadding ??
+                  const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              child: ShadInput(
+                controller: searchController,
+                focusNode: _searchFocusNode,
+                autofocus: widget.autofocus,
+                placeholder: widget.placeholder,
+                decoration: effectiveSearchDecoration,
+                constraints: BoxConstraints(minHeight: effectiveSearchHeight),
+                padding:
+                    commandTheme.searchInputPadding ??
+                    const EdgeInsets.symmetric(horizontal: 8),
+                gap: commandTheme.searchGap ?? 6,
+                leading:
+                    widget.leadingSearchIcon ??
+                    Icon(
+                      LucideIcons.search,
+                      size: commandTheme.searchIconSize ?? 16,
+                      color:
+                          commandTheme.searchIconColor ??
+                          theme.colorScheme.mutedForeground,
+                    ),
+              ),
+            ),
+          Flexible(child: body),
+        ],
+      ),
+    );
+
+    final child = ownsSurface
+        ? ShadDecorator(
+            decoration: effectiveDecoration.copyWith(
+              color: effectiveBackgroundColor,
+            ),
+            child: ClipRRect(
+              borderRadius: borderRadius,
+              child: content,
+            ),
+          )
+        : content;
 
     return ShadRovingFocus(
       controller: _rovingController,
@@ -397,45 +557,7 @@ class ShadCommandState extends State<ShadCommand> {
       onEscape: widget.onEscape,
       // The search field holds focus, so this Focus node must not steal it —
       // it only needs to see key events on their way up.
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: effectiveBackgroundColor,
-          borderRadius: effectiveDecoration.border?.radius,
-        ),
-        child: SizedBox(
-          height: effectiveHeight,
-          width: effectiveWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (widget.showSearch) ...[
-                Padding(
-                  padding:
-                      commandTheme.searchPadding ??
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  child: ShadInput(
-                    controller: searchController,
-                    focusNode: _searchFocusNode,
-                    autofocus: widget.autofocus,
-                    placeholder: widget.placeholder,
-                    decoration: ShadDecoration.none,
-                    leading:
-                        widget.leadingSearchIcon ??
-                        Icon(
-                          LucideIcons.search,
-                          size: 16,
-                          color: theme.colorScheme.mutedForeground,
-                        ),
-                  ),
-                ),
-                const ShadSeparator.horizontal(margin: EdgeInsets.zero),
-              ],
-              Flexible(child: body),
-            ],
-          ),
-        ),
-      ),
+      child: child,
     );
   }
 }
@@ -445,12 +567,16 @@ class _ShadCommandItemView extends StatelessWidget {
     super.key,
     required this.item,
     required this.highlighted,
+    required this.radius,
+    required this.iconSize,
     required this.onTap,
     required this.onHover,
   });
 
   final ShadCommandItem item;
   final bool highlighted;
+  final BorderRadiusGeometry radius;
+  final double iconSize;
   final VoidCallback onTap;
   final VoidCallback onHover;
 
@@ -491,12 +617,10 @@ class _ShadCommandItemView extends StatelessWidget {
                   ? commandTheme.itemSelectedBackgroundColor ??
                         theme.colorScheme.accent
                   : null,
-              borderRadius:
-                  commandTheme.itemRadius ??
-                  const BorderRadius.all(Radius.circular(4)),
+              borderRadius: radius,
             ),
             child: IconTheme(
-              data: IconThemeData(size: 16, color: foreground),
+              data: IconThemeData(size: iconSize, color: foreground),
               child: DefaultTextStyle(
                 style: (commandTheme.itemTextStyle ?? theme.textTheme.small)
                     .copyWith(color: foreground),
@@ -539,20 +663,46 @@ Future<T?> showShadCommandDialog<T>({
     context: context,
     barrierDismissible: barrierDismissible,
     builder: (context) {
-      return ShadDialog(
-        padding: EdgeInsets.zero,
-        closeIcon: const SizedBox.shrink(),
-        child: ShadCommand(
-          groups: groups,
-          placeholder: placeholder,
-          filter: filter,
-          emptyBuilder: emptyBuilder,
-          width: width,
-          height: height,
-          onEscape: () => Navigator.of(context).maybePop(),
-          onItemSelected: (item) {
-            Navigator.of(context).pop(item.value as T?);
-          },
+      final theme = ShadTheme.of(context);
+      final commandTheme = theme.commandTheme;
+      // `.cn-command-dialog top-1/3 translate-y-0`: the top edge sits at a
+      // third of the screen and stays put while filtering changes the
+      // height — the palette grows downward, it never recentres.
+      final topOffset = MediaQuery.sizeOf(context).height / 3;
+      // The dialog takes the palette's own radius
+      // (`.cn-command-dialog rounded-xl!`), its theme's hairline, and no
+      // shadow — `.cn-dialog-content` casts none.
+      final radius = commandTheme.decoration?.border?.radius?.resolve(
+        Directionality.of(context),
+      );
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, topOffset, 16, 16),
+        child: ShadDialog(
+          alignment: Alignment.topCenter,
+          // `sm:max-w-md`, with the padding above keeping the
+          // `calc(100%-2rem)` margins on narrow screens.
+          constraints: const BoxConstraints(maxWidth: 448),
+          removeBorderRadiusWhenTiny: false,
+          radius: radius,
+          padding: EdgeInsets.zero,
+          scrollable: false,
+          shadows: Shadows.none,
+          closeIcon: const SizedBox.shrink(),
+          child: ShadCommand(
+            groups: groups,
+            placeholder: placeholder,
+            filter: filter,
+            emptyBuilder: emptyBuilder,
+            width: width ?? double.infinity,
+            height: height,
+            decoration: ShadDecoration.none,
+            backgroundColor: const Color(0x00000000),
+            itemRadius: commandTheme.dialogItemRadius,
+            onEscape: () => Navigator.of(context).maybePop(),
+            onItemSelected: (item) {
+              Navigator.of(context).pop(item.value as T?);
+            },
+          ),
         ),
       );
     },
