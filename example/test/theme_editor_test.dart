@@ -1,4 +1,5 @@
 import 'package:example/common/app_shell.dart';
+import 'package:example/common/theme_editor/customizer_panel.dart';
 import 'package:example/common/theme_editor/editor_config.dart';
 import 'package:example/common/theme_editor/fonts.dart';
 import 'package:example/common/theme_editor/preview_panel.dart';
@@ -172,7 +173,9 @@ void main() {
 
       await tester.pumpWidget(const App());
       await tester.pump();
-      await tester.tap(find.byIcon(LucideIcons.paintbrush).first);
+      if (find.byType(ThemeCustomizerPanel).evaluate().isEmpty) {
+        await tester.tap(find.byIcon(LucideIcons.paintbrush).first);
+      }
       // The theme animates across 200ms; the preview animates forever, so
       // pump fixed frames rather than settling.
       for (var i = 0; i < 12; i++) {

@@ -17,13 +17,11 @@ class ThemeCustomizerPanel extends StatelessWidget {
     super.key,
     required this.config,
     required this.onChanged,
-    required this.onClose,
     this.showLeadingBorder = true,
   });
 
   final ThemeEditorConfig config;
   final ValueChanged<ThemeEditorConfig> onChanged;
-  final VoidCallback onClose;
 
   /// Drawn when the panel sits beside the app; dropped when it fills a narrow
   /// viewport and there is nothing to separate it from.
@@ -65,39 +63,8 @@ class ThemeCustomizerPanel extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _Header(onClose: onClose),
-          const ShadSeparator.horizontal(margin: EdgeInsets.zero),
           Expanded(child: _Settings(config: config, onChanged: onChanged)),
           _Actions(config: config, onChanged: onChanged),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({required this.onClose});
-
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-      child: Row(
-        children: [
-          Icon(
-            LucideIcons.palette,
-            size: 16,
-            color: theme.colorScheme.mutedForeground,
-          ),
-          const Spacer(),
-          ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.x, semanticLabel: 'Close the editor'),
-            onPressed: onClose,
-          ),
         ],
       ),
     );

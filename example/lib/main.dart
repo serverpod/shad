@@ -134,7 +134,8 @@ final directionalityProvider = Provider((context) => Signal(TextDirection.ltr));
 /// The theme the whole app is built from, edited by the customizer panel.
 final themeConfigProvider = Provider((_) => Signal(const ThemeEditorConfig()));
 
-/// Whether that panel is docked beside the app.
+/// Whether that panel is docked beside the app. [AppShell] opens it by
+/// default on viewports wide enough to dock it.
 final themeEditorOpenProvider = Provider((_) => Signal(false));
 
 /// Named styles the app adds on top of whatever the editor produces — an

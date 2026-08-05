@@ -50,8 +50,8 @@ void main() {
     // The playground is the section shown at launch...
     expect(find.byType(ThemePreviewPanel), findsOneWidget);
     expect(find.text('Contribution History'), findsOneWidget);
-    // ...and the editor is closed until it is asked for.
-    expect(find.byType(ThemeCustomizerPanel), findsNothing);
+    // ...and on a wide viewport the editor is open by default.
+    expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
   });
 
   testWidgets('the Components link opens the docs browser', (tester) async {
@@ -107,7 +107,6 @@ void main() {
       tester,
     ) async {
       await pumpShell(tester);
-      await toggle(tester);
 
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       // Docked, not covering: the page is still there beside it.
@@ -119,12 +118,22 @@ void main() {
 
       await toggle(tester);
       expect(find.byType(ThemeCustomizerPanel), findsNothing);
+
+      await toggle(tester);
+      expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
+    });
+
+    testWidgets('stays closed on a narrow viewport until it is opened', (
+      tester,
+    ) async {
+      await pumpShell(tester, size: const Size(600, 1000));
+
+      expect(find.byType(ThemeCustomizerPanel), findsNothing);
     });
 
     testWidgets('stays available on the components section', (tester) async {
       await pumpShell(tester);
       await openComponents(tester);
-      await toggle(tester);
 
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       expect(find.byType(ShadSidebar), findsOneWidget);
@@ -141,8 +150,6 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
-      await toggle(tester);
-
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       expect(
         find.text('Displays a badge or a component that looks like a badge.'),
@@ -152,6 +159,8 @@ void main() {
 
     testWidgets('fills a narrow viewport', (tester) async {
       await pumpShell(tester, size: const Size(600, 1000));
+
+      expect(find.byType(ThemeCustomizerPanel), findsNothing);
       await toggle(tester);
 
       final panel = find.byType(ThemeCustomizerPanel);

@@ -26,6 +26,17 @@ class _AppShellState extends State<AppShell> {
   /// takes the viewport instead.
   static const _narrow = 700.0;
 
+  bool _initializedEditorOpen = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initializedEditorOpen) return;
+    _initializedEditorOpen = true;
+    themeEditorOpenProvider.of(context).value =
+        MediaQuery.sizeOf(context).width >= _narrow;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SignalBuilder(
@@ -42,7 +53,6 @@ class _AppShellState extends State<AppShell> {
             ThemeCustomizerPanel(
               config: config,
               onChanged: (next) => configSignal.value = next,
-              onClose: () => openSignal.value = false,
               showLeadingBorder: showLeadingBorder,
             );
 
