@@ -1184,62 +1184,87 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     );
   }
 
+  /// The alert box shared by both variants: `bg-card` on a plain `border` —
+  /// the destructive variant recolours its *text*, not its outline — at the
+  /// alert's own radius (`rounded-lg`, a step below the card's in most
+  /// styles). `sera` runs a 2px accent bar down the left edge
+  /// (`after:-left-px after:w-0.5`), drawn here as a thicker left side in
+  /// [accent]; non-uniform side colours are safe because [ShadBoxBorder]
+  /// paints them.
+  ShadDecoration _alertDecoration({required Color accent}) {
+    final radius = radii.resolve(style.alertRadius);
+    final padding = EdgeInsets.symmetric(
+      horizontal: scaled(style.alertPaddingX),
+      vertical: scaled(style.alertPaddingY),
+    );
+    final side = ShadBorderSide(color: colorScheme.border, width: 1);
+    return ShadDecoration(
+      color: colorScheme.card,
+      border: style.alertAccentBar
+          ? ShadBorder(
+              radius: radius,
+              padding: padding,
+              top: side,
+              right: side,
+              bottom: side,
+              left: ShadBorderSide(color: accent, width: scaled(2)),
+            )
+          : ShadBorder.all(
+              color: colorScheme.border,
+              radius: radius,
+              padding: padding,
+              width: 1,
+            ),
+    );
+  }
+
+  /// The icon's inset: the column gap to the text (`has-[>svg]:gap-x-2.5`)
+  /// plus the downward nudge (`*:[svg]:translate-y-0.5`) that lines the
+  /// glyph up with the title's cap height.
+  EdgeInsetsGeometry get _alertIconPadding => EdgeInsetsDirectional.only(
+    end: scaled(style.alertIconGap),
+    top: scaled(style.alertIconOffset),
+  );
+
   @override
   ShadAlertTheme primaryAlertTheme() {
     return ShadAlertTheme(
-      iconPadding: spacing.directional(end: 3),
-      decoration: ShadDecoration(
-        border: ShadBorder.all(
-          color: colorScheme.border,
-          radius: cardRadius,
-          padding: EdgeInsets.symmetric(
-            horizontal: scaled(style.alertPaddingX),
-            vertical: scaled(style.alertPaddingY),
-          ),
-          width: 1,
-        ),
-      ),
-      iconColor: colorScheme.foreground,
+      iconPadding: _alertIconPadding,
+      decoration: _alertDecoration(accent: colorScheme.foreground),
+      iconColor: colorScheme.cardForeground,
+      iconSize: scaled(style.alertIconSize),
+      gap: scaled(style.alertGap),
       titleStyle: style.body
           .apply(effectiveTextTheme.p)
           .copyWith(
-            color: colorScheme.foreground,
+            color: colorScheme.cardForeground,
             fontWeight: style.label.fontWeight,
-            height: 1,
           ),
       descriptionStyle: style.body
           .apply(effectiveTextTheme.muted)
-          .copyWith(color: colorScheme.foreground),
+          .copyWith(color: colorScheme.mutedForeground),
     );
   }
 
   @override
   ShadAlertTheme destructiveAlertTheme() {
     return ShadAlertTheme(
-      iconPadding: spacing.directional(end: 3),
-      decoration: ShadDecoration(
-        border: ShadBorder.all(
-          color: colorScheme.destructive,
-          radius: cardRadius,
-          padding: EdgeInsets.symmetric(
-            horizontal: scaled(style.alertPaddingX),
-            vertical: scaled(style.alertPaddingY),
-          ),
-          width: 1,
-        ),
-      ),
+      iconPadding: _alertIconPadding,
+      decoration: _alertDecoration(accent: colorScheme.destructive),
       iconColor: colorScheme.destructive,
+      iconSize: scaled(style.alertIconSize),
+      gap: scaled(style.alertGap),
       titleStyle: style.body
           .apply(effectiveTextTheme.p)
           .copyWith(
             color: colorScheme.destructive,
             fontWeight: style.label.fontWeight,
-            height: 1,
           ),
+      // `*:data-[slot=alert-description]:text-destructive/90`.
       descriptionStyle: style.body
           .apply(effectiveTextTheme.muted)
           .copyWith(
-            color: colorScheme.destructive,
+            color: colorScheme.destructive.withValues(alpha: 0.9),
           ),
     );
   }

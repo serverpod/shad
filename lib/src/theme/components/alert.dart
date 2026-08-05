@@ -17,6 +17,7 @@ class ShadAlertTheme with _$ShadAlertTheme {
     this.descriptionStyle,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
+    this.gap,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -48,6 +49,9 @@ class ShadAlertTheme with _$ShadAlertTheme {
 
   /// {@macro ShadAlert.iconSize}
   final double? iconSize;
+
+  /// {@macro ShadAlert.gap}
+  final double? gap;
 
   static ShadAlertTheme? lerp(
     ShadAlertTheme? a,

@@ -7,8 +7,8 @@ class AlertDestructiveExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: ShadAlert.destructive(
+      constraints: const BoxConstraints(maxWidth: 576),
+      child: const ShadAlert.destructive(
         icon: Icon(LucideIcons.circleAlert),
         title: Text('Error'),
         description: Text('Your session has expired. Please log in again.'),

@@ -161,11 +161,11 @@ class _TopNav extends StatelessWidget {
                 onTap: () => onSelect(AppSection.components),
               ),
               const Spacer(),
-              const _ThemeEditorButton(),
-              const SizedBox(width: 4),
               const _ThemeModeButton(),
               const SizedBox(width: 4),
               const _DirectionButton(),
+              const SizedBox(width: 4),
+              const _ThemeEditorButton(),
             ],
           );
         },
@@ -226,7 +226,7 @@ class _ThemeEditorButton extends StatelessWidget {
       builder: (context, _) {
         final open = themeEditorOpenProvider.of(context);
         final icon = Icon(
-          LucideIcons.palette,
+          LucideIcons.paintbrush,
           semanticLabel: open.value
               ? 'Hide the theme editor'
               : 'Show the theme editor',

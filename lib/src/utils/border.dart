@@ -27,11 +27,84 @@ extension ShadBorderSideToBorderSide on ShadBorderSide {
 
 extension ShadBorderToBorder on ShadBorder {
   Border toBorder() {
-    return Border(
+    return ShadBoxBorder(
       top: top?.toBorderSide() ?? BorderSide.none,
       right: right?.toBorderSide() ?? BorderSide.none,
       bottom: bottom?.toBorderSide() ?? BorderSide.none,
       left: left?.toBorderSide() ?? BorderSide.none,
+    );
+  }
+}
+
+/// A [Border] that tolerates differently coloured sides inside a radius.
+///
+/// [Border.paint] throws when given a border radius while the visible sides
+/// show more than one colour. Theme animation makes that state routine:
+/// lerping a boxed field towards an underlined or borderless style fades
+/// three sides out while the bottom crosses to another colour, so mid-flight
+/// the sides legitimately disagree. This subclass paints that case as mitred
+/// straight sides clipped to the rounded outline — at field hairline widths
+/// the corners are indistinguishable from the real thing, and the state only
+/// lasts for the frames of the transition.
+class ShadBoxBorder extends Border {
+  const ShadBoxBorder({super.top, super.right, super.bottom, super.left});
+
+  /// Mirrors the cases [Border.paint] can draw inside a radius itself: a
+  /// fully uniform border, a uniformly invisible one, or sides that show a
+  /// single colour with no hairlines. Everything else asserts there.
+  bool get _radiusSafeForSuper {
+    if (isUniform) return true;
+    final topStyle = top.style;
+    final stylesUniform =
+        left.style == topStyle &&
+        bottom.style == topStyle &&
+        right.style == topStyle;
+    if (stylesUniform && topStyle == BorderStyle.none) return true;
+    final visibleColors = <Color>{
+      for (final side in [top, right, bottom, left])
+        if (side.style != BorderStyle.none) side.color,
+    };
+    final hasHairline = [
+      top,
+      right,
+      bottom,
+      left,
+    ].any((side) => side.style == BorderStyle.solid && side.width == 0);
+    return visibleColors.length == 1 && !hasHairline;
+  }
+
+  @override
+  void paint(
+    Canvas canvas,
+    Rect rect, {
+    TextDirection? textDirection,
+    BoxShape shape = BoxShape.rectangle,
+    BorderRadius? borderRadius,
+  }) {
+    if (shape == BoxShape.rectangle &&
+        borderRadius != null &&
+        borderRadius != BorderRadius.zero &&
+        !_radiusSafeForSuper) {
+      canvas
+        ..save()
+        ..clipPath(Path()..addRRect(borderRadius.toRRect(rect)));
+      paintBorder(
+        canvas,
+        rect,
+        top: top,
+        right: right,
+        bottom: bottom,
+        left: left,
+      );
+      canvas.restore();
+      return;
+    }
+    super.paint(
+      canvas,
+      rect,
+      textDirection: textDirection,
+      shape: shape,
+      borderRadius: borderRadius,
     );
   }
 }

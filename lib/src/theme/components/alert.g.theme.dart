@@ -38,6 +38,7 @@ mixin _$ShadAlertTheme {
       mainAxisAlignment: t < 0.5 ? a.mainAxisAlignment : b.mainAxisAlignment,
       crossAxisAlignment: t < 0.5 ? a.crossAxisAlignment : b.crossAxisAlignment,
       iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
+      gap: lerpDouble$(a.gap, b.gap, t),
     );
   }
 
@@ -50,6 +51,7 @@ mixin _$ShadAlertTheme {
     MainAxisAlignment? mainAxisAlignment,
     CrossAxisAlignment? crossAxisAlignment,
     double? iconSize,
+    double? gap,
   }) {
     final _this = (this as ShadAlertTheme);
 
@@ -62,6 +64,7 @@ mixin _$ShadAlertTheme {
       mainAxisAlignment: mainAxisAlignment ?? _this.mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment ?? _this.crossAxisAlignment,
       iconSize: iconSize ?? _this.iconSize,
+      gap: gap ?? _this.gap,
     );
   }
 
@@ -87,6 +90,7 @@ mixin _$ShadAlertTheme {
       mainAxisAlignment: other.mainAxisAlignment,
       crossAxisAlignment: other.crossAxisAlignment,
       iconSize: other.iconSize,
+      gap: other.gap,
     );
   }
 
@@ -110,7 +114,8 @@ mixin _$ShadAlertTheme {
         _other.descriptionStyle == _this.descriptionStyle &&
         _other.mainAxisAlignment == _this.mainAxisAlignment &&
         _other.crossAxisAlignment == _this.crossAxisAlignment &&
-        _other.iconSize == _this.iconSize;
+        _other.iconSize == _this.iconSize &&
+        _other.gap == _this.gap;
   }
 
   @override
@@ -127,6 +132,7 @@ mixin _$ShadAlertTheme {
       _this.mainAxisAlignment,
       _this.crossAxisAlignment,
       _this.iconSize,
+      _this.gap,
     );
   }
 }

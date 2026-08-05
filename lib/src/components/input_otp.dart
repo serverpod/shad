@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/components/disabled.dart';
@@ -90,6 +92,28 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   final registeredOTPs =
       <({FocusNode focusNode, TextEditingController controller})>[];
 
+  /// The focus ring of the currently focused slot, painted by the strip.
+  ///
+  /// shadcn lifts the active slot with `z-10` so its ring overlaps the
+  /// neighbouring slots; Flutter paints siblings in order, so a slot that
+  /// painted its own outward ring would get the next sibling's hairlines
+  /// drawn across it. The focused slot therefore publishes its ring here and
+  /// [_ShadInputOTPRingOverlay] paints it after every slot.
+  final _focusedRing = ValueNotifier<_ShadInputOTPRingSpec?>(null);
+
+  // ignore: use_setters_to_change_properties, reads as _hideRing's pair
+  void _showRing(_ShadInputOTPRingSpec? spec) {
+    _focusedRing.value = spec;
+  }
+
+  void _hideRing(BuildContext slotContext) {
+    // Only the owner may clear: when focus moves between slots the loser's
+    // notification can arrive after the winner's.
+    if (identical(_focusedRing.value?.slotContext, slotContext)) {
+      _focusedRing.value = null;
+    }
+  }
+
   late Listenable listenable;
 
   late final values = List<String>.filled(widget.maxLength, '');
@@ -111,6 +135,9 @@ class ShadInputOTPState extends State<ShadInputOTP> {
 
   @override
   void dispose() {
+    // Slots are unmounted before the strip's own dispose runs, so the
+    // notifier is no longer listened to nor written at this point.
+    _focusedRing.dispose();
     result.dispose();
     super.dispose();
   }
@@ -215,10 +242,15 @@ class ShadInputOTPState extends State<ShadInputOTP> {
       data: this,
       child: ShadDisabled(
         disabled: !widget.enabled,
-        child: Row(
-          textDirection: TextDirection.ltr,
-          mainAxisSize: MainAxisSize.min,
-          children: widget.children.separatedBy(SizedBox(width: effectiveGap)),
+        child: _ShadInputOTPRingOverlay(
+          ring: _focusedRing,
+          child: Row(
+            textDirection: TextDirection.ltr,
+            mainAxisSize: MainAxisSize.min,
+            children: widget.children.separatedBy(
+              SizedBox(width: effectiveGap),
+            ),
+          ),
         ),
       ),
       notifyUpdate: (_) => true,
@@ -320,7 +352,7 @@ class ShadInputOTPSlot extends StatefulWidget {
   final double? height;
 
   /// {@template ShadInputOTPSlot.padding}
-  /// The padding of the slot, defaults to `null`.
+  /// The padding of the slot, defaults to [EdgeInsets.zero].
   /// {@endtemplate}
   final EdgeInsetsGeometry? padding;
 
@@ -421,10 +453,25 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
       focusNode: focusNode,
       controller: controller,
     );
+    focusNode.addListener(_syncRing);
+  }
+
+  /// The ring the strip should paint over the neighbours while this slot is
+  /// focused; computed in [build], null when the decorator paints it itself.
+  _ShadInputOTPRingSpec? _ringSpec;
+
+  void _syncRing() {
+    if (focusNode.hasFocus) {
+      otpProvider._showRing(_ringSpec);
+    } else {
+      otpProvider._hideRing(context);
+    }
   }
 
   @override
   void dispose() {
+    focusNode.removeListener(_syncRing);
+    otpProvider._hideRing(context);
     _focusNode?.dispose();
     _controller?.dispose();
     super.dispose();
@@ -497,7 +544,11 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
     final effectiveKeyboardType =
         widget.keyboardType ?? otpProvider.widget.keyboardType;
 
-    final effectivePadding = widget.padding ?? theme.inputOTPTheme.padding;
+    // Zero by default, *not* ShadInput's field padding: 12px on each side of
+    // a 36px slot leaves less than a glyph's width for the text, which
+    // clipped it and dragged it off-centre.
+    final effectivePadding =
+        widget.padding ?? theme.inputOTPTheme.padding ?? EdgeInsets.zero;
 
     // A slot is a fixed box around a single glyph, so it has to grow with the
     // text scale or the digit is clipped.
@@ -538,12 +589,7 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
         ),
         focusedBorder: ShadBorder(radius: effectiveRadius),
         // Outside the slot, flush against it, like every other field
-        // (`data-[active=true]:ring-3`). shadcn lifts the active slot with
-        // `z-10` so its ring overlaps the neighbours; Flutter paints siblings
-        // in order, so the later slot draws over the ring's edge — but a
-        // slot's fill is transparent (a faint `input/30` wash in dark), so
-        // only its hairlines cross the ring, which is close enough to the
-        // reference to be indistinguishable at 50% ring opacity.
+        // (`data-[active=true]:ring-3`).
         //
         // The ring is painted on a rect inflated by the ring width, so each
         // *rounded* corner grows by the same amount to stay concentric with
@@ -559,73 +605,236 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
       ),
     );
 
+    // Resolve the ring the decorator would paint for the focused slot —
+    // the same merge chain ShadInput and ShadDecorator apply.
+    final textDirection = Directionality.of(context);
+    final resolvedDecoration = theme.decoration.merge(
+      (theme.inputTheme.decoration ?? const ShadDecoration()).merge(
+        effectiveDecoration,
+      ),
+    );
+    final disableSecondaryBorder =
+        resolvedDecoration.disableSecondaryBorder ??
+        theme.disableSecondaryBorder;
+    final hasError = resolvedDecoration.hasError ?? false;
+    var ringBorder = resolvedDecoration.secondaryFocusedBorder;
+    if ((resolvedDecoration.fallbackToBorder ?? true) && ringBorder == null) {
+      ringBorder = resolvedDecoration.secondaryBorder;
+    }
+
+    // shadcn lifts the active slot with `z-10` so its ring overlaps the
+    // neighbours; Flutter paints siblings in order, so a ring painted by the
+    // slot's own decorator gets the next slot's hairlines drawn across it.
+    // Instead the ring is published to the strip, which paints it above every
+    // slot. The decorator keeps painting it itself in the cases the strip
+    // does not reproduce: error rings, and a secondary border that carries
+    // layout (a `padding`).
+    final liftRing =
+        !disableSecondaryBorder &&
+        !hasError &&
+        ringBorder != null &&
+        ringBorder.hasBorder &&
+        ringBorder.padding == null;
+
+    _ringSpec = liftRing
+        ? _ShadInputOTPRingSpec(
+            slotContext: context,
+            border: ringBorder.toBorder(),
+            radius:
+                ringBorder.radius?.resolve(textDirection) ?? BorderRadius.zero,
+            offset: ringBorder.offset ?? 0,
+            textDirection: textDirection,
+          )
+        : null;
+    // Keep a published ring in step with theme changes while focused; the
+    // notifier ignores value-equal updates.
+    if (focusNode.hasFocus) {
+      otpProvider._showRing(_ringSpec);
+    }
+
+    final inputDecoration = liftRing
+        ? effectiveDecoration.merge(
+            const ShadDecoration(disableSecondaryBorder: true),
+          )
+        : effectiveDecoration;
+
     return SizedBox(
       width: effectiveWidth,
       height: effectiveHeight,
-      child: Align(
-        child: ShadInput(
-          focusNode: focusNode,
-          controller: controller,
-          decoration: effectiveDecoration,
-          textAlign: TextAlign.center,
-          textInputAction: widget.textInputAction,
-          onChanged: (v) {
-            // sanitize the text and format it
-            var sanitizedV = v.replaceAll(kInvisibleCharCode, '');
-            final result = TextEditingValue(text: sanitizedV);
-            final formattedValue = effectiveInputFormatters
-                .fold<TextEditingValue>(
-                  result,
-                  (TextEditingValue newValue, TextInputFormatter formatter) =>
-                      formatter.formatEditUpdate(result, newValue),
-                );
-
-            final hasBeenFormatted = formattedValue.text != sanitizedV;
-            sanitizedV = formattedValue.text;
-
-            // if the value is more than 1 and the slot is not the first
-            // get the last character from the value
-            if (index != 0 && sanitizedV.length > 1) {
-              sanitizedV = sanitizedV[sanitizedV.length - 1];
-            }
-            // if the max length is entered, set the values
-            // to all the slots
-            // this condition happens only for the first slot
-            if (sanitizedV.length > 1) {
-              otpProvider
-                ..setValues(sanitizedV)
-                ..jumpToSlot(sanitizedV.length - 1);
-            } else {
-              if (sanitizedV.isEmpty) {
-                final previousText = controller.previousValue?.text ?? '';
-                controller.text = kInvisibleCharCode;
-                // Jump to the previous slot only if the formatter was not
-                // applied
-                if (!hasBeenFormatted) {
-                  otpProvider.jumpToPreviousSlot(
-                    clear: previousText == kInvisibleCharCode,
-                  );
-                }
-              } else {
-                final newText = sanitizedV[sanitizedV.length - 1];
-                controller.value = controller.value.copyWith(
-                  text: newText,
-                  selection: TextSelection.collapsed(offset: newText.length),
-                  composing: TextRange.empty,
-                );
-                otpProvider.jumpToNextSlot();
-              }
-            }
-          },
-          maxLength: otpProvider.widget.maxLength + 1,
-          maxLengthEnforcement:
-              MaxLengthEnforcement.truncateAfterCompositionEnds,
-          padding: effectivePadding,
-          style: defaultStyle,
-          keyboardType: effectiveKeyboardType,
-          keyboardToolbarBuilder: widget.keyboardToolbarBuilder,
+      child: ShadInput(
+        focusNode: focusNode,
+        controller: controller,
+        decoration: inputDecoration,
+        textAlign: TextAlign.center,
+        // RenderEditable reserves `cursorWidth + 1` at the right edge of the
+        // line for the caret (regardless of text direction), so centred text
+        // sits half of that left of centre — visible in a slot this narrow.
+        // Reserving the same amount on the left recentres the glyph on the
+        // slot's midline.
+        inputPadding: EdgeInsets.only(
+          left: (theme.inputTheme.cursorWidth ?? 2.0) + 1,
         ),
+        textInputAction: widget.textInputAction,
+        onChanged: (v) {
+          // sanitize the text and format it
+          var sanitizedV = v.replaceAll(kInvisibleCharCode, '');
+          final result = TextEditingValue(text: sanitizedV);
+          final formattedValue = effectiveInputFormatters
+              .fold<TextEditingValue>(
+                result,
+                (TextEditingValue newValue, TextInputFormatter formatter) =>
+                    formatter.formatEditUpdate(result, newValue),
+              );
+
+          final hasBeenFormatted = formattedValue.text != sanitizedV;
+          sanitizedV = formattedValue.text;
+
+          // if the value is more than 1 and the slot is not the first
+          // get the last character from the value
+          if (index != 0 && sanitizedV.length > 1) {
+            sanitizedV = sanitizedV[sanitizedV.length - 1];
+          }
+          // if the max length is entered, set the values
+          // to all the slots
+          // this condition happens only for the first slot
+          if (sanitizedV.length > 1) {
+            otpProvider
+              ..setValues(sanitizedV)
+              ..jumpToSlot(sanitizedV.length - 1);
+          } else {
+            if (sanitizedV.isEmpty) {
+              final previousText = controller.previousValue?.text ?? '';
+              controller.text = kInvisibleCharCode;
+              // Jump to the previous slot only if the formatter was not
+              // applied
+              if (!hasBeenFormatted) {
+                otpProvider.jumpToPreviousSlot(
+                  clear: previousText == kInvisibleCharCode,
+                );
+              }
+            } else {
+              final newText = sanitizedV[sanitizedV.length - 1];
+              controller.value = controller.value.copyWith(
+                text: newText,
+                selection: TextSelection.collapsed(offset: newText.length),
+                composing: TextRange.empty,
+              );
+              otpProvider.jumpToNextSlot();
+            }
+          }
+        },
+        maxLength: otpProvider.widget.maxLength + 1,
+        maxLengthEnforcement: MaxLengthEnforcement.truncateAfterCompositionEnds,
+        padding: effectivePadding,
+        style: defaultStyle,
+        keyboardType: effectiveKeyboardType,
+        keyboardToolbarBuilder: widget.keyboardToolbarBuilder,
       ),
+    );
+  }
+}
+
+/// What the strip needs to paint a focused slot's ring: where (the slot's
+/// element, resolved to a [RenderBox] at paint time, so the ring follows the
+/// slot through relayouts) and how (the resolved outward border).
+@immutable
+class _ShadInputOTPRingSpec {
+  const _ShadInputOTPRingSpec({
+    required this.slotContext,
+    required this.border,
+    required this.radius,
+    required this.offset,
+    required this.textDirection,
+  });
+
+  final BuildContext slotContext;
+  final Border border;
+  final BorderRadius radius;
+  final double offset;
+  final TextDirection textDirection;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is _ShadInputOTPRingSpec &&
+        identical(other.slotContext, slotContext) &&
+        other.border == border &&
+        other.radius == radius &&
+        other.offset == offset &&
+        other.textDirection == textDirection;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(slotContext, border, radius, offset, textDirection);
+}
+
+/// Paints the focused slot's ring after (and therefore above) every slot.
+///
+/// This is the strip's stand-in for shadcn's `z-10` on the active slot: the
+/// ring overlaps the neighbouring slots, and painting it from the slot itself
+/// would let the next sibling draw its hairlines across it.
+class _ShadInputOTPRingOverlay extends SingleChildRenderObjectWidget {
+  const _ShadInputOTPRingOverlay({required this.ring, super.child});
+
+  final ValueListenable<_ShadInputOTPRingSpec?> ring;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderShadInputOTPRingOverlay(ring);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderShadInputOTPRingOverlay renderObject,
+  ) {
+    renderObject.ring = ring;
+  }
+}
+
+class _RenderShadInputOTPRingOverlay extends RenderProxyBox {
+  _RenderShadInputOTPRingOverlay(this._ring);
+
+  ValueListenable<_ShadInputOTPRingSpec?> _ring;
+  ValueListenable<_ShadInputOTPRingSpec?> get ring => _ring;
+  set ring(ValueListenable<_ShadInputOTPRingSpec?> value) {
+    if (identical(value, _ring)) return;
+    if (attached) _ring.removeListener(markNeedsPaint);
+    _ring = value;
+    if (attached) _ring.addListener(markNeedsPaint);
+    markNeedsPaint();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    _ring.addListener(markNeedsPaint);
+  }
+
+  @override
+  void detach() {
+    _ring.removeListener(markNeedsPaint);
+    super.detach();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    super.paint(context, offset);
+    final spec = _ring.value;
+    if (spec == null) return;
+    final slotBox = spec.slotContext.findRenderObject();
+    if (slotBox is! RenderBox || !slotBox.attached || !slotBox.hasSize) return;
+    final origin = MatrixUtils.transformPoint(
+      slotBox.getTransformTo(this),
+      Offset.zero,
+    );
+    // Same geometry as ShadOutwardBorderPainter: the rect is inflated by the
+    // ring's offset and the border strokes inside it, flush with the slot.
+    spec.border.paint(
+      context.canvas,
+      ((origin + offset) & slotBox.size).inflate(spec.offset),
+      borderRadius: spec.radius,
+      textDirection: spec.textDirection,
     );
   }
 }

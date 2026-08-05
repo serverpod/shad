@@ -31,6 +31,7 @@ class ShadAlert extends StatelessWidget {
     this.iconSize,
     this.titleStyle,
     this.descriptionStyle,
+    this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
     this.leading,
@@ -53,6 +54,7 @@ class ShadAlert extends StatelessWidget {
     this.iconSize,
     this.titleStyle,
     this.descriptionStyle,
+    this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
     this.leading,
@@ -76,6 +78,7 @@ class ShadAlert extends StatelessWidget {
     this.iconSize,
     this.titleStyle,
     this.descriptionStyle,
+    this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
     this.leading,
@@ -155,6 +158,12 @@ class ShadAlert extends StatelessWidget {
   /// [description].
   /// {@endtemplate}
   final TextStyle? descriptionStyle;
+
+  /// {@template ShadAlert.gap}
+  /// The vertical gap between the title and the description, shadcn's
+  /// `gap-0.5`. Defaults to the theme's value.
+  /// {@endtemplate}
+  final double? gap;
 
   /// {@template ShadAlert.mainAxisAlignment}
   /// Main axis alignment for the alert's content, defaults to start if not
@@ -243,7 +252,6 @@ class ShadAlert extends StatelessWidget {
         .copyWith(
           color: theme.colorScheme.foreground,
           fontWeight: FontWeight.w500,
-          height: 1,
         )
         .merge(effectiveAlertTheme.titleStyle)
         .merge(titleStyle);
@@ -251,7 +259,9 @@ class ShadAlert extends StatelessWidget {
     final effectiveDescriptionStyle =
         descriptionStyle ??
         effectiveAlertTheme.descriptionStyle ??
-        theme.textTheme.muted.copyWith(color: theme.colorScheme.foreground);
+        theme.textTheme.muted;
+
+    final effectiveGap = gap ?? effectiveAlertTheme.gap ?? 2.0;
 
     final effectiveMainAxisAlignment =
         mainAxisAlignment ??
@@ -281,6 +291,7 @@ class ShadAlert extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
+                  spacing: effectiveGap,
                   children: [
                     if (title != null)
                       DefaultTextStyle(

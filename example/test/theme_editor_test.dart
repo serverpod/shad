@@ -172,7 +172,7 @@ void main() {
 
       await tester.pumpWidget(const App());
       await tester.pump();
-      await tester.tap(find.byIcon(LucideIcons.palette).first);
+      await tester.tap(find.byIcon(LucideIcons.paintbrush).first);
       // The theme animates across 200ms; the preview animates forever, so
       // pump fixed frames rather than settling.
       for (var i = 0; i < 12; i++) {

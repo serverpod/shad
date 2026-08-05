@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/alert.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/style.dart';
 
 void main() {
   Widget createTestWidget(Widget child) {
@@ -12,6 +14,53 @@ void main() {
       ),
     );
   }
+
+  group('alert theme resolution', () {
+    // The values `.cn-alert` prescribes: `bg-card` behind both variants, a
+    // plain `border` outline even on destructive (only the *text* turns
+    // red), a `text-muted-foreground` description that destructive tints at
+    // 90% (`text-destructive/90`), and sera's accent bar on the left edge.
+    test('both variants sit on bg-card inside a plain border', () {
+      final theme = ShadThemeData();
+      for (final alert in [
+        theme.primaryAlertTheme,
+        theme.destructiveAlertTheme,
+      ]) {
+        expect(alert.decoration?.color, theme.colorScheme.card);
+        expect(alert.decoration?.border?.top?.color, theme.colorScheme.border);
+      }
+      expect(
+        theme.primaryAlertTheme.descriptionStyle?.color,
+        theme.colorScheme.mutedForeground,
+      );
+      expect(
+        theme.destructiveAlertTheme.descriptionStyle?.color,
+        theme.colorScheme.destructive.withValues(alpha: 0.9),
+      );
+    });
+
+    test('sera draws its accent bar as a thick left side', () {
+      final theme = ShadThemeData(style: ShadStyleTokens.sera);
+      final primary = theme.primaryAlertTheme.decoration?.border;
+      final destructive = theme.destructiveAlertTheme.decoration?.border;
+      expect(primary?.left?.width, 2);
+      expect(primary?.left?.color, theme.colorScheme.foreground);
+      expect(destructive?.left?.color, theme.colorScheme.destructive);
+      // The other sides stay on the regular hairline.
+      expect(primary?.top?.width, 1);
+      expect(primary?.top?.color, theme.colorScheme.border);
+    });
+
+    test('mira compacts the icon, vega keeps size-4', () {
+      expect(ShadThemeData().primaryAlertTheme.iconSize, 16);
+      expect(
+        ShadThemeData(
+          style: ShadStyleTokens.mira,
+        ).primaryAlertTheme.iconSize,
+        14,
+      );
+    });
+  });
 
   group('ShadAlert', () {
     testWidgets('renders primary variant correctly', (

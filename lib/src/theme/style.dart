@@ -191,8 +191,14 @@ class ShadStyleTokens {
     this.tabPaddingX = 8,
     this.tabPaddingY = 4,
     this.accordionTitlePaddingY = 16,
+    this.alertRadius = ShadRadiusToken.lg,
     this.alertPaddingX = 16,
     this.alertPaddingY = 12,
+    this.alertGap = 2,
+    this.alertIconGap = 10,
+    this.alertIconSize = 16,
+    this.alertIconOffset = 2,
+    this.alertAccentBar = false,
     this.tableCellPadding = 8,
     this.kbdHeight = 20,
     this.kbdPaddingX = 4,
@@ -533,8 +539,31 @@ class ShadStyleTokens {
   /// Vertical padding of an accordion's title row.
   final double accordionTitlePaddingY;
 
+  /// Corner radius of an alert, `rounded-lg` — one step below the card's in
+  /// most styles.
+  final ShadRadiusToken alertRadius;
+
   final double alertPaddingX;
   final double alertPaddingY;
+
+  /// Vertical gap between an alert's title and description, `gap-0.5`.
+  final double alertGap;
+
+  /// Column gap between an alert's icon and its text,
+  /// `has-[>svg]:gap-x-2.5`.
+  final double alertIconGap;
+
+  /// Default size of an alert's icon,
+  /// `*:[svg:not([class*='size-'])]:size-4`.
+  final double alertIconSize;
+
+  /// The icon's downward nudge, `*:[svg]:translate-y-0.5`, lining the glyph
+  /// up with the title's cap height.
+  final double alertIconOffset;
+
+  /// Whether alerts draw `sera`'s 2px accent bar along their start edge
+  /// (`after:w-0.5 after:bg-foreground`), recoloured per variant.
+  final bool alertAccentBar;
 
   /// Padding inside a table cell, shadcn's `p-2`.
   final double tableCellPadding;
@@ -589,6 +618,7 @@ class ShadStyleTokens {
     accordionTitlePaddingY: 10,
     alertPaddingX: 10,
     alertPaddingY: 8,
+    alertIconGap: 8,
     progressHeight: 4,
   );
 
@@ -678,6 +708,9 @@ class ShadStyleTokens {
     accordionTitlePaddingY: 10,
     alertPaddingX: 10,
     alertPaddingY: 8,
+    alertRadius: ShadRadiusToken.none,
+    alertIconGap: 8,
+    alertIconOffset: 0,
     progressHeight: 4,
   );
 
@@ -742,6 +775,8 @@ class ShadStyleTokens {
     accordionTitlePaddingY: 8,
     alertPaddingX: 8,
     alertPaddingY: 6,
+    alertIconGap: 6,
+    alertIconSize: 14,
     progressHeight: 4,
   );
 
@@ -750,6 +785,7 @@ class ShadStyleTokens {
     name: 'luma',
     buttonRadius: ShadRadiusToken.xl4,
     cardRadius: ShadRadiusToken.xl4,
+    alertRadius: ShadRadiusToken.xl2,
     dialogRadius: ShadRadiusToken.xl4,
     popoverRadius: ShadRadiusToken.xl4,
     textareaRadius: ShadRadiusToken.xl2,
@@ -812,6 +848,9 @@ class ShadStyleTokens {
     name: 'sera',
     buttonRadius: ShadRadiusToken.none,
     cardRadius: ShadRadiusToken.none,
+    alertRadius: ShadRadiusToken.none,
+    alertGap: 4,
+    alertAccentBar: true,
     dialogRadius: ShadRadiusToken.none,
     popoverRadius: ShadRadiusToken.none,
     textareaRadius: ShadRadiusToken.none,
@@ -924,6 +963,7 @@ class ShadStyleTokens {
     // Card and dialog corners are the 4xl step, capped:
     // `rounded-[min(var(--radius-4xl),24px)]`.
     cardRadius: ShadRadiusToken.xl4,
+    alertRadius: ShadRadiusToken.xl2,
     dialogRadius: ShadRadiusToken.xl4,
     surfaceRadiusCap: 24,
     popoverRadius: ShadRadiusToken.xl2,
@@ -1094,8 +1134,14 @@ class ShadStyleTokens {
     double? tabPaddingX,
     double? tabPaddingY,
     double? accordionTitlePaddingY,
+    ShadRadiusToken? alertRadius,
     double? alertPaddingX,
     double? alertPaddingY,
+    double? alertGap,
+    double? alertIconGap,
+    double? alertIconSize,
+    double? alertIconOffset,
+    bool? alertAccentBar,
     double? tableCellPadding,
     double? kbdHeight,
     double? kbdPaddingX,
@@ -1211,8 +1257,14 @@ class ShadStyleTokens {
       tabPaddingY: tabPaddingY ?? this.tabPaddingY,
       accordionTitlePaddingY:
           accordionTitlePaddingY ?? this.accordionTitlePaddingY,
+      alertRadius: alertRadius ?? this.alertRadius,
       alertPaddingX: alertPaddingX ?? this.alertPaddingX,
       alertPaddingY: alertPaddingY ?? this.alertPaddingY,
+      alertGap: alertGap ?? this.alertGap,
+      alertIconGap: alertIconGap ?? this.alertIconGap,
+      alertIconSize: alertIconSize ?? this.alertIconSize,
+      alertIconOffset: alertIconOffset ?? this.alertIconOffset,
+      alertAccentBar: alertAccentBar ?? this.alertAccentBar,
       tableCellPadding: tableCellPadding ?? this.tableCellPadding,
       kbdHeight: kbdHeight ?? this.kbdHeight,
       kbdPaddingX: kbdPaddingX ?? this.kbdPaddingX,
@@ -1320,8 +1372,14 @@ class ShadStyleTokens {
     tabPaddingX,
     tabPaddingY,
     accordionTitlePaddingY,
+    alertRadius,
     alertPaddingX,
     alertPaddingY,
+    alertGap,
+    alertIconGap,
+    alertIconSize,
+    alertIconOffset,
+    alertAccentBar,
     tableCellPadding,
     kbdHeight,
     kbdPaddingX,
