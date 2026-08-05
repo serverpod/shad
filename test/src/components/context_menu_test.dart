@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -119,6 +120,47 @@ void main() {
         TargetPlatform.android,
         TargetPlatform.iOS,
       }),
+    );
+
+    testWidgets(
+      'opening a menu with a disabled item does not assert during build',
+      (tester) async {
+        final controller = ShadContextMenuController();
+        addTearDown(controller.dispose);
+        await tester.pumpWidget(
+          createTestWidget(
+            ShadContextMenuRegion(
+              controller: controller,
+              items: const [
+                ShadContextMenuItem(child: Text('Enabled')),
+                ShadContextMenuItem(
+                  enabled: false,
+                  child: Text('Disabled'),
+                ),
+              ],
+              child: const SizedBox(
+                width: 200,
+                height: 200,
+                key: Key('target'),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final exceptionBefore = tester.takeException();
+        expect(exceptionBefore, isNull);
+
+        await tester.tap(
+          find.byKey(const Key('target')),
+          buttons: kSecondaryButton,
+          warnIfMissed: false,
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.text('Disabled'), findsOneWidget);
+      },
     );
 
     group('ShadContextMenu', () {

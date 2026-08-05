@@ -812,10 +812,21 @@ class _ShadButtonState extends State<ShadButton> {
   void initState() {
     super.initState();
     if (widget.statesController == null) {
-      _statesController = ShadStatesController();
+      _statesController = ShadStatesController({
+        if (!widget.enabled) ShadState.disabled,
+      });
     }
     if (widget.focusNode == null) _focusNode = FocusNode();
-    statesController.update(ShadState.disabled, !widget.enabled);
+    // An external controller may already have listeners (e.g. a context-menu
+    // item shares one with its trailing icon). Syncing disabled state here
+    // would notify them during build, so defer to the first frame.
+    if (widget.statesController != null && !widget.enabled) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          statesController.update(ShadState.disabled, true);
+        }
+      });
+    }
     focusNode.addListener(onFocusChange);
   }
 
