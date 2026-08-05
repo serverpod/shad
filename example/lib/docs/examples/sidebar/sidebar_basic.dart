@@ -32,89 +32,87 @@ class _SidebarBasicExampleState extends State<SidebarBasicExample> {
           border: Border.all(color: theme.colorScheme.border),
           borderRadius: theme.radii.lg,
         ),
-        child: ClipRRect(
+        child: ShadSidebarScaffold(
           borderRadius: theme.radii.lg,
-          child: ShadSidebarScaffold(
-            sidebar: ShadSidebar(
-              collapsible: ShadSidebarCollapsible.icon,
-              header: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: theme.radii.md,
-                    ),
-                    child: Icon(
-                      LucideIcons.galleryVerticalEnd,
-                      size: 16,
-                      color: theme.colorScheme.primaryForeground,
-                    ),
+          sidebar: ShadSidebar(
+            collapsible: ShadSidebarCollapsible.icon,
+            header: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: theme.radii.md,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Acme Inc',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.clip,
-                      style: theme.textTheme.small,
-                    ),
+                  child: Icon(
+                    LucideIcons.galleryVerticalEnd,
+                    size: 16,
+                    color: theme.colorScheme.primaryForeground,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Acme Inc',
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.clip,
+                    style: theme.textTheme.small,
+                  ),
+                ),
+              ],
+            ),
+            footer: ShadSidebarMenuButton(
+              leading: const Icon(LucideIcons.circleUser),
+              trailing: const Icon(LucideIcons.chevronsUpDown),
+              tooltip: 'Account',
+              onPressed: () {},
+              child: const Text('shadcn'),
+            ),
+            children: [
+              ShadSidebarGroup(
+                label: const Text('Platform'),
+                children: [
+                  ShadSidebarMenu(
+                    children: [
+                      item('Home', LucideIcons.house),
+                      item('Inbox', LucideIcons.inbox),
+                      item('Calendar', LucideIcons.calendar),
+                    ],
                   ),
                 ],
               ),
-              footer: ShadSidebarMenuButton(
-                leading: const Icon(LucideIcons.circleUser),
-                trailing: const Icon(LucideIcons.chevronsUpDown),
-                tooltip: 'Account',
-                onPressed: () {},
-                child: const Text('shadcn'),
-              ),
-              children: [
-                ShadSidebarGroup(
-                  label: const Text('Platform'),
-                  children: [
-                    ShadSidebarMenu(
-                      children: [
-                        item('Home', LucideIcons.house),
-                        item('Inbox', LucideIcons.inbox),
-                        item('Calendar', LucideIcons.calendar),
-                      ],
-                    ),
-                  ],
-                ),
-                ShadSidebarGroup(
-                  label: const Text('Settings'),
-                  children: [
-                    ShadSidebarMenu(
-                      children: [
-                        item('Profile', LucideIcons.user),
-                        item('Billing', LucideIcons.creditCard),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
+              ShadSidebarGroup(
+                label: const Text('Settings'),
+                children: [
+                  ShadSidebarMenu(
                     children: [
-                      const ShadSidebarTrigger(),
-                      const SizedBox(width: 8),
-                      Text(selected, style: theme.textTheme.small),
+                      item('Profile', LucideIcons.user),
+                      item('Billing', LucideIcons.creditCard),
                     ],
                   ),
+                ],
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  children: [
+                    const ShadSidebarTrigger(),
+                    const SizedBox(width: 8),
+                    Text(selected, style: theme.textTheme.small),
+                  ],
                 ),
-                const Expanded(
-                  child: Center(child: Text('Content area')),
-                ),
-              ],
-            ),
+              ),
+              const Expanded(
+                child: Center(child: Text('Content area')),
+              ),
+            ],
           ),
         ),
       ),

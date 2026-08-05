@@ -459,5 +459,92 @@ void main() {
         matchesGoldenFile('goldens/button_link.png'),
       );
     });
+
+    group('icon sizing', () {
+      testWidgets('leading and trailing icons take the style default', (
+        tester,
+      ) async {
+        // `.cn-button` is `[&_svg:not([class*='size-'])]:size-4`. Before this
+        // the button passed the size through untouched, so icons fell back to
+        // Flutter's 24.
+        await tester.pumpWidget(
+          createTestWidget(
+            const ShadButton(
+              leading: Icon(Icons.star),
+              trailing: Icon(Icons.arrow_forward),
+              child: Text('Button'),
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byIcon(Icons.star)), const Size.square(16));
+        expect(
+          tester.getSize(find.byIcon(Icons.arrow_forward)),
+          const Size.square(16),
+        );
+      });
+
+      testWidgets('the small size shrinks them, per the style', (
+        tester,
+      ) async {
+        // nova's `.cn-button-size-sm` is `[&_svg…]:size-3.5`.
+        await tester.pumpWidget(
+          createTestWidget(
+            const ShadButton(
+              size: ShadButtonSize.sm,
+              leading: Icon(Icons.star),
+              child: Text('Button'),
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byIcon(Icons.star)), const Size.square(14));
+      });
+
+      testWidgets('an explicit size on the icon wins', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            const ShadButton(
+              leading: Icon(Icons.star, size: 22),
+              child: Text('Button'),
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byIcon(Icons.star)), const Size.square(22));
+      });
+
+      testWidgets('ShadButton.iconSize overrides the style', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            const ShadButton(
+              iconSize: 10,
+              leading: Icon(Icons.star),
+              child: Text('Button'),
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byIcon(Icons.star)), const Size.square(10));
+      });
+
+      testWidgets('size: icon is the icon button, without the wrapper', (
+        tester,
+      ) async {
+        // shadcn has no separate IconButton — `<Button size="icon">` is the
+        // whole of it, and ShadIconButton is a convenience over this.
+        await tester.pumpWidget(
+          createTestWidget(
+            const ShadButton(
+              size: ShadButtonSize.icon,
+              child: Icon(Icons.star),
+            ),
+          ),
+        );
+
+        expect(tester.getSize(find.byType(ShadButton)), const Size.square(32));
+        expect(tester.getSize(find.byIcon(Icons.star)), const Size.square(16));
+      });
+    });
   });
 }

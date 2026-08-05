@@ -1,5 +1,6 @@
 import 'package:disco/disco.dart';
 import 'package:example/common/app_shell.dart';
+import 'package:example/common/theme_editor/editor_config.dart';
 import 'package:example/docs/docs.dart';
 import 'package:example/pages/accordion.dart';
 import 'package:example/pages/alert.dart';
@@ -49,7 +50,6 @@ import 'package:example/pages/table.dart';
 import 'package:example/pages/tabs.dart';
 import 'package:example/pages/textarea.dart';
 import 'package:example/pages/textarea_form_field.dart';
-import 'package:example/pages/theme_editor.dart';
 import 'package:example/pages/time_picker.dart';
 import 'package:example/pages/time_picker_form_field.dart';
 import 'package:example/pages/toast.dart';
@@ -117,7 +117,6 @@ final routes = <String, WidgetBuilder>{
   '/switch-form-field': (_) => const SwitchFormFieldPage(),
   '/table': (_) => const TablePage(),
   '/tabs': (_) => const TabsPage(),
-  '/theme-editor': (_) => const ThemeEditorPage(),
   '/textarea': (_) => const TextareaPage(),
   '/textarea-form-field': (_) => const TextareaFormFieldPage(),
   '/time-picker': (_) => const TimePickerPage(),
@@ -132,17 +131,42 @@ final themeModeProvider = Provider((_) => Signal(ThemeMode.light));
 
 final directionalityProvider = Provider((context) => Signal(TextDirection.ltr));
 
+/// The theme the whole app is built from, edited by the customizer panel.
+final themeConfigProvider = Provider((_) => Signal(const ThemeEditorConfig()));
+
+/// Whether that panel is docked beside the app.
+final themeEditorOpenProvider = Provider((_) => Signal(false));
+
+/// Named styles the app adds on top of whatever the editor produces — an
+/// example of extending [ShadTextTheme]; see the `/typography` page for how
+/// they are read back.
+Map<String, TextStyle> appCustomTextStyles(Brightness brightness) => {
+  'myCustomStyle': TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: brightness == Brightness.light ? Colors.blue : Colors.green,
+  ),
+};
+
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      providers: [themeModeProvider, directionalityProvider],
+      providers: [
+        themeModeProvider,
+        directionalityProvider,
+        themeConfigProvider,
+        themeEditorOpenProvider,
+      ],
       child: SignalBuilder(
         builder: (context, _) {
           final themeMode = themeModeProvider.of(context).value;
           final directionality = directionalityProvider.of(context).value;
+          // Both themes come from the editor's configuration, so the panel
+          // restyles the whole app — navigation, playground and docs alike.
+          final config = themeConfigProvider.of(context).value;
           // Custom App example
           // return ShadApp.custom(
           //   themeMode: themeMode,
@@ -171,60 +195,34 @@ class App extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             themeMode: themeMode,
             routes: routes,
-            theme: ShadThemeData(
-              brightness: Brightness.light,
-              colorScheme: const ShadZincColorScheme.light(
-                // Example of adding a custom color to the color scheme
-                /* 
-                  custom: {
-                     'myCustomColor': Color.fromARGB(255, 177, 4, 196),
-                   },
-                  */
-              ),
-              // Example with google fonts
-              // textTheme: ShadTextTheme.fromGoogleFont(
-              //   GoogleFonts.lavishlyYours,
-              // ),
-
-              // Example of custom font family
-              // textTheme: ShadTextTheme(family: 'UbuntuMono'),
-
-              // Example to disable the secondary border
-              // disableSecondaryBorder: true,
-
-              // Example of extending the ShadTextTheme with a new custom style and name (see `/typography` page for usage example).
-              textTheme: ShadTextTheme(
-                custom: {
-                  'myCustomStyle': const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.blue,
-                  ),
-                },
-              ),
-            ),
-            darkTheme: ShadThemeData(
-              brightness: Brightness.dark,
-              colorScheme: const ShadZincColorScheme.dark(),
-              // Example of custom font family
-              // textTheme: ShadTextTheme(family: 'UbuntuMono'),
-
-              // Example of extending the ShadTextTheme with a new custom style and name (see `/typography` page for usage example).
-              textTheme: ShadTextTheme(
-                custom: {
-                  'myCustomStyle': const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.green,
-                  ),
-                },
-              ),
-            ),
+            // Example of adding a custom color to the color scheme:
+            //   ShadZincColorScheme.light(
+            //     custom: {'myCustomColor': Color.fromARGB(255, 177, 4, 196)},
+            //   )
+            // Example to disable the secondary border:
+            //   disableSecondaryBorder: true
+            theme: config
+                .copyWith(brightness: Brightness.light)
+                .build(
+                  customTextStyles: appCustomTextStyles(Brightness.light),
+                ),
+            darkTheme: config
+                .copyWith(brightness: Brightness.dark)
+                .build(
+                  customTextStyles: appCustomTextStyles(Brightness.dark),
+                ),
             home: const AppShell(),
             builder: (context, child) {
               return Directionality(
                 textDirection: directionality,
-                child: child!,
+                // The editor's text scale applies to the whole app; the
+                // customizer panel resets it for its own chrome.
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: TextScaler.linear(config.textScale),
+                  ),
+                  child: child!,
+                ),
               );
             },
           );

@@ -556,28 +556,46 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   @override
   ShadButtonSizesTheme buttonSizesTheme() {
     // Matches shadcn/ui's button sizes: default `h-9 px-4 py-2`,
-    // sm `h-8 px-3`, lg `h-10 px-6`, icon `size-9`.
+    // sm `h-8 px-3`, lg `h-10 px-6`, icon `size-9`. The icon sizes are the
+    // style's `[&_svg:not([class*='size-'])]:size-*`, which is why the square
+    // sizes carry their own rather than reusing sm/lg.
     return ShadButtonSizesTheme(
       regular: ShadButtonSizeTheme(
         height: scaled(style.buttonHeight),
         padding: EdgeInsets.symmetric(horizontal: scaled(style.buttonPaddingX)),
+        iconSize: scaled(style.buttonIconSize),
       ),
       sm: ShadButtonSizeTheme(
         height: scaled(style.buttonHeightSm),
         padding: EdgeInsets.symmetric(
           horizontal: scaled(style.buttonPaddingXSm),
         ),
+        iconSize: scaled(style.buttonIconSizeSm),
       ),
       lg: ShadButtonSizeTheme(
         height: scaled(style.buttonHeightLg),
         padding: EdgeInsets.symmetric(
           horizontal: scaled(style.buttonPaddingXLg),
         ),
+        iconSize: scaled(style.buttonIconSizeLg),
       ),
       icon: ShadButtonSizeTheme(
         height: scaled(style.iconButtonSize),
         width: scaled(style.iconButtonSize),
         padding: EdgeInsets.zero,
+        iconSize: scaled(style.iconButtonIconSize),
+      ),
+      iconSm: ShadButtonSizeTheme(
+        height: scaled(style.iconButtonSizeSm),
+        width: scaled(style.iconButtonSizeSm),
+        padding: EdgeInsets.zero,
+        iconSize: scaled(style.iconButtonIconSizeSm),
+      ),
+      iconLg: ShadButtonSizeTheme(
+        height: scaled(style.iconButtonSizeLg),
+        width: scaled(style.iconButtonSizeLg),
+        padding: EdgeInsets.zero,
+        iconSize: scaled(style.iconButtonIconSizeLg),
       ),
     );
   }

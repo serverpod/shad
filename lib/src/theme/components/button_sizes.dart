@@ -12,6 +12,7 @@ class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
     required this.height,
     required this.padding,
     this.width,
+    this.iconSize,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -23,6 +24,13 @@ class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
   final double height;
   final EdgeInsetsGeometry padding;
   final double? width;
+
+  /// Size handed to icons inside the button, shadcn's
+  /// `[&_svg:not([class*='size-'])]:size-4`.
+  ///
+  /// Null falls back to the ambient [IconTheme]; an icon that sets its own
+  /// size always wins, as the `:not` in the reference selector does.
+  final double? iconSize;
 
   static ShadButtonSizeTheme? lerp(
     ShadButtonSizeTheme? a,
@@ -45,6 +53,8 @@ class ShadButtonSizesTheme with _$ShadButtonSizesTheme {
     this.sm,
     this.lg,
     this.icon,
+    this.iconSm,
+    this.iconLg,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -56,7 +66,15 @@ class ShadButtonSizesTheme with _$ShadButtonSizesTheme {
   final ShadButtonSizeTheme? regular;
   final ShadButtonSizeTheme? sm;
   final ShadButtonSizeTheme? lg;
+
+  /// The square sizes, shadcn's `size-icon`, `size-icon-sm` and
+  /// `size-icon-lg`.
+  ///
+  /// Separate from [sm]/[lg] because the reference sizes an icon button's
+  /// glyph independently of a text button's at the same step.
   final ShadButtonSizeTheme? icon;
+  final ShadButtonSizeTheme? iconSm;
+  final ShadButtonSizeTheme? iconLg;
 
   static ShadButtonSizesTheme? lerp(
     ShadButtonSizesTheme? a,

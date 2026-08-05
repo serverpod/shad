@@ -1,9 +1,8 @@
-import 'package:disco/disco.dart';
+import 'package:example/common/app_shell.dart';
 import 'package:example/common/theme_editor/editor_config.dart';
 import 'package:example/common/theme_editor/fonts.dart';
 import 'package:example/common/theme_editor/preview_panel.dart';
 import 'package:example/main.dart';
-import 'package:example/pages/theme_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -157,22 +156,28 @@ void main() {
       )
       .data;
 
-  group('ThemeEditorPage', () {
+  group('the customizer panel', () {
+    /// Pumps the whole app and opens the editor.
+    ///
+    /// The app itself is what the panel edits now, so the test drives [App]
+    /// rather than a page: that is the wiring under test.
     Future<void> pump(
       WidgetTester tester, {
       Size size = const Size(1600, 1400),
-    }) {
+    }) async {
       tester.view.physicalSize = size;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      return tester.pumpWidget(
-        ProviderScope(
-          providers: [themeModeProvider, directionalityProvider],
-          child: const ShadApp(home: ThemeEditorPage()),
-        ),
-      );
+      await tester.pumpWidget(const App());
+      await tester.pump();
+      await tester.tap(find.byIcon(LucideIcons.palette).first);
+      // The theme animates across 200ms; the preview animates forever, so
+      // pump fixed frames rather than settling.
+      for (var i = 0; i < 12; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
     }
 
     /// Opens the picker labelled [label] and chooses [option].
@@ -279,10 +284,11 @@ void main() {
       await tester.pump();
       expect(previewTheme(tester).brightness, Brightness.light);
 
-      themeModeProvider.of(tester.element(find.byType(ThemeEditorPage))).value =
+      themeModeProvider.of(tester.element(find.byType(AppShell))).value =
           ThemeMode.dark;
-      await tester.pump();
-      await tester.pump();
+      for (var i = 0; i < 12; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
 
       expect(previewTheme(tester).brightness, Brightness.dark);
       expect(tester.takeException(), isNull);
@@ -330,12 +336,28 @@ void main() {
       expect(scheme.primary, isNot(ShadAccentScheme.greenLight.primary));
     });
 
-    testWidgets('stacks the panes on a narrow viewport', (tester) async {
-      await pump(tester, size: const Size(700, 1400));
+    testWidgets('takes over a narrow viewport', (tester) async {
+      await pump(tester, size: const Size(600, 1400));
       await tester.pump();
 
       expect(find.text('Style'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('re-themes the app around it, not just the playground', (
+      tester,
+    ) async {
+      await pump(tester);
+      await tester.pump();
+
+      await choose(tester, 'Base Color', 'Mist');
+
+      // The shell's own chrome is themed from the same configuration.
+      final shellTheme = ShadTheme.of(tester.element(find.text('Playground')));
+      expect(
+        shellTheme.colorScheme.background,
+        const ShadMistColorScheme.light().background,
+      );
     });
   });
 

@@ -57,6 +57,7 @@ class ShadButton extends StatefulWidget {
     this.trailing,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -112,6 +113,7 @@ class ShadButton extends StatefulWidget {
     super.key,
     required this.variant,
     this.size,
+    this.iconSize,
     this.child,
     this.leading,
     this.trailing,
@@ -174,6 +176,7 @@ class ShadButton extends StatefulWidget {
     this.trailing,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -232,6 +235,7 @@ class ShadButton extends StatefulWidget {
     this.trailing,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -290,6 +294,7 @@ class ShadButton extends StatefulWidget {
     this.trailing,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -347,6 +352,7 @@ class ShadButton extends StatefulWidget {
     this.trailing,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -402,6 +408,7 @@ class ShadButton extends StatefulWidget {
     required this.child,
     this.onPressed,
     this.size,
+    this.iconSize,
     this.cursor,
     this.width,
     this.height,
@@ -495,6 +502,15 @@ class ShadButton extends StatefulWidget {
   /// [padding].
   /// {@endtemplate}
   final ShadButtonSize? size;
+
+  /// {@template ShadButton.iconSize}
+  /// The size handed to icons in the button that do not set one themselves.
+  ///
+  /// Defaults to the size's `iconSize` in `ShadButtonSizesTheme`, shadcn's
+  /// `[&_svg:not([class*='size-'])]:size-4`. An [Icon] with an explicit
+  /// `size` is left alone either way.
+  /// {@endtemplate}
+  final double? iconSize;
 
   /// {@template ShadButton.cursor}
   /// The mouse cursor displayed over the button, overriding the theme default
@@ -912,6 +928,19 @@ class _ShadButtonState extends State<ShadButton> {
     );
   }
 
+  /// The default size for icons in the label row, shadcn's
+  /// `[&_svg:not([class*='size-'])]:size-4`.
+  ///
+  /// Only a default: an [Icon] carrying its own `size` still wins, which is
+  /// what the reference's `:not([class*='size-'])` says.
+  double? iconSize(ShadThemeData theme) {
+    if (widget.iconSize != null) return widget.iconSize;
+    return sizeTheme(
+      theme,
+      widget.size ?? buttonTheme(theme).size ?? ShadButtonSize.regular,
+    ).iconSize;
+  }
+
   Color? background(ShadThemeData theme) {
     return widget.backgroundColor ?? buttonTheme(theme).backgroundColor;
   }
@@ -1045,6 +1074,9 @@ class _ShadButtonState extends State<ShadButton> {
 
     final effectiveWidth = width(theme) ?? 0;
     final effectiveHeight = height(theme);
+    // Null keeps whatever the ambient IconTheme says, rather than falling
+    // back to Flutter's 24 — but every shipped style sets one.
+    final effectiveIconSize = iconSize(theme) ?? iconTheme.size;
 
     return CallbackShortcuts(
       bindings: {
@@ -1112,7 +1144,10 @@ class _ShadButtonState extends State<ShadButton> {
             duration: effectivePressDuration,
             curve: Curves.easeOut,
             child: IconTheme(
-              data: iconTheme.copyWith(color: effectiveForegroundColor),
+              data: iconTheme.copyWith(
+                color: effectiveForegroundColor,
+                size: effectiveIconSize,
+              ),
               child: DefaultTextStyle(
                 style: effectiveTextStyle.copyWith(
                   color: effectiveForegroundColor,

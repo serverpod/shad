@@ -129,9 +129,15 @@ class ShadStyleTokens {
     this.buttonPaddingXSm = 10,
     this.buttonPaddingXLg = 10,
     this.buttonGap = 6,
+    this.buttonIconSize = 16,
+    this.buttonIconSizeSm = 16,
+    this.buttonIconSizeLg = 16,
     this.iconButtonSize = 36,
     this.iconButtonSizeSm = 32,
     this.iconButtonSizeLg = 40,
+    this.iconButtonIconSize = 16,
+    this.iconButtonIconSizeSm = 16,
+    this.iconButtonIconSizeLg = 16,
     // Text fields.
     this.inputHeight = 36,
     this.inputPaddingX = 10,
@@ -343,10 +349,31 @@ class ShadStyleTokens {
   /// Space between a button's icon and its label, shadcn's `gap-1.5`.
   final double buttonGap;
 
+  /// Side of an icon inside a button, shadcn's
+  /// `[&_svg:not([class*='size-'])]:size-4`.
+  ///
+  /// The `:not` is why an [Icon] with its own `size` still wins: these are
+  /// only the default handed down through the button's `IconTheme`. Most
+  /// styles keep 16 at every size; `mira` and `sera` shrink it, and `lyra`,
+  /// `mira` and `nova` shrink it further on the small button only.
+  final double buttonIconSize;
+  final double buttonIconSizeSm;
+  final double buttonIconSizeLg;
+
   /// Side of a square icon button, shadcn's `size-9`.
   final double iconButtonSize;
   final double iconButtonSizeSm;
   final double iconButtonSizeLg;
+
+  /// Side of the icon inside one.
+  ///
+  /// Kept apart from [buttonIconSize] because the reference's
+  /// `.cn-button-size-icon-sm` does *not* repeat the small button's smaller
+  /// glyph: a 28px icon button keeps the 16px icon that a 28px text button
+  /// shrinks to 14.
+  final double iconButtonIconSize;
+  final double iconButtonIconSizeSm;
+  final double iconButtonIconSizeLg;
 
   // --- Text fields --------------------------------------------------------
 
@@ -543,6 +570,7 @@ class ShadStyleTokens {
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
+    buttonIconSizeSm: 14,
     iconButtonSize: 32,
     iconButtonSizeSm: 28,
     iconButtonSizeLg: 36,
@@ -628,6 +656,7 @@ class ShadStyleTokens {
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
+    buttonIconSizeSm: 14,
     iconButtonSize: 32,
     iconButtonSizeSm: 28,
     iconButtonSizeLg: 36,
@@ -683,9 +712,14 @@ class ShadStyleTokens {
     buttonPaddingX: 8,
     buttonPaddingXSm: 8,
     buttonGap: 4,
+    // The only style whose icons follow the size step all the way down.
+    buttonIconSize: 14,
+    buttonIconSizeSm: 12,
     iconButtonSize: 28,
     iconButtonSizeSm: 24,
     iconButtonSizeLg: 32,
+    iconButtonIconSize: 14,
+    iconButtonIconSizeSm: 12,
     inputHeight: 28,
     inputPaddingX: 8,
     inputPaddingY: 2,
@@ -837,9 +871,16 @@ class ShadStyleTokens {
     buttonPaddingX: 24,
     buttonPaddingXSm: 16,
     buttonPaddingXLg: 32,
+    // The one style whose base glyph is `size-3.5` rather than `size-4`.
+    buttonIconSize: 14,
+    buttonIconSizeSm: 14,
+    buttonIconSizeLg: 14,
     iconButtonSize: 40,
     iconButtonSizeSm: 36,
     iconButtonSizeLg: 44,
+    iconButtonIconSize: 14,
+    iconButtonIconSizeSm: 14,
+    iconButtonIconSizeLg: 14,
     inputHeight: 40,
     // sera's fields are underlined rather than boxed, so they carry no
     // horizontal inset at all.
@@ -997,9 +1038,15 @@ class ShadStyleTokens {
     double? buttonPaddingXSm,
     double? buttonPaddingXLg,
     double? buttonGap,
+    double? buttonIconSize,
+    double? buttonIconSizeSm,
+    double? buttonIconSizeLg,
     double? iconButtonSize,
     double? iconButtonSizeSm,
     double? iconButtonSizeLg,
+    double? iconButtonIconSize,
+    double? iconButtonIconSizeSm,
+    double? iconButtonIconSizeLg,
     double? inputHeight,
     double? inputPaddingX,
     double? inputPaddingY,
@@ -1104,9 +1151,17 @@ class ShadStyleTokens {
       buttonPaddingXSm: buttonPaddingXSm ?? this.buttonPaddingXSm,
       buttonPaddingXLg: buttonPaddingXLg ?? this.buttonPaddingXLg,
       buttonGap: buttonGap ?? this.buttonGap,
+      buttonIconSize: buttonIconSize ?? this.buttonIconSize,
+      buttonIconSizeSm: buttonIconSizeSm ?? this.buttonIconSizeSm,
+      buttonIconSizeLg: buttonIconSizeLg ?? this.buttonIconSizeLg,
       iconButtonSize: iconButtonSize ?? this.iconButtonSize,
       iconButtonSizeSm: iconButtonSizeSm ?? this.iconButtonSizeSm,
       iconButtonSizeLg: iconButtonSizeLg ?? this.iconButtonSizeLg,
+      iconButtonIconSize: iconButtonIconSize ?? this.iconButtonIconSize,
+      iconButtonIconSizeSm:
+          iconButtonIconSizeSm ?? this.iconButtonIconSizeSm,
+      iconButtonIconSizeLg:
+          iconButtonIconSizeLg ?? this.iconButtonIconSizeLg,
       inputHeight: inputHeight ?? this.inputHeight,
       inputPaddingX: inputPaddingX ?? this.inputPaddingX,
       inputPaddingY: inputPaddingY ?? this.inputPaddingY,
@@ -1209,9 +1264,15 @@ class ShadStyleTokens {
     buttonPaddingXSm,
     buttonPaddingXLg,
     buttonGap,
+    buttonIconSize,
+    buttonIconSizeSm,
+    buttonIconSizeLg,
     iconButtonSize,
     iconButtonSizeSm,
     iconButtonSizeLg,
+    iconButtonIconSize,
+    iconButtonIconSizeSm,
+    iconButtonIconSizeLg,
     inputHeight,
     inputPaddingX,
     inputPaddingY,

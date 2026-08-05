@@ -17,6 +17,12 @@ import 'package:shad/src/utils/states_controller.dart';
 /// interaction states and integrates with [ShadTheme] for consistent
 /// appearance. Use named constructors like [ShadIconButton.destructive] for
 /// specific variants or [ShadIconButton.raw] for full control.
+///
+/// shadcn/ui itself has no separate component — it is `<Button size="icon">`,
+/// and `ShadButton(size: ShadButtonSize.icon, child: Icon(...))` is exactly
+/// that. This adds the square sizes for the `sm`/`lg` steps (which shadcn
+/// spells `size-icon-sm` / `size-icon-lg`) and the semantic label an
+/// icon-only control needs, so prefer it when the button holds only an icon.
 class ShadIconButton extends StatelessWidget {
   /// Creates a primary variant icon button widget.
   const ShadIconButton({
@@ -465,10 +471,22 @@ class ShadIconButton extends StatelessWidget {
     final theme = ShadTheme.of(context);
 
     final sizesTheme = buttonTheme(theme).sizesTheme;
+    // The square sizes, not the text-button ones: shadcn sizes an icon
+    // button's glyph independently of a text button's at the same step
+    // (`.cn-button-size-icon-sm` keeps 16 where `.cn-button-size-sm` drops
+    // to 14).
     final defaultSize = switch (size ?? ShadButtonSize.icon) {
       ShadButtonSize.icon => sizesTheme?.icon ?? theme.buttonSizesTheme.icon!,
-      ShadButtonSize.sm => sizesTheme?.sm ?? theme.buttonSizesTheme.sm!,
-      ShadButtonSize.lg => sizesTheme?.lg ?? theme.buttonSizesTheme.lg!,
+      ShadButtonSize.sm =>
+        sizesTheme?.iconSm ??
+            theme.buttonSizesTheme.iconSm ??
+            sizesTheme?.sm ??
+            theme.buttonSizesTheme.sm!,
+      ShadButtonSize.lg =>
+        sizesTheme?.iconLg ??
+            theme.buttonSizesTheme.iconLg ??
+            sizesTheme?.lg ??
+            theme.buttonSizesTheme.lg!,
       ShadButtonSize.regular =>
         sizesTheme?.regular ?? theme.buttonSizesTheme.regular!,
     };
@@ -480,49 +498,47 @@ class ShadIconButton extends StatelessWidget {
     // back to the height so an icon button stays square at every size.
     final effectiveWidth = width ?? defaultSize.width ?? effectiveHeight;
 
-    Widget button = IconTheme(
-      data: IconThemeData(size: iconSize),
-      child: ShadButton.raw(
-        variant: variant,
-        width: effectiveWidth,
-        height: effectiveHeight,
-        padding: effectivePadding,
-        onPressed: onPressed,
-        onLongPress: onLongPress,
-        cursor: cursor,
-        backgroundColor: backgroundColor,
-        hoverBackgroundColor: hoverBackgroundColor,
-        foregroundColor: foregroundColor,
-        hoverForegroundColor: hoverForegroundColor,
-        autofocus: autofocus,
-        focusNode: focusNode,
-        pressedBackgroundColor: pressedBackgroundColor,
-        pressedForegroundColor: pressedForegroundColor,
-        shadows: shadows,
-        gradient: gradient,
-        decoration: decoration,
-        enabled: enabled,
-        statesController: statesController,
-        hoverStrategies: hoverStrategies,
-        onHoverChange: onHoverChange,
-        onTapDown: onTapDown,
-        onTapUp: onTapUp,
-        onTapCancel: onTapCancel,
-        onSecondaryTapDown: onSecondaryTapDown,
-        onSecondaryTapUp: onSecondaryTapUp,
-        onSecondaryTapCancel: onSecondaryTapCancel,
-        onLongPressStart: onLongPressStart,
-        onLongPressCancel: onLongPressCancel,
-        onLongPressUp: onLongPressUp,
-        onLongPressDown: onLongPressDown,
-        onLongPressEnd: onLongPressEnd,
-        onDoubleTap: onDoubleTap,
-        onDoubleTapDown: onDoubleTapDown,
-        onDoubleTapCancel: onDoubleTapCancel,
-        longPressDuration: longPressDuration,
-        onFocusChange: onFocusChange,
-        child: icon,
-      ),
+    Widget button = ShadButton.raw(
+      variant: variant,
+      width: effectiveWidth,
+      height: effectiveHeight,
+      padding: effectivePadding,
+      iconSize: iconSize ?? defaultSize.iconSize,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      cursor: cursor,
+      backgroundColor: backgroundColor,
+      hoverBackgroundColor: hoverBackgroundColor,
+      foregroundColor: foregroundColor,
+      hoverForegroundColor: hoverForegroundColor,
+      autofocus: autofocus,
+      focusNode: focusNode,
+      pressedBackgroundColor: pressedBackgroundColor,
+      pressedForegroundColor: pressedForegroundColor,
+      shadows: shadows,
+      gradient: gradient,
+      decoration: decoration,
+      enabled: enabled,
+      statesController: statesController,
+      hoverStrategies: hoverStrategies,
+      onHoverChange: onHoverChange,
+      onTapDown: onTapDown,
+      onTapUp: onTapUp,
+      onTapCancel: onTapCancel,
+      onSecondaryTapDown: onSecondaryTapDown,
+      onSecondaryTapUp: onSecondaryTapUp,
+      onSecondaryTapCancel: onSecondaryTapCancel,
+      onLongPressStart: onLongPressStart,
+      onLongPressCancel: onLongPressCancel,
+      onLongPressUp: onLongPressUp,
+      onLongPressDown: onLongPressDown,
+      onLongPressEnd: onLongPressEnd,
+      onDoubleTap: onDoubleTap,
+      onDoubleTapDown: onDoubleTapDown,
+      onDoubleTapCancel: onDoubleTapCancel,
+      longPressDuration: longPressDuration,
+      onFocusChange: onFocusChange,
+      child: icon,
     );
 
     if (semanticLabel != null) {

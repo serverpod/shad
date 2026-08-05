@@ -92,18 +92,23 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
     if (barrierBlurSigma <= 0) return content;
 
     // The filter sits above the barrier and below the dialog, and fades with
-    // the route so the page does not snap out of focus.
+    // the route so the page does not snap out of focus. It must not hit-test:
+    // the ColoredBox that gives the filter its extent is opaque to taps even
+    // when fully transparent, and without the IgnorePointer it eats the
+    // outside tap that should reach the ModalBarrier and dismiss the route.
     return Stack(
       children: [
         Positioned.fill(
-          child: FadeTransition(
-            opacity: animation,
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: barrierBlurSigma,
-                sigmaY: barrierBlurSigma,
+          child: IgnorePointer(
+            child: FadeTransition(
+              opacity: animation,
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: barrierBlurSigma,
+                  sigmaY: barrierBlurSigma,
+                ),
+                child: const ColoredBox(color: Color(0x00000000)),
               ),
-              child: const ColoredBox(color: Color(0x00000000)),
             ),
           ),
         ),

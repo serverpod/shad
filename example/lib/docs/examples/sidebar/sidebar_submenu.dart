@@ -27,43 +27,41 @@ class _SidebarSubmenuExampleState extends State<SidebarSubmenuExample> {
           border: Border.all(color: theme.colorScheme.border),
           borderRadius: theme.radii.lg,
         ),
-        child: ClipRRect(
+        child: ShadSidebarScaffold(
           borderRadius: theme.radii.lg,
-          child: ShadSidebarScaffold(
-            sidebar: ShadSidebar(
-              variant: ShadSidebarVariant.floating,
-              children: [
-                ShadSidebarGroup(
-                  label: const Text('Documentation'),
-                  children: [
-                    ShadSidebarMenu(
-                      children: [
-                        for (final entry in _sections.entries) ...[
-                          ShadSidebarMenuButton(
-                            leading: const Icon(LucideIcons.bookOpen),
-                            onPressed: () {},
-                            child: Text(entry.key),
-                          ),
-                          ShadSidebarMenuSub(
-                            children: [
-                              for (final page in entry.value)
-                                ShadSidebarMenuSubButton(
-                                  isActive: selected == page,
-                                  onPressed: () =>
-                                      setState(() => selected = page),
-                                  child: Text(page),
-                                ),
-                            ],
-                          ),
-                        ],
+          sidebar: ShadSidebar(
+            variant: ShadSidebarVariant.floating,
+            children: [
+              ShadSidebarGroup(
+                label: const Text('Documentation'),
+                children: [
+                  ShadSidebarMenu(
+                    children: [
+                      for (final entry in _sections.entries) ...[
+                        ShadSidebarMenuButton(
+                          leading: const Icon(LucideIcons.bookOpen),
+                          onPressed: () {},
+                          child: Text(entry.key),
+                        ),
+                        ShadSidebarMenuSub(
+                          children: [
+                            for (final page in entry.value)
+                              ShadSidebarMenuSubButton(
+                                isActive: selected == page,
+                                onPressed: () =>
+                                    setState(() => selected = page),
+                                child: Text(page),
+                              ),
+                          ],
+                        ),
                       ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            child: Center(child: Text(selected)),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
+          child: Center(child: Text(selected)),
         ),
       ),
     );

@@ -108,6 +108,7 @@ class ShadSidebarScope extends InheritedWidget {
     required this.side,
     required this.variant,
     required this.collapsible,
+    required this.collapsedWidth,
     required super.child,
   });
 
@@ -125,6 +126,11 @@ class ShadSidebarScope extends InheritedWidget {
   final ShadSidebarSide side;
   final ShadSidebarVariant variant;
   final ShadSidebarCollapsible collapsible;
+
+  /// The resolved icon-rail width, so descendants shrink to the same rail the
+  /// sidebar animates to even when [ShadSidebar.collapsedWidth] overrides the
+  /// theme.
+  final double collapsedWidth;
 
   /// Whether descendants should render their icon-rail form.
   bool get collapsed =>
@@ -153,7 +159,8 @@ class ShadSidebarScope extends InheritedWidget {
       open != oldWidget.open ||
       side != oldWidget.side ||
       variant != oldWidget.variant ||
-      collapsible != oldWidget.collapsible;
+      collapsible != oldWidget.collapsible ||
+      collapsedWidth != oldWidget.collapsedWidth;
 }
 
 /// {@template ShadSidebarScaffold}
@@ -185,6 +192,7 @@ class ShadSidebarScaffold extends StatefulWidget {
     this.defaultOpen = true,
     this.onOpenChange,
     this.keyboardShortcut = true,
+    this.borderRadius,
   });
 
   /// The sidebar configuration and content.
@@ -207,6 +215,13 @@ class ShadSidebarScaffold extends StatefulWidget {
   /// Whether `⌘B`/`Ctrl+B` toggles the sidebar.
   final bool keyboardShortcut;
 
+  /// Rounds and clips the scaffold's corners.
+  ///
+  /// A scaffold usually fills the page, but one embedded in a rounded
+  /// container (a demo, a card) needs its own clip or the sidebar's square
+  /// surface covers the host's corners. Null means no clip at all.
+  final BorderRadiusGeometry? borderRadius;
+
   @override
   State<ShadSidebarScaffold> createState() => _ShadSidebarScaffoldState();
 }
@@ -219,6 +234,11 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
 
   late bool _lastOpen;
   bool _sheetShowing = false;
+
+  /// The mobile drawer's route, captured when it is shown so it can be
+  /// dismissed precisely — popping blindly would take down whatever the user
+  /// pushed on top of it — and removed if this scaffold is disposed first.
+  ModalRoute<void>? _sheetRoute;
 
   @override
   void initState() {
@@ -255,6 +275,15 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       HardwareKeyboard.instance.removeHandler(_onKeyEvent);
     }
     controller.removeListener(_onControllerChanged);
+    // The drawer is a pushed route, so it would outlive its scaffold — the
+    // reference unmounts it with the provider. Removed post-frame, since
+    // dispose runs mid-teardown when the navigator cannot be mutated.
+    final route = _sheetRoute;
+    if (route != null && route.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (route.isActive) route.navigator?.removeRoute(route);
+      });
+    }
     _internalController?.dispose();
     super.dispose();
   }
@@ -263,6 +292,27 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
     final breakpoints = ShadTheme.of(context).breakpoints;
     return MediaQuery.sizeOf(context).width < breakpoints.md.value;
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The reference renders the sheet only in its mobile branch, so growing
+    // past the breakpoint unmounts it. Here it is a pushed route, which has
+    // to be popped explicitly — after the frame, since this runs mid-build.
+    if (!_isMobile && controller.openMobile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_isMobile && controller.openMobile) {
+          controller.openMobile = false;
+        }
+      });
+    }
+  }
+
+  /// The icon-rail width, resolved the same way [ShadSidebar] resolves it.
+  double get _collapsedWidth =>
+      widget.sidebar.collapsedWidth ??
+      ShadTheme.of(context).sidebarTheme.collapsedWidth ??
+      48;
 
   bool _onKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return false;
@@ -289,7 +339,15 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       _showMobileSheet();
     } else if (!controller.openMobile && _sheetShowing) {
       _sheetShowing = false;
-      Navigator.of(context).pop();
+      final route = _sheetRoute;
+      if (route != null && route.isActive) {
+        // Animate out when the drawer is on top; remove silently when
+        // something else is (its exit animation would play under the
+        // covering route anyway).
+        route.isCurrent
+            ? route.navigator!.pop()
+            : route.navigator!.removeRoute(route);
+      }
     }
   }
 
@@ -305,10 +363,17 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       (ShadSidebarSide.end, TextDirection.ltr) => ShadSheetSide.right,
       (ShadSidebarSide.end, TextDirection.rtl) => ShadSheetSide.left,
     };
+    // The route can outlive this State (dispose removes it a frame later),
+    // and its builder re-runs on MediaQuery changes in the meantime — so
+    // everything it needs is captured here rather than read through `this`,
+    // whose `context` and `widget` are gone after unmount.
+    final controller = this.controller;
+    final collapsedWidth = _collapsedWidth;
     showShadSheet<void>(
       context: context,
       side: sheetSide,
       builder: (sheetContext) {
+        _sheetRoute = ModalRoute.of(sheetContext);
         return ShadSidebarScope(
           controller: controller,
           isMobile: true,
@@ -317,21 +382,28 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
           side: sidebar.side,
           variant: sidebar.variant,
           collapsible: sidebar.collapsible,
+          collapsedWidth: collapsedWidth,
           child: ShadSheet(
             padding: EdgeInsets.zero,
             gap: 0,
             closeIcon: const SizedBox.shrink(),
+            // The sidebar owns its scrolling; the sheet's own scroll view
+            // would hand it unbounded height and break its Expanded column.
+            scrollable: false,
             backgroundColor:
                 sidebar.backgroundColor ??
                 ShadTheme.of(sheetContext).sidebarTheme.backgroundColor,
             constraints: BoxConstraints.tightFor(width: effectiveMobileWidth),
-            child: widget.sidebar,
+            child: sidebar,
           ),
         );
       },
     ).whenComplete(() {
+      // Runs for every way the route can go away — barrier tap, system back,
+      // controller, dispose cleanup — so this is where the state resyncs.
       _sheetShowing = false;
-      if (controller.openMobile) controller.openMobile = false;
+      _sheetRoute = null;
+      if (mounted && controller.openMobile) controller.openMobile = false;
     });
   }
 
@@ -394,7 +466,7 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       );
     }
 
-    final Widget body;
+    Widget body;
     if (isMobile) {
       body = content;
     } else {
@@ -407,6 +479,10 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       );
     }
 
+    if (widget.borderRadius != null) {
+      body = ClipRRect(borderRadius: widget.borderRadius!, child: body);
+    }
+
     return ShadSidebarScope(
       controller: controller,
       isMobile: isMobile,
@@ -415,6 +491,7 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       side: sidebar.side,
       variant: sidebar.variant,
       collapsible: sidebar.collapsible,
+      collapsedWidth: _collapsedWidth,
       child: body,
     );
   }
@@ -538,6 +615,23 @@ class ShadSidebar extends StatelessWidget {
         (sidebarTheme.floatingMargin ?? const EdgeInsets.all(8)).resolve(
           Directionality.of(context),
         );
+
+    // The icon rail keeps the content laid out at the expanded width and lets
+    // the animated container clip it — the same overflow-hidden semantics the
+    // reference gets from CSS. A header that doesn't fit the rail truncates
+    // at the clip edge instead of throwing a RenderFlex overflow; the widgets
+    // that *should* shrink (menu buttons) do so themselves via
+    // `scope.collapsed`, independent of the width they are laid out at.
+    if (collapsible == ShadSidebarCollapsible.icon) {
+      final innerWidth =
+          effectiveWidth - (floating ? floatingMargin.horizontal : 0);
+      content = OverflowBox(
+        minWidth: innerWidth,
+        maxWidth: innerWidth,
+        alignment: AlignmentDirectional.centerStart,
+        child: content,
+      );
+    }
 
     switch (variant) {
       case ShadSidebarVariant.sidebar:
@@ -961,8 +1055,7 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
         .resolve(
           Directionality.of(context),
         );
-    final collapsedSize =
-        (sidebarTheme.collapsedWidth ?? 48) - groupPadding.horizontal;
+    final collapsedSize = scope.collapsedWidth - groupPadding.horizontal;
     final iconSize = sidebarTheme.iconSize ?? 16;
 
     final height = collapsed ? collapsedSize : expandedHeight;
@@ -1001,6 +1094,11 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
     final ringColor = sidebarTheme.ringColor ?? theme.colorScheme.sidebarRing;
     final ringWidth = sidebarTheme.ringWidth ?? 2;
 
+    // Every fixed-width part after the icon animates to zero on the same
+    // timeline as the button's width, so at any point of the collapse the
+    // row's minimum width fits the animated bounds — a plain SizedBox gap
+    // (or an instantly-dropped trailing) overflows the 16px inner width of
+    // the 32px square.
     Widget row = Row(
       children: [
         if (widget.leading != null) ...[
@@ -1008,7 +1106,11 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
             data: IconThemeData(size: iconSize, color: contentColor),
             child: widget.leading!,
           ),
-          SizedBox(width: gap),
+          AnimatedContainer(
+            duration: duration,
+            curve: curve,
+            width: collapsed ? 0 : gap,
+          ),
         ],
         Expanded(
           child: DefaultTextStyle.merge(
@@ -1022,17 +1124,28 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
             child: widget.child,
           ),
         ),
-        // The reference hides badges and actions in the icon rail.
-        if (widget.trailing != null && !collapsed) ...[
-          SizedBox(width: gap),
-          IconTheme.merge(
-            data: IconThemeData(size: iconSize, color: contentColor),
-            child: DefaultTextStyle.merge(
-              style: textStyle.copyWith(color: contentColor),
-              child: widget.trailing!,
+        // The reference hides badges and actions in the icon rail; here they
+        // shrink away instead of vanishing, for the same fits-at-every-frame
+        // reason.
+        if (widget.trailing != null)
+          ClipRect(
+            child: AnimatedAlign(
+              duration: duration,
+              curve: curve,
+              alignment: AlignmentDirectional.centerEnd,
+              widthFactor: collapsed ? 0 : 1,
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(start: gap),
+                child: IconTheme.merge(
+                  data: IconThemeData(size: iconSize, color: contentColor),
+                  child: DefaultTextStyle.merge(
+                    style: textStyle.copyWith(color: contentColor),
+                    child: widget.trailing!,
+                  ),
+                ),
+              ),
             ),
           ),
-        ],
       ],
     );
 
@@ -1072,29 +1185,41 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
             ? () => setState(() => pressed = false)
             : null,
         onTap: widget.enabled ? widget.onPressed : null,
-        child: AnimatedContainer(
-          duration: duration,
-          curve: curve,
-          height: height,
-          padding: padding,
-          decoration: BoxDecoration(
-            color: highlighted
-                ? accent
-                : outline
-                ? theme.colorScheme.background
-                : null,
-            borderRadius: radius,
-            boxShadow: outline
-                ? [
-                    BoxShadow(
-                      color: highlighted ? accent : borderColor,
-                      spreadRadius: 1,
-                      blurStyle: BlurStyle.outer,
-                    ),
-                  ]
-                : null,
-          ),
-          child: row,
+        // The sidebar lays its content out at the expanded width even while
+        // the rail is collapsed (see ShadSidebar), so the square form needs
+        // an explicit width; the LayoutBuilder below supplies the expanded
+        // target so both ends of the animation are finite.
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final expandedWidth = constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : null;
+            return AnimatedContainer(
+              duration: duration,
+              curve: curve,
+              width: collapsed ? collapsedSize : expandedWidth,
+              height: height,
+              padding: padding,
+              decoration: BoxDecoration(
+                color: highlighted
+                    ? accent
+                    : outline
+                    ? theme.colorScheme.background
+                    : null,
+                borderRadius: radius,
+                boxShadow: outline
+                    ? [
+                        BoxShadow(
+                          color: highlighted ? accent : borderColor,
+                          spreadRadius: 1,
+                          blurStyle: BlurStyle.outer,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: row,
+            );
+          },
         ),
       ),
     );
@@ -1122,7 +1247,13 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
       );
     }
 
-    return button;
+    // Pin the (possibly square) button to the start edge: its parent stays at
+    // the expanded width in the icon rail, and stretch would re-widen it.
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      heightFactor: 1,
+      child: button,
+    );
   }
 }
 

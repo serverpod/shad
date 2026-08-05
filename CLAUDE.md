@@ -101,6 +101,18 @@ locks the chain; add to it rather than trusting a local check.
 - `uppercase` on a text role is **not** applied automatically: `TextStyle` has
   no text-transform, and every Shad component takes a caller's widget rather
   than a string. `role.applyCase(text)` is the escape hatch.
+- **Icon sizes inside buttons are a token, not the caller's problem.**
+  `.cn-button` carries `[&_svg:not([class*='size-'])]:size-4`, so the button
+  hands 16 down through its `IconTheme`; without that Flutter's
+  `IconThemeData.fallback()` renders every icon at **24**, which is what made
+  toolbars look wrong and forced `size: 16` on call sites everywhere. The
+  `:not` is the reason it is only a default — an `Icon` with its own `size`
+  still wins. Text buttons and icon buttons are sized *separately*
+  (`buttonIconSize{,Sm,Lg}` vs `iconButtonIconSize{,Sm,Lg}`): the reference's
+  `.cn-button-size-icon-sm` keeps 16 where `.cn-button-size-sm` drops to 14.
+  Only `mira` follows the step all the way down and only `sera` has a
+  `size-3.5` base; `ShadButtonSizesTheme` carries `iconSm`/`iconLg` slots so
+  an icon button never borrows a text button's metrics.
 
 ## Colour tokens (v4)
 
@@ -166,6 +178,12 @@ locks the chain; add to it rather than trusting a local check.
   `DefaultTextStyle` inside a builder's captured `child` cannot see hover.
 - `ShadTextarea` has its own theme; it previously read `ShadInputTheme` for
   padding and alignment, which made every textarea-specific value dead.
+- **A fully transparent `ColoredBox` still hit-tests as opaque** (it extends
+  `RenderProxyBoxWithHitTestBehavior` with `behavior: opaque`). The dialog
+  route's full-screen barrier-blur layer uses one to give its
+  `BackdropFilter` extent, and without an `IgnorePointer` it silently ate
+  every outside tap — barrier dismissal was dead for all dialogs and sheets
+  and nobody noticed, because dialogs have close buttons.
 
 ## Testing
 
@@ -218,16 +236,37 @@ locks the chain; add to it rather than trusting a local check.
   Descendants read `ShadSidebarScope.of(context)` for the collapsed state —
   that is how menu buttons shrink to squares and sub-menus vanish in the
   icon rail.
-- The icon rail works by **geometry, not by swapping layouts**: the rail is
-  48 wide, groups pad by 8, so a button is 32 wide — exactly `px(8) + icon(16)
-  + px(8)` — and the label starts at the clip edge. The width animation plus
-  `Clip.hardEdge` therefore reproduces the CSS truncation. Trailing widgets
-  *are* dropped while collapsed, or the row's minimum width would overflow.
-- Offcanvas keeps the content laid out at full width inside an `OverflowBox`
-  anchored to the inner edge, so it slides off rather than reflowing.
+- **Both collapse modes keep content laid out at the expanded width** inside
+  an `OverflowBox` and let the animated container clip it — that is what CSS
+  `overflow-hidden` does, and it is why a header that is a plain `Row` (logo +
+  gap + label) truncates instead of throwing a RenderFlex overflow. Offcanvas
+  anchors the box to the inner edge so the panel slides off; the icon rail
+  anchors it to the start.
+- Because the parent no longer narrows, the icon rail's square is the menu
+  button's own doing: it animates an explicit width to `collapsedWidth −
+  group padding` (48−16 = 32 = `px(8)+icon(16)+px(8)`) inside an
+  `Align(start, heightFactor: 1)`. Every fixed-width part of its row — the
+  icon-label gap, the trailing badge — animates to zero on the *same*
+  timeline, because anything that disappears instantly (or stays fixed) makes
+  the row's minimum width overflow mid-animation in one direction or the
+  other.
 - The mobile sheet is imperative: the scaffold listens to the controller and
-  pushes/pops a `ShadSheet`. `openMobile` and `open` are independent, as in
-  the reference.
+  pushes/pops a `ShadSheet` with `scrollable: false` — the sheet's own scroll
+  view hands the sidebar's `Expanded` column unbounded height, and the crash
+  surfaces as a misleading `mouse_tracker` assertion. `openMobile` and `open`
+  are independent, as in the reference. Growing past the breakpoint pops the
+  sheet (post-frame, from `didChangeDependencies`), matching the reference
+  unmounting its mobile branch.
+- **The drawer route outlives the scaffold's State**, and its builder re-runs
+  on every MediaQuery change — so `_showMobileSheet` captures everything the
+  builder needs (controller, sidebar, collapsed width) instead of reading
+  `this.widget`/`this.context`, which are gone after unmount. The route
+  itself is captured via `ModalRoute.of` in the builder: closing goes through
+  it (`pop` when current, `removeRoute` when covered — never a blind
+  `Navigator.pop`), and `dispose` removes an orphaned drawer post-frame.
+- `ShadSidebarScaffold.borderRadius` clips the whole scaffold; it exists for
+  embedding in rounded containers (the docs demos), where the sidebar's
+  square surface would otherwise cover the host's corners.
 - Sidebar metrics vary per style through `sidebarItemHeight`/`Sm`/`Lg` and
   `sidebarItemPaddingX`/`sidebarSubItemPaddingX` tokens; radius reuses
   `itemRadius`, the group label reuses the `overline` role, button text the
@@ -237,9 +276,11 @@ locks the chain; add to it rather than trusting a local check.
 
 ## The example docs browser
 
-`example/lib` is a docs site: `common/app_shell.dart` (top nav) →
-`screens/components_screen.dart` (a `ShadSidebarScaffold` listing
-`docs/registry.dart`) → `docs/docs.dart` (the reusable page widgets).
+`example/lib` is a docs site: `common/app_shell.dart` (top nav, two sections)
+→ `screens/components_screen.dart` (a `ShadSidebarScaffold` listing
+`docs/registry.dart`) → `docs/docs.dart` (the reusable page widgets). The
+other section is `screens/playground_screen.dart`, which is the section the
+app opens on.
 
 - **The code shown is the code that runs.** Each example is one standalone
   widget file under `lib/docs/examples/<slug>/<id>.dart`, bundled as an
@@ -261,14 +302,37 @@ locks the chain; add to it rather than trusting a local check.
 
 ## The example theme editor
 
-`example/lib/pages/theme_editor.dart` plus `example/lib/common/theme_editor/`
-mirrors `/create`. Points that were decided deliberately:
+`example/lib/common/theme_editor/` mirrors `/create`. Points that were decided
+deliberately:
 
-- The customizer panel is **fixed dark chrome**, not part of the theme being
-  edited — a panel that follows the configuration becomes unreadable while
-  editing a light or menu-inverted theme.
+- **The editor themes the whole app, not a preview pane.** The configuration
+  lives in `themeConfigProvider` (`main.dart`) and `ShadApp`'s `theme`,
+  `darkTheme` and text scale are all built from it, so the top nav, the
+  playground and the docs browser restyle together. There is no preview-only
+  `ShadThemeScope` any more.
+- `customizer_panel.dart` is the panel; `app_shell.dart` docks it beside the
+  page (`ThemeCustomizerPanel.width`) and lets it cover the viewport below
+  700px, where a docked panel leaves nothing usable. It is toggled from the
+  top nav, so it is reachable from both sections.
+- The page is **always** the first child of the shell's `Stack` and `Row`,
+  and the panel is added after it. Building the page conditionally instead
+  reshaped the element above `ComponentsScreen` and threw its `State` away,
+  so opening the editor bounced you back to the first component — which
+  reads as "the editor does nothing to this page".
+- The customizer panel is **fixed dark chrome** at an unscaled text size, not
+  part of the theme being edited — a panel that follows the configuration
+  becomes unreadable while editing a light, menu-inverted or 1.6×-scaled
+  theme.
 - Light/dark and text direction are the app-wide toolbar switches; the panel
   does not duplicate them.
+- Anything the app adds on top of the generated theme has to be passed
+  *into* `ThemeEditorConfig.build()` — `customTextStyles` is how `main.dart`
+  keeps its `myCustomStyle` example alive, since the editor owns the whole
+  `ShadTextTheme`.
+- The shell reads its signals in the `SignalBuilder` body, **not** inside the
+  `LayoutBuilder` below it: that callback runs during layout, outside the
+  scope solidart tracks, so a read in there never subscribes and the panel
+  never opens.
 - Menu colours are derived from the **menu's own opaque surface**, never from
   the page's `--accent`, which vanishes on an inverted or translucent menu.
 - `fl_chart` and `google_fonts` are example-only dependencies. The package

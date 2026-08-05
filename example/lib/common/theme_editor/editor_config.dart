@@ -151,7 +151,6 @@ class ThemeEditorConfig {
     this.menuFinish = MenuSurfaceFinish.solid,
     this.menuAccent = MenuAccent.subtle,
     this.textScale = 1,
-    this.rtl = false,
     this.spacingStep = 4,
   });
 
@@ -175,7 +174,6 @@ class ThemeEditorConfig {
   final MenuAccent menuAccent;
 
   final double textScale;
-  final bool rtl;
 
   /// One step on the spacing scale, shadcn's `--spacing`.
   final double spacingStep;
@@ -205,7 +203,6 @@ class ThemeEditorConfig {
     MenuSurfaceFinish? menuFinish,
     MenuAccent? menuAccent,
     double? textScale,
-    bool? rtl,
     double? spacingStep,
   }) {
     return ThemeEditorConfig(
@@ -226,7 +223,6 @@ class ThemeEditorConfig {
       menuFinish: menuFinish ?? this.menuFinish,
       menuAccent: menuAccent ?? this.menuAccent,
       textScale: textScale ?? this.textScale,
-      rtl: rtl ?? this.rtl,
       spacingStep: spacingStep ?? this.spacingStep,
     );
   }
@@ -287,7 +283,12 @@ class ThemeEditorConfig {
     );
   }
 
-  ShadThemeData build() {
+  /// Builds the theme.
+  ///
+  /// [customTextStyles] is merged into the text theme's `custom` map — the
+  /// app hands its own named styles down this way, since the editor owns the
+  /// whole [ShadTextTheme] and would otherwise drop them.
+  ShadThemeData build({Map<String, TextStyle> customTextStyles = const {}}) {
     final borderRadius = BorderRadius.all(Radius.circular(effectiveRadius));
 
     // The menu options are the library's own — the same semantics as
@@ -298,7 +299,9 @@ class ThemeEditorConfig {
       brightness: brightness,
       colorScheme: colorScheme,
       radius: borderRadius,
-      textTheme: textTheme,
+      textTheme: customTextStyles.isEmpty
+          ? textTheme
+          : textTheme.copyWith(custom: customTextStyles),
       style: style.tokens,
       spacing: spacing,
       menuColorScheme: menuColorScheme,
