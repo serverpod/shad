@@ -86,13 +86,15 @@ class ShadAvatar extends StatelessWidget {
     return fit ?? theme.avatarTheme.fit;
   }
 
-  Widget frameBuilder(
-    BuildContext context,
-    Widget child,
-    int? frame,
-    bool wasSynchronouslyLoaded,
-  ) {
-    return frame == null ? placeholder ?? const SizedBox.shrink() : child;
+  bool get _hasImageSource {
+    if (src == null) return false;
+    if (src is String) return src.toString().trim().isNotEmpty;
+    return true;
+  }
+
+  Widget? _fallback(BuildContext context) {
+    if (placeholder == null) return null;
+    return Center(child: placeholder);
   }
 
   @override
@@ -100,6 +102,7 @@ class ShadAvatar extends StatelessWidget {
     assert(debugCheckHasShadTheme(context));
     final theme = ShadTheme.of(context);
     final size = effectiveSize(theme);
+    final fallback = _fallback(context);
 
     return Container(
       width: size.width,
@@ -110,15 +113,14 @@ class ShadAvatar extends StatelessWidget {
         shape: effectiveShape(theme),
         color: effectiveBackgroundColor(theme),
       ),
-      child: src == null
-          ? placeholder
+      child: !_hasImageSource
+          ? fallback
           : UniversalImage(
               src,
               width: size.width,
               height: size.height,
-              placeholder: placeholder != null
-                  ? Center(child: placeholder)
-                  : null,
+              placeholder: fallback,
+              errorPlaceholder: fallback,
               fit: effectiveFit(theme),
             ),
     );

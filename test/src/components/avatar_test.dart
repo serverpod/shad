@@ -149,6 +149,36 @@ void main() {
       expect(decoration?.shape, isA<CircleBorder>());
     });
 
+    testWidgets('shows the placeholder when the source is missing', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const ShadAvatar('', placeholder: Text('AB')),
+        ),
+      );
+
+      expect(find.text('AB'), findsOneWidget);
+      expect(find.byType(UniversalImage), findsNothing);
+    });
+
+    testWidgets('shows the placeholder when the image fails to load', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const ShadAvatar(
+            'https://example.invalid/avatar.png',
+            placeholder: Text('AB'),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('AB'), findsOneWidget);
+    });
+
     testWidgets('ShadAvatar matches goldens', (tester) async {
       await tester.pumpWidget(
         createTestWidget(
