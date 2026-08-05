@@ -804,7 +804,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       ],
       reverseDuration: const Duration(milliseconds: 150),
       shadows: style.popoverShadow,
-      textStyle: style.body.apply(effectiveTextTheme.small),
+      textStyle: style.body.apply(effectiveTextTheme.muted),
       padding: EdgeInsets.all(scaled(style.popoverPadding)),
       decoration: ShadDecoration(
         color: colorScheme.popover,
@@ -844,10 +844,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       // The outer radius is the element radius plus the ring width so the two
       // stay concentric.
       secondaryFocusedBorder: ringFor(controlRadius),
-      labelStyle: style.label
+      labelStyle: style.body
           .apply(effectiveTextTheme.muted)
           .copyWith(
-            fontWeight: FontWeight.w500,
+            height: 1.375,
             color: colorScheme.foreground,
           ),
       errorStyle: style.body
@@ -943,10 +943,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       ),
       radius: itemRadius,
       textStyle: style.body
-          .apply(effectiveTextTheme.small)
+          .apply(effectiveTextTheme.muted)
           .copyWith(color: menuScheme.popoverForeground),
       selectedTextStyle: style.body
-          .apply(effectiveTextTheme.small)
+          .apply(effectiveTextTheme.muted)
           .copyWith(color: menuItemHighlightForeground),
       hoveredBackgroundColor: menuItemHighlight,
       selectedIconColor: menuScheme.popoverForeground,
@@ -1526,17 +1526,11 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   @override
   ShadTextTheme textTheme() {
-    // The UI entries carry the style's roles, so app code written against
-    // `theme.textTheme.small` retypes with the style just as the components
-    // do. The prose entries — h1..h4, lead, blockquote, table — are the
-    // typography scale and are deliberately left alone.
-    return effectiveTextTheme.copyWith(
-      large: style.title.apply(effectiveTextTheme.large),
-      small: style.label.apply(effectiveTextTheme.small),
-      p: style.body.apply(effectiveTextTheme.p),
-      list: style.body.apply(effectiveTextTheme.list),
-      muted: style.body.apply(effectiveTextTheme.muted),
-    );
+    // shadcn's typography examples are a fixed prose scale — they do not
+    // change with the style preset. Style roles reach components through their
+    // own theme slots (`style.label.apply(...)` on buttons, menus, and so on),
+    // not by rewriting these entries.
+    return effectiveTextTheme;
   }
 
   @override
@@ -1568,10 +1562,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     ),
     filter: menuFilter,
     textStyle: style.body
-        .apply(effectiveTextTheme.small)
+        .apply(effectiveTextTheme.muted)
         .copyWith(color: menuScheme.popoverForeground),
     selectedTextStyle: style.body
-        .apply(effectiveTextTheme.small)
+        .apply(effectiveTextTheme.muted)
         .copyWith(color: menuItemHighlightForeground),
     trailingTextStyle: style.caption
         .apply(effectiveTextTheme.muted)

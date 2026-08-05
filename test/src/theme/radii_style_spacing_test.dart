@@ -131,21 +131,29 @@ void main() {
       expect(ShadTextRole.defaultHeightFor(18), 28 / 18);
     });
 
-    test('the style retypes the theme text, not just the components', () {
-      // The bug this pins: `ShadThemeData.textTheme` was taken straight from
-      // the merged input, bypassing the variant, so a style change left every
-      // font size alone and app code reading `theme.textTheme.small` never
-      // moved.
+    test('the prose text theme is style-independent', () {
+      // shadcn's typography examples use fixed Tailwind classes; style roles
+      // reach components through their theme slots instead.
       final vega = ShadThemeData(style: ShadStyleTokens.vega);
       final lyra = ShadThemeData(style: ShadStyleTokens.lyra);
       final sera = ShadThemeData(style: ShadStyleTokens.sera);
 
       expect(vega.textTheme.small.fontSize, 14);
-      expect(lyra.textTheme.small.fontSize, 12);
-      expect(lyra.textTheme.muted.fontSize, 12);
+      expect(vega.textTheme.small.fontWeight, FontWeight.w500);
+      expect(vega.textTheme.small.height, 1);
+      expect(vega.textTheme.large.fontSize, 18);
+      expect(vega.textTheme.large.fontWeight, FontWeight.w600);
+      expect(vega.textTheme.muted.fontWeight, FontWeight.w400);
+      expect(vega.textTheme.p.fontSize, 16);
+      expect(lyra.textTheme.small.fontSize, 14);
+      expect(lyra.textTheme.muted.fontSize, 14);
       expect(sera.textTheme.large.fontSize, 18);
-      // Prose headings are the typography scale and stay put.
       expect(lyra.textTheme.h4.fontSize, vega.textTheme.h4.fontSize);
+      expect(vega.textTheme.h1.letterSpacing, -0.9);
+
+      // Buttons still pick up the style's label role.
+      expect(lyra.primaryButtonTheme.textStyle!.fontSize, 12);
+      expect(vega.primaryButtonTheme.textStyle!.fontSize, 14);
     });
 
     test('a textarea keeps a moderate radius in the round styles', () {
