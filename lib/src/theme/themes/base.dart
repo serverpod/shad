@@ -31,6 +31,7 @@ import 'package:shadcn_ui/src/theme/components/resizable.dart';
 import 'package:shadcn_ui/src/theme/components/select.dart';
 import 'package:shadcn_ui/src/theme/components/separator.dart';
 import 'package:shadcn_ui/src/theme/components/sheet.dart';
+import 'package:shadcn_ui/src/theme/components/sidebar.dart';
 import 'package:shadcn_ui/src/theme/components/skeleton.dart';
 import 'package:shadcn_ui/src/theme/components/slider.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
@@ -115,6 +116,7 @@ abstract class ShadBaseTheme {
     required this.paginationTheme,
     required this.collapsibleTheme,
     required this.commandTheme,
+    required this.sidebarTheme,
     required this.variant,
   });
 
@@ -125,6 +127,7 @@ abstract class ShadBaseTheme {
   final ShadThemeVariant variant;
 
   final ShadCommandTheme commandTheme;
+  final ShadSidebarTheme sidebarTheme;
 
   final ShadSkeletonTheme skeletonTheme;
   final ShadKbdTheme kbdTheme;
@@ -282,4 +285,5 @@ abstract class ShadThemeVariant {
   ShadEmptyTheme emptyTheme();
   ShadPaginationTheme paginationTheme();
   ShadCollapsibleTheme collapsibleTheme();
+  ShadSidebarTheme sidebarTheme();
 }

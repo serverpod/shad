@@ -139,7 +139,7 @@ enum MenuAccent {
 class ThemeEditorConfig {
   const ThemeEditorConfig({
     this.brightness = Brightness.light,
-    this.style = StylePreset.vega,
+    this.style = StylePreset.nova,
     this.baseColor = BaseColor.neutral,
     this.accentColor = AccentColor.base,
     this.chartColor = AccentColor.base,

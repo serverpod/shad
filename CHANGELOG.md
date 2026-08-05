@@ -1,5 +1,31 @@
 ## Unreleased
 
+### New component: Sidebar
+
+A full port of shadcn/ui's `Sidebar`: `ShadSidebarScaffold` lays a
+`ShadSidebar` next to the page content, with `offcanvas`/`icon`/`none`
+collapse modes, `sidebar`/`floating`/`inset` variants, a directional
+`start`/`end` side, an optional grab rail, and a `⌘B`/`Ctrl+B` shortcut.
+Below the `md` breakpoint the sidebar presents as a modal sheet instead.
+Content composes from `ShadSidebarGroup`, `ShadSidebarMenu`,
+`ShadSidebarMenuButton` (sizes, outline variant, badges, tooltips in the
+icon rail), `ShadSidebarMenuSub`, `ShadSidebarMenuSkeleton`,
+`ShadSidebarSeparator` and `ShadSidebarTrigger`. Colours come from the
+scheme's `sidebar*` tokens and metrics from five new per-style tokens
+(`sidebarItemHeight`/`Sm`/`Lg`, `sidebarItemPaddingX`,
+`sidebarSubItemPaddingX`).
+
+### Example app: documentation browser
+
+The example is now a docs site: a shadcn-style top navigation
+(Components / Theme Editor, with the light-dark and LTR-RTL switches on the
+right) over a component browser built on the new sidebar. Every component
+has a documentation page — description, live examples with a Preview/Code
+tab pair, and a link to the old knob playground page. Example source is
+shown in JetBrains Mono, highlighted with `syntax_highlight`, and is loaded
+from the *actual bundled example file*, so the code on screen cannot drift
+from the code that runs.
+
 A fidelity pass against shadcn/ui's `/create` registry: colours and states were re-read from `registry/styles/style-*.css` and `registry/config.ts` rather than from the older `new-york-v4` values, and the menu appearance options moved into the theme itself.
 
 ### Breaking (visual): button variants match the current reference
@@ -40,6 +66,10 @@ A fidelity pass against shadcn/ui's `/create` registry: colours and states were 
 - Cards separate their sections by `--card-spacing` (`ShadCardTheme.sectionGap`) while the title/description gap stays small.
 - Surface hairlines are brightness-aware (`ring-foreground/5 dark:ring-foreground/10` in the soft styles); `rhea` cards/dialogs use the capped `min(radius-4xl, 24px)` corner.
 - `ShadDefaultThemeNoSecondaryBorderVariant` is now a subclass of `ShadDefaultThemeVariant`, so every one of these fixes applies to both focus treatments.
+
+### Breaking (visual): nova is the default style
+
+`ShadThemeData` defaults to `ShadStyleTokens.nova` rather than `vega`, matching shadcn's own `DEFAULT_CONFIG.style`. nova is vega one size down and a step rounder: 32px controls and fields, 16px card and dialog padding, `rounded-lg` surfaces, no card shadow. Pass `style: ShadStyleTokens.vega` to keep the previous geometry. The `ShadStyleTokens` *field* defaults are still vega's, so a custom style only states what it changes.
 
 ### Rendering fixes
 

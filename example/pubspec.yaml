@@ -21,9 +21,12 @@ dependencies:
   boxy: ^2.2.1
   disco: ^1.0.3+1
   fl_chart: ^1.2.0
+  syntax_highlight: ^0.5.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  flutter_driver:
     sdk: flutter
   flutter_lints: ^6.0.0
 
@@ -31,3 +34,63 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    # Each docs example directory is bundled so the doc pages can show the
+    # exact source file that renders the preview.
+    - lib/docs/examples/accordion/
+    - lib/docs/examples/alert/
+    - lib/docs/examples/avatar/
+    - lib/docs/examples/badge/
+    - lib/docs/examples/breadcrumb/
+    - lib/docs/examples/button/
+    - lib/docs/examples/calendar/
+    - lib/docs/examples/card/
+    - lib/docs/examples/checkbox/
+    - lib/docs/examples/collapsible/
+    - lib/docs/examples/command/
+    - lib/docs/examples/context_menu/
+    - lib/docs/examples/data_table/
+    - lib/docs/examples/date_picker/
+    - lib/docs/examples/dialog/
+    - lib/docs/examples/empty/
+    - lib/docs/examples/form/
+    - lib/docs/examples/icon_button/
+    - lib/docs/examples/input/
+    - lib/docs/examples/input_otp/
+    - lib/docs/examples/kbd/
+    - lib/docs/examples/keyboard_toolbar/
+    - lib/docs/examples/layout/
+    - lib/docs/examples/menubar/
+    - lib/docs/examples/pagination/
+    - lib/docs/examples/popover/
+    - lib/docs/examples/progress/
+    - lib/docs/examples/radio_group/
+    - lib/docs/examples/resizable/
+    - lib/docs/examples/select/
+    - lib/docs/examples/separator/
+    - lib/docs/examples/sheet/
+    - lib/docs/examples/sidebar/
+    - lib/docs/examples/skeleton/
+    - lib/docs/examples/slider/
+    - lib/docs/examples/sonner/
+    - lib/docs/examples/spinner/
+    - lib/docs/examples/switch/
+    - lib/docs/examples/table/
+    - lib/docs/examples/tabs/
+    - lib/docs/examples/textarea/
+    - lib/docs/examples/time_picker/
+    - lib/docs/examples/toast/
+    - lib/docs/examples/toggle/
+    - lib/docs/examples/toggle_group/
+    - lib/docs/examples/tooltip/
+    - lib/docs/examples/typography/
+
+  fonts:
+    - family: JetBrainsMono
+      fonts:
+        - asset: fonts/JetBrainsMono-Regular.ttf
+        - asset: fonts/JetBrainsMono-Medium.ttf
+          weight: 500
+        - asset: fonts/JetBrainsMono-Bold.ttf
+          weight: 700
+        - asset: fonts/JetBrainsMono-Italic.ttf
+          style: italic

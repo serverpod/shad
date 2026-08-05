@@ -211,6 +211,54 @@ locks the chain; add to it rather than trusting a local check.
   `com.apple.security.network.client` entitlement that `google_fonts` needs)
   will not commit.
 
+## The sidebar component
+
+- `ShadSidebarScaffold` owns the responsive behaviour; `ShadSidebar` carries
+  the configuration (`side`/`variant`/`collapsible`) and renders the panel.
+  Descendants read `ShadSidebarScope.of(context)` for the collapsed state —
+  that is how menu buttons shrink to squares and sub-menus vanish in the
+  icon rail.
+- The icon rail works by **geometry, not by swapping layouts**: the rail is
+  48 wide, groups pad by 8, so a button is 32 wide — exactly `px(8) + icon(16)
+  + px(8)` — and the label starts at the clip edge. The width animation plus
+  `Clip.hardEdge` therefore reproduces the CSS truncation. Trailing widgets
+  *are* dropped while collapsed, or the row's minimum width would overflow.
+- Offcanvas keeps the content laid out at full width inside an `OverflowBox`
+  anchored to the inner edge, so it slides off rather than reflowing.
+- The mobile sheet is imperative: the scaffold listens to the controller and
+  pushes/pops a `ShadSheet`. `openMobile` and `open` are independent, as in
+  the reference.
+- Sidebar metrics vary per style through `sidebarItemHeight`/`Sm`/`Lg` and
+  `sidebarItemPaddingX`/`sidebarSubItemPaddingX` tokens; radius reuses
+  `itemRadius`, the group label reuses the `overline` role, button text the
+  `body` role. The floating/inset surface radius is the popover radius capped
+  at the 2xl step (`_sidebarSurfaceRadius`), which matches all styles within
+  2px without a dedicated token.
+
+## The example docs browser
+
+`example/lib` is a docs site: `common/app_shell.dart` (top nav) →
+`screens/components_screen.dart` (a `ShadSidebarScaffold` listing
+`docs/registry.dart`) → `docs/docs.dart` (the reusable page widgets).
+
+- **The code shown is the code that runs.** Each example is one standalone
+  widget file under `lib/docs/examples/<slug>/<id>.dart`, bundled as an
+  *asset* (one pubspec entry per directory — asset dirs are non-recursive)
+  and loaded with `rootBundle` by `CodeBlock.asset`. Adding an example means:
+  widget file + `ComponentExample` in `docs/pages/<slug>.dart` + the pubspec
+  entry if the directory is new.
+- Code blocks are always dark, in JetBrains Mono (vendored in
+  `example/fonts/`), highlighted by `syntax_highlight`, whose grammar loads
+  in `main()` via `CodeHighlighter.ensureInitialized()` **before** `runApp`.
+- The old knob pages under `example/lib/pages/` are still routed — each doc
+  page links to its playground — but are no longer the primary navigation.
+- `example/test_driver/app.dart` wraps `main()` in
+  `enableFlutterDriverExtension()`; run with
+  `flutter run -t test_driver/app.dart` to drive the app from tooling
+  (screenshots, taps). Driver commands hang until
+  `set_frame_sync: false` because doc previews contain forever-animating
+  spinners.
+
 ## The example theme editor
 
 `example/lib/pages/theme_editor.dart` plus `example/lib/common/theme_editor/`

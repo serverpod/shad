@@ -28,6 +28,7 @@ mixin _$ShadThemeData {
     return ShadThemeData(
       variant: t < 0.5 ? a.variant : b.variant,
       commandTheme: ShadCommandTheme.lerp(a.commandTheme, b.commandTheme, t)!,
+      sidebarTheme: ShadSidebarTheme.lerp(a.sidebarTheme, b.sidebarTheme, t)!,
       skeletonTheme: ShadSkeletonTheme.lerp(
         a.skeletonTheme,
         b.skeletonTheme,
@@ -229,6 +230,7 @@ mixin _$ShadThemeData {
   ShadThemeData copyWith({
     ShadThemeVariant? variant,
     ShadCommandTheme? commandTheme,
+    ShadSidebarTheme? sidebarTheme,
     ShadSkeletonTheme? skeletonTheme,
     ShadKbdTheme? kbdTheme,
     ShadSpinnerTheme? spinnerTheme,
@@ -296,6 +298,7 @@ mixin _$ShadThemeData {
     return ShadThemeData(
       variant: variant ?? _this.variant,
       commandTheme: commandTheme ?? _this.commandTheme,
+      sidebarTheme: sidebarTheme ?? _this.sidebarTheme,
       skeletonTheme: skeletonTheme ?? _this.skeletonTheme,
       kbdTheme: kbdTheme ?? _this.kbdTheme,
       spinnerTheme: spinnerTheme ?? _this.spinnerTheme,
@@ -380,6 +383,7 @@ mixin _$ShadThemeData {
     return copyWith(
       variant: other.variant,
       commandTheme: _this.commandTheme.merge(other.commandTheme),
+      sidebarTheme: _this.sidebarTheme.merge(other.sidebarTheme),
       skeletonTheme: _this.skeletonTheme.merge(other.skeletonTheme),
       kbdTheme: _this.kbdTheme.merge(other.kbdTheme),
       spinnerTheme: _this.spinnerTheme.merge(other.spinnerTheme),
@@ -479,6 +483,7 @@ mixin _$ShadThemeData {
 
     return _other.variant == _this.variant &&
         _other.commandTheme == _this.commandTheme &&
+        _other.sidebarTheme == _this.sidebarTheme &&
         _other.skeletonTheme == _this.skeletonTheme &&
         _other.kbdTheme == _this.kbdTheme &&
         _other.spinnerTheme == _this.spinnerTheme &&
@@ -550,6 +555,7 @@ mixin _$ShadThemeData {
       runtimeType,
       _this.variant,
       _this.commandTheme,
+      _this.sidebarTheme,
       _this.skeletonTheme,
       _this.kbdTheme,
       _this.spinnerTheme,

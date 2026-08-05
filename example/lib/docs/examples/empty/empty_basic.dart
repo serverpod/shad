@@ -1,0 +1,28 @@
+import 'package:flutter/widgets.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+class EmptyBasicExample extends StatelessWidget {
+  const EmptyBasicExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadCard(
+      width: 400,
+      child: ShadEmpty(
+        icon: const Icon(LucideIcons.inbox),
+        title: const Text('No messages'),
+        description: const Text('Messages you receive will show up here.'),
+        actions: [
+          ShadButton.outline(
+            onPressed: () {},
+            child: const Text('Refresh'),
+          ),
+          ShadButton(
+            onPressed: () {},
+            child: const Text('Compose'),
+          ),
+        ],
+      ),
+    );
+  }
+}

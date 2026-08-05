@@ -16,14 +16,28 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 /// halves are wrapped in [ShadThemeScope] rather than a bare `ShadTheme`, so
 /// their text and icon colours follow their own theme instead of inheriting
 /// the app's.
-class ThemeEditorPage extends StatefulWidget {
+class ThemeEditorPage extends StatelessWidget {
   const ThemeEditorPage({super.key});
 
   @override
-  State<ThemeEditorPage> createState() => _ThemeEditorPageState();
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      appBar: MyAppBar(title: 'Theme Editor'),
+      body: ThemeEditorView(),
+    );
+  }
 }
 
-class _ThemeEditorPageState extends State<ThemeEditorPage> {
+/// The editor itself, without any scaffolding — embeddable both under the
+/// app shell's top navigation and in the standalone [ThemeEditorPage] route.
+class ThemeEditorView extends StatefulWidget {
+  const ThemeEditorView({super.key});
+
+  @override
+  State<ThemeEditorView> createState() => _ThemeEditorViewState();
+}
+
+class _ThemeEditorViewState extends State<ThemeEditorView> {
   ThemeEditorConfig config = const ThemeEditorConfig();
 
   void update(ThemeEditorConfig next) => setState(() => config = next);
@@ -73,12 +87,11 @@ class _ThemeEditorPageState extends State<ThemeEditorPage> {
       child: _Customizer(config: config, onChanged: update),
     );
 
-    return Scaffold(
-      // The page behind the preview carries the preview's own canvas colour,
-      // so nothing white shows through at the edges or under a docked panel.
-      backgroundColor: config.build().colorScheme.muted,
-      appBar: const MyAppBar(title: 'Theme Editor'),
-      body: LayoutBuilder(
+    // The surface behind the preview carries the preview's own canvas colour,
+    // so nothing white shows through at the edges or under a docked panel.
+    return ColoredBox(
+      color: config.build().colorScheme.muted,
+      child: LayoutBuilder(
         builder: (context, constraints) {
           // Below this the floating panel would cover the preview, so it docks
           // to the top instead.

@@ -39,6 +39,7 @@ import 'package:shadcn_ui/src/theme/components/resizable.dart';
 import 'package:shadcn_ui/src/theme/components/select.dart';
 import 'package:shadcn_ui/src/theme/components/separator.dart';
 import 'package:shadcn_ui/src/theme/components/sheet.dart';
+import 'package:shadcn_ui/src/theme/components/sidebar.dart';
 import 'package:shadcn_ui/src/theme/components/skeleton.dart';
 import 'package:shadcn_ui/src/theme/components/slider.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
@@ -68,7 +69,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     required this.colorScheme,
     required this.radius,
     required this.effectiveTextTheme,
-    this.style = ShadStyleTokens.vega,
+    this.style = ShadStyleTokens.nova,
     this.spacing = const ShadSpacing(),
     this.menuColorScheme,
     this.menuTranslucent = false,
@@ -265,9 +266,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   /// The outline of a checkbox or radio: `border-input`, or transparent in
   /// the styles that fill their controls instead of outlining them.
-  Color get controlBorderColor => style.controlBorderless
-      ? const Color(0x00000000)
-      : colorScheme.input;
+  Color get controlBorderColor =>
+      style.controlBorderless ? const Color(0x00000000) : colorScheme.input;
 
   // --- Menus ---------------------------------------------------------------
 
@@ -277,9 +277,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   bool get _menuIsDark => _schemeIsDark(menuScheme);
 
   /// The surface behind a menu's rows.
-  Color get menuSurfaceColor => menuTranslucent
-      ? _wash(menuScheme.popover, .7)
-      : menuScheme.popover;
+  Color get menuSurfaceColor =>
+      menuTranslucent ? _wash(menuScheme.popover, .7) : menuScheme.popover;
 
   /// A menu surface's hairline outline, on the menu palette.
   Color get menuSurfaceBorderColor => _surfaceBorderColorOf(menuScheme);
@@ -288,9 +287,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   ///
   /// `focus:bg-accent` normally; on a translucent surface shadcn switches to
   /// a `foreground/10` wash so the highlight reads through the glass.
-  Color get menuItemHighlight => menuTranslucent
-      ? _wash(menuScheme.foreground, .1)
-      : menuScheme.accent;
+  Color get menuItemHighlight =>
+      menuTranslucent ? _wash(menuScheme.foreground, .1) : menuScheme.accent;
 
   /// The text and icon colour on [menuItemHighlight],
   /// `focus:text-accent-foreground`.
@@ -339,9 +337,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   /// A field's outline colour: `border-input`, or transparent in the styles
   /// that fill their fields instead of outlining them.
-  Color get fieldBorderColor => style.fieldBorderless
-      ? const Color(0x00000000)
-      : colorScheme.input;
+  Color get fieldBorderColor =>
+      style.fieldBorderless ? const Color(0x00000000) : colorScheme.input;
 
   /// The border a multi-line field draws.
   ///
@@ -1909,6 +1906,94 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       duration: Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       crossAxisAlignment: CrossAxisAlignment.stretch,
+    );
+  }
+
+  /// A surface-level radius for the sidebar's floating and inset chrome.
+  ///
+  /// The reference uses `rounded-lg`/`rounded-xl` on the standard styles,
+  /// `rounded-none` on the square ones and `rounded-2xl` on the pill ones —
+  /// the popover radius capped at the 2xl step reproduces that pattern
+  /// (within 2px on `mira`) without a dedicated token.
+  BorderRadius get _sidebarSurfaceRadius {
+    final popover = radii.resolve(style.popoverRadius);
+    final cap = radii.xl2;
+    Radius min(Radius a, Radius b) => a.x <= b.x ? a : b;
+    return BorderRadius.only(
+      topLeft: min(popover.topLeft, cap.topLeft),
+      topRight: min(popover.topRight, cap.topRight),
+      bottomLeft: min(popover.bottomLeft, cap.bottomLeft),
+      bottomRight: min(popover.bottomRight, cap.bottomRight),
+    );
+  }
+
+  @override
+  ShadSidebarTheme sidebarTheme() {
+    // `text-sm` following the style's body role, coloured with the sidebar's
+    // own foreground; `lyra` and `mira` drop to 12px through the role.
+    final itemTextStyle = style.body
+        .apply(effectiveTextTheme.small)
+        .copyWith(color: colorScheme.sidebarForeground);
+    final itemPaddingX = scaled(style.sidebarItemPaddingX);
+    return ShadSidebarTheme(
+      // --sidebar-width: 16rem, --sidebar-width-icon: 3rem, mobile 18rem.
+      width: scaled(256),
+      collapsedWidth: scaled(48),
+      mobileWidth: scaled(288),
+      backgroundColor: colorScheme.sidebar,
+      foregroundColor: colorScheme.sidebarForeground,
+      borderColor: colorScheme.sidebarBorder,
+      accentColor: colorScheme.sidebarAccent,
+      accentForegroundColor: colorScheme.sidebarAccentForeground,
+      ringColor: colorScheme.sidebarRing,
+      ringWidth: 2,
+      headerPadding: EdgeInsets.all(scaled(8)),
+      footerPadding: EdgeInsets.all(scaled(8)),
+      groupPadding: EdgeInsets.all(scaled(8)),
+      contentGap: scaled(8),
+      menuGap: scaled(4),
+      groupLabelHeight: scaled(32),
+      groupLabelPadding: EdgeInsets.symmetric(horizontal: itemPaddingX),
+      // `text-xs font-medium text-sidebar-foreground/70`, with `sera`'s
+      // uppercase tracking coming through the overline role.
+      groupLabelTextStyle: style.overline
+          .apply(effectiveTextTheme.small)
+          .copyWith(
+            fontSize: 12,
+            color: colorScheme.sidebarForeground.withValues(alpha: .7),
+          ),
+      menuButtonHeight: scaled(style.sidebarItemHeight),
+      menuButtonHeightSm: scaled(style.sidebarItemHeightSm),
+      menuButtonHeightLg: scaled(style.sidebarItemHeightLg),
+      menuButtonPadding: EdgeInsets.symmetric(horizontal: itemPaddingX),
+      menuButtonGap: scaled(8),
+      menuButtonRadius: itemRadius,
+      menuButtonTextStyle: itemTextStyle,
+      // The sm size is `text-xs` in every style.
+      menuButtonTextStyleSm: itemTextStyle.copyWith(fontSize: 12),
+      iconSize: scaled(16),
+      subMenuMargin: EdgeInsets.symmetric(horizontal: scaled(14)),
+      subMenuPadding: EdgeInsets.symmetric(
+        horizontal: scaled(10),
+        vertical: scaled(2),
+      ),
+      subButtonHeight: scaled(28),
+      subButtonPadding: EdgeInsets.symmetric(
+        horizontal: scaled(style.sidebarSubItemPaddingX),
+      ),
+      subButtonTextStyle: itemTextStyle,
+      // `h-5 min-w-5 px-1 text-xs font-medium`.
+      badgeTextStyle: style.caption
+          .apply(effectiveTextTheme.small)
+          .copyWith(color: colorScheme.sidebarForeground),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.linear,
+      floatingMargin: EdgeInsets.all(scaled(8)),
+      floatingRadius: _sidebarSurfaceRadius,
+      floatingShadows: Shadows.sm,
+      insetMargin: EdgeInsets.all(scaled(8)),
+      insetRadius: _sidebarSurfaceRadius,
+      insetShadows: Shadows.sm,
     );
   }
 

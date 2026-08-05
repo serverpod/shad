@@ -17,12 +17,23 @@ class PickerOption<T> {
   final Color? swatch;
 }
 
+/// The style of a setting row's small heading, e.g. "Style" or "Base Color".
+///
+/// shadcn's customizer sets these `text-xs text-muted-foreground`. The colour
+/// has to be stated: `ShadTextTheme.muted` carries the muted *metrics* but no
+/// colour, so on its own it renders in the ambient foreground.
+TextStyle _labelStyle(ShadThemeData theme) => theme.textTheme.muted.copyWith(
+  fontSize: 11,
+  color: theme.colorScheme.mutedForeground,
+);
+
 /// A setting row from shadcn/ui's customizer.
 ///
 /// The trigger is a two-line stack — a small muted label above the current
-/// value — with a chevron on the right; tapping it opens a popover holding a
-/// single-select list. This is the shape every picker in shadcn's `/create`
-/// sidebar uses.
+/// value — with the row's icon or colour swatch at the trailing edge; tapping
+/// it opens a popover holding a single-select list. This is the shape every
+/// picker in shadcn's `/create` sidebar uses, where that indicator is
+/// positioned `right-2.5 top-1/2 -translate-y-1/2`.
 class ThemePicker<T> extends StatefulWidget {
   const ThemePicker({
     super.key,
@@ -40,7 +51,7 @@ class ThemePicker<T> extends StatefulWidget {
   final ValueChanged<T> onChanged;
   final bool enabled;
 
-  /// Shown at the leading edge when the setting has no colour to show.
+  /// Shown at the trailing edge when the setting has no colour to show.
   ///
   /// shadcn's customizer gives every row its own icon, which is what makes the
   /// list scannable without reading it.
@@ -123,26 +134,12 @@ class _ThemePickerState<T> extends State<ThemePicker<T>> {
             ),
             child: Row(
               children: [
-                if (selected.swatch != null) ...[
-                  _Swatch(color: selected.swatch!),
-                  const SizedBox(width: 8),
-                ] else if (widget.icon != null) ...[
-                  Icon(
-                    widget.icon,
-                    size: 15,
-                    color: theme.colorScheme.mutedForeground,
-                  ),
-                  const SizedBox(width: 8),
-                ],
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        widget.label,
-                        style: theme.textTheme.muted.copyWith(fontSize: 11),
-                      ),
+                      Text(widget.label, style: _labelStyle(theme)),
                       Text(
                         selected.label,
                         style: theme.textTheme.small,
@@ -151,6 +148,20 @@ class _ThemePickerState<T> extends State<ThemePicker<T>> {
                     ],
                   ),
                 ),
+                // The row's indicator sits at the trailing edge, centred on
+                // the two-line stack — shadcn positions it `right-2.5
+                // top-1/2 -translate-y-1/2`.
+                if (selected.swatch != null) ...[
+                  const SizedBox(width: 8),
+                  _Swatch(color: selected.swatch!),
+                ] else if (widget.icon != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    widget.icon,
+                    size: 15,
+                    color: theme.colorScheme.mutedForeground,
+                  ),
+                ],
               ],
             ),
           ),
@@ -275,20 +286,29 @@ class ThemeSlider extends StatelessWidget {
           ],
           SizedBox(
             width: 74,
-            child: Text(
-              label,
-              style: theme.textTheme.muted.copyWith(fontSize: 11),
-            ),
+            child: Text(label, style: _labelStyle(theme)),
           ),
           Expanded(
             child: SliderTheme(
+              // Straight from the theme's slider, so the panel's control
+              // matches the ones in the preview. The thumb used to be the
+              // page background — near-black, and invisible on this
+              // deliberately dark panel.
               data: SliderThemeData(
-                trackHeight: 4,
-                activeTrackColor: theme.colorScheme.primary,
-                inactiveTrackColor: theme.colorScheme.muted,
-                thumbColor: theme.colorScheme.background,
+                trackHeight: theme.sliderTheme.trackHeight ?? 4,
+                activeTrackColor:
+                    theme.sliderTheme.activeTrackColor ??
+                    theme.colorScheme.primary,
+                inactiveTrackColor:
+                    theme.sliderTheme.inactiveTrackColor ??
+                    theme.colorScheme.muted,
+                thumbColor:
+                    theme.sliderTheme.thumbColor ??
+                    theme.colorScheme.foreground,
                 overlayShape: SliderComponentShape.noOverlay,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                thumbShape: RoundSliderThumbShape(
+                  enabledThumbRadius: theme.sliderTheme.thumbRadius ?? 8,
+                ),
               ),
               child: Slider(
                 value: value.clamp(min, max),
@@ -302,7 +322,7 @@ class ThemeSlider extends StatelessWidget {
             width: 40,
             child: Text(
               '${value.toStringAsFixed(fractionDigits)}$suffix',
-              style: theme.textTheme.muted.copyWith(fontSize: 11),
+              style: _labelStyle(theme),
               textAlign: TextAlign.end,
             ),
           ),
@@ -397,7 +417,7 @@ class _ThemeGroupPickerState extends State<ThemeGroupPicker> {
                   padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
                   child: Text(
                     widget.groups[g].label,
-                    style: theme.textTheme.muted.copyWith(fontSize: 11),
+                    style: _labelStyle(theme),
                   ),
                 ),
                 Opacity(
@@ -435,23 +455,12 @@ class _ThemeGroupPickerState extends State<ThemeGroupPicker> {
           ),
           child: Row(
             children: [
-              if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
-                  size: 15,
-                  color: theme.colorScheme.mutedForeground,
-                ),
-                const SizedBox(width: 8),
-              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      widget.label,
-                      style: theme.textTheme.muted.copyWith(fontSize: 11),
-                    ),
+                    Text(widget.label, style: _labelStyle(theme)),
                     Text(
                       widget.value,
                       style: theme.textTheme.small,
@@ -460,6 +469,14 @@ class _ThemeGroupPickerState extends State<ThemeGroupPicker> {
                   ],
                 ),
               ),
+              if (widget.icon != null) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  widget.icon,
+                  size: 15,
+                  color: theme.colorScheme.mutedForeground,
+                ),
+              ],
             ],
           ),
         ),

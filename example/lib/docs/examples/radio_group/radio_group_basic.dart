@@ -1,0 +1,28 @@
+import 'package:flutter/widgets.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
+enum NotifyAbout {
+  all('All new messages'),
+  mentions('Direct messages and mentions'),
+  nothing('Nothing');
+
+  const NotifyAbout(this.message);
+
+  final String message;
+}
+
+class RadioGroupBasicExample extends StatelessWidget {
+  const RadioGroupBasicExample({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadRadioGroup<NotifyAbout>(
+      initialValue: NotifyAbout.mentions,
+      onChanged: (value) {},
+      items: [
+        for (final option in NotifyAbout.values)
+          ShadRadio(value: option, label: Text(option.message)),
+      ],
+    );
+  }
+}

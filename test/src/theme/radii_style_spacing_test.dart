@@ -229,7 +229,8 @@ void main() {
     test('a single-line field centres its text in its fixed height', () {
       final theme = ShadThemeData();
 
-      expect(theme.inputTheme.constraints!.minHeight, 36);
+      // nova, the default style, sizes its fields `h-8`.
+      expect(theme.inputTheme.constraints!.minHeight, 32);
       expect(theme.inputTheme.alignment, AlignmentDirectional.centerStart);
       expect(
         theme.inputTheme.placeholderAlignment,
@@ -272,7 +273,8 @@ void main() {
       expect(theme.tabsTheme.padding, const EdgeInsets.all(3)); // p-[3px]
       expect(
         theme.tabsTheme.tabPadding,
-        const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // px-2 py-1
+        // nova's `px-1.5 py-0.5`.
+        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       );
     });
 
@@ -496,15 +498,16 @@ void main() {
       final normal = ShadThemeData();
       final tight = ShadThemeData(spacing: const ShadSpacing(step: 2));
 
-      expect(normal.cardTheme.padding, const EdgeInsets.all(24));
-      expect(tight.cardTheme.padding, const EdgeInsets.all(12));
+      // nova's `--card-spacing` is `--spacing(4)`, so it halves with the step.
+      expect(normal.cardTheme.padding, const EdgeInsets.all(16));
+      expect(tight.cardTheme.padding, const EdgeInsets.all(8));
       expect(tight.spacing(6), 12);
 
       // A style's metrics are stored in the pixels they render at the default
-      // step, and rescale with it — exactly as Tailwind's `h-9` follows
+      // step, and rescale with it — exactly as Tailwind's `h-8` follows
       // `--spacing`. Its bracketed literals do not.
-      expect(tight.buttonSizesTheme.regular!.height, 18);
-      expect(tight.switchTheme.width, ShadStyleTokens.vega.switchWidth);
+      expect(tight.buttonSizesTheme.regular!.height, 16);
+      expect(tight.switchTheme.width, ShadStyleTokens.nova.switchWidth);
     });
 
     test('style and spacing survive copyWith', () {

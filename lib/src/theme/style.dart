@@ -70,8 +70,9 @@ enum ShadSurfaceFill {
 /// to a theme variant reshapes every component at once, which is what makes a
 /// style switch a single setting rather than a second theme.
 ///
-/// The defaults are `vega`'s, so a custom style only has to state what it
-/// changes.
+/// The field defaults here are `vega`'s, so a custom style only has to state
+/// what it changes. That is separate from the *theme's* default style, which
+/// is [nova] — shadcn's own `DEFAULT_CONFIG.style`.
 @immutable
 class ShadStyleTokens {
   const ShadStyleTokens({
@@ -150,6 +151,12 @@ class ShadStyleTokens {
     this.itemPaddingY = 6,
     this.menubarHeight = 36,
     this.menubarPadding = 4,
+    // Sidebar.
+    this.sidebarItemHeight = 32,
+    this.sidebarItemHeightSm = 28,
+    this.sidebarItemHeightLg = 48,
+    this.sidebarItemPaddingX = 8,
+    this.sidebarSubItemPaddingX = 8,
     // Selection controls.
     this.controlFill = ShadSurfaceFill.none,
     this.controlFillDark = ShadSurfaceFill.input30,
@@ -399,6 +406,22 @@ class ShadStyleTokens {
   /// A bracketed literal in some styles (`p-[3px]`), so it is not scaled.
   final double menubarPadding;
 
+  // --- Sidebar ------------------------------------------------------------
+
+  /// Height of a sidebar menu button, shadcn's `h-8` (`h-9` in the roomier
+  /// styles). The sm/lg sizes shift with it.
+  final double sidebarItemHeight;
+  final double sidebarItemHeightSm;
+  final double sidebarItemHeightLg;
+
+  /// Horizontal padding of a sidebar menu button and group label, shadcn's
+  /// `p-2`/`px-2` (`px-3` in the roomier styles).
+  final double sidebarItemPaddingX;
+
+  /// Horizontal padding of a sidebar sub-menu button, shadcn's `px-2`
+  /// (`px-3` in `luma`, `sera` and `rhea`).
+  final double sidebarSubItemPaddingX;
+
   // --- Selection controls -------------------------------------------------
 
   /// The fill of an unchecked checkbox or radio in light mode.
@@ -497,10 +520,12 @@ class ShadStyleTokens {
 
   // --- shadcn/ui's eight styles ------------------------------------------
 
-  /// The shadcn/ui default: 36px controls, 24px card padding, a 3px ring.
+  /// The registry's baseline: 36px controls, 24px card padding, a 3px ring.
+  /// Every other style is expressed as a delta from it.
   static const vega = ShadStyleTokens(name: 'vega');
 
-  /// vega, one size down and a step rounder.
+  /// vega, one size down and a step rounder — and shadcn's default style,
+  /// which is what a theme uses when none is given.
   static const nova = ShadStyleTokens(
     name: 'nova',
     // `leading-snug` on the card title.
@@ -577,6 +602,10 @@ class ShadStyleTokens {
     sliderTrackHeight: 12,
     tableCellPadding: 12,
     progressHeight: 12,
+    sidebarItemHeight: 36,
+    sidebarItemHeightSm: 32,
+    sidebarItemHeightLg: 56,
+    sidebarItemPaddingX: 12,
   );
 
   /// Square and compact.
@@ -737,6 +766,11 @@ class ShadStyleTokens {
     kbdHeight: 22,
     kbdPaddingX: 6,
     progressHeight: 12,
+    sidebarItemHeight: 36,
+    sidebarItemHeightSm: 32,
+    sidebarItemHeightLg: 56,
+    sidebarItemPaddingX: 12,
+    sidebarSubItemPaddingX: 12,
   );
 
   /// Editorial: square, uppercase, letter-spaced, and the largest of the eight.
@@ -835,6 +869,11 @@ class ShadStyleTokens {
     kbdHeight: 22,
     kbdPaddingX: 6,
     progressHeight: 2,
+    sidebarItemHeight: 36,
+    sidebarItemHeightSm: 32,
+    sidebarItemHeightLg: 56,
+    sidebarItemPaddingX: 12,
+    sidebarSubItemPaddingX: 12,
   );
 
   /// Rounded and compact.
@@ -894,6 +933,8 @@ class ShadStyleTokens {
     tabPaddingX: 6,
     tabPaddingY: 2,
     progressHeight: 8,
+    sidebarItemPaddingX: 12,
+    sidebarSubItemPaddingX: 12,
   );
 
   /// All eight, in shadcn/ui's order.
@@ -976,6 +1017,11 @@ class ShadStyleTokens {
     double? itemPaddingY,
     double? menubarHeight,
     double? menubarPadding,
+    double? sidebarItemHeight,
+    double? sidebarItemHeightSm,
+    double? sidebarItemHeightLg,
+    double? sidebarItemPaddingX,
+    double? sidebarSubItemPaddingX,
     ShadSurfaceFill? controlFill,
     ShadSurfaceFill? controlFillDark,
     bool? controlBorderless,
@@ -1078,6 +1124,12 @@ class ShadStyleTokens {
       itemPaddingY: itemPaddingY ?? this.itemPaddingY,
       menubarHeight: menubarHeight ?? this.menubarHeight,
       menubarPadding: menubarPadding ?? this.menubarPadding,
+      sidebarItemHeight: sidebarItemHeight ?? this.sidebarItemHeight,
+      sidebarItemHeightSm: sidebarItemHeightSm ?? this.sidebarItemHeightSm,
+      sidebarItemHeightLg: sidebarItemHeightLg ?? this.sidebarItemHeightLg,
+      sidebarItemPaddingX: sidebarItemPaddingX ?? this.sidebarItemPaddingX,
+      sidebarSubItemPaddingX:
+          sidebarSubItemPaddingX ?? this.sidebarSubItemPaddingX,
       controlFill: controlFill ?? this.controlFill,
       controlFillDark: controlFillDark ?? this.controlFillDark,
       controlBorderless: controlBorderless ?? this.controlBorderless,
@@ -1175,6 +1227,11 @@ class ShadStyleTokens {
     menuMinWidth,
     itemPaddingX,
     itemPaddingY,
+    sidebarItemHeight,
+    sidebarItemHeightSm,
+    sidebarItemHeightLg,
+    sidebarItemPaddingX,
+    sidebarSubItemPaddingX,
     menubarHeight,
     menubarPadding,
     controlFill,

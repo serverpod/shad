@@ -217,7 +217,8 @@ void main() {
       expect(containerFinder, findsOneWidget);
       final container = tester.widget<Container>(containerFinder);
       final decoration = container.decoration as BoxDecoration?;
-      expect(container.padding, const EdgeInsets.all(24)); // Default padding
+      // The default style is nova, whose `--card-spacing` is `--spacing(4)`.
+      expect(container.padding, const EdgeInsets.all(16));
       expect(
         decoration?.color,
         ShadTheme.of(tester.element(containerFinder)).colorScheme.card,

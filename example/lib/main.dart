@@ -1,6 +1,6 @@
 import 'package:disco/disco.dart';
-import 'package:example/common/app_bar.dart';
-import 'package:example/common/extensions.dart';
+import 'package:example/common/app_shell.dart';
+import 'package:example/docs/docs.dart';
 import 'package:example/pages/accordion.dart';
 import 'package:example/pages/alert.dart';
 import 'package:example/pages/avatar.dart';
@@ -61,8 +61,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SolidartConfig.devToolsEnabled = false;
+  // The docs' code blocks need the Dart grammar and highlighter theme.
+  await CodeHighlighter.ensureInitialized();
   runApp(const App());
 }
 
@@ -125,8 +128,6 @@ final routes = <String, WidgetBuilder>{
   '/tooltip': (_) => const TooltipPage(),
   '/typography': (_) => const TypographyPage(),
 };
-final routeToNameRegex = RegExp('(?:^/|-)([a-zA-Z])');
-
 final themeModeProvider = Provider((_) => Signal(ThemeMode.light));
 
 final directionalityProvider = Provider((context) => Signal(TextDirection.ltr));
@@ -153,7 +154,7 @@ class App extends StatelessWidget {
           //     return MaterialApp(
           //       routes: routes,
           //       theme: Theme.of(context),
-          //       home: const MainPage(),
+          //       home: const AppShell(),
           //       localizationsDelegates: const [
           //         GlobalShadLocalizations.delegate,
           //       ],
@@ -219,7 +220,7 @@ class App extends StatelessWidget {
                 },
               ),
             ),
-            home: const MainPage(),
+            home: const AppShell(),
             builder: (context, child) {
               return Directionality(
                 textDirection: directionality,
@@ -229,134 +230,6 @@ class App extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-}
-
-/// A featured entry point for the theme editor.
-///
-/// The editor is not a component demo, so it would otherwise sit unnoticed
-/// between "Textarea" and "TimePicker" in the alphabetical list. It stays in
-/// that list too, so searching for it still works.
-class _ThemeEditorBanner extends StatelessWidget {
-  const _ThemeEditorBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: ShadCard(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                borderRadius: theme.radius,
-              ),
-              child: Icon(
-                LucideIcons.palette,
-                size: 20,
-                color: theme.colorScheme.primaryForeground,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Theme Editor', style: theme.textTheme.large),
-                  Text(
-                    'Configure colours, radius, focus ring and typography '
-                    'with a live preview.',
-                    style: theme.textTheme.muted,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            ShadButton(
-              onPressed: () => Navigator.of(context).pushNamed('/theme-editor'),
-              trailing: const Icon(LucideIcons.arrowRight, size: 16),
-              child: const Text('Open'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
-
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  final search = Signal('');
-
-  @override
-  void dispose() {
-    search.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppBar(
-        titleWidget: ShadInput(
-          placeholder: const Text('Search ShadcnUI component'),
-          onChanged: search.set,
-        ),
-      ),
-      body: Column(
-        children: [
-          const _ThemeEditorBanner(),
-          Expanded(child: _buildRoutesList(context)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRoutesList(BuildContext context) {
-    return SignalBuilder(
-      builder: (context, child) {
-        final filteredRoutes = {
-          for (final k in routes.keys.where(
-            (k) => k.toLowerCase().contains(search().toLowerCase()),
-          ))
-            k: routes[k]!,
-        };
-
-        return ListView.builder(
-          itemCount: filteredRoutes.length,
-          itemBuilder: (BuildContext context, int index) {
-            final route = filteredRoutes.keys.elementAt(index);
-
-            final name = route.replaceAllMapped(
-              routeToNameRegex,
-              (match) => match.group(0)!.substring(1).toUpperCase(),
-            );
-
-            return Material(
-              child: ListTile(
-                title: Text(name),
-                onTap: () {
-                  Navigator.of(context).pushNamed(route);
-                },
-              ),
-            );
-          },
-        );
-      },
     );
   }
 }

@@ -32,6 +32,7 @@ import 'package:shadcn_ui/src/theme/components/resizable.dart';
 import 'package:shadcn_ui/src/theme/components/select.dart';
 import 'package:shadcn_ui/src/theme/components/separator.dart';
 import 'package:shadcn_ui/src/theme/components/sheet.dart';
+import 'package:shadcn_ui/src/theme/components/sidebar.dart';
 import 'package:shadcn_ui/src/theme/components/skeleton.dart';
 import 'package:shadcn_ui/src/theme/components/slider.dart';
 import 'package:shadcn_ui/src/theme/components/sonner.dart';
@@ -130,6 +131,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ShadPaginationTheme? paginationTheme,
     ShadCollapsibleTheme? collapsibleTheme,
     ShadCommandTheme? commandTheme,
+    ShadSidebarTheme? sidebarTheme,
     ShadThemeVariant? variant,
     ShadContextMenuTheme? contextMenuTheme,
     ShadCalendarTheme? calendarTheme,
@@ -143,7 +145,8 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ShadDefaultKeyboardToolbarTheme? defaultKeyboardToolbarTheme,
 
     /// The shadcn/ui style: the radius, focus-ring and label treatment shared
-    /// by every component. Defaults to [ShadStyleTokens.vega].
+    /// by every component. Defaults to [ShadStyleTokens.nova], which is
+    /// shadcn's own default (`DEFAULT_CONFIG.style`).
     ///
     /// When a [variant] is also given, the variant is rebuilt with this style.
     ShadStyleTokens? style,
@@ -270,7 +273,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
             colorScheme: effectiveColorScheme,
             radius: effectiveRadius,
             effectiveTextTheme: effectiveTextTheme,
-            style: style ?? ShadStyleTokens.vega,
+            style: style ?? ShadStyleTokens.nova,
             spacing: spacing ?? const ShadSpacing(),
             menuColorScheme: effectiveMenuColorScheme,
             menuTranslucent: menuTranslucent ?? false,
@@ -279,7 +282,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
             colorScheme: effectiveColorScheme,
             radius: effectiveRadius,
             effectiveTextTheme: effectiveTextTheme,
-            style: style ?? ShadStyleTokens.vega,
+            style: style ?? ShadStyleTokens.nova,
             spacing: spacing ?? const ShadSpacing(),
             menuColorScheme: effectiveMenuColorScheme,
             menuTranslucent: menuTranslucent ?? false,
@@ -400,6 +403,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
         collapsibleTheme,
       ),
       commandTheme: effectiveVariant.commandTheme().merge(commandTheme),
+      sidebarTheme: effectiveVariant.sidebarTheme().merge(sidebarTheme),
       variant: effectiveVariant,
     );
   }
@@ -467,6 +471,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     required super.paginationTheme,
     required super.collapsibleTheme,
     required super.commandTheme,
+    required super.sidebarTheme,
     required super.variant,
   });
 

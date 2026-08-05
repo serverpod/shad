@@ -132,7 +132,8 @@ void main() {
       expect(snippet, contains('Brightness.dark'));
       expect(snippet, contains('ShadZincColorScheme.dark()'));
       expect(snippet, contains('applyAccentScheme'));
-      expect(snippet, contains('ShadStyleTokens.vega'));
+      // The default style, mirroring shadcn's own `DEFAULT_CONFIG.style`.
+      expect(snippet, contains('ShadStyleTokens.nova'));
     });
 
     test('the snippet omits applyAccent when the accent is the base', () {
