@@ -7,7 +7,7 @@ import 'package:intl/intl.dart' as intl show TextDirection;
 //
 // Only what the package's own public API requires is re-exported. `boxy`,
 // `flutter_svg` and `universal_image` used to be re-exported wholesale even
-// though they appear nowhere in a Shad* signature; importing shadcn_ui dumped
+// though they appear nowhere in a Shad* signature; importing shad dumped
 // several hundred unrelated symbols (BoxyDelegate, RenderBoxy, SvgPicture, …)
 // into the caller's namespace. Depend on those packages directly if you need
 // them.

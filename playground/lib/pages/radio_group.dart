@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class RadioGroupPage extends StatelessWidget {
   const RadioGroupPage({super.key});

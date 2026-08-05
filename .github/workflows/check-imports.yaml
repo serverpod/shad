@@ -34,8 +34,8 @@ jobs:
           # Check for cupertino.dart imports (excluding specified files)
           CUPERTINO_IMPORTS=$(eval "grep -r \"import.*cupertino\.dart\" lib/ $GREP_EXCLUDE || true")
 
-          # Check for shadcn_ui.dart imports in lib directory
-          SHADCN_UI_IMPORTS=$(grep -r "import.*shadcn_ui/shadcn_ui\.dart" lib/ || true)
+          # Check for shad.dart imports in lib directory
+          SHAD_IMPORTS=$(grep -r "import.*shad/shad\.dart" lib/ || true)
 
           # Report all findings first
           FOUND_VIOLATIONS=false
@@ -52,9 +52,9 @@ jobs:
             FOUND_VIOLATIONS=true
           fi
 
-          if [ ! -z "$SHADCN_UI_IMPORTS" ]; then
-            echo "❌ Found prohibited shadcn_ui.dart imports:"
-            echo "$SHADCN_UI_IMPORTS"
+          if [ ! -z "$SHAD_IMPORTS" ]; then
+            echo "❌ Found prohibited shad.dart imports:"
+            echo "$SHAD_IMPORTS"
             FOUND_VIOLATIONS=true
           fi
 

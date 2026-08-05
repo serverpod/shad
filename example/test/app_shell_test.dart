@@ -4,7 +4,7 @@ import 'package:example/main.dart';
 import 'package:example/pages/theme_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 void main() {
   Future<void> pumpShell(WidgetTester tester) async {
@@ -30,7 +30,7 @@ void main() {
   ) async {
     await pumpShell(tester);
 
-    expect(find.text('shadcn_ui'), findsOneWidget);
+    expect(find.text('shad'), findsOneWidget);
     expect(find.text('Components'), findsWidgets);
     expect(find.text('Theme Editor'), findsOneWidget);
     // The sidebar lists the components; Typography is the first entry.

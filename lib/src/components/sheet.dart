@@ -6,9 +6,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shadcn_ui/src/components/dialog.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/position.dart';
+import 'package:shad/src/components/dialog.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/position.dart';
 
 /// Shows a [ShadSheet], which is a modal bottom sheet implementation.
 ///

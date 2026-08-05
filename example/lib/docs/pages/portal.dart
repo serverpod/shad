@@ -1,6 +1,6 @@
 import 'package:example/docs/docs.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 final portalDoc = ComponentDoc(
   slug: 'portal',

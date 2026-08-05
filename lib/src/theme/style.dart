@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/radii.dart';
-import 'package:shadcn_ui/src/theme/text_role.dart';
-import 'package:shadcn_ui/src/theme/themes/shadows.dart';
+import 'package:shad/src/theme/radii.dart';
+import 'package:shad/src/theme/text_role.dart';
+import 'package:shad/src/theme/themes/shadows.dart';
 
 /// A wash of colour a style paints behind a control or an outline button.
 ///

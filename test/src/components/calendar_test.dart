@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/components/calendar.dart'; // Adjust import path based on your project structure
-import 'package:shadcn_ui/src/components/icon_button.dart';
-import 'package:shadcn_ui/src/utils/extensions/date_time.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/calendar.dart'; // Adjust import path based on your project structure
+import 'package:shad/src/components/icon_button.dart';
+import 'package:shad/src/utils/extensions/date_time.dart';
 
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold

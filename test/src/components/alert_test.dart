@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/alert.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/alert.dart';
 
 void main() {
   Widget createTestWidget(Widget child) {

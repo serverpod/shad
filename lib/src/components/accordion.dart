@@ -2,15 +2,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/separator.dart';
-import 'package:shadcn_ui/src/raw_components/focusable.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/animate.dart';
-import 'package:shadcn_ui/src/utils/animation_builder.dart';
-import 'package:shadcn_ui/src/utils/effects.dart';
-import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
-import 'package:shadcn_ui/src/utils/provider.dart';
+import 'package:shad/src/components/separator.dart';
+import 'package:shad/src/raw_components/focusable.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/animate.dart';
+import 'package:shad/src/utils/animation_builder.dart';
+import 'package:shad/src/utils/effects.dart';
+import 'package:shad/src/utils/extensions/text_style.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/provider.dart';
 
 /// {@template ShadAccordionController}
 /// A controller for managing the state of a [ShadAccordion] widget.

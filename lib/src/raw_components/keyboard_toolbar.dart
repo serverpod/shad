@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shad/src/theme/theme.dart';
 
 /// {@template ShadKeyboardToolbar}
 /// Renders a toolbar above the keyboard fully customizable.

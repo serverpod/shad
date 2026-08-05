@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/accordion.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/accordion.dart';
 
 void main() {
   /// Wraps a widget with necessary providers and material app structure for

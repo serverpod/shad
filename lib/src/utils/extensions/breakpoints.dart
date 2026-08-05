@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/responsive.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/responsive.dart';
 
 extension ShadBreakpointsExt on BuildContext {
   ShadBreakpoint get breakpoint {

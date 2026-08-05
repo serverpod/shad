@@ -2,7 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// A selectable font, mirroring shadcn/ui's `FONT_DEFINITIONS`.
 ///
@@ -81,7 +81,7 @@ class EditorFont {
   /// Builds the text theme for this font.
   ShadTextTheme textTheme() {
     if (bundled) {
-      return ShadTextTheme(family: family, package: 'shadcn_ui');
+      return ShadTextTheme(family: family, package: 'shad');
     }
     return ShadTextTheme.fromGoogleFont(builder);
   }

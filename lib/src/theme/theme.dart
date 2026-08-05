@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
+import 'package:shad/src/theme/data.dart';
 
 class ShadTheme extends StatelessWidget {
   const ShadTheme({

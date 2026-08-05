@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class ContextMenuBasicExample extends StatelessWidget {
   const ContextMenuBasicExample({super.key});

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/components/card.dart';
-import 'package:shadcn_ui/src/components/form/fields/input.dart';
-import 'package:shadcn_ui/src/components/tabs.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/green.dart';
-import 'package:shadcn_ui/src/theme/components/tabs.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/card.dart';
+import 'package:shad/src/components/form/fields/input.dart';
+import 'package:shad/src/components/tabs.dart';
+import 'package:shad/src/theme/color_scheme/green.dart';
+import 'package:shad/src/theme/components/tabs.dart';
+import 'package:shad/src/theme/data.dart';
 
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold

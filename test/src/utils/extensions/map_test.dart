@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/utils/extensions/map.dart';
+import 'package:shad/src/utils/extensions/map.dart';
 
 void main() {
   group('MapExtensions', () {

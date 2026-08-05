@@ -238,7 +238,7 @@ String _generateSkillMd(
   buffer.writeln('# Shadcn UI for Flutter');
   buffer.writeln();
   buffer.writeln(
-    'This skill provides documentation and examples for using the `shadcn_ui` package in Flutter.',
+    'This skill provides documentation and examples for using the `shad` package in Flutter.',
   );
   buffer.writeln();
   buffer.writeln('## Theming and Customization');
@@ -272,10 +272,10 @@ String _generateSkillMd(
   buffer.writeln();
   buffer.writeln('### Basic Setup');
   buffer.writeln(
-    'Here is a complete example of a Counter App using `shadcn_ui`, including light and dark theme support.',
+    'Here is a complete example of a Counter App using `shad`, including light and dark theme support.',
   );
   buffer.writeln('```dart');
-  buffer.writeln("import 'package:shadcn_ui/shadcn_ui.dart';");
+  buffer.writeln("import 'package:shad/shad.dart';");
   buffer.writeln();
   buffer.writeln('void main() {');
   buffer.writeln('  runApp(const MyApp());');

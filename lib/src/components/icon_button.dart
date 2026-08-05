@@ -1,13 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/theme/components/button.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
-import 'package:shadcn_ui/src/utils/states_controller.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/theme/components/button.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/states_controller.dart';
 
 /// A customizable icon-only button widget with variant styling.
 ///

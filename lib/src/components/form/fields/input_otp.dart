@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/form/field.dart';
-import 'package:shadcn_ui/src/components/input_otp.dart';
+import 'package:shad/src/components/form/field.dart';
+import 'package:shad/src/components/input_otp.dart';
 
 class ShadInputOTPFormField extends ShadFormBuilderField<String> {
   ShadInputOTPFormField({

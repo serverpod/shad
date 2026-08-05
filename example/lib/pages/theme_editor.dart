@@ -7,7 +7,7 @@ import 'package:example/common/theme_editor/preview_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// A recreation of shadcn/ui's theme editor (ui.shadcn.com/create).
 ///
@@ -411,7 +411,7 @@ class _Customizer extends StatelessWidget {
               snippet,
               style: ShadTheme.of(context).textTheme.small.copyWith(
                 fontFamily: 'GeistMono',
-                package: 'shadcn_ui',
+                package: 'shad',
               ),
             ),
           ),

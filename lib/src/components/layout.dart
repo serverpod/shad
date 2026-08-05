@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shad/src/theme/theme.dart';
 
 /// Empty space between two children of a [Row], [Column] or [Flex], measured
 /// in steps on the theme's spacing scale.

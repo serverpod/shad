@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/raw_components/portal.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/raw_components/portal.dart';
 
 void main() {
   Widget createTestWidget(Widget child) {

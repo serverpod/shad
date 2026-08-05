@@ -15,7 +15,7 @@ dependencies:
     sdk: flutter
   flutter_solidart: ^2.5.0
   go_router: ^16.2.2
-  shadcn_ui:
+  shad:
     path: ..
   awesome_flutter_extensions: ^2.0.1
   web: ^1.1.0

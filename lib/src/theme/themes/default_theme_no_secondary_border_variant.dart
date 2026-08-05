@@ -1,21 +1,21 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/base.dart';
-import 'package:shadcn_ui/src/theme/components/calendar.dart';
-import 'package:shadcn_ui/src/theme/components/checkbox.dart';
-import 'package:shadcn_ui/src/theme/components/context_menu.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/components/input_otp.dart';
-import 'package:shadcn_ui/src/theme/components/radio.dart';
-import 'package:shadcn_ui/src/theme/components/select.dart';
-import 'package:shadcn_ui/src/theme/components/switch.dart';
-import 'package:shadcn_ui/src/theme/components/tabs.dart';
-import 'package:shadcn_ui/src/theme/components/time_picker.dart';
-import 'package:shadcn_ui/src/theme/spacing.dart';
-import 'package:shadcn_ui/src/theme/style.dart';
-import 'package:shadcn_ui/src/theme/text_theme/text_styles_default.dart';
-import 'package:shadcn_ui/src/theme/text_theme/theme.dart';
-import 'package:shadcn_ui/src/theme/themes/default_theme_variant.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
+import 'package:shad/src/theme/color_scheme/base.dart';
+import 'package:shad/src/theme/components/calendar.dart';
+import 'package:shad/src/theme/components/checkbox.dart';
+import 'package:shad/src/theme/components/context_menu.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/components/input_otp.dart';
+import 'package:shad/src/theme/components/radio.dart';
+import 'package:shad/src/theme/components/select.dart';
+import 'package:shad/src/theme/components/switch.dart';
+import 'package:shad/src/theme/components/tabs.dart';
+import 'package:shad/src/theme/components/time_picker.dart';
+import 'package:shad/src/theme/spacing.dart';
+import 'package:shad/src/theme/style.dart';
+import 'package:shad/src/theme/text_theme/text_styles_default.dart';
+import 'package:shad/src/theme/text_theme/theme.dart';
+import 'package:shad/src/theme/themes/default_theme_variant.dart';
+import 'package:shad/src/utils/border.dart';
 
 /// [ShadDefaultThemeVariant] without the outward focus ring.
 ///

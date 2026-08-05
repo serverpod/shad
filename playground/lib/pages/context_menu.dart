@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class ContextMenuPage extends StatelessWidget {
   const ContextMenuPage({super.key});

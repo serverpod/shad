@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
 
 /// {@template ShadSpinner}
 /// An indeterminate circular loading indicator.

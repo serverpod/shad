@@ -1,13 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/input.dart';
-import 'package:shadcn_ui/src/components/select.dart';
-import 'package:shadcn_ui/src/i18n/localizations_delegate.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
-import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
-import 'package:shadcn_ui/src/utils/separated_iterable.dart';
+import 'package:shad/src/components/input.dart';
+import 'package:shad/src/components/select.dart';
+import 'package:shad/src/i18n/localizations_delegate.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/extensions/text_style.dart';
+import 'package:shad/src/utils/separated_iterable.dart';
 
 /// Whether the TimeOfDay is before or after noon.
 enum ShadDayPeriod {

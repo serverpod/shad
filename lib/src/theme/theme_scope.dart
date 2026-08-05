@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/theme.dart';
 
 /// Derives the Material [ThemeData] a [ShadThemeData] implies.
 ///

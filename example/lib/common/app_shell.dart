@@ -3,7 +3,7 @@ import 'package:example/pages/theme_editor.dart';
 import 'package:example/screens/components_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 enum AppSection { components, themeEditor }
 
@@ -79,7 +79,7 @@ class _TopNav extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            'shadcn_ui',
+            'shad',
             style: theme.textTheme.large.copyWith(fontSize: 15),
           ),
           const SizedBox(width: 28),

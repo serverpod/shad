@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/avatar.dart'; // Adjust import path based on your project structure
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/avatar.dart'; // Adjust import path based on your project structure
 import 'package:universal_image/universal_image.dart';
 
 void main() {

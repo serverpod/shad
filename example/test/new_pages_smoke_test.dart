@@ -2,7 +2,7 @@ import 'package:disco/disco.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// Renders every page added for the 0.57.0 components.
 ///

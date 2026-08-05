@@ -3,7 +3,7 @@ import 'package:example/common/base_scaffold.dart';
 import 'package:example/common/component_view.dart';
 import 'package:example/common/properties/bool_property.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 // Example of extension on ShadTextTheme with a custom style.
 // which can be retrieved with `ShadTheme.of(context).textTheme.myCustomStyle`.

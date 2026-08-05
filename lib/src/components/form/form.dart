@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/form/field.dart';
-import 'package:shadcn_ui/src/utils/extensions/map.dart';
+import 'package:shad/src/components/form/field.dart';
+import 'package:shad/src/utils/extensions/map.dart';
 
 /// Used to configure the auto validation of [FormField and [ShadForm]
 /// widgets.

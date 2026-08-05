@@ -7,7 +7,7 @@ import 'package:example/pages/theme_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 void main() {
   // google_fonts downloads faces on first use; there is no network in tests,

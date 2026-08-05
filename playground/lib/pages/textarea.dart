@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// A demo page showcasing the usage of [ShadTextarea] with controls
 /// to toggle `enabled` and `resizable` states dynamically.

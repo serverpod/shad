@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// The placeholder used to be driven by a ValueListenableBuilder wrapped
 /// around the whole field, so every keystroke — and every cursor move, since

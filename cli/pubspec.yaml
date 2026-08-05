@@ -1,5 +1,5 @@
 name: shadcn
-description: The shadcn_ui CLI to install components directly into your source code without depending on a dependency.
+description: The shad CLI to install components directly into your source code without depending on a dependency.
 version: 0.0.0
 homepage: https://mariuti.com/flutter-shadcn-ui
 repository: https://github.com/nank1ro/flutter-shadcn-ui

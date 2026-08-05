@@ -1,16 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/raw_components/focusable.dart';
-import 'package:shadcn_ui/src/theme/components/button.dart';
-import 'package:shadcn_ui/src/theme/components/button_sizes.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
-import 'package:shadcn_ui/src/utils/separated_iterable.dart';
-import 'package:shadcn_ui/src/utils/states_controller.dart';
+import 'package:shad/src/raw_components/focusable.dart';
+import 'package:shad/src/theme/components/button.dart';
+import 'package:shad/src/theme/components/button_sizes.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/separated_iterable.dart';
+import 'package:shad/src/utils/states_controller.dart';
 
 /// Variants available for the [ShadButton] widget.
 enum ShadButtonVariant {

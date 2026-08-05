@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class ButtonIconExample extends StatelessWidget {
   const ButtonIconExample({super.key});

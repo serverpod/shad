@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 // Returns the Positioned widget that directly anchors the sheet's close
 // ShadIconButton. find.ancestor yields ancestors nearest-first, so .first

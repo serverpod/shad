@@ -1,14 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/dialog.dart';
-import 'package:shadcn_ui/src/components/empty.dart';
-import 'package:shadcn_ui/src/components/input.dart';
-import 'package:shadcn_ui/src/components/separator.dart';
-import 'package:shadcn_ui/src/raw_components/roving_focus.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
+import 'package:shad/src/components/dialog.dart';
+import 'package:shad/src/components/empty.dart';
+import 'package:shad/src/components/input.dart';
+import 'package:shad/src/components/separator.dart';
+import 'package:shad/src/raw_components/roving_focus.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
 
 /// A single selectable row in a [ShadCommand].
 ///

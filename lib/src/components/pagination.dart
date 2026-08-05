@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/components/icon_button.dart';
-import 'package:shadcn_ui/src/i18n/localizations_delegate.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/icon_button.dart';
+import 'package:shad/src/i18n/localizations_delegate.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
 
 /// {@template ShadPagination}
 /// A page navigator.

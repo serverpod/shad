@@ -1,14 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/disabled.dart';
-import 'package:shadcn_ui/src/components/input.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/text_theme/text_styles_default.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
-import 'package:shadcn_ui/src/utils/provider.dart';
-import 'package:shadcn_ui/src/utils/separated_iterable.dart';
-import 'package:shadcn_ui/src/utils/text_editing_controller.dart';
+import 'package:shad/src/components/disabled.dart';
+import 'package:shad/src/components/input.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/text_theme/text_styles_default.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/provider.dart';
+import 'package:shad/src/utils/separated_iterable.dart';
+import 'package:shad/src/utils/text_editing_controller.dart';
 
 const kInvisibleCharCode = '\u200b';
 

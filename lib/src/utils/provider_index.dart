@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/utils/provider.dart';
+import 'package:shad/src/utils/provider.dart';
 
 /// An immutable class that holds an [index].
 ///

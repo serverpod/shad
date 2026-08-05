@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 enum ShadDatePickerVariantPlayground { single, range, presets }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
 
 /// Variants available for the [ShadAlert] widget.
 enum ShadAlertVariant {

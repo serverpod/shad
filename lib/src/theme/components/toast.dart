@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
+import 'package:shad/src/utils/border.dart';
 
-import 'package:shadcn_ui/src/utils/position.dart';
+import 'package:shad/src/utils/position.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 part 'toast.g.theme.dart';

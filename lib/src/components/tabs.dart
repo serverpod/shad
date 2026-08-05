@@ -3,14 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/theme/themes/shadows.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
-import 'package:shadcn_ui/src/utils/provider.dart';
-import 'package:shadcn_ui/src/utils/states_controller.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/theme/themes/shadows.dart';
+import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/provider.dart';
+import 'package:shad/src/utils/states_controller.dart';
 
 /// A controller for [ShadTabs] to manage tab selection.
 ///

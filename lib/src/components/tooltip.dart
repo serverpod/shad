@@ -1,14 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shadcn_ui/src/components/popover.dart';
-import 'package:shadcn_ui/src/raw_components/portal.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/animate.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
-import 'package:shadcn_ui/src/utils/mouse_area.dart';
+import 'package:shad/src/components/popover.dart';
+import 'package:shad/src/raw_components/portal.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/animate.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/mouse_area.dart';
 
 /// Controls the visibility of a [ShadTooltip].
 typedef ShadTooltipController = ShadPopoverController;

@@ -1,6 +1,6 @@
 import 'package:example/common/base_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class CommandPage extends StatefulWidget {
   const CommandPage({super.key});

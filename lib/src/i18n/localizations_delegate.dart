@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/i18n/strings.g.dart';
+import 'package:shad/src/i18n/strings.g.dart';
 
 /// Flutter localizations delegate for [ShadLocalizationsData].
 ///

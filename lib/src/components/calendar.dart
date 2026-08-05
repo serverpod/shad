@@ -4,14 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/components/icon_button.dart';
-import 'package:shadcn_ui/src/components/select.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
-import 'package:shadcn_ui/src/utils/extensions/date_time.dart';
-import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/icon_button.dart';
+import 'package:shad/src/components/select.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/extensions/date_time.dart';
+import 'package:shad/src/utils/extensions/text_style.dart';
 
 /// Encapsulates a start and end [DateTime] that represent the range of dates.
 ///

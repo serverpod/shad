@@ -1,6 +1,6 @@
 import 'package:example/common/theme_editor/fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// shadcn/ui's neutral *base colours*.
 enum BaseColor {
@@ -338,7 +338,7 @@ class ThemeEditorConfig {
     if (font.bundled) {
       buffer.writeln(
         "  textTheme: ShadTextTheme(family: '${font.family}', "
-        "package: 'shadcn_ui'),",
+        "package: 'shad'),",
       );
     } else {
       buffer.writeln(

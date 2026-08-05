@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/badge.dart'; // Adjust import path based on your project structure
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/badge.dart'; // Adjust import path based on your project structure
 
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold

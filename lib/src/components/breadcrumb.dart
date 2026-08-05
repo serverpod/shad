@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/button.dart';
-import 'package:shadcn_ui/src/components/popover.dart';
-import 'package:shadcn_ui/src/raw_components/portal.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/extensions/text_style.dart';
+import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/popover.dart';
+import 'package:shad/src/raw_components/portal.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/extensions/text_style.dart';
 
 /// {@template ShadBreadcrumb}
 /// A breadcrumb navigation component that displays the current page location

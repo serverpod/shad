@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:shadcn_ui/src/components/checkbox.dart';
-import 'package:shadcn_ui/src/components/empty.dart';
-import 'package:shadcn_ui/src/components/pagination.dart';
-import 'package:shadcn_ui/src/components/table.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
+import 'package:shad/src/components/checkbox.dart';
+import 'package:shad/src/components/empty.dart';
+import 'package:shad/src/components/pagination.dart';
+import 'package:shad/src/components/table.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 /// The direction a [ShadDataTable] is sorted in.

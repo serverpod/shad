@@ -1,7 +1,7 @@
 import 'package:example/docs/docs.dart';
 import 'package:example/docs/registry.dart';
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 /// The documentation browser: a [ShadSidebar] of every component next to the
 /// selected component's doc page.

@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shadcn_ui:
+  shad:
     path: ..
   flutter_solidart: ^2.1.0
   awesome_flutter_extensions: ^2.0.1

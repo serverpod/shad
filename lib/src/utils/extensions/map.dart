@@ -1,5 +1,5 @@
-import 'package:shadcn_ui/src/utils/extensions/list.dart';
-import 'package:shadcn_ui/src/utils/extensions/set.dart';
+import 'package:shad/src/utils/extensions/list.dart';
+import 'package:shad/src/utils/extensions/set.dart';
 
 /// Extensions for Map operations with String keys and dynamic values.
 extension MapExtensions on Map<String, dynamic> {

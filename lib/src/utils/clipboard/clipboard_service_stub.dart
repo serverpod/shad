@@ -1,4 +1,4 @@
-import 'package:shadcn_ui/src/utils/clipboard/clipboard_service.dart';
+import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 
 void addPasteFilesListener(ShadPasteFilesCallback callback) {}
 void removePasteFilesListener(ShadPasteFilesCallback callback) {}

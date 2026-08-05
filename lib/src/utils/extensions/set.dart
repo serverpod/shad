@@ -1,5 +1,5 @@
-import 'package:shadcn_ui/src/utils/extensions/list.dart';
-import 'package:shadcn_ui/src/utils/extensions/map.dart';
+import 'package:shad/src/utils/extensions/list.dart';
+import 'package:shad/src/utils/extensions/map.dart';
 
 /// Deep copy extension for Set.
 extension SetDeepCopyExtension on Set<dynamic> {

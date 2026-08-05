@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/disabled.dart';
-import 'package:shadcn_ui/src/theme/components/badge.dart';
-import 'package:shadcn_ui/src/theme/data.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/gesture_detector.dart';
+import 'package:shad/src/components/disabled.dart';
+import 'package:shad/src/theme/components/badge.dart';
+import 'package:shad/src/theme/data.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/gesture_detector.dart';
 
 /// Variants available for the [ShadBadge] widget.
 enum ShadBadgeVariant {

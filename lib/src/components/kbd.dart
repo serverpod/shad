@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/border.dart';
-import 'package:shadcn_ui/src/utils/debug_check.dart';
-import 'package:shadcn_ui/src/utils/separated_iterable.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/debug_check.dart';
+import 'package:shad/src/utils/separated_iterable.dart';
 
 /// {@template ShadKbd}
 /// A keyboard key cap, used to document a shortcut.

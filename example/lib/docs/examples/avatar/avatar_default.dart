@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 
 class AvatarDefaultExample extends StatelessWidget {
   const AvatarDefaultExample({super.key});

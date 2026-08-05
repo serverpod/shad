@@ -1,22 +1,22 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/accent.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/blue.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/gray.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/green.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/mauve.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/mist.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/neutral.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/olive.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/orange.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/red.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/rose.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/slate.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/stone.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/taupe.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/violet.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/yellow.dart';
-import 'package:shadcn_ui/src/theme/color_scheme/zinc.dart';
+import 'package:shad/src/theme/color_scheme/accent.dart';
+import 'package:shad/src/theme/color_scheme/blue.dart';
+import 'package:shad/src/theme/color_scheme/gray.dart';
+import 'package:shad/src/theme/color_scheme/green.dart';
+import 'package:shad/src/theme/color_scheme/mauve.dart';
+import 'package:shad/src/theme/color_scheme/mist.dart';
+import 'package:shad/src/theme/color_scheme/neutral.dart';
+import 'package:shad/src/theme/color_scheme/olive.dart';
+import 'package:shad/src/theme/color_scheme/orange.dart';
+import 'package:shad/src/theme/color_scheme/red.dart';
+import 'package:shad/src/theme/color_scheme/rose.dart';
+import 'package:shad/src/theme/color_scheme/slate.dart';
+import 'package:shad/src/theme/color_scheme/stone.dart';
+import 'package:shad/src/theme/color_scheme/taupe.dart';
+import 'package:shad/src/theme/color_scheme/violet.dart';
+import 'package:shad/src/theme/color_scheme/yellow.dart';
+import 'package:shad/src/theme/color_scheme/zinc.dart';
 
 @immutable
 class ShadColorScheme {

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/extensions/tap_details.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/extensions/tap_details.dart';
 
 @immutable
 class ShadHoverStrategies {

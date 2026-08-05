@@ -45,8 +45,8 @@ body:
       required: true
   - type: input
     attributes:
-      label: shadcn_ui version
-      description: Please tell us which version of shadcn_ui you are using.
+      label: shad version
+      description: Please tell us which version of shad you are using.
       placeholder: ex. 0.7.3
     validations:
       required: true

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shad/shad.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 
 /// One documented component: what the sidebar lists and a doc page renders.

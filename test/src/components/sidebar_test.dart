@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shadcn_ui/src/app.dart';
-import 'package:shadcn_ui/src/components/sidebar.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shad/src/app.dart';
+import 'package:shad/src/components/sidebar.dart';
+import 'package:shad/src/theme/theme.dart';
 
 void main() {
   // Wider than the md breakpoint, so the sidebar renders inline.

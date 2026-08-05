@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/theme/components/separator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
+import 'package:shad/src/theme/components/separator.dart';
+import 'package:shad/src/theme/theme.dart';
 
 /// Variants available for the [ShadSeparator] widget.
 enum ShadSeparatorVariant { vertical, horizontal }

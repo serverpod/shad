@@ -2,10 +2,10 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/input.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
-import 'package:shadcn_ui/src/theme/theme.dart';
-import 'package:shadcn_ui/src/utils/clipboard/clipboard_service.dart';
+import 'package:shad/src/components/input.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 
 /// A customizable multiline textarea widget with
 /// adjustable height and optional resizing grip.

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:shadcn_ui/src/components/form/field.dart';
-import 'package:shadcn_ui/src/components/time_picker.dart';
-import 'package:shadcn_ui/src/theme/components/decorator.dart';
+import 'package:shad/src/components/form/field.dart';
+import 'package:shad/src/components/time_picker.dart';
+import 'package:shad/src/theme/components/decorator.dart';
 
 class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
   ShadTimePickerFormField({
