@@ -1,22 +1,7 @@
 # Flutter ShadcnUI
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-purple.svg)](https://github.com/nank1ro/flutter-shadcn-ui/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/nank1ro/flutter-shadcn-ui)](https://gitHub.com/nank1ro/flutter-shadcn-ui/stargazers/)
-[![GitHub issues](https://img.shields.io/github/issues/nank1ro/flutter-shadcn-ui)](https://gitHub.com/nank1ro/flutter-shadcn-ui/issues/)
-[![GitHub pull-requests](https://img.shields.io/github/issues-pr/nank1ro/flutter-shadcn-ui.svg)](https://gitHub.com/nank1ro/flutter-shadcn-ui/pull/)
-[![shadcn_ui Pub Version (including pre-releases)](https://img.shields.io/pub/v/shadcn_ui?include_prereleases)](https://pub.dev/packages/shadcn_ui)
-![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/nank1ro/flutter-shadcn-ui)
-[![Join Discord](https://dcbadge.limes.pink/api/server/ZhRMAPNh5Y?style=flat)](https://discord.gg/ZhRMAPNh5Y)
-[![Supported by ufirst](https://custom-icon-badges.demolab.com/badge/Supported%20by-ufirst-blue?logo=heart)](https://ufirst.com)
-
-<a href="https://www.buymeacoffee.com/nank1ro" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-
 Shadcn UI ported in Flutter.
 Awesome UI components for Flutter, fully customizable.
-
-## Documentation
-
-See the [documentation](https://mariuti.com/flutter-shadcn-ui/) to interact with the components and see the code.
 
 ### Agent Skills
 
