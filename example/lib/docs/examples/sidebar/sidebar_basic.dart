@@ -36,6 +36,9 @@ class _SidebarBasicExampleState extends State<SidebarBasicExample> {
           borderRadius: theme.radii.lg,
           sidebar: ShadSidebar(
             collapsible: ShadSidebarCollapsible.icon,
+            // The inner edge highlights under the pointer and toggles the
+            // sidebar on click.
+            rail: true,
             header: Row(
               children: [
                 Container(

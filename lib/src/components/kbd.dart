@@ -132,7 +132,9 @@ class ShadKbd extends StatelessWidget {
           decoration: BoxDecoration(
             color: effectiveBackgroundColor,
             borderRadius: effectiveBorder.radius,
-            border: effectiveBorder.hasBorder ? effectiveBorder.toBorder() : null,
+            border: effectiveBorder.hasBorder
+                ? effectiveBorder.toBorder()
+                : null,
           ),
           child: Text(text, style: effectiveTextStyle),
         ),

@@ -575,6 +575,83 @@ void main() {
     });
   });
 
+  group('ShadSidebar.rail', () {
+    Widget railWidget(
+      ShadSidebarController controller, {
+      ShadSidebarCollapsible collapsible = ShadSidebarCollapsible.icon,
+    }) {
+      return ShadApp(
+        home: Scaffold(
+          body: ShadSidebarScaffold(
+            controller: controller,
+            sidebar: ShadSidebar(
+              rail: true,
+              collapsible: collapsible,
+              children: [
+                ShadSidebarGroup(
+                  label: const Text('Group'),
+                  children: [
+                    ShadSidebarMenu(
+                      children: [
+                        ShadSidebarMenuButton(
+                          onPressed: () {},
+                          child: const Text('Home'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            child: const Text('page'),
+          ),
+        ),
+      );
+    }
+
+    Finder railFinder() => find.byWidgetPredicate(
+      (widget) =>
+          widget is MouseRegion &&
+          (widget.cursor == SystemMouseCursors.resizeLeft ||
+              widget.cursor == SystemMouseCursors.resizeRight),
+    );
+
+    MouseCursor railCursor(WidgetTester tester) =>
+        tester.widget<MouseRegion>(railFinder()).cursor;
+
+    testWidgets('clicking the edge toggles the sidebar, and the cursor '
+        'points where the edge will go', (tester) async {
+      final controller = ShadSidebarController();
+      addTearDown(controller.dispose);
+      await pumpDesktop(tester, railWidget(controller));
+
+      // Expanded, on the left: the edge collapses leftwards.
+      expect(controller.open, isTrue);
+      expect(railCursor(tester), SystemMouseCursors.resizeLeft);
+
+      // A click anywhere on the strip toggles — not just on the 2px line.
+      await tester.tapAt(tester.getCenter(railFinder()) + const Offset(5, 0));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(controller.open, isFalse);
+      expect(railCursor(tester), SystemMouseCursors.resizeRight);
+
+      await tester.tapAt(tester.getCenter(railFinder()));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(controller.open, isTrue);
+    });
+
+    testWidgets('only accompanies the icon collapse mode', (tester) async {
+      final controller = ShadSidebarController();
+      addTearDown(controller.dispose);
+      await pumpDesktop(
+        tester,
+        railWidget(controller, collapsible: ShadSidebarCollapsible.offcanvas),
+      );
+
+      expect(railFinder(), findsNothing);
+    });
+  });
+
   group('ShadSidebar.scrollController', () {
     testWidgets('drives the content area between header and footer', (
       tester,

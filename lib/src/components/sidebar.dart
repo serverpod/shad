@@ -449,7 +449,11 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
       );
     }
 
-    if (!isMobile && sidebar.rail) {
+    // The rail only accompanies the icon collapse: with offcanvas the edge
+    // disappears along with the panel, so there is nothing to grab.
+    if (!isMobile &&
+        sidebar.rail &&
+        sidebar.collapsible == ShadSidebarCollapsible.icon) {
       content = Stack(
         clipBehavior: Clip.none,
         children: [
@@ -537,7 +541,12 @@ class ShadSidebar extends StatelessWidget {
   /// The scrollable content, typically [ShadSidebarGroup]s.
   final List<Widget> children;
 
-  /// Whether the sidebar shows a grab rail on its inner edge that toggles it.
+  /// Whether the sidebar shows a grab rail on its inner edge that toggles
+  /// it, shadcn/ui's `SidebarRail`: the edge highlights under the pointer,
+  /// shows a resize cursor, and a click collapses or expands the sidebar.
+  ///
+  /// Only takes effect with [ShadSidebarCollapsible.icon] — with the other
+  /// modes the edge leaves the screen together with the panel.
   final bool rail;
 
   /// {@template ShadSidebar.width}
@@ -851,8 +860,22 @@ class _ShadSidebarRailState extends State<_ShadSidebarRail> {
     final scope = ShadSidebarScope.of(context);
     final borderColor =
         theme.sidebarTheme.borderColor ?? theme.colorScheme.sidebarBorder;
+
+    // The cursor points where clicking will move the edge, like the
+    // reference: `[[data-side=left]_&]:cursor-w-resize` flipping to
+    // `e-resize` when collapsed, and mirrored on the right side.
+    final onLeft =
+        (scope.side == ShadSidebarSide.start) ==
+        (Directionality.of(context) == TextDirection.ltr);
+    final cursor = onLeft == scope.open
+        ? SystemMouseCursors.resizeLeft
+        : SystemMouseCursors.resizeRight;
+
     return ShadGestureDetector(
-      cursor: SystemMouseCursors.resizeColumn,
+      cursor: cursor,
+      // The whole strip toggles, not just the 2px line it highlights —
+      // deferring to the child left everything but the hairline untappable.
+      behavior: HitTestBehavior.opaque,
       onHoverChange: (value) => setState(() => hovered = value),
       onTap: scope.toggle,
       child: Center(

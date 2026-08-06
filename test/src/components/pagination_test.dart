@@ -4,7 +4,8 @@ import 'package:shad/src/app.dart';
 import 'package:shad/src/components/pagination.dart';
 
 void main() {
-  Widget wrap(Widget child) => ShadApp(home: Scaffold(body: Center(child: child)));
+  Widget wrap(Widget child) =>
+      ShadApp(home: Scaffold(body: Center(child: child)));
 
   testWidgets('inactive page buttons match the selected button size', (
     tester,

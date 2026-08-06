@@ -38,7 +38,9 @@ void main() {
       expect(cap.height, lessThan(80));
     });
 
-    testWidgets('keeps its own width inside a stretched column', (tester) async {
+    testWidgets('keeps its own width inside a stretched column', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         createTestWidget(
           const SizedBox(

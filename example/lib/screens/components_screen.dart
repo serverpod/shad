@@ -101,7 +101,6 @@ class ComponentsScreenState extends State<ComponentsScreen> {
 
     return ShadSidebarScaffold(
       sidebar: ShadSidebar(
-        rail: true,
         scrollController: _sidebarScrollController,
         header: ShadInput(
           placeholder: const Text('Search docs'),

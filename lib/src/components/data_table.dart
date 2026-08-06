@@ -22,8 +22,8 @@ const _kSelectionCellPadding = EdgeInsetsDirectional.only(start: 16, end: 8);
 /// Matches the table's default horizontal inset on the trailing edge.
 const _kTrailingCellPadding = EdgeInsetsDirectional.only(start: 8, end: 16);
 
-/// Fills the viewport after [precedingExtent], leaving [trailingFixed] pixels
-/// for trailing fixed-width columns.
+/// Fills the viewport after the preceding columns, leaving a fixed number
+/// of pixels for trailing fixed-width columns.
 class _RemainingMinusTrailingFixedExtent extends TableSpanExtent {
   const _RemainingMinusTrailingFixedExtent(this.trailingFixed);
 
@@ -394,8 +394,8 @@ class _ShadDataTableState<T> extends State<ShadDataTable<T>> {
     return _RemainingMinusTrailingFixedExtent(trailingFixed);
   }
 
-  /// The rightmost column without an [extent] that sits before the trailing
-  /// fixed-width suffix.
+  /// The rightmost column without a [ShadDataTableColumn.extent] that sits
+  /// before the trailing fixed-width suffix.
   int? _flexColumnIndex(List<ShadDataTableColumn<T>> columns) {
     final trailingStart = _trailingFixedStartIndex(columns);
     for (var i = trailingStart - 1; i >= 0; i--) {
