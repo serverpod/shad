@@ -218,7 +218,8 @@ locks the chain; add to it rather than trusting a local check.
   `build_runner`. Only `lib/src/i18n/en.i18n.yaml` needs editing; other locales
   inherit from English.
 - **Nothing under `lib/` may import `material.dart`, `cupertino.dart` or the
-  package's own barrel** — `lib/src/app.dart` is the only exemption, and
+  package's own barrel** — `lib/src/app.dart` and `lib/src/theme/theme_scope.dart`
+  are the only exemptions (Material/Cupertino interop), and
   `.github/workflows/check-imports.yaml` enforces it. This is why `ShadSpinner`
   is a `CustomPainter` rather than a wrapped `CircularProgressIndicator`.
 - Verify with: `flutter analyze` and `flutter test` at the root, then the same

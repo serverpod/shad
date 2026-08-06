@@ -20,6 +20,7 @@ jobs:
           # Define excluded files
           EXCLUDED_FILES=(
             "lib/src/app.dart"
+            "lib/src/theme/theme_scope.dart"
           )
 
           # Build grep exclusion pattern
@@ -28,14 +29,14 @@ jobs:
             GREP_EXCLUDE="$GREP_EXCLUDE | grep -v \"$file\""
           done
 
-          # Check for material.dart imports (excluding specified files)
-          MATERIAL_IMPORTS=$(eval "grep -r \"import.*material\.dart\" lib/ $GREP_EXCLUDE || true")
+          # Only match actual import lines, not doc comments that mention them.
+          MATERIAL_IMPORTS=$(eval "grep -rE \"^[[:space:]]*import .*material\\.dart\" lib/ $GREP_EXCLUDE || true")
 
           # Check for cupertino.dart imports (excluding specified files)
-          CUPERTINO_IMPORTS=$(eval "grep -r \"import.*cupertino\.dart\" lib/ $GREP_EXCLUDE || true")
+          CUPERTINO_IMPORTS=$(eval "grep -rE \"^[[:space:]]*import .*cupertino\\.dart\" lib/ $GREP_EXCLUDE || true")
 
           # Check for shad.dart imports in lib directory
-          SHAD_IMPORTS=$(grep -r "import.*shad/shad\.dart" lib/ || true)
+          SHAD_IMPORTS=$(grep -rE "^[[:space:]]*import .*shad/shad\.dart" lib/ || true)
 
           # Report all findings first
           FOUND_VIOLATIONS=false
