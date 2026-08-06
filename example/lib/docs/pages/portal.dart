@@ -1,6 +1,6 @@
 import 'package:example/docs/docs.dart';
+import 'package:example/docs/examples/portal/portal_anchoring.dart';
 import 'package:flutter/widgets.dart';
-import 'package:shad/shad.dart';
 
 final portalDoc = ComponentDoc(
   slug: 'portal',
@@ -9,15 +9,21 @@ final portalDoc = ComponentDoc(
       'The raw overlay primitive underneath popover, select, tooltip, and '
       'menus: renders a follower widget anchored to its child, above '
       'everything else.',
-  playgroundRoute: '/portal',
-  body: (context) {
-    final theme = ShadTheme.of(context);
-    return Text(
-      'ShadPortal is a building block rather than an end-user component. '
-      'Reach for ShadPopover, ShadTooltip, or the menu components first, '
-      'and use the portal directly only when building a new floating '
-      'surface. The playground shows the anchoring modes.',
-      style: theme.textTheme.p,
-    );
-  },
+  body: (context) => const DocParagraph(
+    '`ShadPortal` is a building block rather than an end-user component. '
+    'Reach for `ShadPopover`, `ShadTooltip`, or the menu components first. '
+    'Use the portal directly only when you build a new floating surface.',
+  ),
+  examples: [
+    ComponentExample(
+      id: 'portal_anchoring',
+      title: 'Anchoring modes',
+      description:
+          'Hover the red square. The portal cycles through '
+          '`ShadAnchorAuto` follower anchors every second.',
+      minPreviewHeight: 360,
+      padding: EdgeInsets.zero,
+      builder: (_) => const PortalAnchoringExample(),
+    ),
+  ],
 );

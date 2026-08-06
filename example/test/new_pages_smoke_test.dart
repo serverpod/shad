@@ -15,7 +15,6 @@ void main() {
     '/data-table',
     '/empty',
     '/kbd',
-    '/layout',
     '/pagination',
     '/skeleton',
     '/spinner',

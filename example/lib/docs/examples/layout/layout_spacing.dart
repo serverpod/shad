@@ -1,18 +1,17 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/shad.dart';
 
+/// `ShadRow` and `ShadColumn` accept a `spacing` argument in theme steps.
 class LayoutSpacingExample extends StatelessWidget {
   const LayoutSpacingExample({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return ShadColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4,
       children: [
-        // ShadRow/ShadColumn space their children in *steps* of the theme's
-        // spacing scale: 2 steps is 8px with the default 4px step.
         ShadCard(
           child: ShadRow(
             mainAxisSize: MainAxisSize.min,
@@ -23,21 +22,19 @@ class LayoutSpacingExample extends StatelessWidget {
             ],
           ),
         ),
-        const ShadGap(4),
-        ShadCard(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Stacked'),
-              const ShadGap(2),
-              const Text('with a two-step gap'),
-              const ShadGap(4),
-              Text(
-                'theme.spacing(4) is ${theme.spacing(4)}px',
-                style: theme.textTheme.muted,
-              ),
-            ],
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: ShadCard(
+            child: ShadColumn(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 3,
+              children: [
+                const ShadInput(placeholder: Text('Email')),
+                const ShadInput(placeholder: Text('Password')),
+                ShadButton(onPressed: () {}, child: const Text('Sign in')),
+              ],
+            ),
           ),
         ),
       ],

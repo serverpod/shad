@@ -62,6 +62,7 @@ flutter:
     - lib/docs/examples/menubar/
     - lib/docs/examples/pagination/
     - lib/docs/examples/popover/
+    - lib/docs/examples/portal/
     - lib/docs/examples/progress/
     - lib/docs/examples/radio_group/
     - lib/docs/examples/resizable/

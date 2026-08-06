@@ -22,16 +22,13 @@ import 'package:example/pages/dialog.dart';
 import 'package:example/pages/empty.dart';
 import 'package:example/pages/icon_button.dart';
 import 'package:example/pages/input.dart';
-import 'package:example/pages/input_form_field.dart';
 import 'package:example/pages/input_otp.dart';
 import 'package:example/pages/input_otp_form_field.dart';
 import 'package:example/pages/kbd.dart';
-import 'package:example/pages/layout.dart';
 import 'package:example/pages/keyboard_toolbar.dart';
 import 'package:example/pages/menubar.dart';
 import 'package:example/pages/pagination.dart';
 import 'package:example/pages/popover.dart';
-import 'package:example/pages/portal.dart';
 import 'package:example/pages/progress.dart';
 import 'package:example/pages/radio_group.dart';
 import 'package:example/pages/radio_group_form_field.dart';
@@ -94,14 +91,11 @@ final routes = <String, WidgetBuilder>{
   '/input': (_) => const InputPage(),
   '/input-OTP': (_) => const InputOTPPage(),
   '/input-OTP-form-field': (_) => const InputOTPFormFieldPage(),
-  '/input-form-field': (_) => const InputFormFieldPage(),
   '/kbd': (_) => const KbdPage(),
   '/keyboard-toolbar': (_) => const KeyboardToolbarPage(),
-  '/layout': (_) => const LayoutPage(),
   '/menubar': (_) => const MenubarPage(),
   '/popover': (_) => const PopoverPage(),
   '/pagination': (_) => const PaginationPage(),
-  '/portal': (_) => const ShadPortalPage(),
   '/progress': (_) => const ProgressPage(),
   '/radio-group': (_) => const RadioPage(),
   '/radio-group-form-field': (_) => const RadioGroupFormFieldPage(),

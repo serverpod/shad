@@ -415,7 +415,12 @@ class DocExample extends StatelessWidget {
         Text(example.title, style: theme.textTheme.h4),
         if (example.description != null) ...[
           const SizedBox(height: 4),
-          Text(example.description!, style: theme.textTheme.muted),
+          Text.rich(
+            TextSpan(
+              children: DocParagraph.spans(context, example.description!),
+              style: theme.textTheme.muted,
+            ),
+          ),
         ],
         const SizedBox(height: 12),
         ShadTabs<String>(
@@ -455,6 +460,7 @@ class ComponentDocPage extends StatelessWidget {
 
     return SelectionArea(
       child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         // A stable key per component so switching pages resets the scroll.
         key: PageStorageKey('docs-${doc.slug}'),
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
@@ -466,7 +472,12 @@ class ComponentDocPage extends StatelessWidget {
               children: [
                 Text(doc.title, style: theme.textTheme.h2),
                 const SizedBox(height: 8),
-                Text(doc.description, style: theme.textTheme.lead),
+                Text.rich(
+                  TextSpan(
+                    children: DocParagraph.spans(context, doc.description),
+                    style: theme.textTheme.lead,
+                  ),
+                ),
                 if (doc.playgroundRoute != null) ...[
                   const SizedBox(height: 16),
                   Align(

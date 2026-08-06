@@ -9,7 +9,6 @@ final formDoc = ComponentDoc(
   description:
       'Building forms with ShadForm: field values collect under their ids, '
       'and validation runs per field.',
-  playgroundRoute: '/input-form-field',
   examples: [
     ComponentExample(
       id: 'form_profile',
