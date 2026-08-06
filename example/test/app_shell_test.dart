@@ -34,10 +34,15 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
   }
 
-  /// Switches to the docs browser, which is no longer the launch section.
+  /// Switches to the component reference, which is no longer the launch
+  /// section. Three pumps: the sidebar's scroll to the Components group is
+  /// scheduled post-frame, animates from the following frame, and completes
+  /// on the one after.
   Future<void> openComponents(WidgetTester tester) async {
     await tester.tap(find.text('Components').first);
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(milliseconds: 400));
   }
 
@@ -92,8 +97,13 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.text('Badge'), findsWidgets);
-    expect(find.text('Accordion'), findsNothing);
+    // Scoped to the sidebar: the open page is still titled Accordion.
+    Finder inSidebar(String text) => find.descendant(
+      of: find.byType(ShadSidebar),
+      matching: find.text(text),
+    );
+    expect(inSidebar('Badge'), findsOneWidget);
+    expect(inSidebar('Accordion'), findsNothing);
   });
 
   group('the theme editor toggle', () {

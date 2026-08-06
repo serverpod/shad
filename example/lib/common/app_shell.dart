@@ -1,4 +1,5 @@
 import 'package:example/common/theme_editor/customizer_panel.dart';
+import 'package:example/docs/registry.dart';
 import 'package:example/main.dart';
 import 'package:example/screens/components_screen.dart';
 import 'package:example/screens/playground_screen.dart';
@@ -6,7 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:shad/shad.dart';
 
-enum AppSection { playground, components }
+/// The two screens of the [IndexedStack].
+enum AppSection { playground, docs }
+
+/// The links of the top navigation. Docs and Components both show the
+/// documentation browser — Docs lands on the written pages, Components on the
+/// component reference further down the same sidebar.
+enum AppNavItem { playground, docs, components }
 
 /// The application frame: a shadcn-style top navigation bar over the current
 /// section, with the theme customizer docked beside it when it is open. Both
@@ -22,6 +29,12 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   AppSection section = AppSection.playground;
 
+  final _docsKey = GlobalKey<ComponentsScreenState>();
+
+  /// Whether the docs browser is showing a page from the Components group —
+  /// that is what decides which of the two docs links reads as active.
+  bool _viewingComponents = false;
+
   /// Below this the docked panel would leave the app too narrow to use, so it
   /// takes the viewport instead.
   static const _narrow = 700.0;
@@ -35,6 +48,28 @@ class _AppShellState extends State<AppShell> {
     _initializedEditorOpen = true;
     themeEditorOpenProvider.of(context).value =
         MediaQuery.sizeOf(context).width >= _narrow;
+  }
+
+  AppNavItem get _activeNavItem => switch (section) {
+    AppSection.playground => AppNavItem.playground,
+    AppSection.docs =>
+      _viewingComponents ? AppNavItem.components : AppNavItem.docs,
+  };
+
+  void _selectNavItem(AppNavItem item) {
+    switch (item) {
+      case AppNavItem.playground:
+        setState(() => section = AppSection.playground);
+      case AppNavItem.docs:
+        setState(() => section = AppSection.docs);
+        _docsKey.currentState?.open(docGroups.first.items.first.slug);
+      case AppNavItem.components:
+        setState(() => section = AppSection.docs);
+        final components = docGroups.firstWhere(
+          (group) => group.title == 'Components',
+        );
+        _docsKey.currentState?.open(components.items.first.slug);
+    }
   }
 
   @override
@@ -62,14 +97,22 @@ class _AppShellState extends State<AppShell> {
               final narrow = constraints.maxWidth < _narrow;
               final body = IndexedStack(
                 index: section.index,
-                children: const [PlaygroundScreen(), ComponentsScreen()],
+                children: [
+                  const PlaygroundScreen(),
+                  ComponentsScreen(
+                    key: _docsKey,
+                    onSelectionChanged: (group) => setState(() {
+                      _viewingComponents = group.title == 'Components';
+                    }),
+                  ),
+                ],
               );
 
               return Column(
                 children: [
                   _TopNav(
-                    section: section,
-                    onSelect: (value) => setState(() => section = value),
+                    active: _activeNavItem,
+                    onSelect: _selectNavItem,
                   ),
                   // The page is always the first child of both the Stack and
                   // the Row, so opening the panel never reshapes the element
@@ -113,10 +156,10 @@ class _AppShellState extends State<AppShell> {
 }
 
 class _TopNav extends StatelessWidget {
-  const _TopNav({required this.section, required this.onSelect});
+  const _TopNav({required this.active, required this.onSelect});
 
-  final AppSection section;
-  final ValueChanged<AppSection> onSelect;
+  final AppNavItem active;
+  final ValueChanged<AppNavItem> onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +175,9 @@ class _TopNav extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           // On a phone-width viewport the wordmark's text is the first thing
-          // to go: the links and the toolbar have to stay reachable.
-          final compact = constraints.maxWidth < 480;
+          // to go: the links and the toolbar have to stay reachable. With
+          // three links, the full row needs a bit over 600px.
+          final compact = constraints.maxWidth < 640;
 
           return Row(
             children: [
@@ -161,14 +205,20 @@ class _TopNav extends StatelessWidget {
               SizedBox(width: compact ? 16 : 28),
               _NavLink(
                 label: 'Playground',
-                selected: section == AppSection.playground,
-                onTap: () => onSelect(AppSection.playground),
+                selected: active == AppNavItem.playground,
+                onTap: () => onSelect(AppNavItem.playground),
+              ),
+              SizedBox(width: compact ? 12 : 20),
+              _NavLink(
+                label: 'Docs',
+                selected: active == AppNavItem.docs,
+                onTap: () => onSelect(AppNavItem.docs),
               ),
               SizedBox(width: compact ? 12 : 20),
               _NavLink(
                 label: 'Components',
-                selected: section == AppSection.components,
-                onTap: () => onSelect(AppSection.components),
+                selected: active == AppNavItem.components,
+                onTap: () => onSelect(AppNavItem.components),
               ),
               const Spacer(),
               const _ThemeModeButton(),

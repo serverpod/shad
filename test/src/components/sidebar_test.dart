@@ -574,4 +574,61 @@ void main() {
       expect(clip.borderRadius, BorderRadius.circular(12));
     });
   });
+
+  group('ShadSidebar.scrollController', () {
+    testWidgets('drives the content area between header and footer', (
+      tester,
+    ) async {
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
+
+      await pumpDesktop(
+        tester,
+        ShadApp(
+          home: Scaffold(
+            body: ShadSidebarScaffold(
+              sidebar: ShadSidebar(
+                scrollController: controller,
+                header: const Text('Header'),
+                children: [
+                  for (var group = 0; group < 20; group++)
+                    ShadSidebarGroup(
+                      label: Text('Group $group'),
+                      children: [
+                        ShadSidebarMenu(
+                          children: [
+                            for (var item = 0; item < 4; item++)
+                              ShadSidebarMenuButton(
+                                onPressed: () {},
+                                child: Text('Item $group.$item'),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+              child: const Text('content'),
+            ),
+          ),
+        ),
+      );
+
+      expect(controller.hasClients, isTrue);
+      expect(controller.offset, 0);
+
+      controller.jumpTo(200);
+      await tester.pump();
+      expect(controller.offset, 200);
+
+      // The header is pinned outside the scrolled region.
+      expect(tester.getTopLeft(find.text('Header')).dy, lessThan(50));
+      // And ensureVisible reaches the content through the same scrollable.
+      await Scrollable.ensureVisible(
+        tester.element(find.text('Group 19', skipOffstage: false)),
+      );
+      await tester.pump();
+      expect(controller.offset, greaterThan(200));
+    });
+  });
 }

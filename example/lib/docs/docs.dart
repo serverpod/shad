@@ -242,6 +242,124 @@ class _CopyButtonState extends State<_CopyButton> {
   }
 }
 
+/// A titled prose section on a documentation page.
+///
+/// The written pages — installation, theming and so on — are assembled from
+/// these: a heading followed by paragraphs, code blocks and lists, with the
+/// page supplying the spacing between sections.
+class DocSection extends StatelessWidget {
+  const DocSection({super.key, required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(title, style: theme.textTheme.h4),
+        for (final child in children) ...[
+          const SizedBox(height: 12),
+          child,
+        ],
+      ],
+    );
+  }
+}
+
+/// A documentation paragraph.
+///
+/// Renders `backtick` spans as inline code — a mono face on the muted
+/// surface — so identifiers read as identifiers without a full code block.
+class DocParagraph extends StatelessWidget {
+  const DocParagraph(this.text, {super.key});
+
+  final String text;
+
+  /// [text] split into plain and `code` spans.
+  static List<InlineSpan> spans(BuildContext context, String text) {
+    final theme = ShadTheme.of(context);
+    final code = TextStyle(
+      fontFamily: 'JetBrainsMono',
+      fontSize: 13,
+      color: theme.colorScheme.foreground,
+      backgroundColor: theme.colorScheme.muted,
+    );
+    final parts = text.split('`');
+    return [
+      for (var i = 0; i < parts.length; i++)
+        if (parts[i].isNotEmpty)
+          TextSpan(text: parts[i], style: i.isOdd ? code : null),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    return Text.rich(
+      TextSpan(children: spans(context, text)),
+      style: theme.textTheme.p,
+    );
+  }
+}
+
+/// A bulleted list, with the same inline-code treatment as [DocParagraph].
+class DocBullets extends StatelessWidget {
+  const DocBullets({super.key, required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final item in items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('•', style: theme.textTheme.p),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(children: DocParagraph.spans(context, item)),
+                    style: theme.textTheme.p,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The body of a written documentation page: sections separated by a
+/// consistent gap.
+class DocProse extends StatelessWidget {
+  const DocProse({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var i = 0; i < children.length; i++) ...[
+          if (i > 0) const SizedBox(height: 32),
+          children[i],
+        ],
+      ],
+    );
+  }
+}
+
 /// The bordered live-preview area of an example.
 class ExamplePreview extends StatelessWidget {
   const ExamplePreview({

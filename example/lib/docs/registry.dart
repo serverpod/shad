@@ -1,5 +1,10 @@
 import 'package:example/docs/docs.dart';
 import 'package:example/docs/pages/accordion.dart';
+import 'package:example/docs/pages/installation.dart';
+import 'package:example/docs/pages/introduction.dart';
+import 'package:example/docs/pages/responsive.dart';
+import 'package:example/docs/pages/styles.dart';
+import 'package:example/docs/pages/theming.dart';
 import 'package:example/docs/pages/alert.dart';
 import 'package:example/docs/pages/avatar.dart';
 import 'package:example/docs/pages/badge.dart';
@@ -48,13 +53,23 @@ import 'package:example/docs/pages/toggle_group.dart';
 import 'package:example/docs/pages/tooltip.dart';
 import 'package:example/docs/pages/typography.dart';
 
-/// Every documented component, in the order the sidebar shows them.
+/// Every documented page, in the order the sidebar shows them.
 final docGroups = <DocGroup>[
+  DocGroup(
+    title: 'Getting started',
+    items: [
+      introductionDoc,
+      installationDoc,
+      themingDoc,
+      stylesDoc,
+    ],
+  ),
   DocGroup(
     title: 'Foundations',
     items: [
       typographyDoc,
       layoutDoc,
+      responsiveDoc,
       formDoc,
       portalDoc,
     ],

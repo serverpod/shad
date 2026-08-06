@@ -521,6 +521,7 @@ class ShadSidebar extends StatelessWidget {
     this.mobileWidth,
     this.backgroundColor,
     this.borderColor,
+    this.scrollController,
   });
 
   final ShadSidebarSide side;
@@ -564,6 +565,16 @@ class ShadSidebar extends StatelessWidget {
   /// {@endtemplate}
   final Color? borderColor;
 
+  /// {@template ShadSidebar.scrollController}
+  /// Controls the scrollable content area — the region holding [children],
+  /// between [header] and [footer].
+  ///
+  /// Attach one to drive the sidebar's scroll position from outside: restore
+  /// it, jump to the top, or bring a section into view (pairs with
+  /// `Scrollable.ensureVisible` on a key inside the content).
+  /// {@endtemplate}
+  final ScrollController? scrollController;
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasShadTheme(context));
@@ -590,6 +601,7 @@ class ShadSidebar extends StatelessWidget {
     final column = _SidebarColumn(
       header: header,
       footer: footer,
+      scrollController: scrollController,
       children: children,
     );
 
@@ -717,11 +729,13 @@ class _SidebarColumn extends StatelessWidget {
   const _SidebarColumn({
     required this.header,
     required this.footer,
+    required this.scrollController,
     required this.children,
   });
 
   final Widget? header;
   final Widget? footer;
+  final ScrollController? scrollController;
   final List<Widget> children;
 
   @override
@@ -746,6 +760,7 @@ class _SidebarColumn extends StatelessWidget {
           ),
         Expanded(
           child: SingleChildScrollView(
+            controller: scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: spaced,
