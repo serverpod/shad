@@ -314,6 +314,48 @@ void main() {
       expect(changed, [26, 74]);
     });
 
+    testWidgets(
+        'the low thumb stays draggable when both are pulled to the max', (
+      tester,
+    ) async {
+      // Regression: tied thumbs stacked in a fixed order, so once both were
+      // dragged to the maximum the high thumb — pinned in place by its
+      // equal-valued neighbour and unable to move at all — sat on top and
+      // absorbed every pointer event, leaving no way to grab the low thumb
+      // and pull the range back.
+      List<double>? changed;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(
+                initialValues: const [100, 100],
+                max: 100,
+                onChanged: (values) => changed = values,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Both thumbs occupy the same pixel position, right at the slider's
+      // trailing edge. Start a hair inside it — the exact edge pixel is
+      // outside the Stack's own hit-testable bounds regardless of which
+      // thumb should win — and drag left; it must still reach the low
+      // thumb.
+      final thumbRect = tester.getRect(thumbs().last);
+      await tester.dragFrom(
+        thumbRect.center.translate(-2, 0),
+        const Offset(-100, 0),
+      );
+      await tester.pump();
+
+      expect(changed, isNotNull);
+      expect(changed!.first, moreOrLessEquals(75, epsilon: 1));
+      expect(changed!.last, 100);
+    });
+
     testWidgets('only the hovered thumb rings', (tester) async {
       await tester.pumpWidget(
         createTestWidget(

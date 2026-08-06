@@ -1084,7 +1084,17 @@ class _ShadSliderCoreState extends State<_ShadSliderCore> {
         final thumbOrder = List<int>.generate(values.length, (i) => i)
           ..sort((a, b) {
             final byValue = values[a].compareTo(values[b]);
-            return byValue != 0 ? byValue : a.compareTo(b);
+            if (byValue != 0) return byValue;
+            // Tied thumbs stack with the highest index on top, so a tie at
+            // the minimum still surfaces the one thumb able to move (the
+            // others are pinned below by a same-valued lower neighbour).
+            // At the maximum that same rule pins every higher-index thumb
+            // in the tied run in place instead, so it is inverted there:
+            // the lowest index — the only one still free to move — goes on
+            // top. Without this a range dragged fully to one side can
+            // never be pulled back with the pointer.
+            if (values[a] == effectiveMax) return b.compareTo(a);
+            return a.compareTo(b);
           });
 
         return SizedBox(
