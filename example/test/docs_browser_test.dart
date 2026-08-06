@@ -50,8 +50,8 @@ void main() {
     );
     expect(sidebarOffset(tester), 0);
 
-    // Components: opens the first component and scrolls the sidebar down to
-    // the Components section.
+    // Components: opens the overview page and scrolls the sidebar down to the
+    // Components section.
     await tester.tap(find.text('Components').first);
     // Three pumps: the reveal is scheduled post-frame, its animation ticks
     // from the following frame, and completes on the one after.
@@ -61,7 +61,7 @@ void main() {
     final state = tester.state<ComponentsScreenState>(
       find.byType(ComponentsScreen),
     );
-    expect(state.selectedSlug, 'accordion');
+    expect(state.selectedSlug, 'overview');
     expect(sidebarOffset(tester), greaterThan(0));
 
     // Back to Docs: Introduction again, scrolled back up.

@@ -1,4 +1,5 @@
 import 'package:example/docs/docs.dart';
+import 'package:example/docs/pages/overview.dart';
 import 'package:example/docs/pages/accordion.dart';
 import 'package:example/docs/pages/installation.dart';
 import 'package:example/docs/pages/introduction.dart';
@@ -77,6 +78,14 @@ final docGroups = <DocGroup>[
   DocGroup(
     title: 'Components',
     items: [
+      overviewDoc,
+      ...componentDocs,
+    ],
+  ),
+];
+
+/// Every component reference page, in sidebar order.
+final componentDocs = [
       accordionDoc,
       alertDoc,
       avatarDoc,
@@ -121,6 +130,12 @@ final docGroups = <DocGroup>[
       toggleDoc,
       toggleGroupDoc,
       tooltipDoc,
-    ],
-  ),
 ];
+
+final overviewDoc = ComponentDoc(
+  slug: 'overview',
+  title: 'Overview',
+  description:
+      'Every component in the library — pick one to open its documentation.',
+  body: (context) => ComponentsOverview(components: componentDocs),
+);

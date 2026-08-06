@@ -63,9 +63,12 @@ void main() {
     await pumpShell(tester);
     await openComponents(tester);
 
-    // The sidebar lists the components; Typography is the first entry.
     expect(find.byType(ShadSidebar), findsOneWidget);
-    expect(find.text('Typography'), findsWidgets);
+    expect(find.text('Overview'), findsWidgets);
+    expect(
+      find.textContaining('Every component in the library'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('selecting a component in the sidebar opens its doc page', (
@@ -97,7 +100,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    // Scoped to the sidebar: the open page is still titled Accordion.
+    // Scoped to the sidebar: the open page is still Overview.
     Finder inSidebar(String text) => find.descendant(
       of: find.byType(ShadSidebar),
       matching: find.text(text),
