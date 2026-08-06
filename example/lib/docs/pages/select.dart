@@ -17,6 +17,9 @@ final selectDoc = ComponentDoc(
     ComponentExample(
       id: 'select_search',
       title: 'With search',
+      description:
+          'Filter a long list of Dart frameworks and tools — Serverpod, '
+          'Relic, Flutter, and more.',
       builder: (_) => const SelectSearchExample(),
     ),
   ],
