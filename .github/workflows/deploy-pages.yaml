@@ -10,10 +10,11 @@ on:
       - ".github/workflows/deploy-pages.yaml"
   workflow_dispatch:
 
-# Only one deployment at a time; skip queued runs in favor of the latest.
+# Cancel an in-flight deploy when a newer one starts. Leaving the old job
+# running can wedge the Pages queue (deployment_queued until timeout).
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -34,6 +35,9 @@ jobs:
       - name: Configure GitHub Pages
         id: pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+        with:
+          # Ensures the repo is on the GitHub Actions Pages deployment path.
+          enablement: true
 
       # example/web is gitignored (see the "platform apps" section of
       # .gitignore) since it is boilerplate Flutter regenerates on demand.
@@ -45,6 +49,14 @@ jobs:
         working-directory: example
         run: flutter build web --release --base-href "${{ steps.pages.outputs.base_path }}/"
 
+      # Flutter ships debug symbol sidecars alongside the wasm/js bundles.
+      # They are not served to browsers and only inflate the Pages artifact.
+      - name: Strip build debug symbols
+        run: find example/build/web -name '*.symbols' -delete
+
+      - name: Report artifact size
+        run: du -sh example/build/web && du -sh example/build/web/* | sort -hr | head -10
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
@@ -55,8 +67,14 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ fromJSON(steps.deployment.outputs.outputs).page_url }}
     steps:
+      # Pages occasionally leaves a deploy in deployment_queued; retry a few
+      # times before failing. The action hard-caps polling at 10 minutes.
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        uses: Wandalen/wretry.action@v3.8.0
+        with:
+          action: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
+          attempt_limit: 3
+          attempt_delay: 60000
