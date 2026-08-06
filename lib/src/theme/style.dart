@@ -82,6 +82,7 @@ class ShadStyleTokens {
     this.cardRadius = ShadRadiusToken.xl,
     this.dialogRadius = ShadRadiusToken.xl,
     this.popoverRadius = ShadRadiusToken.md,
+    this.tooltipRadius = ShadRadiusToken.md,
     this.commandRadius = ShadRadiusToken.xl,
     this.commandItemDialogRadius = ShadRadiusToken.lg,
     this.commandSearchRadius = ShadRadiusToken.lg,
@@ -232,6 +233,10 @@ class ShadStyleTokens {
 
   /// Corner radius of popovers, select and menu surfaces.
   final ShadRadiusToken popoverRadius;
+
+  /// Corner radius of a tooltip (`.cn-tooltip-content`), `rounded-md` —
+  /// tighter than the popover's in most styles.
+  final ShadRadiusToken tooltipRadius;
 
   /// Corner radius of a command palette (`.cn-command`).
   final ShadRadiusToken commandRadius;
@@ -688,6 +693,7 @@ class ShadStyleTokens {
     commandRadius: ShadRadiusToken.xl4,
     dialogRadius: ShadRadiusToken.xl4,
     popoverRadius: ShadRadiusToken.xl2,
+    tooltipRadius: ShadRadiusToken.xl2,
     textareaRadius: ShadRadiusToken.xl,
     itemRadius: ShadRadiusToken.xl,
     checkboxRadius: 6,
@@ -736,6 +742,7 @@ class ShadStyleTokens {
     commandRadius: ShadRadiusToken.none,
     dialogRadius: ShadRadiusToken.none,
     popoverRadius: ShadRadiusToken.none,
+    tooltipRadius: ShadRadiusToken.none,
     textareaRadius: ShadRadiusToken.none,
     itemRadius: ShadRadiusToken.none,
     checkboxRadius: 0,
@@ -863,6 +870,7 @@ class ShadStyleTokens {
     alertRadius: ShadRadiusToken.xl2,
     dialogRadius: ShadRadiusToken.xl4,
     popoverRadius: ShadRadiusToken.xl4,
+    tooltipRadius: ShadRadiusToken.xl,
     textareaRadius: ShadRadiusToken.xl2,
     itemRadius: ShadRadiusToken.xl2,
     checkboxRadius: 5,
@@ -938,6 +946,7 @@ class ShadStyleTokens {
     alertAccentBar: true,
     dialogRadius: ShadRadiusToken.none,
     popoverRadius: ShadRadiusToken.none,
+    tooltipRadius: ShadRadiusToken.none,
     textareaRadius: ShadRadiusToken.none,
     itemRadius: ShadRadiusToken.none,
     checkboxRadius: 0,
@@ -1058,6 +1067,7 @@ class ShadStyleTokens {
     dialogRadius: ShadRadiusToken.xl4,
     surfaceRadiusCap: 24,
     popoverRadius: ShadRadiusToken.xl2,
+    tooltipRadius: ShadRadiusToken.xl,
     textareaRadius: ShadRadiusToken.xl2,
     itemRadius: ShadRadiusToken.xl,
     checkboxRadius: 5,
@@ -1132,6 +1142,7 @@ class ShadStyleTokens {
     ShadRadiusToken? cardRadius,
     ShadRadiusToken? dialogRadius,
     ShadRadiusToken? popoverRadius,
+    ShadRadiusToken? tooltipRadius,
     ShadRadiusToken? commandRadius,
     ShadRadiusToken? commandItemDialogRadius,
     ShadRadiusToken? commandSearchRadius,
@@ -1254,6 +1265,7 @@ class ShadStyleTokens {
       cardRadius: cardRadius ?? this.cardRadius,
       dialogRadius: dialogRadius ?? this.dialogRadius,
       popoverRadius: popoverRadius ?? this.popoverRadius,
+      tooltipRadius: tooltipRadius ?? this.tooltipRadius,
       commandRadius: commandRadius ?? this.commandRadius,
       commandItemDialogRadius:
           commandItemDialogRadius ?? this.commandItemDialogRadius,
@@ -1394,6 +1406,7 @@ class ShadStyleTokens {
     cardRadius,
     dialogRadius,
     popoverRadius,
+    tooltipRadius,
     commandRadius,
     commandItemDialogRadius,
     commandSearchRadius,

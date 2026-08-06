@@ -1280,6 +1280,9 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
           overlayAlignment: Alignment.centerLeft,
           offset: Offset(8, 0),
         ),
+        // The tooltip sits to the right of the rail, so the arrow points
+        // back at it.
+        arrowDirection: AxisDirection.left,
         builder: (context) => Text(widget.tooltip!),
         child: button,
       );

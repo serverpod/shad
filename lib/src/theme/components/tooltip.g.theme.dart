@@ -44,6 +44,11 @@ mixin _$ShadTooltipTheme {
       ),
       duration: lerpDuration$(a.duration, b.duration, t),
       reverseDuration: lerpDuration$(a.reverseDuration, b.reverseDuration, t),
+      textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
+      maxWidth: lerpDouble$(a.maxWidth, b.maxWidth, t),
+      showArrow: t < 0.5 ? a.showArrow : b.showArrow,
+      arrowSize: lerpDouble$(a.arrowSize, b.arrowSize, t),
+      arrowRadius: lerpDouble$(a.arrowRadius, b.arrowRadius, t),
     );
   }
 
@@ -58,6 +63,11 @@ mixin _$ShadTooltipTheme {
     Duration? longPressDuration,
     Duration? duration,
     Duration? reverseDuration,
+    TextStyle? textStyle,
+    double? maxWidth,
+    bool? showArrow,
+    double? arrowSize,
+    double? arrowRadius,
   }) {
     final _this = (this as ShadTooltipTheme);
 
@@ -72,6 +82,11 @@ mixin _$ShadTooltipTheme {
       longPressDuration: longPressDuration ?? _this.longPressDuration,
       duration: duration ?? _this.duration,
       reverseDuration: reverseDuration ?? _this.reverseDuration,
+      textStyle: textStyle ?? _this.textStyle,
+      maxWidth: maxWidth ?? _this.maxWidth,
+      showArrow: showArrow ?? _this.showArrow,
+      arrowSize: arrowSize ?? _this.arrowSize,
+      arrowRadius: arrowRadius ?? _this.arrowRadius,
     );
   }
 
@@ -97,6 +112,11 @@ mixin _$ShadTooltipTheme {
       longPressDuration: other.longPressDuration,
       duration: other.duration,
       reverseDuration: other.reverseDuration,
+      textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
+      maxWidth: other.maxWidth,
+      showArrow: other.showArrow,
+      arrowSize: other.arrowSize,
+      arrowRadius: other.arrowRadius,
     );
   }
 
@@ -122,7 +142,12 @@ mixin _$ShadTooltipTheme {
         _other.hoverStrategies == _this.hoverStrategies &&
         _other.longPressDuration == _this.longPressDuration &&
         _other.duration == _this.duration &&
-        _other.reverseDuration == _this.reverseDuration;
+        _other.reverseDuration == _this.reverseDuration &&
+        _other.textStyle == _this.textStyle &&
+        _other.maxWidth == _this.maxWidth &&
+        _other.showArrow == _this.showArrow &&
+        _other.arrowSize == _this.arrowSize &&
+        _other.arrowRadius == _this.arrowRadius;
   }
 
   @override
@@ -141,6 +166,11 @@ mixin _$ShadTooltipTheme {
       _this.longPressDuration,
       _this.duration,
       _this.reverseDuration,
+      _this.textStyle,
+      _this.maxWidth,
+      _this.showArrow,
+      _this.arrowSize,
+      _this.arrowRadius,
     );
   }
 }

@@ -746,19 +746,32 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
         ScaleEffect(begin: Offset(.95, .95), end: Offset(1, 1)),
         MoveEffect(begin: Offset(0, 2), end: Offset.zero),
       ],
-      padding: EdgeInsets.symmetric(
-        horizontal: scaled(style.popoverPadding) * .75,
-        vertical: scaled(style.popoverPadding) * .375,
-      ),
+      // `px-3 py-1.5` — fixed across the styles, unlike the popover's.
+      padding: spacing.symmetric(horizontal: 3, vertical: 1.5),
+      // The inverted surface: `bg-foreground text-background`, with no
+      // border and no shadow, at the tooltip's own radius (`rounded-md`,
+      // tighter than the popover's in most styles).
       decoration: ShadDecoration(
         border: ShadBorder.all(
-          radius: popoverRadius,
-          color: surfaceBorderColor,
+          radius: radii.resolve(style.tooltipRadius),
           width: 0,
         ),
-        color: colorScheme.popover,
-        shadows: style.popoverShadow,
+        color: colorScheme.foreground,
       ),
+      // `text-xs` on the inverted surface.
+      textStyle: effectiveTextTheme.muted.copyWith(
+        fontSize: 12,
+        height: 16 / 12,
+        fontWeight: FontWeight.normal,
+        color: colorScheme.background,
+      ),
+      // `max-w-xs`.
+      maxWidth: 320,
+      showArrow: true,
+      // `size-2.5 rotate-45 rounded-[2px]`; the square styles keep the tip
+      // sharp (`rounded-none`).
+      arrowSize: scaled(10),
+      arrowRadius: style.itemRadius == ShadRadiusToken.none ? 0 : 2,
       anchor: const ShadAnchorAuto(
         offset: Offset(0, -4),
         followerAnchor: Alignment.topCenter,

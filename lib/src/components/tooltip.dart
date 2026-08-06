@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -37,6 +39,8 @@ class ShadTooltip extends StatefulWidget {
     this.longPressDuration,
     this.duration,
     this.reverseDuration,
+    this.showArrow,
+    this.arrowDirection,
   });
 
   /// {@template ShadTooltip.builder}
@@ -151,6 +155,23 @@ class ShadTooltip extends StatefulWidget {
   /// Defaults to [Duration.zero].
   /// {@endtemplate}
   final Duration? reverseDuration;
+
+  /// {@template ShadTooltip.showArrow}
+  /// Whether the tooltip draws the arrow pointing at its trigger, defaults
+  /// to true.
+  /// {@endtemplate}
+  final bool? showArrow;
+
+  /// {@template ShadTooltip.arrowDirection}
+  /// The direction the arrow points, i.e. which edge of the tooltip it
+  /// rides: [AxisDirection.down] puts it on the bottom edge.
+  ///
+  /// Defaults to pointing at the trigger through the default anchors: down
+  /// while the tooltip sits above it, flipping up when the portal falls
+  /// back below. Set it explicitly when using a custom [anchor] that places
+  /// the tooltip to the side.
+  /// {@endtemplate}
+  final AxisDirection? arrowDirection;
 
   @override
   State<ShadTooltip> createState() => _ShadTooltipState();
@@ -322,13 +343,45 @@ class _ShadTooltipState extends State<ShadTooltip>
                 child: Padding(
                   padding: effectivePadding ?? EdgeInsets.zero,
                   child: DefaultTextStyle(
-                    style: theme.textTheme.muted.copyWith(
-                      color: theme.colorScheme.popoverForeground,
-                    ),
+                    // The inverted surface's `text-background`, at `text-xs`.
+                    style:
+                        theme.tooltipTheme.textStyle ??
+                        theme.textTheme.muted.copyWith(
+                          fontSize: 12,
+                          height: 16 / 12,
+                          color: theme.colorScheme.background,
+                        ),
                     child: widget.builder(context),
                   ),
                 ),
               );
+
+              final maxWidth = theme.tooltipTheme.maxWidth ?? 320.0;
+              tooltip = ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: tooltip,
+              );
+
+              final showArrow =
+                  widget.showArrow ?? theme.tooltipTheme.showArrow ?? true;
+              if (showArrow) {
+                // The default anchors put the tooltip above the trigger, so
+                // the arrow rides the bottom edge — flipping up when the
+                // portal fell back below.
+                final direction =
+                    widget.arrowDirection ??
+                    (ShadPortalPlacement.usedFallbackOf(context)
+                        ? AxisDirection.up
+                        : AxisDirection.down);
+                tooltip = _ShadTooltipArrow(
+                  direction: direction,
+                  size: theme.tooltipTheme.arrowSize ?? 10,
+                  radius: theme.tooltipTheme.arrowRadius ?? 2,
+                  color:
+                      effectiveDecoration.color ?? theme.colorScheme.foreground,
+                  child: tooltip,
+                );
+              }
 
               if (effectiveEffects.isNotEmpty) {
                 tooltip = ShadAnimate(
@@ -349,6 +402,84 @@ class _ShadTooltipState extends State<ShadTooltip>
           ),
         );
       },
+    );
+  }
+}
+
+/// The arrow pointing from the tooltip at its trigger, shadcn/ui's
+/// `TooltipArrow`: a `size-2.5` square rotated 45°, filled like the surface,
+/// its tip rounded by `rounded-[2px]`.
+///
+/// The square's centre sits 2px inside the edge it rides
+/// (`translate-y-[calc(-50%-2px)]`), so about half its diagonal — 5px —
+/// pokes out across the anchor gap. It is painted under the bubble and in
+/// the same colour, so the overlap never shows.
+class _ShadTooltipArrow extends StatelessWidget {
+  const _ShadTooltipArrow({
+    required this.direction,
+    required this.size,
+    required this.radius,
+    required this.color,
+    required this.child,
+  });
+
+  final AxisDirection direction;
+  final double size;
+  final double radius;
+  final Color color;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final diamond = Transform.rotate(
+      angle: math.pi / 4,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.all(Radius.circular(radius)),
+        ),
+      ),
+    );
+
+    // The square's centre sits 2px inside the bubble's edge.
+    final inset = -(size / 2) + 2;
+    final positioned = switch (direction) {
+      AxisDirection.down => Positioned(
+        bottom: inset,
+        left: 0,
+        right: 0,
+        child: Center(child: diamond),
+      ),
+      AxisDirection.up => Positioned(
+        top: inset,
+        left: 0,
+        right: 0,
+        child: Center(child: diamond),
+      ),
+      AxisDirection.left => Positioned(
+        left: inset,
+        top: 0,
+        bottom: 0,
+        child: Center(child: diamond),
+      ),
+      AxisDirection.right => Positioned(
+        right: inset,
+        top: 0,
+        bottom: 0,
+        child: Center(child: diamond),
+      ),
+    };
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Painted before (under) the bubble, so only the protruding tip
+        // shows.
+        positioned,
+        child,
+      ],
     );
   }
 }

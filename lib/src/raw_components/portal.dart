@@ -129,6 +129,35 @@ class ShadGlobalAnchor extends ShadAnchorBase {
   int get hashCode => offset.hashCode;
 }
 
+/// Publishes which position the enclosing [ShadPortal] resolved to: the
+/// primary anchor, or its [ShadAnchorAuto.fallback].
+///
+/// An overlay that renders differently per side — a tooltip's arrow — reads
+/// this to flip along with the portal. Outside an auto-anchored portal the
+/// lookup reports the primary position.
+class ShadPortalPlacement extends InheritedWidget {
+  const ShadPortalPlacement({
+    super.key,
+    required this.usedFallback,
+    required super.child,
+  });
+
+  /// Whether the overlay is positioned by the anchor's fallback.
+  final bool usedFallback;
+
+  /// Whether the nearest portal above [context] fell back to its anchor's
+  /// [ShadAnchorAuto.fallback] position.
+  static bool usedFallbackOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<ShadPortalPlacement>()
+          ?.usedFallback ??
+      false;
+
+  @override
+  bool updateShouldNotify(ShadPortalPlacement oldWidget) =>
+      usedFallback != oldWidget.usedFallback;
+}
+
 class ShadPortal extends StatefulWidget {
   const ShadPortal({
     super.key,
@@ -152,6 +181,7 @@ class _ShadPortalState extends State<ShadPortal> {
   final overlayPortalController = OverlayPortalController();
   final overlayKey = GlobalKey();
   Offset? _calculatedTarget;
+  bool _usedFallback = false;
   // When scrolling, recalculate the position
   ScrollNotificationObserverState? _scrollNotificationObserver;
   bool _autoPositionUpdateScheduled = false;
@@ -259,7 +289,11 @@ class _ShadPortalState extends State<ShadPortal> {
         show();
       } else {
         if (_calculatedTarget != null) {
-          setState(() => _calculatedTarget = null);
+          setState(() {
+            _calculatedTarget = null;
+            // The next open starts from the primary position again.
+            _usedFallback = false;
+          });
         }
         hide();
       }
@@ -361,6 +395,7 @@ class _ShadPortalState extends State<ShadPortal> {
     // provided, try using the fallback anchor instead. The fallback is only
     // applied if it actually fits better (i.e. fits within the screen
     // vertically); if neither fits, the original target is kept.
+    var usedFallback = false;
     if (anchor.fallback != null && overlay != null && overlay.hasSize) {
       final screenHeight = overlayAncestor.size.height;
       final fitsVertically =
@@ -378,14 +413,16 @@ class _ShadPortalState extends State<ShadPortal> {
             fallbackTarget.dy + overlaySize.height <= screenHeight;
         if (fallbackFitsVertically) {
           target = fallbackTarget;
+          usedFallback = true;
         }
       }
     }
 
-    if (target != _calculatedTarget) {
+    if (target != _calculatedTarget || usedFallback != _usedFallback) {
       if (mounted) {
         setState(() {
           _calculatedTarget = target;
+          _usedFallback = usedFallback;
         });
       }
     } else if (overlay == null) {
@@ -436,7 +473,10 @@ class _ShadPortalState extends State<ShadPortal> {
           visible: overlay != null,
           child: IgnorePointer(
             ignoring: overlay == null,
-            child: widget.portalBuilder(context),
+            child: ShadPortalPlacement(
+              usedFallback: _usedFallback,
+              child: Builder(builder: widget.portalBuilder),
+            ),
           ),
         ),
       ),

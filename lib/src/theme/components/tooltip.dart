@@ -22,6 +22,11 @@ class ShadTooltipTheme with _$ShadTooltipTheme {
     this.longPressDuration,
     this.duration,
     this.reverseDuration,
+    this.textStyle,
+    this.maxWidth,
+    this.showArrow,
+    this.arrowSize,
+    this.arrowRadius,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -59,6 +64,23 @@ class ShadTooltipTheme with _$ShadTooltipTheme {
 
   /// {@macro ShadTooltip.reverseDuration}
   final Duration? reverseDuration;
+
+  /// The text style of the tooltip's content, `text-xs` on the inverted
+  /// surface's `text-background`.
+  final TextStyle? textStyle;
+
+  /// The widest the tooltip may grow, `max-w-xs`.
+  final double? maxWidth;
+
+  /// {@macro ShadTooltip.showArrow}
+  final bool? showArrow;
+
+  /// The edge length of the arrow's rotated square, `size-2.5`.
+  final double? arrowSize;
+
+  /// The corner radius of the arrow's tip, `rounded-[2px]` — zero in the
+  /// square styles.
+  final double? arrowRadius;
 
   static ShadTooltipTheme? lerp(
     ShadTooltipTheme? a,
