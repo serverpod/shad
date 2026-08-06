@@ -1321,10 +1321,8 @@ class ShadStyleTokens {
       iconButtonSizeSm: iconButtonSizeSm ?? this.iconButtonSizeSm,
       iconButtonSizeLg: iconButtonSizeLg ?? this.iconButtonSizeLg,
       iconButtonIconSize: iconButtonIconSize ?? this.iconButtonIconSize,
-      iconButtonIconSizeSm:
-          iconButtonIconSizeSm ?? this.iconButtonIconSizeSm,
-      iconButtonIconSizeLg:
-          iconButtonIconSizeLg ?? this.iconButtonIconSizeLg,
+      iconButtonIconSizeSm: iconButtonIconSizeSm ?? this.iconButtonIconSizeSm,
+      iconButtonIconSizeLg: iconButtonIconSizeLg ?? this.iconButtonIconSizeLg,
       inputHeight: inputHeight ?? this.inputHeight,
       inputPaddingX: inputPaddingX ?? this.inputPaddingX,
       inputPaddingY: inputPaddingY ?? this.inputPaddingY,

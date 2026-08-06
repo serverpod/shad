@@ -51,7 +51,8 @@ class _SelectSearchExampleState extends State<SelectSearchExample> {
               child: ShadOption(value: entry.key, child: Text(entry.value)),
             ),
         ],
-        selectedOptionBuilder: (context, value) => Text(_dartFrameworks[value]!),
+        selectedOptionBuilder: (context, value) =>
+            Text(_dartFrameworks[value]!),
         onChanged: (value) {},
       ),
     );

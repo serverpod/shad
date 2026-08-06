@@ -50,15 +50,10 @@ void main() {
       expect(tooltip.arrowRadius, 2);
     });
 
-    test('the radius follows the style, and square styles sharpen the tip',
-        () {
-      BorderRadius radiusOf(ShadStyleTokens style) =>
-          ShadThemeData(style: style)
-              .tooltipTheme
-              .decoration!
-              .border!
-              .radius!
-              .resolve(TextDirection.ltr);
+    test('the radius follows the style, and square styles sharpen the tip', () {
+      BorderRadius radiusOf(ShadStyleTokens style) => ShadThemeData(
+        style: style,
+      ).tooltipTheme.decoration!.border!.radius!.resolve(TextDirection.ltr);
 
       // vega `rounded-md` 8, maia `rounded-2xl` 16, luma `rounded-xl` 14.
       expect(radiusOf(ShadStyleTokens.vega).topLeft.x, 8);
@@ -66,8 +61,10 @@ void main() {
       expect(radiusOf(ShadStyleTokens.luma).topLeft.x, 14);
       expect(radiusOf(ShadStyleTokens.lyra), BorderRadius.zero);
       expect(radiusOf(ShadStyleTokens.sera), BorderRadius.zero);
-      expect(ShadThemeData(style: ShadStyleTokens.lyra)
-          .tooltipTheme.arrowRadius, 0);
+      expect(
+        ShadThemeData(style: ShadStyleTokens.lyra).tooltipTheme.arrowRadius,
+        0,
+      );
     });
   });
 

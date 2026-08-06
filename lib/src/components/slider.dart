@@ -365,8 +365,7 @@ class _ShadSliderState extends State<ShadSlider> {
           disabledInactiveTrackColor: widget.disabledInactiveTrackColor,
           trackHeight: widget.trackHeight,
           thumbRadius: widget.thumbRadius,
-          onChangeStart: (values) =>
-              widget.onChangeStart?.call(values.first),
+          onChangeStart: (values) => widget.onChangeStart?.call(values.first),
           onChangeEnd: (values) => widget.onChangeEnd?.call(values.first),
           divisions: widget.divisions,
           showDivisionMarks: widget.showDivisionMarks,
@@ -918,7 +917,8 @@ class _ShadSliderCoreState extends State<_ShadSliderCore> {
         widget.enabled &&
         (effectiveAllowedInteraction == ShadSliderInteraction.tapAndSlide ||
             effectiveAllowedInteraction == ShadSliderInteraction.slideOnly);
-    final canSlideThumb = widget.enabled &&
+    final canSlideThumb =
+        widget.enabled &&
         effectiveAllowedInteraction != ShadSliderInteraction.tapOnly;
 
     // The thumb's ring is the same one fields draw: colour, opacity and width
@@ -977,12 +977,12 @@ class _ShadSliderCoreState extends State<_ShadSliderCore> {
           final value = values[index];
           return Positioned(
             key: ValueKey<int>(index),
-            left: (fractionOf(value) * effectiveTrackWidth -
-                    effectiveThumbRadius)
-                .clamp(
-                  -effectiveThumbRadius,
-                  effectiveTrackWidth - effectiveThumbRadius,
-                ),
+            left:
+                (fractionOf(value) * effectiveTrackWidth - effectiveThumbRadius)
+                    .clamp(
+                      -effectiveThumbRadius,
+                      effectiveTrackWidth - effectiveThumbRadius,
+                    ),
             top: (effectiveHeight - effectiveThumbRadius * 2) / 2,
             child: ShadFocusable(
               focusNode: _focusNodeFor(index),

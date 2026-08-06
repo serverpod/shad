@@ -832,8 +832,7 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
     // The row's own horizontal padding (`px-2`), from the style tokens so a
     // denser or roomier style moves it. An inset row reserves shadcn's
     // `pl-8`-style gutter: the base padding plus a 24px icon column.
-    final itemPaddingX =
-        theme.style.itemPaddingX * theme.spacing.step / 4;
+    final itemPaddingX = theme.style.itemPaddingX * theme.spacing.step / 4;
     final defaultInsetPadding = switch (widget.variant) {
       ShadContextMenuItemVariant.primary => EdgeInsets.symmetric(
         horizontal: itemPaddingX,
@@ -934,8 +933,7 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
           theme.contextMenuTheme.destructiveSelectedBackgroundColor ??
           destructive.withValues(
             alpha:
-                destructive.a *
-                (theme.brightness == Brightness.dark ? .2 : .1),
+                destructive.a * (theme.brightness == Brightness.dark ? .2 : .1),
           );
     }
 

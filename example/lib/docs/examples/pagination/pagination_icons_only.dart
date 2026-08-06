@@ -9,7 +9,8 @@ class PaginationIconsOnlyExample extends StatefulWidget {
       _PaginationIconsOnlyExampleState();
 }
 
-class _PaginationIconsOnlyExampleState extends State<PaginationIconsOnlyExample> {
+class _PaginationIconsOnlyExampleState
+    extends State<PaginationIconsOnlyExample> {
   int page = 4;
 
   @override

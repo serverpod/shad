@@ -63,7 +63,9 @@ class ThemeCustomizerPanel extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Expanded(child: _Settings(config: config, onChanged: onChanged)),
+          Expanded(
+            child: _Settings(config: config, onChanged: onChanged),
+          ),
           _Actions(config: config, onChanged: onChanged),
         ],
       ),

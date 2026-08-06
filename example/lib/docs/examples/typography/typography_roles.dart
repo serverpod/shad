@@ -6,36 +6,37 @@ import 'package:shad/shad.dart';
 class TypographyRolesExample extends StatelessWidget {
   const TypographyRolesExample({super.key});
 
-  static const _textThemeStyles = <(String label, String styleKey, String sample)>[
-    ('h1Large', 'h1Large', 'Taxing Laughter'),
-    ('h1', 'h1', 'Taxing Laughter: The Joke Tax Chronicles'),
-    ('h2', 'h2', 'The People of the Kingdom'),
-    ('h3', 'h3', 'The Joke Tax'),
-    ('h4', 'h4', 'People stopped telling jokes'),
-    (
-      'p',
-      'p',
-      'The king, seeing how much happier his subjects were, realized '
-      'the error of his ways and repealed the joke tax.',
-    ),
-    (
-      'blockquote',
-      'blockquote',
-      '"After all," he said, "everyone enjoys a good joke, so it\'s '
-      'only fair that they should pay for the privilege."',
-    ),
-    ('table', 'table', "King's Treasury"),
-    ('list', 'list', '1st level of puns: 5 gold coins'),
-    (
-      'lead',
-      'lead',
-      'A modal dialog that interrupts the user with important content '
-      'and expects a response.',
-    ),
-    ('large', 'large', 'Are you absolutely sure?'),
-    ('small', 'small', 'Email address'),
-    ('muted', 'muted', 'Enter your email address.'),
-  ];
+  static const _textThemeStyles =
+      <(String label, String styleKey, String sample)>[
+        ('h1Large', 'h1Large', 'Taxing Laughter'),
+        ('h1', 'h1', 'Taxing Laughter: The Joke Tax Chronicles'),
+        ('h2', 'h2', 'The People of the Kingdom'),
+        ('h3', 'h3', 'The Joke Tax'),
+        ('h4', 'h4', 'People stopped telling jokes'),
+        (
+          'p',
+          'p',
+          'The king, seeing how much happier his subjects were, realized '
+              'the error of his ways and repealed the joke tax.',
+        ),
+        (
+          'blockquote',
+          'blockquote',
+          '"After all," he said, "everyone enjoys a good joke, so it\'s '
+              'only fair that they should pay for the privilege."',
+        ),
+        ('table', 'table', "King's Treasury"),
+        ('list', 'list', '1st level of puns: 5 gold coins'),
+        (
+          'lead',
+          'lead',
+          'A modal dialog that interrupts the user with important content '
+              'and expects a response.',
+        ),
+        ('large', 'large', 'Are you absolutely sure?'),
+        ('small', 'small', 'Email address'),
+        ('muted', 'muted', 'Enter your email address.'),
+      ];
 
   static const _minContrast = 3.0;
   static const _proseLabelWidth = 104.0;
@@ -219,8 +220,8 @@ class TypographyRolesExample extends StatelessWidget {
       'button.primary.textStyle' ||
       'badge.primary.textStyle' ||
       'calendar.selectedDayButtonTextStyle' => scheme.primary,
-      'button.secondary.textStyle' || 'badge.secondary.textStyle' =>
-        scheme.secondary,
+      'button.secondary.textStyle' ||
+      'badge.secondary.textStyle' => scheme.secondary,
       'toast.destructive.titleStyle' ||
       'toast.destructive.descriptionStyle' => scheme.destructive,
       'sidebar.groupLabelTextStyle' ||
@@ -243,8 +244,7 @@ class TypographyRolesExample extends StatelessWidget {
       'alertDialog.descriptionStyle' ||
       'command.groupHeadingStyle' ||
       'command.itemTextStyle' ||
-      'command.emptyTextStyle' =>
-        scheme.popover,
+      'command.emptyTextStyle' => scheme.popover,
       'contextMenu.textStyle' ||
       'contextMenu.trailingTextStyle' => scheme.popover,
       'contextMenu.selectedTextStyle' ||
@@ -254,7 +254,9 @@ class TypographyRolesExample extends StatelessWidget {
   }
 
   static Color _fallbackSurface(Color textColor, ShadColorScheme scheme) {
-    return textColor.computeLuminance() > 0.5 ? scheme.foreground : scheme.muted;
+    return textColor.computeLuminance() > 0.5
+        ? scheme.foreground
+        : scheme.muted;
   }
 
   static Color? _backgroundForSample(

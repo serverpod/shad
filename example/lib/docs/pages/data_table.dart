@@ -11,8 +11,7 @@ final dataTableDoc = ComponentDoc(
     ComponentExample(
       id: 'data_table_payments',
       title: 'Payments',
-      description:
-          'Tap a column header to sort. A third tap clears the sort.',
+      description: 'Tap a column header to sort. A third tap clears the sort.',
       minPreviewHeight: 420,
       builder: (_) => const DataTablePaymentsExample(),
     ),

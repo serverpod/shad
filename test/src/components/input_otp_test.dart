@@ -133,8 +133,7 @@ void main() {
       final boundaryRect = tester.getRect(find.byKey(boundaryKey));
       Color pixel(Offset global) {
         final local = global - boundaryRect.topLeft;
-        final index =
-            (local.dy.floor() * image.width + local.dx.floor()) * 4;
+        final index = (local.dy.floor() * image.width + local.dx.floor()) * 4;
         return Color.fromARGB(
           data.getUint8(index + 3),
           data.getUint8(index),

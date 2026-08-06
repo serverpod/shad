@@ -6,7 +6,11 @@ import 'package:shad/shad.dart';
 /// The documentation browser: a [ShadSidebar] of every doc page next to the
 /// selected page.
 class ComponentsScreen extends StatefulWidget {
-  const ComponentsScreen({super.key, this.initialSlug, this.onSelectionChanged});
+  const ComponentsScreen({
+    super.key,
+    this.initialSlug,
+    this.onSelectionChanged,
+  });
 
   final String? initialSlug;
 
