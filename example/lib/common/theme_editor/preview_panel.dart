@@ -541,6 +541,9 @@ class _Row extends StatelessWidget {
 class _RecentTransactionsCard extends StatelessWidget {
   const _RecentTransactionsCard();
 
+  static const _dateWidth = 120.0;
+  static const _amountWidth = 88.0;
+
   static const _items = [
     (
       LucideIcons.coffee,
@@ -610,21 +613,25 @@ class _RecentTransactionsCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Flexible(
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: _dateWidth,
                     child: Text(
                       date,
                       style: theme.textTheme.muted,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    amount,
-                    style: theme.textTheme.small.copyWith(
-                      color: amount.startsWith('+')
-                          ? theme.colorScheme.charts[1]
-                          : null,
+                  SizedBox(
+                    width: _amountWidth,
+                    child: Text(
+                      amount,
+                      style: theme.textTheme.small.copyWith(
+                        color: amount.startsWith('+')
+                            ? theme.colorScheme.charts[1]
+                            : null,
+                      ),
+                      textAlign: TextAlign.end,
                     ),
                   ),
                 ],
