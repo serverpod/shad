@@ -7,7 +7,6 @@ final dataTableDoc = ComponentDoc(
   description:
       'A table with sorting, selection, filtering, and pagination, driven '
       'by a controller.',
-  playgroundRoute: '/data-table',
   examples: [
     ComponentExample(
       id: 'data_table_payments',

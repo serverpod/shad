@@ -5,7 +5,6 @@ final badgeDoc = ComponentDoc(
   slug: 'badge',
   title: 'Badge',
   description: 'Displays a badge or a component that looks like a badge.',
-  playgroundRoute: '/badge',
   examples: [
     ComponentExample(
       id: 'badge_variants',

@@ -5,7 +5,6 @@ final iconButtonDoc = ComponentDoc(
   slug: 'icon_button',
   title: 'Icon Button',
   description: 'A square button holding a single icon.',
-  playgroundRoute: '/icon-button',
   examples: [
     ComponentExample(
       id: 'icon_button_variants',

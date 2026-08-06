@@ -7,7 +7,6 @@ final switchDoc = ComponentDoc(
   description:
       'A control that allows the user to toggle between checked and not '
       'checked.',
-  playgroundRoute: '/switch',
   examples: [
     ComponentExample(
       id: 'switch_basic',

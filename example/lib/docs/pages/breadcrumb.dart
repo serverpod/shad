@@ -7,7 +7,6 @@ final breadcrumbDoc = ComponentDoc(
   title: 'Breadcrumb',
   description:
       'Displays the path to the current resource using a hierarchy of links.',
-  playgroundRoute: '/breadcrumb',
   examples: [
     ComponentExample(
       id: 'breadcrumb_basic',

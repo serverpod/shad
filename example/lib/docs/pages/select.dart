@@ -8,7 +8,6 @@ final selectDoc = ComponentDoc(
   description:
       'Displays a list of options for the user to pick from, triggered by a '
       'button.',
-  playgroundRoute: '/select',
   examples: [
     ComponentExample(
       id: 'select_basic',

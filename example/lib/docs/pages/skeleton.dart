@@ -5,7 +5,6 @@ final skeletonDoc = ComponentDoc(
   slug: 'skeleton',
   title: 'Skeleton',
   description: 'A placeholder to show while content is loading.',
-  playgroundRoute: '/skeleton',
   examples: [
     ComponentExample(
       id: 'skeleton_card',

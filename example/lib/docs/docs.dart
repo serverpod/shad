@@ -9,7 +9,6 @@ class ComponentDoc {
     required this.slug,
     required this.title,
     required this.description,
-    this.playgroundRoute,
     this.examples = const [],
     this.body,
   });
@@ -21,9 +20,6 @@ class ComponentDoc {
 
   /// One or two sentences under the title.
   final String description;
-
-  /// Route of the interactive knob playground for this component, if any.
-  final String? playgroundRoute;
 
   final List<ComponentExample> examples;
 
@@ -478,20 +474,6 @@ class ComponentDocPage extends StatelessWidget {
                     style: theme.textTheme.lead,
                   ),
                 ),
-                if (doc.playgroundRoute != null) ...[
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: ShadButton.outline(
-                      size: ShadButtonSize.sm,
-                      onPressed: () => Navigator.of(
-                        context,
-                      ).pushNamed(doc.playgroundRoute!),
-                      trailing: const Icon(LucideIcons.arrowUpRight),
-                      child: const Text('Open playground'),
-                    ),
-                  ),
-                ],
                 const SizedBox(height: 24),
                 for (final example in doc.examples) ...[
                   DocExample(slug: doc.slug, example: example),

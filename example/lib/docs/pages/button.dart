@@ -10,7 +10,6 @@ final buttonDoc = ComponentDoc(
   description:
       'Displays a button or a component that looks like a button. Six '
       'variants share one API: pick the one matching the action\'s weight.',
-  playgroundRoute: '/button',
   examples: [
     ComponentExample(
       id: 'button_variants',

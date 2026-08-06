@@ -7,7 +7,6 @@ final emptyDoc = ComponentDoc(
   description:
       'A placeholder for an empty state: icon, title, description, and '
       'actions.',
-  playgroundRoute: '/empty',
   examples: [
     ComponentExample(
       id: 'empty_basic',

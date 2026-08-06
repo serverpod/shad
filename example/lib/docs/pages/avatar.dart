@@ -5,7 +5,6 @@ final avatarDoc = ComponentDoc(
   slug: 'avatar',
   title: 'Avatar',
   description: 'An image element with a fallback for representing the user.',
-  playgroundRoute: '/avatar',
   examples: [
     ComponentExample(
       id: 'avatar_default',

@@ -7,7 +7,6 @@ final keyboardToolbarDoc = ComponentDoc(
   description:
       'A toolbar shown above the software keyboard on mobile, with focus '
       'navigation and a done button.',
-  playgroundRoute: '/keyboard-toolbar',
   examples: [
     ComponentExample(
       id: 'keyboard_toolbar_basic',

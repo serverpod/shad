@@ -7,7 +7,6 @@ final inputDoc = ComponentDoc(
   slug: 'input',
   title: 'Input',
   description: 'Displays a form input field.',
-  playgroundRoute: '/input',
   examples: [
     ComponentExample(
       id: 'input_basic',

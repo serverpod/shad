@@ -7,7 +7,6 @@ final sheetDoc = ComponentDoc(
   description:
       'Extends the dialog to display content that complements the main '
       'content of the screen, sliding in from any edge.',
-  playgroundRoute: '/sheet',
   examples: [
     ComponentExample(
       id: 'sheet_sides',

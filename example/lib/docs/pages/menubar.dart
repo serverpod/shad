@@ -5,7 +5,6 @@ final menubarDoc = ComponentDoc(
   slug: 'menubar',
   title: 'Menubar',
   description: 'A visually persistent menu, common in desktop applications.',
-  playgroundRoute: '/menubar',
   examples: [
     ComponentExample(
       id: 'menubar_basic',

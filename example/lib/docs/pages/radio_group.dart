@@ -6,7 +6,6 @@ final radioGroupDoc = ComponentDoc(
   title: 'Radio Group',
   description:
       'A set of checkable buttons where only one can be checked at a time.',
-  playgroundRoute: '/radio-group',
   examples: [
     ComponentExample(
       id: 'radio_group_basic',

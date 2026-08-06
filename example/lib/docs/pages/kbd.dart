@@ -5,7 +5,6 @@ final kbdDoc = ComponentDoc(
   slug: 'kbd',
   title: 'Kbd',
   description: 'Displays a keyboard key or chord.',
-  playgroundRoute: '/kbd',
   examples: [
     ComponentExample(
       id: 'kbd_basic',

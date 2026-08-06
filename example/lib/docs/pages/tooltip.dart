@@ -7,7 +7,6 @@ final tooltipDoc = ComponentDoc(
   description:
       'A popup that displays information related to an element on hover or '
       'focus.',
-  playgroundRoute: '/tooltip',
   examples: [
     ComponentExample(
       id: 'tooltip_basic',

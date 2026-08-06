@@ -5,7 +5,6 @@ final tableDoc = ComponentDoc(
   slug: 'table',
   title: 'Table',
   description: 'A responsive table component with header and footer rows.',
-  playgroundRoute: '/table',
   examples: [
     ComponentExample(
       id: 'table_invoices',

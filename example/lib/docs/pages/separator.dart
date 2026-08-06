@@ -5,7 +5,6 @@ final separatorDoc = ComponentDoc(
   slug: 'separator',
   title: 'Separator',
   description: 'Visually or semantically separates content.',
-  playgroundRoute: '/divider',
   examples: [
     ComponentExample(
       id: 'separator_basic',

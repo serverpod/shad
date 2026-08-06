@@ -6,7 +6,6 @@ final alertDoc = ComponentDoc(
   slug: 'alert',
   title: 'Alert',
   description: 'Displays a callout for user attention.',
-  playgroundRoute: '/alert',
   examples: [
     ComponentExample(
       id: 'alert_default',

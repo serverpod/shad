@@ -6,7 +6,6 @@ final datePickerDoc = ComponentDoc(
   slug: 'date_picker',
   title: 'Date Picker',
   description: 'A date picker with the calendar in a popover.',
-  playgroundRoute: '/date-picker',
   examples: [
     ComponentExample(
       id: 'date_picker_single',

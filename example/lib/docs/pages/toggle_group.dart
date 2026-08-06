@@ -7,7 +7,6 @@ final toggleGroupDoc = ComponentDoc(
   slug: 'toggle_group',
   title: 'Toggle Group',
   description: 'A set of two-state buttons that can be toggled on or off.',
-  playgroundRoute: '/toggle-group',
   examples: [
     ComponentExample(
       id: 'toggle_group_basic',

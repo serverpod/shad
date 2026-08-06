@@ -5,7 +5,6 @@ final cardDoc = ComponentDoc(
   slug: 'card',
   title: 'Card',
   description: 'Displays a card with title, description, content, and footer.',
-  playgroundRoute: '/card',
   examples: [
     ComponentExample(
       id: 'card_project',

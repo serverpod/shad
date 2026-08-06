@@ -8,7 +8,6 @@ final commandDoc = ComponentDoc(
   description:
       'A composable command menu with filtering and full keyboard '
       'navigation.',
-  playgroundRoute: '/command',
   examples: [
     ComponentExample(
       id: 'command_inline',

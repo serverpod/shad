@@ -6,7 +6,6 @@ final timePickerDoc = ComponentDoc(
   slug: 'time_picker',
   title: 'Time Picker',
   description: 'A field for entering a time of day.',
-  playgroundRoute: '/time-picker',
   examples: [
     ComponentExample(
       id: 'time_picker_basic',

@@ -5,7 +5,6 @@ final spinnerDoc = ComponentDoc(
   slug: 'spinner',
   title: 'Spinner',
   description: 'An animated loading indicator.',
-  playgroundRoute: '/spinner',
   examples: [
     ComponentExample(
       id: 'spinner_basic',

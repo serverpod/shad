@@ -5,7 +5,6 @@ final progressDoc = ComponentDoc(
   slug: 'progress',
   title: 'Progress',
   description: 'An indicator that shows how much of a task is complete.',
-  playgroundRoute: '/progress',
   examples: [
     ComponentExample(
       id: 'progress_basic',

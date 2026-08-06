@@ -8,7 +8,6 @@ final accordionDoc = ComponentDoc(
   description:
       'A vertically stacked set of interactive headings that each reveal a '
       'section of content.',
-  playgroundRoute: '/accordion',
   examples: [
     ComponentExample(
       id: 'accordion_single',

@@ -5,7 +5,6 @@ final tabsDoc = ComponentDoc(
   slug: 'tabs',
   title: 'Tabs',
   description: 'A set of layered sections of content displayed one at a time.',
-  playgroundRoute: '/tabs',
   examples: [
     ComponentExample(
       id: 'tabs_basic',

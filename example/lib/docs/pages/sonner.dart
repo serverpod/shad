@@ -7,7 +7,6 @@ final sonnerDoc = ComponentDoc(
   description:
       'An opinionated toast stack: notifications collect and expand '
       'on hover.',
-  playgroundRoute: '/sonner',
   examples: [
     ComponentExample(
       id: 'sonner_basic',

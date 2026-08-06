@@ -8,7 +8,6 @@ final calendarDoc = ComponentDoc(
   description:
       'A component that allows users to select dates: single, multiple, or '
       'a range.',
-  playgroundRoute: '/calendar',
   examples: [
     ComponentExample(
       id: 'calendar_single',

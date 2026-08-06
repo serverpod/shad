@@ -8,7 +8,6 @@ final dialogDoc = ComponentDoc(
   description:
       'A modal window overlaid on the page, rendering the content underneath '
       'inert.',
-  playgroundRoute: '/dialog',
   examples: [
     ComponentExample(
       id: 'dialog_form',

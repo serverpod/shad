@@ -6,7 +6,6 @@ final toastDoc = ComponentDoc(
   slug: 'toast',
   title: 'Toast',
   description: 'A succinct message that is displayed temporarily.',
-  playgroundRoute: '/toast',
   examples: [
     ComponentExample(
       id: 'toast_basic',

@@ -88,7 +88,6 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('Open playground'), findsOneWidget);
   });
 
   testWidgets('the search box filters the sidebar', (tester) async {

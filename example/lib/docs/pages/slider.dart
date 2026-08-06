@@ -6,7 +6,6 @@ final sliderDoc = ComponentDoc(
   title: 'Slider',
   description:
       'An input where the user selects a value from within a given range.',
-  playgroundRoute: '/slider',
   examples: [
     ComponentExample(
       id: 'slider_basic',

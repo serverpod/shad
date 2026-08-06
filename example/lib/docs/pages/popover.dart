@@ -5,7 +5,6 @@ final popoverDoc = ComponentDoc(
   slug: 'popover',
   title: 'Popover',
   description: 'Displays rich content in a portal, triggered by a button.',
-  playgroundRoute: '/popover',
   examples: [
     ComponentExample(
       id: 'popover_basic',

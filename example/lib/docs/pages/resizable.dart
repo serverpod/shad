@@ -6,7 +6,6 @@ final resizableDoc = ComponentDoc(
   title: 'Resizable',
   description:
       'Resizable panel groups and layouts, with nesting and drag handles.',
-  playgroundRoute: '/resizable',
   examples: [
     ComponentExample(
       id: 'resizable_basic',

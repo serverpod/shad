@@ -5,7 +5,6 @@ final textareaDoc = ComponentDoc(
   slug: 'textarea',
   title: 'Textarea',
   description: 'A multi-line text input, optionally user-resizable.',
-  playgroundRoute: '/textarea',
   examples: [
     ComponentExample(
       id: 'textarea_basic',
