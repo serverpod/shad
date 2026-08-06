@@ -118,21 +118,24 @@ class ShadKbd extends StatelessWidget {
 
     // The Align keeps the cap its own size when the parent hands down tight
     // constraints — inside a button's row, say — instead of letting it
-    // stretch to the parent's full height.
+    // stretch to the parent's full height. [IntrinsicWidth] does the same on
+    // the cross axis when a column stretches its children.
     return Align(
       widthFactor: 1,
       heightFactor: 1,
-      child: Container(
-        constraints: BoxConstraints(minWidth: effectiveMinWidth),
-        height: effectiveHeight,
-        padding: effectivePadding,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: effectiveBackgroundColor,
-          borderRadius: effectiveBorder.radius,
-          border: effectiveBorder.hasBorder ? effectiveBorder.toBorder() : null,
+      child: IntrinsicWidth(
+        child: Container(
+          constraints: BoxConstraints(minWidth: effectiveMinWidth),
+          height: effectiveHeight,
+          padding: effectivePadding,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: effectiveBackgroundColor,
+            borderRadius: effectiveBorder.radius,
+            border: effectiveBorder.hasBorder ? effectiveBorder.toBorder() : null,
+          ),
+          child: Text(text, style: effectiveTextStyle),
         ),
-        child: Text(text, style: effectiveTextStyle),
       ),
     );
   }

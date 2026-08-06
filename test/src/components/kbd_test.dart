@@ -38,6 +38,29 @@ void main() {
       expect(cap.height, lessThan(80));
     });
 
+    testWidgets('keeps its own width inside a stretched column', (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const SizedBox(
+            width: 400,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [ShadKbd('K')],
+            ),
+          ),
+        ),
+      );
+
+      final cap = tester.getSize(
+        find.descendant(
+          of: find.byType(ShadKbd),
+          matching: find.byType(Container),
+        ),
+      );
+
+      expect(cap.width, lessThan(400));
+    });
+
     testWidgets('height follows the theme', (tester) async {
       await tester.pumpWidget(
         createTestWidget(const Center(child: ShadKbd('K', height: 32))),

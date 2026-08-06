@@ -4,8 +4,38 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/components/button.dart';
 import 'package:shad/src/components/icon_button.dart';
 import 'package:shad/src/i18n/localizations_delegate.dart';
+import 'package:shad/src/theme/components/decorator.dart';
+import 'package:shad/src/theme/data.dart';
 import 'package:shad/src/theme/theme.dart';
+import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/debug_check.dart';
+
+const _transparent = Color(0x00000000);
+
+/// Reserves the same inset as [ShadButtonVariant.outline] without showing a
+/// border, so page numbers do not shift when the selection moves.
+ShadDecoration _inactivePageButtonDecoration(ShadThemeData theme) {
+  final outlineBorder = theme.outlineButtonTheme.decoration?.border;
+  if (outlineBorder == null) {
+    return ShadDecoration(
+      border: ShadBorder.all(width: 1, color: _transparent),
+    );
+  }
+
+  ShadBorderSide transparentize(ShadBorderSide? side) {
+    final effective = side ?? const ShadBorderSide(width: 1);
+    return effective.copyWith(color: _transparent);
+  }
+
+  return ShadDecoration(
+    border: outlineBorder.copyWith(
+      top: transparentize(outlineBorder.top),
+      right: transparentize(outlineBorder.right),
+      bottom: transparentize(outlineBorder.bottom),
+      left: transparentize(outlineBorder.left),
+    ),
+  );
+}
 
 /// {@template ShadPagination}
 /// A page navigator.
@@ -226,6 +256,9 @@ class ShadPagination extends StatelessWidget {
                   ? ShadButtonVariant.outline
                   : ShadButtonVariant.ghost,
               size: ShadButtonSize.icon,
+              decoration: isCurrent
+                  ? null
+                  : _inactivePageButtonDecoration(theme),
               enabled: enabled && onPageChanged != null,
               onPressed: onPageChanged == null || isCurrent
                   ? null
