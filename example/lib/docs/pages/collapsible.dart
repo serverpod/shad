@@ -4,7 +4,7 @@ import 'package:example/docs/examples/collapsible/collapsible_basic.dart';
 final collapsibleDoc = ComponentDoc(
   slug: 'collapsible',
   title: 'Collapsible',
-  description: 'An interactive component which expands and collapses a panel.',
+  description: 'An interactive component that expands and collapses a panel.',
   playgroundRoute: '/collapsible',
   examples: [
     ComponentExample(

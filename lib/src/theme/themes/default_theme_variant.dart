@@ -1892,7 +1892,13 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   }
 
   @override
-  ShadToggleTheme toggleTheme() {
+  ShadToggleTheme toggleTheme() => _toggleTheme(borderWidth: 0);
+
+  @override
+  ShadToggleTheme outlineToggleTheme() => _toggleTheme(borderWidth: 1);
+
+  /// Shared toggle metrics; outline adds `border-input shadow-xs`.
+  ShadToggleTheme _toggleTheme({required double borderWidth}) {
     // `hover:bg-muted hover:text-foreground aria-pressed:bg-muted` — the
     // pressed state is the muted surface, not the accent, and its size
     // follows the button metrics (`h-9 min-w-9 px-2.5`).
@@ -1905,7 +1911,13 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       selectedForegroundColor: colorScheme.foreground,
       padding: EdgeInsets.symmetric(horizontal: scaled(style.buttonPaddingX)),
       decoration: ShadDecoration(
-        border: ShadBorder.all(radius: controlRadius, width: 0),
+        border: ShadBorder.all(
+          radius: controlRadius,
+          color: borderWidth == 0 ? null : colorScheme.input,
+          width: borderWidth,
+          padding: focusReserve(borderWidth),
+        ),
+        shadows: borderWidth == 0 ? null : style.controlShadow,
       ),
       textStyle: style.label.apply(effectiveTextTheme.small),
       gap: scaled(style.buttonGap),

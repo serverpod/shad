@@ -1556,25 +1556,66 @@ class _Swatch extends StatelessWidget {
 class _TypographyCard extends StatelessWidget {
   const _TypographyCard();
 
+  static const _styles = <(String label, String styleKey, String sample)>[
+    ('h1', 'h1', 'Taxing Laughter'),
+    ('h2', 'h2', 'The People of the Kingdom'),
+    ('h3', 'h3', 'The Joke Tax'),
+    ('h4', 'h4', 'People stopped telling jokes'),
+    ('p', 'p', 'The king repealed the joke tax.'),
+    ('quote', 'blockquote', '"Everyone enjoys a good joke."'),
+    ('table', 'table', "King's Treasury"),
+    ('list', 'list', '1st level of puns: 5 gold coins'),
+    ('lead', 'lead', 'A modal dialog that interrupts the user.'),
+    ('large', 'large', 'Are you absolutely sure?'),
+    ('small', 'small', 'Email address'),
+    ('muted', 'muted', 'Enter your email address.'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
     final text = theme.textTheme;
+    final styleName = theme.style.name;
+    final capitalizedStyle =
+        '${styleName[0].toUpperCase()}${styleName.substring(1)}';
 
-    Widget row(String name, TextStyle style, String sample) {
+    TextStyle styleFor(String key) => switch (key) {
+      'h1' => text.h1,
+      'h2' => text.h2,
+      'h3' => text.h3,
+      'h4' => text.h4,
+      'p' => text.p,
+      'blockquote' => text.blockquote,
+      'table' => text.table,
+      'list' => text.list,
+      'lead' => text.lead,
+      'large' => text.large,
+      'small' => text.small,
+      'muted' => text.muted,
+      _ => text.p,
+    };
+
+    final labelStyle = text.muted.copyWith(
+      fontSize: 11,
+      color: theme.colorScheme.mutedForeground,
+    );
+
+    Widget row(String label, TextStyle style, String sample) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.baseline,
         textBaseline: TextBaseline.alphabetic,
         children: [
           SizedBox(
-            width: 72,
-            child: Text(
-              '$name ${style.fontSize?.toStringAsFixed(0)}',
-              style: text.muted.copyWith(fontSize: 11),
-            ),
+            width: 80,
+            child: Text(label, style: labelStyle),
           ),
           Expanded(
-            child: Text(sample, style: style, overflow: TextOverflow.ellipsis),
+            child: Text(
+              sample,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       );
@@ -1582,28 +1623,14 @@ class _TypographyCard extends StatelessWidget {
 
     return _PreviewCard(
       title: 'Typography',
-      description: theme.style.name,
+      trailing: ShadBadge(child: Text(capitalizedStyle)),
       child: ShadColumn(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
-        spacing: 2,
+        spacing: 4,
         children: [
-          row('Heading', text.h4, 'The quick brown fox'),
-          row('Title', text.large, 'Payout scheduled'),
-          row('Body', text.p, 'Transfers settle in 1-2 business days.'),
-          row('Label', text.small, 'Amount'),
-          row('Muted', text.muted, 'Updated 3 minutes ago'),
-          const ShadSeparator.horizontal(
-            margin: EdgeInsets.symmetric(vertical: 4),
-          ),
-          ShadRow(
-            spacing: 2,
-            children: [
-              ShadButton(onPressed: () {}, child: const Text('Button')),
-              ShadBadge(child: const Text('Badge')),
-              const ShadKbd.group(['⌘', 'K']),
-            ],
-          ),
+          for (final (label, styleKey, sample) in _styles)
+            row(label, styleFor(styleKey), sample),
         ],
       ),
     );

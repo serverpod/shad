@@ -117,6 +117,24 @@ void main() {
       expect(changes, isEmpty);
     });
 
+    testWidgets('outline uses the outline toggle theme', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          ShadToggle.outline(
+            value: false,
+            onChanged: (_) {},
+            child: const Text('Bold'),
+          ),
+        ),
+      );
+
+      final theme = ShadTheme.of(
+        tester.element(find.byType(ShadToggle)),
+      );
+      expect(theme.outlineToggleTheme.decoration?.border?.top?.width, 1);
+      expect(theme.toggleTheme.decoration?.border?.top?.width, 0);
+    });
+
     testWidgets('exposes its toggled state to semantics', (tester) async {
       final handle = tester.ensureSemantics();
       await tester.pumpWidget(

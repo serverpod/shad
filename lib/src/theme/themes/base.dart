@@ -112,6 +112,7 @@ abstract class ShadBaseTheme {
     required this.kbdTheme,
     required this.spinnerTheme,
     required this.toggleTheme,
+    required this.outlineToggleTheme,
     required this.emptyTheme,
     required this.paginationTheme,
     required this.collapsibleTheme,
@@ -133,6 +134,7 @@ abstract class ShadBaseTheme {
   final ShadKbdTheme kbdTheme;
   final ShadSpinnerTheme spinnerTheme;
   final ShadToggleTheme toggleTheme;
+  final ShadToggleTheme outlineToggleTheme;
   final ShadEmptyTheme emptyTheme;
   final ShadPaginationTheme paginationTheme;
   final ShadCollapsibleTheme collapsibleTheme;
@@ -282,6 +284,7 @@ abstract class ShadThemeVariant {
   ShadKbdTheme kbdTheme();
   ShadSpinnerTheme spinnerTheme();
   ShadToggleTheme toggleTheme();
+  ShadToggleTheme outlineToggleTheme();
   ShadEmptyTheme emptyTheme();
   ShadPaginationTheme paginationTheme();
   ShadCollapsibleTheme collapsibleTheme();

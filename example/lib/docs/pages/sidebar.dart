@@ -14,9 +14,9 @@ final sidebarDoc = ComponentDoc(
       id: 'sidebar_basic',
       title: 'Icon rail',
       description:
-          'With collapsible: icon the sidebar shrinks to a rail of icons; '
-          'menu buttons show their label as a tooltip. This docs app itself '
-          'runs on ShadSidebarScaffold.',
+          'With collapsible: icon the sidebar shrinks to a rail of icons. '
+          'Menu buttons show their label as a tooltip. This docs app '
+          'itself runs on ShadSidebarScaffold.',
       minPreviewHeight: 480,
       builder: (_) => const SidebarBasicExample(),
     ),

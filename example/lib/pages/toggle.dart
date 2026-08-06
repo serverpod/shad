@@ -47,6 +47,15 @@ class _TogglePageState extends State<TogglePage> {
           child: const Icon(LucideIcons.italic),
         ),
         const SizedBox(height: 16),
+        Text('Outline', style: theme.textTheme.h4),
+        ShadToggle.outline(
+          value: bold,
+          enabled: enabled,
+          semanticLabel: 'Bold',
+          onChanged: (value) => setState(() => bold = value),
+          child: const Icon(LucideIcons.bold),
+        ),
+        const SizedBox(height: 16),
         Text('With a label', style: theme.textTheme.h4),
         ShadToggle(
           value: withLabel,

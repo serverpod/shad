@@ -14,8 +14,8 @@ final installationDoc = ComponentDoc(
           ),
           CodeBlock(code: 'flutter pub add shad'),
           DocParagraph(
-            'Everything ships through one import — components, theme, '
-            'Lucide icons and animation effects:',
+            'Everything ships through one import: components, theme, '
+            'Lucide icons, and animation effects.',
           ),
           CodeBlock(code: "import 'package:shad/shad.dart';"),
         ],
@@ -24,10 +24,10 @@ final installationDoc = ComponentDoc(
         title: 'Set up ShadApp',
         children: [
           DocParagraph(
-            '`ShadApp` takes the place of `MaterialApp`: it installs the '
-            'theme, localizations, navigation and the overlay layer the '
+            '`ShadApp` takes the place of `MaterialApp`. It installs the '
+            'theme, localizations, navigation, and the overlay layer the '
             'floating components use. With no arguments it uses the slate '
-            'colour scheme and the nova style.',
+            'color scheme and the nova style.',
           ),
           CodeBlock(
             code: '''
@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
 }''',
           ),
           DocParagraph(
-            'Apps using the `Router` API use `ShadApp.router` with the '
+            'Apps that use the `Router` API use `ShadApp.router` with the '
             'usual `routerConfig` or delegate parameters.',
           ),
         ],
@@ -60,8 +60,8 @@ class MyApp extends StatelessWidget {
         children: [
           DocParagraph(
             'Pass a `theme` and a `darkTheme`, and pick between them with '
-            '`themeMode` — follow the platform, or bind it to your own '
-            'setting:',
+            '`themeMode`. Follow the platform, or bind it to your own '
+            'setting.',
           ),
           CodeBlock(
             code: '''
@@ -92,9 +92,9 @@ ShadButton(
 )''',
           ),
           DocParagraph(
-            'From here, the Theming and Styles pages cover making it yours, '
-            'and each component page pairs live previews with the code that '
-            'renders them.',
+            'From here, the Theming and Styles pages cover how to make it '
+            'yours, and each component page pairs a live preview with the '
+            'code that renders it.',
           ),
         ],
       ),

@@ -4,7 +4,7 @@ final themingDoc = ComponentDoc(
   slug: 'theming',
   title: 'Theming',
   description:
-      'One ShadThemeData drives every component: colour scheme, radius, '
+      'One ShadThemeData drives every component: color scheme, radius, '
       'typography, and per-component overrides.',
   body: (context) => const DocProse(
     children: [
@@ -27,12 +27,12 @@ theme.style;                 // the active style preset''',
         ],
       ),
       DocSection(
-        title: 'Colour schemes',
+        title: 'Color schemes',
         children: [
           DocParagraph(
             'Sixteen schemes ship in light and dark: blue, gray, green, '
             'mauve, mist, neutral, olive, orange, red, rose, slate '
-            '(the default), stone, taupe, violet, yellow and zinc.',
+            '(the default), stone, taupe, violet, yellow, and zinc.',
           ),
           CodeBlock(
             code: '''
@@ -60,11 +60,11 @@ final scheme = ShadColorScheme.fromName(
         ],
       ),
       DocSection(
-        title: 'Customising a scheme',
+        title: 'Customizing a scheme',
         children: [
           DocParagraph(
-            'A scheme is a value: override individual slots where you '
-            'construct it, and carry your own colours in the `custom` map '
+            'A scheme is a value. Override individual slots where you '
+            'construct it, and carry your own colors in the `custom` map '
             'so they lerp and switch with the rest of the theme.',
           ),
           CodeBlock(
@@ -82,7 +82,7 @@ ShadThemeData(
 ShadTheme.of(context).colorScheme.custom['highlight'];''',
           ),
           DocParagraph(
-            'An extension keeps custom colours as ergonomic as the '
+            'An extension keeps custom colors as convenient as the '
             'built-in ones:',
           ),
           CodeBlock(
@@ -97,8 +97,8 @@ extension AppColors on ShadColorScheme {
         title: 'Component themes',
         children: [
           DocParagraph(
-            'Every component has a theme slot on `ShadThemeData` — '
-            '`primaryButtonTheme`, `cardTheme`, `inputTheme` and so on. '
+            'Every component has a theme slot on `ShadThemeData`: '
+            '`primaryButtonTheme`, `cardTheme`, `inputTheme`, and so on. '
             'Values you pass are merged over what the style derives, so an '
             'override touches exactly the property you name:',
           ),
@@ -116,8 +116,8 @@ ShadThemeData(
         title: 'Radius',
         children: [
           DocParagraph(
-            'The theme carries one base radius — the `md` step of the '
-            "scale. Everything else derives from it: at the default 8 the "
+            'The theme carries one base radius, the `md` step of the '
+            'scale. Everything else derives from it: at the default 8 the '
             'scale runs sm 6, md 8, lg 10, xl 14, 2xl 16, 3xl 24, 4xl 32, '
             'and each component picks the step its style prescribes.',
           ),
@@ -134,7 +134,7 @@ ShadThemeData(
         children: [
           DocParagraph(
             "The shadcn theme editor's menu options are theme settings "
-            'here too: `menuColorScheme` renders menu surfaces on another '
+            'here too. `menuColorScheme` renders menu surfaces on another '
             'palette (pass the dark counterpart for the "Inverted" look), '
             '`menuTranslucent` gives them the blurred 70% finish, and '
             '`menuAccent` picks how strongly rows highlight.',
@@ -155,7 +155,7 @@ ShadThemeData(
           DocParagraph(
             'Focus is shown as an outward ring, like shadcn/ui. Set '
             '`disableSecondaryBorder: true` to switch to the alternative '
-            'treatment — a 2px border inside the control — which keeps '
+            'treatment: a 2px border inside the control, which keeps '
             'focus visible where an outward ring would be clipped.',
           ),
         ],

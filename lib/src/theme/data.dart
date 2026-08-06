@@ -127,6 +127,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     ShadKbdTheme? kbdTheme,
     ShadSpinnerTheme? spinnerTheme,
     ShadToggleTheme? toggleTheme,
+    ShadToggleTheme? outlineToggleTheme,
     ShadEmptyTheme? emptyTheme,
     ShadPaginationTheme? paginationTheme,
     ShadCollapsibleTheme? collapsibleTheme,
@@ -395,6 +396,9 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
       kbdTheme: effectiveVariant.kbdTheme().merge(kbdTheme),
       spinnerTheme: effectiveVariant.spinnerTheme().merge(spinnerTheme),
       toggleTheme: effectiveVariant.toggleTheme().merge(toggleTheme),
+      outlineToggleTheme: effectiveVariant.outlineToggleTheme().merge(
+        outlineToggleTheme,
+      ),
       emptyTheme: effectiveVariant.emptyTheme().merge(emptyTheme),
       paginationTheme: effectiveVariant.paginationTheme().merge(
         paginationTheme,
@@ -467,6 +471,7 @@ class ShadThemeData extends ShadBaseTheme with _$ShadThemeData {
     required super.kbdTheme,
     required super.spinnerTheme,
     required super.toggleTheme,
+    required super.outlineToggleTheme,
     required super.emptyTheme,
     required super.paginationTheme,
     required super.collapsibleTheme,

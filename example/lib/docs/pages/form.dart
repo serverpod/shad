@@ -16,14 +16,14 @@ final formDoc = ComponentDoc(
       title: 'Validation and submit',
       description:
           'saveAndValidate runs every validator and returns whether the '
-          'form is valid; values collect in formKey.currentState!.value.',
+          'form is valid. Values collect in formKey.currentState!.value.',
       builder: (_) => const FormProfileExample(),
     ),
     ComponentExample(
       id: 'form_fields',
       title: 'Every field type',
       description:
-          'Input, select, textarea, radio group, date picker, time picker '
+          'Input, select, textarea, radio group, date picker, time picker, '
           'and switch, all as form fields.',
       minPreviewHeight: 480,
       builder: (_) => const FormFieldsExample(),

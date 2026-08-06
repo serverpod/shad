@@ -5,7 +5,7 @@ final layoutDoc = ComponentDoc(
   slug: 'layout',
   title: 'Layout',
   description:
-      'Spacing-scale primitives: ShadRow, ShadColumn, ShadGap and '
+      'Spacing-scale primitives: ShadRow, ShadColumn, ShadGap, and '
       'ShadPadding lay out in steps of the theme spacing.',
   playgroundRoute: '/layout',
   examples: [

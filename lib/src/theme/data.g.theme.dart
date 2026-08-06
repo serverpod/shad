@@ -37,6 +37,11 @@ mixin _$ShadThemeData {
       kbdTheme: ShadKbdTheme.lerp(a.kbdTheme, b.kbdTheme, t)!,
       spinnerTheme: ShadSpinnerTheme.lerp(a.spinnerTheme, b.spinnerTheme, t)!,
       toggleTheme: ShadToggleTheme.lerp(a.toggleTheme, b.toggleTheme, t)!,
+      outlineToggleTheme: ShadToggleTheme.lerp(
+        a.outlineToggleTheme,
+        b.outlineToggleTheme,
+        t,
+      )!,
       emptyTheme: ShadEmptyTheme.lerp(a.emptyTheme, b.emptyTheme, t)!,
       paginationTheme: ShadPaginationTheme.lerp(
         a.paginationTheme,
@@ -235,6 +240,7 @@ mixin _$ShadThemeData {
     ShadKbdTheme? kbdTheme,
     ShadSpinnerTheme? spinnerTheme,
     ShadToggleTheme? toggleTheme,
+    ShadToggleTheme? outlineToggleTheme,
     ShadEmptyTheme? emptyTheme,
     ShadPaginationTheme? paginationTheme,
     ShadCollapsibleTheme? collapsibleTheme,
@@ -303,6 +309,7 @@ mixin _$ShadThemeData {
       kbdTheme: kbdTheme ?? _this.kbdTheme,
       spinnerTheme: spinnerTheme ?? _this.spinnerTheme,
       toggleTheme: toggleTheme ?? _this.toggleTheme,
+      outlineToggleTheme: outlineToggleTheme ?? _this.outlineToggleTheme,
       emptyTheme: emptyTheme ?? _this.emptyTheme,
       paginationTheme: paginationTheme ?? _this.paginationTheme,
       collapsibleTheme: collapsibleTheme ?? _this.collapsibleTheme,
@@ -388,6 +395,9 @@ mixin _$ShadThemeData {
       kbdTheme: _this.kbdTheme.merge(other.kbdTheme),
       spinnerTheme: _this.spinnerTheme.merge(other.spinnerTheme),
       toggleTheme: _this.toggleTheme.merge(other.toggleTheme),
+      outlineToggleTheme: _this.outlineToggleTheme.merge(
+        other.outlineToggleTheme,
+      ),
       emptyTheme: _this.emptyTheme.merge(other.emptyTheme),
       paginationTheme: _this.paginationTheme.merge(other.paginationTheme),
       collapsibleTheme: _this.collapsibleTheme.merge(other.collapsibleTheme),
@@ -488,6 +498,7 @@ mixin _$ShadThemeData {
         _other.kbdTheme == _this.kbdTheme &&
         _other.spinnerTheme == _this.spinnerTheme &&
         _other.toggleTheme == _this.toggleTheme &&
+        _other.outlineToggleTheme == _this.outlineToggleTheme &&
         _other.emptyTheme == _this.emptyTheme &&
         _other.paginationTheme == _this.paginationTheme &&
         _other.collapsibleTheme == _this.collapsibleTheme &&
@@ -560,6 +571,7 @@ mixin _$ShadThemeData {
       _this.kbdTheme,
       _this.spinnerTheme,
       _this.toggleTheme,
+      _this.outlineToggleTheme,
       _this.emptyTheme,
       _this.paginationTheme,
       _this.collapsibleTheme,

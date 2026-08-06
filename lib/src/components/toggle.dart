@@ -9,6 +9,15 @@ import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/provider.dart';
 import 'package:shad/src/utils/states_controller.dart';
 
+/// Variants available for the [ShadToggle] widget.
+enum ShadToggleVariant {
+  /// A borderless toggle with a muted fill when pressed.
+  default_,
+
+  /// A bordered toggle with a subtle shadow.
+  outline,
+}
+
 /// {@template ShadToggle}
 /// A two-state button that stays pressed when on.
 ///
@@ -55,7 +64,66 @@ class ShadToggle extends StatefulWidget {
     this.onFocusChange,
     this.statesController,
     this.semanticLabel,
+  }) : variant = ShadToggleVariant.default_;
+
+  /// A bordered toggle, matching shadcn/ui's `variant="outline"`.
+  const ShadToggle.outline({
+    super.key,
+    required this.value,
+    required this.child,
+    this.onChanged,
+    this.enabled = true,
+    this.leading,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+    this.selectedBackgroundColor,
+    this.selectedHoverBackgroundColor,
+    this.foregroundColor,
+    this.hoverForegroundColor,
+    this.selectedForegroundColor,
+    this.padding,
+    this.decoration,
+    this.textStyle,
+    this.gap,
+    this.height,
+    this.width,
+    this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
+    this.statesController,
+    this.semanticLabel,
+  }) : variant = ShadToggleVariant.outline;
+
+  /// Creates a toggle with a specified [variant], allowing full control.
+  const ShadToggle.raw({
+    super.key,
+    required this.variant,
+    required this.value,
+    required this.child,
+    this.onChanged,
+    this.enabled = true,
+    this.leading,
+    this.backgroundColor,
+    this.hoverBackgroundColor,
+    this.selectedBackgroundColor,
+    this.selectedHoverBackgroundColor,
+    this.foregroundColor,
+    this.hoverForegroundColor,
+    this.selectedForegroundColor,
+    this.padding,
+    this.decoration,
+    this.textStyle,
+    this.gap,
+    this.height,
+    this.width,
+    this.focusNode,
+    this.autofocus = false,
+    this.onFocusChange,
+    this.statesController,
+    this.semanticLabel,
   });
+
+  final ShadToggleVariant variant;
 
   /// Whether the toggle is on.
   final bool value;
@@ -176,7 +244,10 @@ class _ShadToggleState extends State<ShadToggle> {
   Widget build(BuildContext context) {
     assert(debugCheckHasShadTheme(context));
     final theme = ShadTheme.of(context);
-    final toggleTheme = theme.toggleTheme;
+    final toggleTheme = switch (widget.variant) {
+      ShadToggleVariant.default_ => theme.toggleTheme,
+      ShadToggleVariant.outline => theme.outlineToggleTheme,
+    };
 
     final selected = widget.value;
 
@@ -385,6 +456,7 @@ class ShadToggleGroup<T> extends StatefulWidget {
     this.controller,
     this.allowDeselection = true,
     this.enabled = true,
+    this.toggleVariant = ShadToggleVariant.default_,
     this.gap,
     this.axis = Axis.horizontal,
     this.mainAxisSize = MainAxisSize.min,
@@ -398,6 +470,7 @@ class ShadToggleGroup<T> extends StatefulWidget {
     this.onChanged,
     this.controller,
     this.enabled = true,
+    this.toggleVariant = ShadToggleVariant.default_,
     this.gap,
     this.axis = Axis.horizontal,
     this.mainAxisSize = MainAxisSize.min,
@@ -405,6 +478,9 @@ class ShadToggleGroup<T> extends StatefulWidget {
        allowDeselection = true;
 
   final ShadToggleGroupVariant variant;
+
+  /// The visual style shared by every toggle in the group.
+  final ShadToggleVariant toggleVariant;
 
   /// The items in the group.
   final List<ShadToggleGroupItem<T>> children;
@@ -499,7 +575,8 @@ class _ShadToggleGroupState<T> extends State<ShadToggleGroup<T>> {
       }
       final item = widget.children[i];
       items.add(
-        ShadToggle(
+        ShadToggle.raw(
+          variant: widget.toggleVariant,
           value: controller.isSelected(item.value),
           enabled: widget.enabled && item.enabled,
           onChanged: (_) => controller.toggle(item.value),

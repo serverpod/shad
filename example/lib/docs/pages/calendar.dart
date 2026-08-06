@@ -6,8 +6,8 @@ final calendarDoc = ComponentDoc(
   slug: 'calendar',
   title: 'Calendar',
   description:
-      'A component that allows users to select dates: single, multiple or a '
-      'range.',
+      'A component that allows users to select dates: single, multiple, or '
+      'a range.',
   playgroundRoute: '/calendar',
   examples: [
     ComponentExample(

@@ -12,7 +12,7 @@ final responsiveDoc = ComponentDoc(
         title: 'Breakpoints',
         children: [
           DocParagraph(
-            'The theme carries six breakpoints matching Tailwind’s '
+            "The theme carries six breakpoints matching Tailwind's "
             'scale. Override any of them on `ShadThemeData`:',
           ),
           CodeBlock(
@@ -48,7 +48,7 @@ ShadResponsiveBuilder(
 )''',
           ),
           DocParagraph(
-            'Comparisons follow Tailwind’s semantics: `sm` means '
+            "Comparisons follow Tailwind's semantics. `sm` means "
             '"small *and up*", so test with `>=`. Use `==` only to target '
             'exactly one band.',
           ),

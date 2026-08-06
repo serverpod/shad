@@ -136,6 +136,6 @@ final overviewDoc = ComponentDoc(
   slug: 'overview',
   title: 'Overview',
   description:
-      'Every component in the library — pick one to open its documentation.',
+      'Every component in the library. Pick one to open its documentation.',
   body: (context) => ComponentsOverview(components: componentDocs),
 );

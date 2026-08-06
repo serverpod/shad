@@ -5,8 +5,8 @@ final typographyDoc = ComponentDoc(
   slug: 'typography',
   title: 'Typography',
   description:
-      'The text styles of the theme: headings, body, lead, large, small and '
-      'muted.',
+      'Every text style in the theme: the prose scale and the per-component '
+      'styles derived from style roles.',
   playgroundRoute: '/typography',
   examples: [
     ComponentExample(

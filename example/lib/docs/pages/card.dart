@@ -4,7 +4,7 @@ import 'package:example/docs/examples/card/card_project.dart';
 final cardDoc = ComponentDoc(
   slug: 'card',
   title: 'Card',
-  description: 'Displays a card with title, description, content and footer.',
+  description: 'Displays a card with title, description, content, and footer.',
   playgroundRoute: '/card',
   examples: [
     ComponentExample(
