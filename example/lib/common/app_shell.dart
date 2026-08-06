@@ -177,10 +177,15 @@ class _TopNav extends StatelessWidget {
                   color: theme.colorScheme.primary,
                   borderRadius: theme.radii.sm,
                 ),
-                child: Icon(
-                  LucideIcons.layoutDashboard,
-                  size: 14,
-                  color: theme.colorScheme.primaryForeground,
+                child: Center(
+                  child: Image.asset(
+                    theme.brightness == Brightness.dark
+                        ? 'assets/logo-black.png'
+                        : 'assets/logo-white.png',
+                    width: 14,
+                    height: 14,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
               if (!compact) ...[

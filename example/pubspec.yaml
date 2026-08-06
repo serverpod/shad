@@ -33,6 +33,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/
     # Each docs example directory is bundled so the doc pages can show the
     # exact source file that renders the preview.
     - lib/docs/examples/accordion/
