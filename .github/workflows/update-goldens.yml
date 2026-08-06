@@ -1,0 +1,36 @@
+name: Update goldens (Linux)
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_path:
+        description: Test file or directory to run
+        required: false
+        default: test/src/components/sheet_test.dart
+      test_name:
+        description: Optional --plain-name filter
+        required: false
+        default: golden: expandable bottom sheet at initial size
+
+jobs:
+  update-goldens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+        with:
+          channel: stable
+          cache: true
+
+      - name: Regenerate goldens on Linux
+        run: |
+          flutter test "${{ inputs.test_path }}" \
+            --plain-name "${{ inputs.test_name }}" \
+            --update-goldens
+
+      - name: Upload updated goldens
+        uses: actions/upload-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          name: updated-goldens
+          path: test/src/components/goldens/
