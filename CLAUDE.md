@@ -1,4 +1,4 @@
-# Working notes for `shadcn_ui`
+# Working notes for `shad`
 
 Things that are true about this repo and are expensive to rediscover. Written
 for whoever (or whatever) picks the work up next.
@@ -222,9 +222,11 @@ locks the chain; add to it rather than trusting a local check.
   `.github/workflows/check-imports.yaml` enforces it. This is why `ShadSpinner`
   is a `CustomPainter` rather than a wrapped `CircularProgressIndicator`.
 - Verify with: `flutter analyze` and `flutter test` at the root, then the same
-  in `example/`, then `flutter analyze lib` in `playground/`. The example and
-  playground consume the package through the public barrel, so they catch
-  export breakage that the root analyzer does not.
+  in `example/`, then `dart analyze` in `cli/`. The example consumes the
+  package through the public barrel, so it catches export breakage that the
+  root analyzer does not. There is no separate `playground/` app any more —
+  it was a standalone Flutter web project superseded by the example app's own
+  `PlaygroundScreen` and removed with its Firebase hosting config.
 - `example/macos/` is gitignored, so changes there (e.g. the
   `com.apple.security.network.client` entitlement that `google_fonts` needs)
   will not commit.
@@ -291,8 +293,6 @@ app opens on.
 - Code blocks are always dark, in JetBrains Mono (vendored in
   `example/fonts/`), highlighted by `syntax_highlight`, whose grammar loads
   in `main()` via `CodeHighlighter.ensureInitialized()` **before** `runApp`.
-- The old knob pages under `example/lib/pages/` are still routed — each doc
-  page links to its playground — but are no longer the primary navigation.
 - `example/test_driver/app.dart` wraps `main()` in
   `enableFlutterDriverExtension()`; run with
   `flutter run -t test_driver/app.dart` to drive the app from tooling

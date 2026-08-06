@@ -12,7 +12,7 @@ jobs:
   publish:
     permissions:
       id-token: write # Required for authentication using OIDC
-    uses: nank1ro/flutter-shadcn-ui/.github/workflows/cached-publish.yaml@main
+    uses: serverpod/shad/.github/workflows/cached-publish.yaml@main
     with:
       environment: pub.dev
       install_flutter: true

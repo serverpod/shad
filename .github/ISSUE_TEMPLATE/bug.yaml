@@ -1,7 +1,7 @@
 name: Report a bug
 description: |
-  You found a bug in Flutter ShadcnUI causing your application to crash or
-  throw an exception, a widget is buggy, or something looks wrong.
+  You found a bug in shad causing your application to crash or throw an
+  exception, a widget is buggy, or something looks wrong.
 labels:
   - bug
   - triage
@@ -9,18 +9,18 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for using Flutter ShadcnUI!
+        Thank you for using shad!
 
-        If you are looking for support, please check out our documentation
-        or consider asking a question on Discord:
+        If you are looking for support, please check out the documentation
+        or ask a question on the Serverpod Discord:
 
-          - https://flutter-shadcn-ui.mariuti.com
-          - https://discord.gg/ZhRMAPNh5Y
+          - https://serverpod.github.io/shad/
+          - https://serverpod.dev/discord
   - type: markdown
     attributes:
       value: |
         Before filling the form fields, please consider the following:
-        - Ensure that you have searched the [existing issues](https://github.com/nank1ro/flutter-shadcn-ui/issues)
+        - Ensure that you have searched the [existing issues](https://github.com/serverpod/shad/issues)
   - type: textarea
     attributes:
       label: Steps to reproduce

@@ -3,7 +3,7 @@ name: Publish to pub.dev
 ## Caller of this workflow should use it as follows:
 ## jobs:
 ##   publish:
-##     uses: nank1ro/flutter-shadcn-ui/.github/workflows/cached-publish.yaml@main [or a recent commit hash / version tag]
+##     uses: serverpod/shad/.github/workflows/cached-publish.yaml@main [or a recent commit hash / version tag]
 ##     # with:
 ##     #   install_flutter: true
 ##     #   environment: pub.dev

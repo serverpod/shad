@@ -1,84 +1,95 @@
-# Flutter ShadcnUI
+# shad
 
-Shadcn UI ported in Flutter.
-Awesome UI components for Flutter, fully customizable.
+[![pub package](https://img.shields.io/pub/v/shad.svg)](https://pub.dev/packages/shad)
+[![Flutter test](https://github.com/serverpod/shad/actions/workflows/flutter-test.yaml/badge.svg)](https://github.com/serverpod/shad/actions/workflows/flutter-test.yaml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-### Agent Skills
+A Flutter port of [shadcn/ui](https://ui.shadcn.com). `shad` provides more than 40 components as plain Flutter widgets, themed by one `ShadThemeData`, with no dependency on Material or Cupertino.
 
-You can install the [Agent Skills](https://agentskills.io) for this project with:
+Live component browser and docs: **<https://serverpod.github.io/shad/>**
+
+## Features
+
+- **Components.** Buttons, forms, dialogs, sheets, menus, a sidebar, a data table, and more. Every component is a regular `StatelessWidget` or `StatefulWidget`, so it composes with the rest of your widget tree.
+- **Styles.** The eight named shadcn/ui styles (`vega`, `nova`, `maia`, `lyra`, `mira`, `luma`, `sera`, `rhea`) are complete presets for control size, radius, shadows, and type, switchable with one line.
+- **Color schemes.** 16 palettes ship in light and dark, plus support for fully custom schemes.
+- **Theming.** One `ShadThemeData` resolves color, typography, radius, spacing, and every component's own theme. Override any level without losing the rest.
+- **Forms.** `ShadForm` and a `*FormField` widget for every input, with per-field validation.
+- **Localization.** Built on `slang`, with English included and other locales inheriting from it.
+- **Material and Cupertino interop.** `ShadApp.custom` renders `shad` components inside a `MaterialApp` or `CupertinoApp`, so both widget sets can share one page.
+
+## Installation
 
 ```bash
-npx skills add nank1ro/flutter-shadcn-ui
+flutter pub add shad
 ```
 
-## Progress
+## Usage
 
-> Follow the progress on [X (Twitter)](https://twitter.com/nank1ro)
+```dart
+import 'package:flutter/widgets.dart';
+import 'package:shad/shad.dart';
 
-- [x] [Accordion](https://mariuti.com/flutter-shadcn-ui/components/accordion/)
-- [x] [Alert](https://mariuti.com/flutter-shadcn-ui/components/alert/)
-- [x] [Breadcrumb](https://mariuti.com/flutter-shadcn-ui/components/breadcrumb/)
-- [x] [Dialog](https://mariuti.com/flutter-shadcn-ui/components/dialog/)
-- [x] [Avatar](https://mariuti.com/flutter-shadcn-ui/components/avatar/)
-- [x] [Badge](https://mariuti.com/flutter-shadcn-ui/components/badge/)
-- [x] [Button](https://mariuti.com/flutter-shadcn-ui/components/button/)
-- [x] [IconButton](https://mariuti.com/flutter-shadcn-ui/components/icon-button/)
-- [x] [Calendar](https://mariuti.com/flutter-shadcn-ui/components/calendar/)
-- [x] [Card](https://mariuti.com/flutter-shadcn-ui/components/card/)
-- [ ] Carousel
-- [x] [Checkbox](https://mariuti.com/flutter-shadcn-ui/components/checkbox/)
-- [x] Collapsible
-- [x] Empty
-- [x] [Combobox](https://mariuti.com/flutter-shadcn-ui/components/select/#with-search)
-- [x] Command
-- [x] [Context Menu](https://mariuti.com/flutter-shadcn-ui/components/context-menu/)
-- [x] Data Table
-- [x] [Date Picker](https://mariuti.com/flutter-shadcn-ui/components/date-picker/)
-- [ ] Drawer
-- [x] <strike>Dropdown Menu</strike> Use Context Menu instead
-- [x] [Form](https://mariuti.com/flutter-shadcn-ui/components/form/)
-- [x] <strike>Hover Card</strike> Use Popover instead
-- [x] [Input](https://mariuti.com/flutter-shadcn-ui/components/input/)
-- [x] [Input OTP](https://mariuti.com/flutter-shadcn-ui/components/input-otp/)
-- [x] <strike>Label</strike> Use Text instead
-- [x] [Menubar](https://mariuti.com/flutter-shadcn-ui/components/menubar/)
-- [ ] Navigation Menu
-- [x] Pagination
-- [x] [Popover](https://mariuti.com/flutter-shadcn-ui/components/popover/)
-- [x] [Progress](https://mariuti.com/flutter-shadcn-ui/components/progress/)
-- [x] [RadioGroup](https://mariuti.com/flutter-shadcn-ui/components/radio-group/)
-- [x] [Resizable](https://mariuti.com/flutter-shadcn-ui/components/resizable/)
-- [x] <strike>Scroll Area</strike> Use SingleScrollView, ListView etc. instead
-- [x] [Select](https://mariuti.com/flutter-shadcn-ui/components/select/)
-- [x] [Separator](https://mariuti.com/flutter-shadcn-ui/components/separator/)
-- [x] [Sheet](https://mariuti.com/flutter-shadcn-ui/components/sheet/)
-- [x] Kbd
-- [x] Skeleton
-- [x] Spinner
-- [x] [Slider](https://mariuti.com/flutter-shadcn-ui/components/slider/)
-- [x] [Sonner](https://mariuti.com/flutter-shadcn-ui/components/sonner/)
-- [x] [Switch](https://mariuti.com/flutter-shadcn-ui/components/switch/)
-- [x] [Table](https://mariuti.com/flutter-shadcn-ui/components/table/)
-- [x] [Tabs](https://mariuti.com/flutter-shadcn-ui/components/tabs/)
-- [x] [TextArea](https://mariuti.com/flutter-shadcn-ui/components/text-area/)
-- [x] [Time Picker](https://mariuti.com/flutter-shadcn-ui/components/time-picker/)
-- [x] [Toast](https://mariuti.com/flutter-shadcn-ui/components/toast/)
-- [x] Toggle
-- [x] ToggleGroup
-- [x] [Tooltip](https://mariuti.com/flutter-shadcn-ui/components/tooltip/)
+void main() {
+  runApp(const MyApp());
+}
 
-## FAQs
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-<details>
-<summary>What's the difference with shadcn_flutter</summary>
-My repo was created the 05/01/2024 while he started the 12/02/2024. He never contacted me to contribute.
-It's an open source project, I'd love to have contributions.
+  @override
+  Widget build(BuildContext context) {
+    return ShadApp(
+      theme: ShadThemeData(
+        brightness: Brightness.light,
+        colorScheme: const ShadZincColorScheme.light(),
+      ),
+      darkTheme: ShadThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ShadZincColorScheme.dark(),
+      ),
+      themeMode: ThemeMode.system,
+      home: const HomePage(),
+    );
+  }
+}
 
-Each widget I make takes some time because I try to solve problems in a simple way, making each widget extremely customizable.
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-Another library could probably come first with more widgets, but in the long run it's the quality the most important thing.
-</details>
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ShadButton(
+          onPressed: () {},
+          child: const Text('Get started'),
+        ),
+      ),
+    );
+  }
+}
+```
 
-## Star History
+See <https://serverpod.github.io/shad/> for the full component reference, each page pairs a live preview with the exact source that renders it, plus guides on theming, styles, layout, forms, and responsive design.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=nank1ro/flutter-shadcn-ui&type=Date)](https://star-history.com/#nank1ro/flutter-shadcn-ui&Date)
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `lib/` | The `shad` package. |
+| `example/` | The live docs site and component browser deployed to GitHub Pages, and a reference for how to structure an app around `shad`. |
+| `test/` | The package's test suite. |
+| `skills/shad-overview/` | An [Agent Skill](https://agentskills.io) describing `shad`'s API, for coding agents. |
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set up the project, the test suite, and the pull request process.
+
+## Credits
+
+`shad` began as [flutter-shadcn-ui](https://github.com/nank1ro/flutter-shadcn-ui) by [Alexandru Mariuti](https://github.com/nank1ro). It is now maintained by [Serverpod](https://serverpod.dev).
+
+## License
+
+[MIT](LICENSE)

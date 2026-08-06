@@ -38,15 +38,25 @@ jobs:
       - name: Clean
         run: flutter clean
 
-      - name: Install and analyze
+      # The package and the example app are two separate pub projects. Each
+      # is analyzed and tested on its own so a broken export from the
+      # package surfaces in whichever project actually consumes it.
+      - name: Install and analyze package
         run: |
           flutter pub get
-          cd cli && dart pub get
-          cd ../playground && flutter pub get
-          cd ..
           flutter analyze
 
-      - name: Test
+      - name: Test package
+        run: flutter test -r github --fail-fast
+
+      - name: Install and analyze example
+        working-directory: example
+        run: |
+          flutter pub get
+          flutter analyze
+
+      - name: Test example
+        working-directory: example
         run: flutter test -r github --fail-fast
 
       - name: Downgrade dependencies

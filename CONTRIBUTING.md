@@ -1,173 +1,140 @@
-Contributing to Flutter Shadcn UI
-=======================
+# Contributing to shad
 
-_TL;DR_: join [Discord](https://discord.gg/ZhRMAPNh5Y), be courteous.
+Thank you for your interest in contributing. This guide covers project setup, the test suite, coding conventions, and the pull request process.
 
-## Welcome
+## Ways to contribute
 
-There are many ways to contribute, including writing code, filing issues on GitHub, helping to triage, reproduce, or
-fix bugs that people have filed, adding to our documentation,
-doing outreach about Flutter, or helping out in any other way.
+- Report bugs and reproduce or triage [existing issues](https://github.com/serverpod/shad/issues).
+- Add or improve tests.
+- Add a missing component, or improve an existing one.
+- Improve the documentation in the example app or in `skills/shad-overview/`.
 
-We communicate primarily over GitHub and [Discord](https://discord.gg/ZhRMAPNh5Y).
+We communicate through GitHub issues and pull requests, and on the [Serverpod Discord](https://serverpod.dev/discord).
 
-### Helping out in the issue database
+## Project setup
 
-Triage is the process of going through bug reports and determining if they are valid, finding out
-how to reproduce them, catching duplicate reports, and generally making our issues list
-useful for our engineers.
+The repository has two separate Dart/Flutter projects:
 
-If you want to help us triage, you are very welcome to do so!
+| Path | What it is |
+| --- | --- |
+| `/` | The `shad` package. |
+| `example/` | The docs site and component browser, also deployed to GitHub Pages. |
 
-See all the issues [here](https://github.com/nank1ro/flutter-shadcn-ui/issues)
+Install dependencies for each project you plan to touch:
 
-## Quality Assurance
+```bash
+flutter pub get
+cd example && flutter pub get && cd ..
+```
 
-One of the most useful tasks, closely related to triage, is finding and filing bug reports. Testing
-beta releases, looking for regressions, creating test cases, adding to our test suites, and
-other work along these lines can really drive the quality of the product up. Creating tests
-that increase our test coverage, writing tests for issues others have filed, all these tasks
-are really valuable contributions to open source projects.
+## Running the example app
 
-If this interests you, you can jump in and submit bug reports without needing anyone's permission!
+The example app doubles as a manual test bed and documentation site. Run it like a normal Flutter app:
 
-If you want to contribute test cases, you can also submit PRs.
+```bash
+cd example
+flutter run -d chrome # or a connected device/simulator
+```
 
-## Introducing new components
+## Verifying your change
 
-See the missing components in the [README.md](./README.md).
+Run these before opening a pull request. CI runs the same commands against the package and the example app, each analyzed and tested on its own.
 
-> The component you want to add must be present on [shadcn.com](https://ui.shadcn.com/docs/components/).
+```bash
+flutter analyze
+flutter test
 
-Create a new file in the `lib/src/components` directory and follow the structure of the other components.
-The name of the file is the name of the component, for example `avatar.dart` or `dialog.dart`.
+cd example
+flutter analyze
+flutter test
+cd ..
+```
 
-The name of the widget must be prefixed with `Shad`, so we have `ShadAvatar` and `ShadDialog`.
+### Regenerating generated files
 
-Each component should have a corresponding theme, which is put at the path `lib/src/theme/components` with the same name of the component you provided early.
+Component themes are generated. After changing anything under `lib/src/theme/`, run:
 
-The component and the component's theme must be exported from the `lib/shadcn_ui.dart` file.
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
 
-The parameters of the component should be as customizable as possible, ideally they must be put in both the component and component's theme.
+Commit the resulting `*.g.theme.dart` files together with your change.
 
-"Ideally" the parameter in the component must be retrieved in this way:
+Translations use slang's legacy builder, which writes to disk directly instead of through `build_runner`. Only `lib/src/i18n/en.i18n.yaml` needs editing, other locales inherit from English. If a `lib/src/i18n/strings*.g.dart` file goes missing, regenerate it with:
+
+```bash
+dart run slang
+```
+
+## Adding a component
+
+The component must exist on [ui.shadcn.com](https://ui.shadcn.com/docs/components).
+
+1. Look up its markup, states, and measurements in the shadcn/ui reference (see `CLAUDE.md` for where each value lives). Read values from the reference; do not guess colors, padding, radii, or type.
+2. Create `lib/src/components/<name>.dart`. Name the widget class `Shad<Name>`, for example `ShadAvatar` or `ShadDialog`.
+3. Create its theme at `lib/src/theme/components/<name>.dart`, following the pattern of an existing component theme.
+4. Export both files from `lib/shad.dart`.
+5. Add the component's default values to both theme variants: `lib/src/theme/themes/default_theme_variant.dart` and `default_theme_no_secondary_border_variant.dart`. The two variants should differ only in how the component's decoration handles the secondary (outward) border.
+6. Add a documentation page: an example under `example/lib/docs/examples/<slug>/`, a `ComponentDoc` in `example/lib/docs/pages/<slug>.dart`, and an entry in `example/lib/docs/registry.dart`.
+7. Regenerate the component's skill page: `dart run scripts/generate_skills.dart`.
+8. Add tests under `test/src/components/`.
+
+### Component parameters
+
+Make every parameter overridable on both the component and its theme, and resolve it the same way every other component does:
 
 ```dart
 Widget build(BuildContext context) {
   final theme = ShadTheme.of(context);
-  final effectivePadding = widget.padding ?? theme.avatarTheme.padding ?? {DEFAULT_PADDING_VALUE};
+  final effectivePadding = widget.padding ?? theme.avatarTheme.padding ?? kDefaultPadding;
 }
 ```
 
-To make this work, both the padding parameter in the component and the padding parameter in the theme must be optional.
+Both the component's parameter and the theme's parameter must be optional for this pattern to work.
 
-Another important step is the default component theme which is placed in the `lib/src/theme/themes/default_theme_variant` and `lib/src/theme/themes/default_theme_no_secondary_border_variant` files.
+### Component variants
 
-The difference between the two default themes is that the first one uses the secondary border in each component, while the second one does not use it.
-The only difference between the two themes should be the `decoration` of the component parts, to handle or not the secondary border.
-
----
-
-When the same component has multiple variants, create an enum, for example:
+When a component has multiple variants, model them as an enum and give each variant its own named constructor, plus a `.raw` constructor for the general case:
 
 ```dart
-enum ShadAlertVariant {
-  primary,
-  destructive,
+enum ShadAlertVariant { primary, destructive }
+
+class ShadAlert extends StatelessWidget {
+  // The primary constructor.
+  const ShadAlert({super.key}) : variant = ShadAlertVariant.primary;
+
+  // A named constructor for a specific variant.
+  const ShadAlert.destructive({super.key}) : variant = ShadAlertVariant.destructive;
+
+  // A generic constructor that accepts any variant.
+  const ShadAlert.raw({super.key, required this.variant});
+
+  final ShadAlertVariant variant;
 }
 ```
 
-The constructors of the component should be like this:
+## Code style
 
-```dart
-// This is the primary constructor
-const ShadAlert({
-    super.key,
-}) : variant = ShadAlertVariant.primary;
+- Run `dart format .` before committing.
+- `flutter analyze` must report no issues. The package follows `very_good_analysis`; see `analysis_options.yaml` for project-specific overrides.
+- Nothing under `lib/` may import `material.dart`, `cupertino.dart`, or the package's own barrel (`package:shad/shad.dart`). `lib/src/app.dart` is the only exception. CI enforces this.
+- Add or update a doc comment (`///`) on every public member you add or change.
+- Do not add comments that only restate what the code does. Add a comment when the code cannot explain its own intent, a trade-off, or a constraint.
 
-// This a specific variant constructor
-const ShadAlert.destructive({
-  super.key,
-}) : variant = ShadAlertVariant.destructive;
+## Tests
 
-// This is a generic constructor, which can be used to create any variant
-const ShadAlert.raw({
-  super.key,
-  required this.variant,
- });
+- New behavior needs a test. Bug fixes should include a test that fails before the fix and passes after.
+- Prefer asserting resolved theme values over pixels or golden images.
+- Use `matchesGoldenFile` only with `await expectLater(...)`. An unawaited `expect` never reports a mismatch.
+- Popover-based components animate their entrance behind an `IgnorePointer`. Pump about 12 frames of 50 ms before interacting with one in a test.
 
-final ShadAlertVariant variant;
-```
+## Commit and pull request process
 
-## Running example
+1. Fork the repository and create a branch for your change.
+2. Make your change, following the conventions above.
+3. Update `CHANGELOG.md` with a summary of your change, under the pattern already used at the top of the file.
+4. Bump the version in `pubspec.yaml`. Until the package reaches 1.0, the second number is the effective major version and the third is the effective minor version: a breaking change or a new feature bumps the second number (`0.18.0` to `0.19.0`), a fix or a chore bumps the third (`0.18.0` to `0.18.1`).
+5. Open a pull request describing what changed and why, and link the issue it fixes, if any.
+6. Make sure CI passes. It runs `flutter analyze` and `flutter test` against the package and the example app, plus an import check and a check that generated files are up to date.
 
-The `example` folder is where you can add and manually test each component.
-Copy a component from `lib/pages` and add the code to it.
-
-The basic structure of an example component contains:
-
-```dart
-return BaseScaffold(
-  appBarTitle: 'Alert',
-  children: [
-    ShadAlert(),
-  ],
-),
-```
-
-The `BaseScaffold` can contain an `editable` list of widgets, to apply customizations to the component from the right side of the screen.
-
-For example:
-
-```diff
-BaseScaffold(
-+  editable: [
-+   MyBoolProperty(
-+     label: 'Enabled',
-+     value: enabled,
-+     onChanged: (value) => setState(() => enabled = value),
-+    ),
-+ ],
-),
-```
-
-You can see all the available properties in the `lib/common/properties` folder.
-Feel free to propose a new property if you need it.
-
-## Playground
-
-The playground is used to show components from the documentation.
-The directory of the playground is `playground`.
-
-You can add a new component in the `lib/pages` directory.
-
-To create the new component route, add a code like this in the `lib/router.dart` file:
-
-```dart
-final router = GoRouter(
-  routes: [
-    ... // other routes
-    GoRoute(
-      path: '/alert',
-      builder: (context, state) {
-        final style =
-            state.uri.queryParameters['style'] ?? ShadAlertVariant.primary.name;
-        return AlertPage(
-          style: ShadAlertVariant.values.byName(style),
-        );
-      },
-    ),
-]
-```
-## Regenerating generated files
-
-Run `dart run build_runner build`.
-
-Translations are generated by slang's `legacy` builder, which writes to disk directly rather than through build_runner.
-That means build_runner cannot tell when a `lib/src/i18n/strings*.g.dart` file has been deleted, and a normal build will report it as `skipped` instead of regenerating it.
-If those files go missing, run `dart run slang` to write them back.
-
-## Last things
-
-I wrote the documentation quickly, if you notice any problems let me know on Discord (find the link above) and I will be happy to improve this documentation.
-
+A maintainer merges your pull request once it is approved and CI passes. Publishing to pub.dev and deploying the example app to GitHub Pages happen automatically from `main`.

@@ -14,9 +14,9 @@ Update the `ref` below with your branch name, then users can test your changes b
 To try this branch, add the following to your `pubspec.yaml`:
 
 ```yaml
-shadcn_ui:
+shad:
     git:
-      url: https://github.com/nank1ro/flutter-shadcn-ui
+      url: https://github.com/serverpod/shad
       ref: your-branch-name-here
 ```
 
@@ -32,10 +32,10 @@ shadcn_ui:
 - [ ] I bumped the package version following the [Semantic Versioning](https://semver.org/) guidelines (For now the major is the second number and the minor the third, because the package is not feature complete). For example, if the package is at version `0.18.0` and you introduced a breaking change or a new feature, bump it to `0.19.0`, if you just added a fix or a chore bump it to `0.18.1`.
 - [ ] I updated the `CHANGELOG.md` file with a summary of changes made following the format already used.
 
-If you need help, consider asking for advice on [Discord].
+If you need help, consider asking on [Discord].
 
 <!-- Links -->
-[Contributor Guide]: [https://github.com/flutter/flutter/blob/main/docs/contributing/Tree-hygiene.md#overview](https://github.com/nank1ro/flutter-shadcn-ui/blob/main/CONTRIBUTING.md)
+[Contributor Guide]: https://github.com/serverpod/shad/blob/main/CONTRIBUTING.md
 [Flutter Style Guide]: https://github.com/flutter/flutter/blob/main/docs/contributing/Style-guide-for-Flutter-repo.md
-[Discord]: https://discord.gg/ZhRMAPNh5Y
+[Discord]: https://serverpod.dev/discord
 [Data Driven Fixes]: https://github.com/flutter/flutter/blob/main/docs/contributing/Data-driven-Fixes.md

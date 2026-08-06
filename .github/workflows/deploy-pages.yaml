@@ -1,0 +1,62 @@
+name: Deploy example to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "example/**"
+      - "lib/**"
+      - "pubspec.yaml"
+      - ".github/workflows/deploy-pages.yaml"
+  workflow_dispatch:
+
+# Only one deployment at a time; skip queued runs in favor of the latest.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      # example/web is gitignored (see the "platform apps" section of
+      # .gitignore) since it is boilerplate Flutter regenerates on demand.
+      - name: Add the web platform
+        working-directory: example
+        run: flutter create . --platforms web
+
+      - name: Build the example app for the web
+        working-directory: example
+        run: flutter build web --release --base-href "${{ steps.pages.outputs.base_path }}/"
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: example/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

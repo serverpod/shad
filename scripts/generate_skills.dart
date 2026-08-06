@@ -1,386 +1,249 @@
-// ignore_for_file: avoid_print, lines_longer_than_80_chars
+// ignore_for_file: avoid_print
+//
+// Regenerates skills/shad-overview/components/*.md from the example app's
+// documentation pages, which are the single source of truth for component
+// descriptions and sample code (see CLAUDE.md: "the code shown is the code
+// that runs").
+//
+// Run from the repository root:
+//   dart run scripts/generate_skills.dart
+//
+// This only touches the per-component pages under components/. The overview
+// (SKILL.md) and the guides/ directory are maintained by hand, because they
+// carry explanatory prose that the example app does not have a source for.
 
 import 'dart:io';
 
-class ComponentInfo {
-  ComponentInfo({
-    required this.name,
-    required this.fileName,
-    required this.description,
-    required this.content,
-  });
-  final String name;
-  final String fileName;
-  final String description;
-  final String content;
-}
+/// Component slugs, in the order `example/lib/docs/registry.dart` lists
+/// them. Kept as an explicit list (rather than scanning the directory) so a
+/// component only appears here once it has a real docs page.
+const _slugs = [
+  'accordion',
+  'alert',
+  'avatar',
+  'badge',
+  'breadcrumb',
+  'button',
+  'calendar',
+  'card',
+  'checkbox',
+  'collapsible',
+  'command',
+  'context_menu',
+  'data_table',
+  'date_picker',
+  'dialog',
+  'empty',
+  'icon_button',
+  'input',
+  'input_otp',
+  'kbd',
+  'keyboard_toolbar',
+  'menubar',
+  'pagination',
+  'popover',
+  'progress',
+  'radio_group',
+  'resizable',
+  'select',
+  'separator',
+  'sheet',
+  'sidebar',
+  'skeleton',
+  'slider',
+  'sonner',
+  'spinner',
+  'switch',
+  'table',
+  'tabs',
+  'textarea',
+  'time_picker',
+  'toast',
+  'toggle',
+  'toggle_group',
+  'tooltip',
+];
 
-class GuideInfo {
-  GuideInfo({
-    required this.title,
-    required this.fileName,
-    required this.content,
-  });
-  final String title;
-  final String fileName;
-  final String content;
-}
+void main() {
+  final pagesDir = Directory('example/lib/docs/pages');
+  final outDir = Directory('skills/shad-overview/components')
+    ..createSync(recursive: true);
 
-void main() async {
-  final componentsDir = Directory('docs/src/content/docs/Components');
-  final themeFile = File('docs/src/content/docs/Theme/data.md');
-  final typographyFile = File('docs/src/content/docs/typography.mdx');
-  final indexFile = File('docs/src/content/docs/index.md');
-  final utilsDir = Directory('docs/src/content/docs/Utils');
-  final packagesFile = File('docs/src/content/docs/packages.md');
-  final outputDir = Directory('skills/shadcn-ui-flutter');
-
-  if (!outputDir.existsSync()) {
-    outputDir.createSync(recursive: true);
+  // Start clean so a renamed or removed component cannot leave a stale file
+  // behind.
+  for (final entity in outDir.listSync()) {
+    if (entity is File && entity.path.endsWith('.md')) entity.deleteSync();
   }
 
-  // Ensure subdirectories exist
-  Directory('skills/shadcn-ui-flutter/components').createSync(recursive: true);
-  Directory('skills/shadcn-ui-flutter/guides').createSync(recursive: true);
+  final rows = <String>[];
 
-  print('Parsing components...');
-  final components = <ComponentInfo>[];
-  if (componentsDir.existsSync()) {
-    for (final file in componentsDir.listSync().whereType<File>()) {
-      if (file.path.endsWith('.mdx')) {
-        final content = await file.readAsString();
-        final name =
-            _extractTitle(content) ??
-            file.uri.pathSegments.last.replaceAll('.mdx', '');
-        final cleanedContent = _cleanMdx(content);
-        final description = _extractDescription(cleanedContent);
-        final exampleContent = await _getExampleContent(
-          file.uri.pathSegments.last.replaceAll('.mdx', ''),
-        );
-
-        components.add(
-          ComponentInfo(
-            name: name,
-            fileName: file.uri.pathSegments.last.replaceAll('.mdx', '.md'),
-            description: description,
-            content: '$cleanedContent\n\n$exampleContent',
-          ),
-        );
-      }
-    }
-  }
-  components.sort((a, b) => a.name.compareTo(b.name));
-
-  print('Generating component files...');
-  for (final comp in components) {
-    final compFile = File(
-      'skills/shadcn-ui-flutter/components/${comp.fileName}',
-    );
-    await compFile.writeAsString('# ${comp.name}\n\n${comp.content}');
-  }
-
-  print('Parsing guides...');
-  final guides = <GuideInfo>[];
-
-  if (themeFile.existsSync()) {
-    final themeContent = await themeFile.readAsString();
-    guides.add(
-      GuideInfo(
-        title: 'Theming',
-        fileName: 'theming.md',
-        content: _cleanMdx(themeContent),
-      ),
-    );
-  }
-
-  if (typographyFile.existsSync()) {
-    final typoContent = await typographyFile.readAsString();
-    guides.add(
-      GuideInfo(
-        title: 'Typography',
-        fileName: 'typography.md',
-        content: _cleanMdx(typoContent),
-      ),
-    );
-  }
-
-  if (indexFile.existsSync()) {
-    final indexContent = await indexFile.readAsString();
-    final materialSection = _extractSection(indexContent, 'Shadcn + Material');
-    final cupertinoSection = _extractSection(
-      indexContent,
-      'Shadcn + Cupertino',
-    );
-    if (materialSection.isNotEmpty || cupertinoSection.isNotEmpty) {
-      guides.add(
-        GuideInfo(
-          title: 'Material & Cupertino Interop',
-          fileName: 'interop.md',
-          content:
-              '# Interoperability\n\n$materialSection\n\n$cupertinoSection',
-        ),
-      );
-    }
-  }
-
-  if (utilsDir.existsSync()) {
-    for (final file in utilsDir.listSync().whereType<File>()) {
-      final path = file.path;
-      if (path.endsWith('.md') || path.endsWith('.mdx')) {
-        final content = await file.readAsString();
-        final title =
-            _extractTitle(content) ??
-            file.uri.pathSegments.last.replaceAll(RegExp(r'\.mdx?'), '');
-        guides.add(
-          GuideInfo(
-            title: title,
-            fileName: file.uri.pathSegments.last.replaceAll(
-              RegExp(r'\.mdx?'),
-              '.md',
-            ),
-            content: _cleanMdx(content),
-          ),
-        );
-      }
-    }
-  }
-
-  print('Generating guide files...');
-  for (final guide in guides) {
-    final guideFile = File('skills/shadcn-ui-flutter/guides/${guide.fileName}');
-    await guideFile.writeAsString(guide.content);
-  }
-
-  print('Generating SKILL.md...');
-  var packagesContent = '';
-  if (packagesFile.existsSync()) {
-    packagesContent = _cleanMdx(await packagesFile.readAsString());
-  }
-  final skillMd = _generateSkillMd(components, guides, packagesContent);
-  await File('skills/shadcn-ui-flutter/SKILL.md').writeAsString(skillMd);
-
-  print('Done!');
-}
-
-String? _extractTitle(String content) {
-  final match = RegExp(r'^title:\s*(.*)$', multiLine: true).firstMatch(content);
-  return match?.group(1)?.trim();
-}
-
-String _cleanMdx(String content) {
-  // Remove frontmatter
-  var cleaned = content.replaceFirst(RegExp(r'^---[\s\S]*?---'), '');
-
-  // Remove Astro imports
-  cleaned = cleaned.replaceAll(RegExp(r'^import .*?;$', multiLine: true), '');
-
-  // Remove <Preview> tags but keep content inside
-  cleaned = cleaned.replaceAll(RegExp('<Preview.*?>'), '');
-  cleaned = cleaned.replaceAll('</Preview>', '');
-
-  // Remove other common MDX components if any
-  cleaned = cleaned.replaceAll(
-    RegExp(r':::.+?(\n|$)'),
-    '',
-  ); // :::tip, :::note etc
-  cleaned = cleaned.replaceAll(':::', '');
-
-  return cleaned.trim();
-}
-
-String _extractDescription(String content) {
-  final lines = content.split('\n');
-  for (final line in lines) {
-    final trimmed = line.trim();
-    if (trimmed.isNotEmpty &&
-        !trimmed.startsWith('#') &&
-        !trimmed.startsWith('![')) {
-      return trimmed;
-    }
-  }
-  return '';
-}
-
-String _extractSection(String content, String sectionTitle) {
-  final lines = content.split('\n');
-  var inSection = false;
-  final sectionLines = <String>[];
-
-  for (final line in lines) {
-    if (line.startsWith('## ') && line.contains(sectionTitle)) {
-      inSection = true;
-      sectionLines.add(line);
+  for (final slug in _slugs) {
+    final pageFile = File('${pagesDir.path}/$slug.dart');
+    if (!pageFile.existsSync()) {
+      stderr.writeln('Skipping $slug: no docs page at ${pageFile.path}');
       continue;
     }
-    if (inSection && line.startsWith('## ')) {
-      break;
-    }
-    if (inSection) {
-      sectionLines.add(line);
-    }
-  }
-  return sectionLines.join('\n').trim();
-}
-
-String _generateSkillMd(
-  List<ComponentInfo> components,
-  List<GuideInfo> guides,
-  String packagesContent,
-) {
-  final buffer = StringBuffer();
-  buffer.writeln('---');
-  buffer.writeln('name: shadcn-ui-flutter');
-  buffer.writeln(
-    'description: A comprehensive Flutter UI library inspired by shadcn/ui. Provides high-quality, customizable, and accessible components including Buttons, Cards, Forms, and more. Use this skill when building Flutter UIs, implementing design systems, or needing specific component usage examples.',
-  );
-  buffer.writeln('---');
-  buffer.writeln();
-  buffer.writeln('# Shadcn UI for Flutter');
-  buffer.writeln();
-  buffer.writeln(
-    'This skill provides documentation and examples for using the `shad` package in Flutter.',
-  );
-  buffer.writeln();
-  buffer.writeln('## Theming and Customization');
-  buffer.writeln(
-    'Shadcn UI for Flutter provides a powerful theming system. You can use built-in color schemes (blue, gray, green, neutral, orange, red, rose, slate, stone, violet, yellow, zinc) or create your own.',
-  );
-  buffer.writeln();
-  buffer.writeln('### Applying a Theme');
-  buffer.writeln(
-    'Use `ShadThemeData` within `ShadApp` to define your light and dark themes.',
-  );
-  buffer.writeln();
-  buffer.writeln('### Detailed Guides');
-  for (final guide in guides) {
-    buffer.writeln('- [${guide.title}](guides/${guide.fileName})');
-  }
-  buffer.writeln();
-  buffer.writeln('## Components');
-  buffer.writeln('| Name | Description | Reference |');
-  buffer.writeln('| :--- | :--- | :--- |');
-  for (final comp in components) {
-    buffer.writeln(
-      '| ${comp.name} | ${comp.description} | [${comp.fileName}](components/${comp.fileName}) |',
+    final source = pageFile.readAsStringSync();
+    final page = _parsePage(source);
+    final fileName = slug.replaceAll('_', '-');
+    File('${outDir.path}/$fileName.md').writeAsStringSync(_render(slug, page));
+    rows.add(
+      '| ${page.title} | ${page.description} | [$fileName.md](components/$fileName.md) |',
     );
-  }
-  buffer.writeln();
-  buffer.writeln('## Usage Examples');
-  buffer.writeln(
-    'Examples are available at the bottom of each component page.',
-  );
-  buffer.writeln();
-  buffer.writeln('### Basic Setup');
-  buffer.writeln(
-    'Here is a complete example of a Counter App using `shad`, including light and dark theme support.',
-  );
-  buffer.writeln('```dart');
-  buffer.writeln("import 'package:shad/shad.dart';");
-  buffer.writeln();
-  buffer.writeln('void main() {');
-  buffer.writeln('  runApp(const MyApp());');
-  buffer.writeln('}');
-  buffer.writeln();
-  buffer.writeln('class MyApp extends StatelessWidget {');
-  buffer.writeln('  const MyApp({super.key});');
-  buffer.writeln();
-  buffer.writeln('  @override');
-  buffer.writeln('  Widget build(BuildContext context) {');
-  buffer.writeln('    return ShadApp(');
-  buffer.writeln('      debugShowCheckedModeBanner: false,');
-  buffer.writeln('      theme: ShadThemeData(');
-  buffer.writeln('        brightness: Brightness.light,');
-  buffer.writeln('        colorScheme: const ShadZincColorScheme.light(),');
-  buffer.writeln('      ),');
-  buffer.writeln('      darkTheme: ShadThemeData(');
-  buffer.writeln('        brightness: Brightness.dark,');
-  buffer.writeln('        colorScheme: const ShadZincColorScheme.dark(),');
-  buffer.writeln('      ),');
-  buffer.writeln('      themeMode: ThemeMode.system,');
-  buffer.writeln('      home: const CounterPage(),');
-  buffer.writeln('    );');
-  buffer.writeln('  }');
-  buffer.writeln('}');
-  buffer.writeln();
-  buffer.writeln('class CounterPage extends StatefulWidget {');
-  buffer.writeln('  const CounterPage({super.key});');
-  buffer.writeln();
-  buffer.writeln('  @override');
-  buffer.writeln('  State<CounterPage> createState() => _CounterPageState();');
-  buffer.writeln('}');
-  buffer.writeln();
-  buffer.writeln('class _CounterPageState extends State<CounterPage> {');
-  buffer.writeln('  int _counter = 0;');
-  buffer.writeln();
-  buffer.writeln('  void _incrementCounter() {');
-  buffer.writeln('    setState(() {');
-  buffer.writeln('      _counter++;');
-  buffer.writeln('    });');
-  buffer.writeln('  }');
-  buffer.writeln();
-  buffer.writeln('  @override');
-  buffer.writeln('  Widget build(BuildContext context) {');
-  buffer.writeln('    final theme = ShadTheme.of(context);');
-  buffer.writeln('    return Scaffold(');
-  buffer.writeln("      appBar: AppBar(title: const Text('Shadcn Counter')),");
-  buffer.writeln('      body: Center(');
-  buffer.writeln('        child: Column(');
-  buffer.writeln('          mainAxisAlignment: MainAxisAlignment.center,');
-  buffer.writeln('          children: [');
-  buffer.writeln('            Text(');
-  buffer.writeln(
-    "              'You have pushed the button this many times:',",
-  );
-  buffer.writeln('              style: theme.textTheme.muted,');
-  buffer.writeln('            ),');
-  buffer.writeln('            Text(');
-  buffer.writeln(r"              '$_counter',");
-  buffer.writeln('              style: theme.textTheme.h1,');
-  buffer.writeln('            ),');
-  buffer.writeln('          ],');
-  buffer.writeln('        ),');
-  buffer.writeln('      ),');
-  buffer.writeln('      floatingActionButton: ShadButton(');
-  buffer.writeln('        onPressed: _incrementCounter,');
-  buffer.writeln('        child: const Icon(LucideIcons.plus),');
-  buffer.writeln('      ),');
-  buffer.writeln('    );');
-  buffer.writeln('  }');
-  buffer.writeln('}');
-  buffer.writeln('```');
-
-  if (packagesContent.isNotEmpty) {
-    buffer.writeln();
-    buffer.writeln(packagesContent);
+    print('Wrote components/$fileName.md');
   }
 
-  return buffer.toString();
+  print('');
+  print('Component table rows (paste into SKILL.md if the set changed):');
+  print(rows.join('\n'));
 }
 
-Future<String> _getExampleContent(String componentName) async {
-  final name = componentName.replaceAll('-', '_');
-  final mainExample = File('example/lib/pages/$name.dart');
-  final formExample = File('example/lib/pages/${name}_form_field.dart');
+class _Page {
+  _Page({
+    required this.title,
+    required this.description,
+    required this.examples,
+  });
 
-  final buffer = StringBuffer();
+  final String title;
+  final String description;
+  final List<_Example> examples;
+}
 
-  if (mainExample.existsSync()) {
-    buffer.writeln('## Example');
-    buffer.writeln('```dart');
-    buffer.writeln(await mainExample.readAsString());
-    buffer.writeln('```');
+class _Example {
+  _Example({required this.id, required this.title, this.description});
 
-    if (formExample.existsSync()) {
-      buffer.writeln('\n## Form Example');
-      buffer.writeln('```dart');
-      buffer.writeln(await formExample.readAsString());
-      buffer.writeln('```');
+  final String id;
+  final String title;
+  final String? description;
+}
+
+_Page _parsePage(String source) {
+  final title = _firstMatch(source, RegExp(r"title:\s*'([^']*)'"));
+
+  final examplesIndex = source.indexOf('examples:');
+  final descriptionSpan = source.substring(
+    source.indexOf('description:'),
+    examplesIndex == -1 ? source.indexOf(');') : examplesIndex,
+  );
+  final description = _concatStrings(descriptionSpan);
+
+  final examples = <_Example>[];
+  if (examplesIndex != -1) {
+    final block = _bracketedBlock(source, source.indexOf('[', examplesIndex));
+    for (final chunk in _splitTopLevel(block, 'ComponentExample(')) {
+      final id = _firstMatch(chunk, RegExp(r"id:\s*'([^']*)'"));
+      final exTitle = _firstMatch(chunk, RegExp(r"title:\s*'([^']*)'"));
+      String? exDescription;
+      if (chunk.contains('description:')) {
+        final descStart = chunk.indexOf('description:');
+        final builderStart = chunk.indexOf('builder:');
+        final span = chunk.substring(
+          descStart,
+          builderStart == -1 ? chunk.length : builderStart,
+        );
+        exDescription = _concatStrings(span);
+      }
+      if (id != null && exTitle != null) {
+        examples.add(
+          _Example(id: id, title: exTitle, description: exDescription),
+        );
+      }
     }
-  } else if (formExample.existsSync()) {
-    buffer.writeln('## Example');
-    buffer.writeln('```dart');
-    buffer.writeln(await formExample.readAsString());
-    buffer.writeln('```');
+  }
+
+  return _Page(
+    title: title ?? '',
+    description: description,
+    examples: examples,
+  );
+}
+
+/// Concatenates every single-quoted string literal in [span], which is how
+/// Dart's formatter wraps a long string constant across multiple lines
+/// (adjacent string literals).
+String _concatStrings(String span) {
+  final matches = RegExp(r"'((?:[^'\\]|\\.)*)'").allMatches(span);
+  return matches
+      .map((m) => m.group(1)!.replaceAll(r"\'", "'").replaceAll(r'\\', r'\'))
+      .join();
+}
+
+String? _firstMatch(String source, RegExp pattern) =>
+    pattern.firstMatch(source)?.group(1);
+
+/// Returns the contents of the bracketed block starting at [openIndex]
+/// (which must point at `[` or `(`), matching brackets by depth so nested
+/// parens (e.g. `builder: (_) => Foo()`) do not confuse the split below.
+String _bracketedBlock(String source, int openIndex) {
+  final open = source[openIndex];
+  final close = open == '[' ? ']' : ')';
+  var depth = 0;
+  for (var i = openIndex; i < source.length; i++) {
+    if (source[i] == open) depth++;
+    if (source[i] == close) {
+      depth--;
+      if (depth == 0) return source.substring(openIndex + 1, i);
+    }
+  }
+  throw StateError('Unbalanced brackets from index $openIndex');
+}
+
+/// Splits [block] into the top-level occurrences of `$marker ... )`,
+/// tracking paren depth so nested calls stay inside their own chunk.
+List<String> _splitTopLevel(String block, String marker) {
+  final chunks = <String>[];
+  var searchFrom = 0;
+  while (true) {
+    final start = block.indexOf(marker, searchFrom);
+    if (start == -1) break;
+    final openIndex = start + marker.length - 1;
+    var depth = 0;
+    var end = openIndex;
+    for (var i = openIndex; i < block.length; i++) {
+      if (block[i] == '(') depth++;
+      if (block[i] == ')') {
+        depth--;
+        if (depth == 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+    chunks.add(block.substring(start, end + 1));
+    searchFrom = end + 1;
+  }
+  return chunks;
+}
+
+String _render(String slug, _Page page) {
+  final buffer = StringBuffer()
+    ..writeln('# ${page.title}')
+    ..writeln()
+    ..writeln(page.description)
+    ..writeln();
+
+  for (final example in page.examples) {
+    buffer.writeln('## ${example.title}');
+    buffer.writeln();
+    if (example.description != null) {
+      buffer.writeln(example.description);
+      buffer.writeln();
+    }
+    final exampleFile = File(
+      'example/lib/docs/examples/$slug/${example.id}.dart',
+    );
+    if (exampleFile.existsSync()) {
+      buffer
+        ..writeln('```dart')
+        ..writeln(exampleFile.readAsStringSync().trimRight())
+        ..writeln('```')
+        ..writeln();
+    } else {
+      stderr.writeln(
+        'Missing example source: ${exampleFile.path} (referenced by $slug)',
+      );
+    }
   }
 
   return buffer.toString();
