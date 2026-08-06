@@ -652,6 +652,69 @@ void main() {
     });
   });
 
+  group('icon rail tooltips', () {
+    testWidgets('pop up on the inner side of the rail, arrow pointing back', (
+      tester,
+    ) async {
+      final controller = ShadSidebarController(open: false);
+      addTearDown(controller.dispose);
+      await pumpDesktop(
+        tester,
+        ShadApp(
+          home: Scaffold(
+            body: ShadSidebarScaffold(
+              controller: controller,
+              sidebar: ShadSidebar(
+                collapsible: ShadSidebarCollapsible.icon,
+                children: [
+                  ShadSidebarGroup(
+                    children: [
+                      ShadSidebarMenu(
+                        children: [
+                          ShadSidebarMenuButton(
+                            onPressed: () {},
+                            tooltip: 'Home',
+                            leading: const Icon(IconData(0x2302)),
+                            child: const Text('Home'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              child: const Text('page'),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // The button's layout box keeps the expanded width inside the rail's
+      // clip, so aim at the visible square on the left.
+      final button = find.byType(ShadSidebarMenuButton);
+      final buttonRect = tester.getRect(button);
+      final gesture = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await gesture.moveTo(
+        Offset(buttonRect.left + 16, buttonRect.center.dy),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // The row label plus the tooltip.
+      expect(find.text('Home'), findsNWidgets(2));
+      // The tooltip sits to the right of the collapsed rail (48px), not
+      // over the page's left edge.
+      final tooltip = find.text('Home').last;
+      expect(tester.getTopLeft(tooltip).dx, greaterThan(48));
+    });
+  });
+
   group('ShadSidebar.scrollController', () {
     testWidgets('drives the content area between header and footer', (
       tester,

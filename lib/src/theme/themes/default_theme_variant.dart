@@ -1787,8 +1787,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       border: ShadBorder.all(color: colorScheme.border, width: 1),
       anchor: const ShadAnchor(
         offset: Offset(-4, 8),
-        childAlignment: AlignmentDirectional.topStart,
-        overlayAlignment: AlignmentDirectional.bottomStart,
+        childAlignment: AlignmentDirectional.bottomStart,
+        overlayAlignment: AlignmentDirectional.topStart,
       ),
       // Border-box: the strip's height minus its padding and hairline.
       buttonHeight: scaled(style.menubarHeight) - 2 * style.menubarPadding - 2,

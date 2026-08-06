@@ -10,7 +10,7 @@ class TooltipBasicExample extends StatelessWidget {
       builder: (context) => const Text('Add to library'),
       child: ShadButton.outline(
         onPressed: () {},
-        child: const Text('Hover'),
+        child: const Text('Show Tooltip'),
       ),
     );
   }

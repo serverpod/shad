@@ -338,6 +338,18 @@ class _ShadTooltipState extends State<ShadTooltip>
             visible: controller.isOpen,
             anchor: effectiveAnchor,
             portalBuilder: (context) {
+              // Key caps invert along with the surface, the reference's
+              // `in-data-[slot=tooltip-content]:bg-background/20
+              // text-background` (a `/10` wash in dark).
+              final contentTheme = theme.copyWith(
+                kbdTheme: theme.kbdTheme.copyWith(
+                  backgroundColor: theme.colorScheme.background.withValues(
+                    alpha: theme.brightness == Brightness.dark ? .1 : .2,
+                  ),
+                  foregroundColor: theme.colorScheme.background,
+                ),
+              );
+
               Widget tooltip = ShadDecorator(
                 decoration: effectiveDecoration,
                 child: Padding(
@@ -351,7 +363,13 @@ class _ShadTooltipState extends State<ShadTooltip>
                           height: 16 / 12,
                           color: theme.colorScheme.background,
                         ),
-                    child: widget.builder(context),
+                    child: ShadTheme(
+                      data: contentTheme,
+                      // Through a Builder, so a custom [ShadTooltip.builder]
+                      // sees the inverted text style and theme through its
+                      // own context.
+                      child: Builder(builder: widget.builder),
+                    ),
                   ),
                 ),
               );

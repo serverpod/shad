@@ -488,8 +488,8 @@ class _ShadMenubarItemState extends State<ShadMenubarItem> {
         theme.menubarTheme.anchor ??
         const ShadAnchor(
           offset: Offset(-4, 8),
-          childAlignment: AlignmentDirectional.topStart,
-          overlayAlignment: AlignmentDirectional.bottomStart,
+          childAlignment: AlignmentDirectional.bottomStart,
+          overlayAlignment: AlignmentDirectional.topStart,
         );
 
     final effectiveHeight =

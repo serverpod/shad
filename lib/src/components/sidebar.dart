@@ -1274,15 +1274,24 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
     );
 
     if (widget.tooltip != null && collapsed && !scope.isMobile) {
+      // The tooltip hangs off the button's inner side — away from the
+      // screen edge the rail sits on — with the arrow pointing back at it.
+      final towardEnd = scope.side == ShadSidebarSide.start;
+      final physicalRight =
+          towardEnd == (Directionality.of(context) == TextDirection.ltr);
       button = ShadTooltip(
-        anchor: const ShadAnchor(
-          childAlignment: Alignment.centerRight,
-          overlayAlignment: Alignment.centerLeft,
-          offset: Offset(8, 0),
+        anchor: ShadAnchor(
+          childAlignment: towardEnd
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
+          overlayAlignment: towardEnd
+              ? AlignmentDirectional.centerStart
+              : AlignmentDirectional.centerEnd,
+          offset: Offset(physicalRight ? 8 : -8, 0),
         ),
-        // The tooltip sits to the right of the rail, so the arrow points
-        // back at it.
-        arrowDirection: AxisDirection.left,
+        arrowDirection: physicalRight
+            ? AxisDirection.left
+            : AxisDirection.right,
         builder: (context) => Text(widget.tooltip!),
         child: button,
       );

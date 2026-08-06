@@ -72,13 +72,25 @@ class ShadAnchor extends ShadAnchorBase {
     this.offset = Offset.zero,
   });
 
+  /// The point on the child — the anchored widget — that the overlay
+  /// attaches to.
+  ///
+  /// `childAlignment: Alignment.centerRight` with
+  /// `overlayAlignment: Alignment.centerLeft` hangs the overlay off the
+  /// child's right edge.
   final AlignmentGeometry childAlignment;
+
+  /// The point on the overlay glued to [childAlignment], shifted by
+  /// [offset].
   final AlignmentGeometry overlayAlignment;
+
+  /// A further shift of the overlay, in logical pixels.
   final Offset offset;
 
+  /// The overlay hangs centred below the child.
   static const center = ShadAnchor(
-    childAlignment: Alignment.topCenter,
-    overlayAlignment: Alignment.bottomCenter,
+    childAlignment: Alignment.bottomCenter,
+    overlayAlignment: Alignment.topCenter,
   );
 
   ShadAnchor copyWith({
@@ -491,8 +503,11 @@ class _ShadPortalState extends State<ShadPortal> {
     return CompositedTransformFollower(
       link: layerLink,
       offset: anchor.offset,
-      followerAnchor: anchor.childAlignment.resolve(textDirection),
-      targetAnchor: anchor.overlayAlignment.resolve(textDirection),
+      // The follower is the overlay and the target is the child; these used
+      // to be crossed, which put every manually anchored overlay on the
+      // opposite side of the one its alignments named.
+      followerAnchor: anchor.overlayAlignment.resolve(textDirection),
+      targetAnchor: anchor.childAlignment.resolve(textDirection),
       child: widget.portalBuilder(context),
     );
   }

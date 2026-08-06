@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shad/src/app.dart';
+import 'package:shad/src/components/kbd.dart';
 import 'package:shad/src/components/tooltip.dart';
 import 'package:shad/src/theme/data.dart';
 import 'package:shad/src/theme/style.dart';
+import 'package:shad/src/theme/theme.dart';
 
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
@@ -66,6 +68,43 @@ void main() {
       expect(radiusOf(ShadStyleTokens.sera), BorderRadius.zero);
       expect(ShadThemeData(style: ShadStyleTokens.lyra)
           .tooltipTheme.arrowRadius, 0);
+    });
+  });
+
+  group('content inversion', () {
+    testWidgets('the builder context sees the inverted text style and the '
+        'kbd re-theme', (tester) async {
+      final controller = ShadTooltipController();
+      addTearDown(controller.dispose);
+      TextStyle? seenStyle;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: ShadTooltip(
+              controller: controller,
+              builder: (context) {
+                seenStyle = DefaultTextStyle.of(context).style;
+                return const ShadKbd('S');
+              },
+              child: const Text('trigger'),
+            ),
+          ),
+        ),
+      );
+      controller.show();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final theme = ShadTheme.of(tester.element(find.text('trigger')));
+      // A custom builder reads the tooltip's own style through its context —
+      // it used to get the page's, which painted foreground-on-foreground.
+      expect(seenStyle?.color, theme.colorScheme.background);
+      expect(seenStyle?.fontSize, 12);
+
+      // And a key cap inverts with the surface:
+      // `in-data-[slot=tooltip-content]:bg-background/20 text-background`.
+      final capText = tester.widget<Text>(find.text('S'));
+      expect(capText.style?.color, theme.colorScheme.background);
     });
   });
 
