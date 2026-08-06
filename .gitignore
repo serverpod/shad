@@ -60,3 +60,5 @@ test/**/failures/
 # The shadcn/ui checkout used as a visual reference (see CLAUDE.md).
 # Large, and not ours to vendor.
 reference/
+.claude
+.dart_skills
