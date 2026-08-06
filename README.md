@@ -6,7 +6,9 @@
 
 A Flutter port of [shadcn/ui](https://ui.shadcn.com). `shad` provides more than 40 components as plain Flutter widgets, themed by one `ShadThemeData`, with no dependency on Material or Cupertino.
 
-Live component browser and docs: **<https://serverpod.github.io/shad/>**
+[![Live demo](https://raw.githubusercontent.com/serverpod/shad/main/assets/screenshot.png)](https://shad.serverpod.dev/)
+
+Live component browser and docs: **<https://shad.serverpod.dev/>**
 
 ## Features
 
@@ -71,7 +73,7 @@ class HomePage extends StatelessWidget {
 }
 ```
 
-See <https://serverpod.github.io/shad/> for the full component reference, each page pairs a live preview with the exact source that renders it, plus guides on theming, styles, layout, forms, and responsive design.
+See <https://shad.serverpod.dev/> for the full component reference, each page pairs a live preview with the exact source that renders it, plus guides on theming, styles, layout, forms, and responsive design.
 
 ## Repository layout
 
