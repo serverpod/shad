@@ -48,23 +48,24 @@ class _PasswordInputState extends State<PasswordInput> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return ShadInput(
       placeholder: const Text('Password'),
       obscureText: obscure,
-      leading: Icon(LucideIcons.lock),
-      trailing: SizedBox.square(
-        dimension: 24,
-        child: OverflowBox(
-          maxWidth: 28,
-          maxHeight: 28,
-          child: ShadIconButton(
-            iconSize: 20,
-            padding: EdgeInsets.all(2),
-            icon: Icon(obscure ? LucideIcons.eyeOff : LucideIcons.eye),
-            onPressed: () {
-              setState(() => obscure = !obscure);
-            },
-          ),
+      leading: Icon(
+        LucideIcons.lock,
+        size: 16,
+        color: theme.colorScheme.mutedForeground,
+      ),
+      trailing: ShadGestureDetector(
+        cursor: SystemMouseCursors.click,
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => obscure = !obscure),
+        child: Icon(
+          obscure ? LucideIcons.eyeOff : LucideIcons.eye,
+          size: 16,
+          color: theme.colorScheme.mutedForeground,
         ),
       ),
     );

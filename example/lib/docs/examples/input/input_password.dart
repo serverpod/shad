@@ -13,23 +13,26 @@ class _InputPasswordExampleState extends State<InputPasswordExample> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 320),
       child: ShadInput(
         placeholder: const Text('Password'),
         obscureText: obscure,
-        leading: const Icon(LucideIcons.lock),
-        trailing: SizedBox.square(
-          dimension: 24,
-          child: OverflowBox(
-            maxWidth: 28,
-            maxHeight: 28,
-            child: ShadIconButton(
-              iconSize: 20,
-              padding: const EdgeInsets.all(2),
-              icon: Icon(obscure ? LucideIcons.eyeOff : LucideIcons.eye),
-              onPressed: () => setState(() => obscure = !obscure),
-            ),
+        leading: Icon(
+          LucideIcons.lock,
+          size: 16,
+          color: theme.colorScheme.mutedForeground,
+        ),
+        trailing: ShadGestureDetector(
+          cursor: SystemMouseCursors.click,
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => obscure = !obscure),
+          child: Icon(
+            obscure ? LucideIcons.eyeOff : LucideIcons.eye,
+            size: 16,
+            color: theme.colorScheme.mutedForeground,
           ),
         ),
       ),
