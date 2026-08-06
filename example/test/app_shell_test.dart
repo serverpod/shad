@@ -52,11 +52,10 @@ void main() {
     expect(find.text('shad'), findsOneWidget);
     expect(find.text('Playground'), findsOneWidget);
     expect(find.text('Components'), findsWidgets);
-    // The playground is the section shown at launch...
+    // The playground is the section shown at launch.
     expect(find.byType(ThemePreviewPanel), findsOneWidget);
     expect(find.text('Contribution History'), findsOneWidget);
-    // ...and on a wide viewport the editor is open by default.
-    expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
+    expect(find.byType(ThemeCustomizerPanel), findsNothing);
   });
 
   testWidgets('the Components link opens the docs browser', (tester) async {
@@ -121,6 +120,9 @@ void main() {
     ) async {
       await pumpShell(tester);
 
+      expect(find.byType(ThemeCustomizerPanel), findsNothing);
+      await toggle(tester);
+
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       // Docked, not covering: the page is still there beside it.
       expect(find.byType(ThemePreviewPanel), findsOneWidget);
@@ -147,6 +149,7 @@ void main() {
     testWidgets('stays available on the components section', (tester) async {
       await pumpShell(tester);
       await openComponents(tester);
+      await toggle(tester);
 
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       expect(find.byType(ShadSidebar), findsOneWidget);
@@ -162,6 +165,7 @@ void main() {
       await tester.tap(find.text('Badge').first);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
+      await toggle(tester);
 
       expect(find.byType(ThemeCustomizerPanel), findsOneWidget);
       expect(

@@ -39,17 +39,6 @@ class _AppShellState extends State<AppShell> {
   /// takes the viewport instead.
   static const _narrow = 700.0;
 
-  bool _initializedEditorOpen = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_initializedEditorOpen) return;
-    _initializedEditorOpen = true;
-    themeEditorOpenProvider.of(context).value =
-        MediaQuery.sizeOf(context).width >= _narrow;
-  }
-
   AppNavItem get _activeNavItem => switch (section) {
     AppSection.playground => AppNavItem.playground,
     AppSection.docs =>
@@ -175,8 +164,7 @@ class _TopNav extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           // On a phone-width viewport the wordmark's text is the first thing
-          // to go: the links and the toolbar have to stay reachable. With
-          // three links, the full row needs a bit over 600px.
+          // to go, then the Components link. The toolbar icons stay reachable.
           final compact = constraints.maxWidth < 640;
 
           return Row(
@@ -214,18 +202,20 @@ class _TopNav extends StatelessWidget {
                 selected: active == AppNavItem.docs,
                 onTap: () => onSelect(AppNavItem.docs),
               ),
-              SizedBox(width: compact ? 12 : 20),
-              _NavLink(
-                label: 'Components',
-                selected: active == AppNavItem.components,
-                onTap: () => onSelect(AppNavItem.components),
-              ),
+              if (!compact) ...[
+                const SizedBox(width: 20),
+                _NavLink(
+                  label: 'Components',
+                  selected: active == AppNavItem.components,
+                  onTap: () => onSelect(AppNavItem.components),
+                ),
+              ],
               const Spacer(),
               const _ThemeModeButton(),
               const SizedBox(width: 4),
               const _DirectionButton(),
               const SizedBox(width: 4),
-              const _ThemeEditorButton(),
+              _ThemeEditorButton(showLabel: !compact),
             ],
           );
         },
@@ -278,25 +268,43 @@ class _NavLinkState extends State<_NavLink> {
 
 /// Shows and hides the customizer, from either section.
 class _ThemeEditorButton extends StatelessWidget {
-  const _ThemeEditorButton();
+  const _ThemeEditorButton({required this.showLabel});
+
+  final bool showLabel;
 
   @override
   Widget build(BuildContext context) {
     return SignalBuilder(
       builder: (context, _) {
         final open = themeEditorOpenProvider.of(context);
+        void toggle() => open.value = !open.value;
         final icon = Icon(
           LucideIcons.paintbrush,
           semanticLabel: open.value
               ? 'Hide the theme editor'
               : 'Show the theme editor',
         );
-        void toggle() => open.value = !open.value;
+
+        if (!showLabel) {
+          return open.value
+              ? ShadIconButton.secondary(icon: icon, onPressed: toggle)
+              : ShadIconButton.ghost(icon: icon, onPressed: toggle);
+        }
 
         // The pressed-in secondary variant is what marks the panel as open.
         return open.value
-            ? ShadIconButton.secondary(icon: icon, onPressed: toggle)
-            : ShadIconButton.ghost(icon: icon, onPressed: toggle);
+            ? ShadButton.secondary(
+                size: ShadButtonSize.sm,
+                onPressed: toggle,
+                leading: icon,
+                child: const Text('Edit Theme'),
+              )
+            : ShadButton.ghost(
+                size: ShadButtonSize.sm,
+                onPressed: toggle,
+                leading: icon,
+                child: const Text('Edit Theme'),
+              );
       },
     );
   }
