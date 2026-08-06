@@ -8,6 +8,8 @@ class EmptyBasicExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShadCard(
       width: 400,
+      height: 320,
+      columnMainAxisSize: MainAxisSize.max,
       child: ShadEmpty(
         icon: const Icon(LucideIcons.inbox),
         title: const Text('No messages'),

@@ -131,59 +131,68 @@ class ShadEmpty extends StatelessWidget {
       container: true,
       child: Padding(
         padding: effectivePadding,
-        child: Column(
-          mainAxisSize: mainAxisSize,
-          mainAxisAlignment: effectiveMainAxisAlignment,
-          crossAxisAlignment: effectiveCrossAxisAlignment,
-          children: [
-            if (icon != null) ...[
-              // shadcn's `EmptyMedia variant="icon"`: the glyph sits centred
-              // in a `size-10 bg-muted rounded-lg` chip at `size-6`, rather
-              // than being blown up to the chip's own size.
-              Container(
-                width: effectiveIconSize,
-                height: effectiveIconSize,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.muted,
-                  borderRadius: theme.radii.lg,
-                ),
-                child: IconTheme(
-                  data: IconThemeData(
-                    size: effectiveIconSize * .6,
-                    color: effectiveIconColor,
-                  ),
-                  child: icon!,
-                ),
-              ),
-              SizedBox(height: effectiveGap * 2),
-            ],
-            DefaultTextStyle(
-              style: effectiveTitleStyle,
-              textAlign: TextAlign.center,
-              child: effectiveTitle,
-            ),
-            if (description != null) ...[
-              SizedBox(height: effectiveGap),
-              DefaultTextStyle(
-                style: effectiveDescriptionStyle,
-                textAlign: TextAlign.center,
-                child: description!,
-              ),
-            ],
-            if (actions.isNotEmpty) ...[
-              SizedBox(height: effectiveGap * 2),
-              Row(
-                mainAxisSize: MainAxisSize.min,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final boundedHeight = constraints.hasBoundedHeight;
+            return SizedBox(
+              width: double.infinity,
+              height: boundedHeight ? constraints.maxHeight : null,
+              child: Column(
+                mainAxisSize: boundedHeight ? MainAxisSize.max : mainAxisSize,
+                mainAxisAlignment: effectiveMainAxisAlignment,
+                crossAxisAlignment: effectiveCrossAxisAlignment,
                 children: [
-                  for (var i = 0; i < actions.length; i++) ...[
-                    if (i > 0) SizedBox(width: effectiveGap),
-                    actions[i],
+                  if (icon != null) ...[
+                    // shadcn's `EmptyMedia variant="icon"`: the glyph sits centred
+                    // in a `size-10 bg-muted rounded-lg` chip at `size-6`, rather
+                    // than being blown up to the chip's own size.
+                    Container(
+                      width: effectiveIconSize,
+                      height: effectiveIconSize,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.muted,
+                        borderRadius: theme.radii.lg,
+                      ),
+                      child: IconTheme(
+                        data: IconThemeData(
+                          size: effectiveIconSize * .6,
+                          color: effectiveIconColor,
+                        ),
+                        child: icon!,
+                      ),
+                    ),
+                    SizedBox(height: effectiveGap * 2),
+                  ],
+                  DefaultTextStyle(
+                    style: effectiveTitleStyle,
+                    textAlign: TextAlign.center,
+                    child: effectiveTitle,
+                  ),
+                  if (description != null) ...[
+                    SizedBox(height: effectiveGap),
+                    DefaultTextStyle(
+                      style: effectiveDescriptionStyle,
+                      textAlign: TextAlign.center,
+                      child: description!,
+                    ),
+                  ],
+                  if (actions.isNotEmpty) ...[
+                    SizedBox(height: effectiveGap * 2),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < actions.length; i++) ...[
+                          if (i > 0) SizedBox(width: effectiveGap),
+                          actions[i],
+                        ],
+                      ],
+                    ),
                   ],
                 ],
               ),
-            ],
-          ],
+            );
+          },
         ),
       ),
     );
