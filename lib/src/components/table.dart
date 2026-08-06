@@ -138,6 +138,7 @@ class ShadTableCell extends TableViewCell {
 
     return TableViewCell(
       child: Container(
+        width: double.infinity,
         height: effectiveHeight,
         alignment: effectiveAlignment,
         padding: effectivePadding,

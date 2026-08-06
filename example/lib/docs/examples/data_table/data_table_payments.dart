@@ -35,52 +35,103 @@ class _DataTablePaymentsExampleState extends State<DataTablePaymentsExample> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    controller.addListener(_onControllerChanged);
+  }
+
+  @override
   void dispose() {
+    controller.removeListener(_onControllerChanged);
     controller.dispose();
     super.dispose();
   }
 
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    final total = controller.filteredRows.length;
+    final rowHeight = theme.tableTheme.cellHeight ?? 48;
+    final visibleRowCount = controller.visibleRows.length;
+    // TableView does not shrink-wrap, so height tracks the pinned header
+    // plus the rows on the current page.
+    final tableHeight = visibleRowCount == 0
+        ? rowHeight * 3
+        : rowHeight * (visibleRowCount + 1);
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 700),
-      child: ShadDataTable<Payment>(
-        controller: controller,
-        selectable: true,
-        keyOf: (payment) => payment.id,
-        height: 320,
-        columns: [
-          ShadDataTableColumn(
-            id: 'status',
-            header: 'Status',
-            extent: const FixedTableSpanExtent(140),
-            compare: (a, b) => a.status.compareTo(b.status),
-            cellBuilder: (context, payment) => ShadBadge.raw(
-              variant: switch (payment.status) {
-                'success' => ShadBadgeVariant.primary,
-                'failed' => ShadBadgeVariant.destructive,
-                _ => ShadBadgeVariant.secondary,
-              },
-              child: Text(payment.status),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShadCard(
+              padding: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              child: ShadDataTable<Payment>(
+                controller: controller,
+                selectable: true,
+                keyOf: (payment) => payment.id,
+                height: tableHeight,
+                showPagination: false,
+                showSelectionCount: false,
+                columns: [
+                  ShadDataTableColumn(
+                    id: 'status',
+                    header: 'Status',
+                    extent: const FixedTableSpanExtent(140),
+                    compare: (a, b) => a.status.compareTo(b.status),
+                    cellBuilder: (context, payment) => ShadBadge.raw(
+                      variant: switch (payment.status) {
+                        'success' => ShadBadgeVariant.primary,
+                        'failed' => ShadBadgeVariant.destructive,
+                        _ => ShadBadgeVariant.secondary,
+                      },
+                      child: Text(payment.status),
+                    ),
+                  ),
+                  ShadDataTableColumn(
+                    id: 'email',
+                    header: 'Email',
+                    compare: (a, b) => a.email.compareTo(b.email),
+                    cellBuilder: (context, payment) =>
+                        Text(payment.email, overflow: TextOverflow.ellipsis),
+                  ),
+                  ShadDataTableColumn(
+                    id: 'amount',
+                    header: 'Amount',
+                    extent: const FixedTableSpanExtent(120),
+                    alignment: Alignment.centerRight,
+                    compare: (a, b) => a.amount.compareTo(b.amount),
+                    cellBuilder: (context, payment) =>
+                        Text('\$${payment.amount.toStringAsFixed(2)}'),
+                  ),
+                ],
+              ),
             ),
-          ),
-          ShadDataTableColumn(
-            id: 'email',
-            header: 'Email',
-            compare: (a, b) => a.email.compareTo(b.email),
-            cellBuilder: (context, payment) =>
-                Text(payment.email, overflow: TextOverflow.ellipsis),
-          ),
-          ShadDataTableColumn(
-            id: 'amount',
-            header: 'Amount',
-            extent: const FixedTableSpanExtent(120),
-            alignment: Alignment.centerRight,
-            compare: (a, b) => a.amount.compareTo(b.amount),
-            cellBuilder: (context, payment) =>
-                Text('\$${payment.amount.toStringAsFixed(2)}'),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(
+                  '${controller.selectedKeys.length} of $total row(s) selected.',
+                  style: theme.textTheme.muted,
+                ),
+                const Spacer(),
+                ShadPaginationCompact(
+                  page: controller.page,
+                  pageCount: controller.pageCount,
+                  onPageChanged: (page) => controller.page = page,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

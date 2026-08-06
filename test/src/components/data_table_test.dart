@@ -247,10 +247,27 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      expect(find.byIcon(LucideIcons.moveUp), findsNothing);
+      expect(find.byIcon(LucideIcons.moveDown), findsNothing);
+
       await tester.tap(find.text('Name'));
       await tester.pumpAndSettle();
       expect(controller.sortColumnId, 'name');
       expect(controller.sortDirection, ShadSortDirection.ascending);
+      expect(find.byIcon(LucideIcons.moveDown), findsOneWidget);
+      expect(find.byIcon(LucideIcons.moveUp), findsNothing);
+
+      await tester.tap(find.text('Name'));
+      await tester.pumpAndSettle();
+      expect(controller.sortDirection, ShadSortDirection.descending);
+      expect(find.byIcon(LucideIcons.moveUp), findsOneWidget);
+      expect(find.byIcon(LucideIcons.moveDown), findsNothing);
+
+      await tester.tap(find.text('Name'));
+      await tester.pumpAndSettle();
+      expect(controller.sortColumnId, isNull);
+      expect(find.byIcon(LucideIcons.moveUp), findsNothing);
+      expect(find.byIcon(LucideIcons.moveDown), findsNothing);
     });
 
     testWidgets('a non-sortable header does not sort', (tester) async {
