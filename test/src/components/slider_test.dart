@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/slider.dart';
@@ -134,6 +135,212 @@ void main() {
       );
 
       expect(tester.getSize(find.byType(ShadSlider)).height, 40);
+    });
+  });
+
+  group('ShadRangeSlider', () {
+    /// The thumbs, in the order they are painted (lowest value first).
+    Finder thumbs() => find.byWidgetPredicate(
+      (widget) =>
+          widget is Container &&
+          widget.decoration is BoxDecoration &&
+          (widget.decoration! as BoxDecoration).shape == BoxShape.circle,
+    );
+
+    /// The filled part of the track: the only box with the primary colour.
+    Rect activeTrack(WidgetTester tester, Color color) {
+      final finder = find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox &&
+            (widget.decoration as BoxDecoration).color == color,
+      );
+      return tester.getRect(finder);
+    }
+
+    testWidgets('renders one thumb per value, spanning the range between '
+        'the outermost two', (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(initialValues: [25, 75], max: 100),
+            ),
+          ),
+        ),
+      );
+
+      expect(thumbs(), findsNWidgets(2));
+
+      final theme = ShadTheme.of(tester.element(find.byType(ShadRangeSlider)));
+      final slider = tester.getRect(find.byType(ShadRangeSlider));
+      final track = activeTrack(tester, theme.colorScheme.primary);
+
+      // The fill starts at the low thumb rather than at the track's start,
+      // and stops at the high one: a quarter in, half the width.
+      expect(track.left - slider.left, moreOrLessEquals(100, epsilon: 1));
+      expect(track.width, moreOrLessEquals(200, epsilon: 1));
+    });
+
+    testWidgets('a single value still fills from the start, like ShadSlider', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(initialValues: [25], max: 100),
+            ),
+          ),
+        ),
+      );
+
+      final theme = ShadTheme.of(tester.element(find.byType(ShadRangeSlider)));
+      final slider = tester.getRect(find.byType(ShadRangeSlider));
+      final track = activeTrack(tester, theme.colorScheme.primary);
+
+      expect(track.left, moreOrLessEquals(slider.left, epsilon: 1));
+      expect(track.width, moreOrLessEquals(100, epsilon: 1));
+    });
+
+    testWidgets('dragging a thumb moves only that thumb', (tester) async {
+      List<double>? changed;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(
+                initialValues: const [25, 75],
+                max: 100,
+                onChanged: (values) => changed = values,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Grab the high thumb and drag it left by a quarter of the track.
+      await tester.drag(thumbs().last, const Offset(-100, 0));
+      await tester.pump();
+
+      expect(changed!.first, 25);
+      expect(changed!.last, moreOrLessEquals(50, epsilon: 1));
+    });
+
+    testWidgets('a thumb stops at its neighbour instead of crossing it', (
+      tester,
+    ) async {
+      List<double>? changed;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(
+                initialValues: const [25, 75],
+                max: 100,
+                onChanged: (values) => changed = values,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Drag the high thumb well past the low one.
+      await tester.drag(thumbs().last, const Offset(-300, 0));
+      await tester.pump();
+
+      // It parks on its neighbour, keeping the values ascending.
+      expect(changed, [25, 25]);
+    });
+
+    testWidgets('tapping the track moves the nearest thumb', (tester) async {
+      List<double>? changed;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(
+                initialValues: const [25, 75],
+                max: 100,
+                onChanged: (values) => changed = values,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final slider = tester.getRect(find.byType(ShadRangeSlider));
+      // A tenth in: closer to the low thumb.
+      await tester.tapAt(Offset(slider.left + 40, slider.center.dy));
+      await tester.pump();
+
+      expect(changed!.first, moreOrLessEquals(10, epsilon: 1));
+      expect(changed!.last, 75);
+    });
+
+    testWidgets('each thumb takes the arrow keys on its own', (tester) async {
+      List<double>? changed;
+      await tester.pumpWidget(
+        createTestWidget(
+          Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(
+                initialValues: const [25, 75],
+                max: 100,
+                divisions: 100,
+                onChanged: (values) => changed = values,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Tab lands on the lowest thumb, then on the next one up.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(changed, [26, 75]);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(changed, [26, 74]);
+    });
+
+    testWidgets('only the hovered thumb rings', (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const Center(
+            child: SizedBox(
+              width: 400,
+              child: ShadRangeSlider(initialValues: [25, 75], max: 100),
+            ),
+          ),
+        ),
+      );
+
+      List<BoxShadow?> shadows() => tester
+          .widgetList<Container>(thumbs())
+          .map((c) => (c.decoration! as BoxDecoration).boxShadow?.single)
+          .toList();
+
+      expect(shadows(), [null, null]);
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer();
+      addTearDown(gesture.removePointer);
+      await gesture.moveTo(tester.getCenter(thumbs().last));
+      await tester.pump();
+
+      expect(shadows().first, isNull);
+      expect(shadows().last, isNotNull);
     });
   });
 }
