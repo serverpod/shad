@@ -129,6 +129,16 @@ mixin _$ShadCalendarTheme {
           ? a.weekNumbersTextAlign
           : b.weekNumbersTextAlign,
       dayButtonSize: lerpDouble$(a.dayButtonSize, b.dayButtonSize, t),
+      dayButtonRadius: BorderRadius.lerp(
+        a.dayButtonRadius,
+        b.dayButtonRadius,
+        t,
+      ),
+      selectorMinHeight: lerpDouble$(
+        a.selectorMinHeight,
+        b.selectorMinHeight,
+        t,
+      ),
       dayButtonOutsideMonthOpacity: lerpDouble$(
         a.dayButtonOutsideMonthOpacity,
         b.dayButtonOutsideMonthOpacity,
@@ -234,6 +244,8 @@ mixin _$ShadCalendarTheme {
     TextStyle? weekNumbersTextStyle,
     TextAlign? weekNumbersTextAlign,
     double? dayButtonSize,
+    BorderRadius? dayButtonRadius,
+    double? selectorMinHeight,
     double? dayButtonOutsideMonthOpacity,
     EdgeInsetsGeometry? dayButtonPadding,
     ShadDecoration? dayButtonDecoration,
@@ -304,6 +316,8 @@ mixin _$ShadCalendarTheme {
       weekNumbersTextStyle: weekNumbersTextStyle ?? _this.weekNumbersTextStyle,
       weekNumbersTextAlign: weekNumbersTextAlign ?? _this.weekNumbersTextAlign,
       dayButtonSize: dayButtonSize ?? _this.dayButtonSize,
+      dayButtonRadius: dayButtonRadius ?? _this.dayButtonRadius,
+      selectorMinHeight: selectorMinHeight ?? _this.selectorMinHeight,
       dayButtonOutsideMonthOpacity:
           dayButtonOutsideMonthOpacity ?? _this.dayButtonOutsideMonthOpacity,
       dayButtonPadding: dayButtonPadding ?? _this.dayButtonPadding,
@@ -394,6 +408,8 @@ mixin _$ShadCalendarTheme {
           other.weekNumbersTextStyle,
       weekNumbersTextAlign: other.weekNumbersTextAlign,
       dayButtonSize: other.dayButtonSize,
+      dayButtonRadius: other.dayButtonRadius,
+      selectorMinHeight: other.selectorMinHeight,
       dayButtonOutsideMonthOpacity: other.dayButtonOutsideMonthOpacity,
       dayButtonPadding: other.dayButtonPadding,
       dayButtonDecoration:
@@ -485,6 +501,8 @@ mixin _$ShadCalendarTheme {
         _other.weekNumbersTextStyle == _this.weekNumbersTextStyle &&
         _other.weekNumbersTextAlign == _this.weekNumbersTextAlign &&
         _other.dayButtonSize == _this.dayButtonSize &&
+        _other.dayButtonRadius == _this.dayButtonRadius &&
+        _other.selectorMinHeight == _this.selectorMinHeight &&
         _other.dayButtonOutsideMonthOpacity ==
             _this.dayButtonOutsideMonthOpacity &&
         _other.dayButtonPadding == _this.dayButtonPadding &&
@@ -554,6 +572,8 @@ mixin _$ShadCalendarTheme {
       _this.weekNumbersTextStyle,
       _this.weekNumbersTextAlign,
       _this.dayButtonSize,
+      _this.dayButtonRadius,
+      _this.selectorMinHeight,
       _this.dayButtonOutsideMonthOpacity,
       _this.dayButtonPadding,
       _this.dayButtonDecoration,

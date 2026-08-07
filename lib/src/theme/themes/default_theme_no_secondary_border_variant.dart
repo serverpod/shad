@@ -231,9 +231,11 @@ class ShadDefaultThemeNoSecondaryBorderVariant extends ShadDefaultThemeVariant {
   @override
   ShadInputOTPTheme inputOTPTheme() {
     final base = super.inputOTPTheme();
+    // No extra slot padding here: a slot is a fixed square with a centred
+    // glyph, so vertical padding cannot move anything — but it can overflow
+    // the box once the reserve and a tall text role (mira) use up the room.
     return base.merge(
       ShadInputOTPTheme(
-        padding: spacing.symmetric(vertical: 1),
         decoration: (base.decoration ?? const ShadDecoration()).copyWith(
           border: base.decoration?.border?.copyWith(
             padding: focusReserve(1),

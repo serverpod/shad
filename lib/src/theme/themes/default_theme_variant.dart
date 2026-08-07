@@ -405,6 +405,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   /// The radius rows inside a surface use, per [style].
   BorderRadius get itemRadius => radii.resolve(style.itemRadius);
 
+  /// The calendar's `--cell-radius`, per [style].
+  BorderRadius get _calendarCellRadius =>
+      radii.resolve(style.calendarCellRadius);
+
   @override
   ShadButtonTheme primaryButtonTheme() {
     return ShadButtonTheme(
@@ -909,9 +913,13 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     return ShadSelectTheme(
       minWidth: kDefaultSelectMinWidth,
       maxHeight: kDefaultSelectMaxHeight,
+      // The reference pins the trigger at the field height
+      // (`data-[size=default]:h-9` and friends), which is what keeps it level
+      // with inputs and buttons on a row; its `py-2` never gets to act on a
+      // single-line trigger, so only the horizontal padding is real.
+      minHeight: scaled(style.inputHeight),
       padding: EdgeInsets.symmetric(
         horizontal: scaled(style.selectPaddingX),
-        vertical: scaled(style.selectPaddingY),
       ),
       decoration: ShadDecoration(
         color: fieldFillColor,
@@ -1612,17 +1620,24 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       secondaryFocusedBorder: ShadBorder.all(
         width: 2,
         offset: 2,
-        radius: radius.add(const BorderRadius.all(Radius.circular(2))),
+        radius: _calendarCellRadius.add(
+          const BorderRadius.all(Radius.circular(2)),
+        ),
         color: colorScheme.ring.withValues(alpha: .5),
       ),
     ),
     hideNavigation: false,
     yearSelectorMinWidth: 64,
     monthSelectorMinWidth: 64,
-    yearSelectorPadding: spacing.symmetric(horizontal: 2, vertical: 1),
-    monthSelectorPadding: spacing.symmetric(horizontal: 2, vertical: 1),
-    navigationButtonSize: 28,
-    navigationButtonIconSize: 16,
+    // Horizontal only: the trigger height is pinned (`h-8` and friends), so
+    // vertical padding could only push past it — same story as the select
+    // trigger's inert `py-2`.
+    yearSelectorPadding: spacing.symmetric(horizontal: 2),
+    monthSelectorPadding: spacing.symmetric(horizontal: 2),
+    // `size-(--cell-size)`: navigation buttons, day cells and the caption
+    // row all share the cell size.
+    navigationButtonSize: scaled(style.calendarCellSize),
+    navigationButtonIconSize: scaled(style.iconButtonIconSize),
     backNavigationButtonIconData: LucideIcons.chevronLeft,
     forwardNavigationButtonIconData: LucideIcons.chevronRight,
     navigationButtonPadding: EdgeInsets.zero,
@@ -1630,22 +1645,31 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     decoration: ShadDecoration(
       border: ShadBorder.all(
         radius: radius,
-        padding: spacing.all(3),
+        padding: EdgeInsets.all(scaled(style.calendarPadding)),
         color: colorScheme.border,
         width: 1,
       ),
     ),
     spacingBetweenMonths: 16,
     runSpacingBetweenMonths: 16,
-    headerHeight: 38,
+    // The caption row is `h-(--cell-size)`, but `mira`'s dropdown triggers
+    // are a step taller than its cells, so the header makes room for both.
+    headerHeight: math.max(
+      scaled(style.calendarCellSize),
+      scaled(style.calendarCaptionHeight),
+    ),
     headerPadding: spacing.only(bottom: 4),
-    captionLayoutGap: 8,
+    captionLayoutGap: 6,
     headerTextStyle: style.label.apply(effectiveTextTheme.small),
+    // No monthConstraints here: the widget derives the month width from the
+    // day cell size — and widens it when week numbers add a column.
+    dayButtonRadius: _calendarCellRadius,
+    selectorMinHeight: scaled(style.calendarCaptionHeight),
     weekdaysPadding: spacing.only(bottom: 2),
     weekNumbersHeaderText: '#',
     weekNumbersHeaderTextStyle: textTheme().muted.copyWith(fontSize: 12.8),
     weekNumbersTextStyle: textTheme().muted.copyWith(fontSize: 12.8),
-    dayButtonSize: 36,
+    dayButtonSize: scaled(style.calendarCellSize),
     dayButtonOutsideMonthOpacity: .5,
     dayButtonPadding: EdgeInsets.zero,
     selectedDayButtonTextStyle: textTheme().small.copyWith(
@@ -1701,30 +1725,25 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       runAlignment: WrapAlignment.center,
       crossAxisAlignment: WrapCrossAlignment.center,
       gap: 4,
+      // The reference has no time picker; its fields take the same text,
+      // outline, fill and height as a text field so a picker sits level with
+      // the other controls on a row.
       style: style.field
           .apply(effectiveTextTheme.muted)
-          .copyWith(
-            color: colorScheme.foreground,
-            fontSize: 16,
-            height: 24 / 16,
-          ),
-      placeholderStyle: style.field
-          .apply(effectiveTextTheme.muted)
-          .copyWith(
-            fontSize: 16,
-            height: 24 / 16,
-          ),
+          .copyWith(color: colorScheme.foreground),
+      placeholderStyle: style.field.apply(effectiveTextTheme.muted),
       labelStyle: effectiveTextTheme.small.copyWith(fontSize: 12),
       fieldWidth: 48,
-      fieldPadding: spacing.symmetric(horizontal: 3, vertical: 2),
-      periodHeight: 42,
+      fieldPadding: EdgeInsets.symmetric(
+        horizontal: scaled(style.inputPaddingX),
+        vertical: scaled(style.inputPaddingY),
+      ),
+      periodHeight: scaled(style.inputHeight),
       periodMinWidth: 65,
       fieldDecoration: ShadDecoration(
-        border: ShadBorder.all(
-          color: colorScheme.border,
-          radius: radius,
-          width: 1,
-        ),
+        color: fieldFillColor,
+        shadows: style.controlShadow,
+        border: fieldBorder,
       ),
     );
   }

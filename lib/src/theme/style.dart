@@ -154,13 +154,17 @@ class ShadStyleTokens {
     this.fieldBorderless = false,
     // Select and menus.
     this.selectPaddingX = 10,
-    this.selectPaddingY = 8,
     this.menuPadding = 4,
     this.menuMinWidth = 128,
     this.itemPaddingX = 8,
     this.itemPaddingY = 6,
     this.menubarHeight = 36,
     this.menubarPadding = 4,
+    // Calendar.
+    this.calendarCellSize = 32,
+    this.calendarCellRadius = ShadRadiusToken.md,
+    this.calendarPadding = 12,
+    this.calendarCaptionHeight = 32,
     // Command palette.
     this.commandPadding = 4,
     this.commandGroupPadding = 4,
@@ -446,9 +450,10 @@ class ShadStyleTokens {
 
   // --- Select and menus ---------------------------------------------------
 
-  /// Padding of a select trigger.
+  /// Horizontal padding of a select trigger. There is no vertical
+  /// counterpart: the reference pins the trigger at [inputHeight]
+  /// (`data-[size=default]:h-9`), which makes its `py-2` inert.
   final double selectPaddingX;
-  final double selectPaddingY;
 
   /// Padding around the rows of a menu surface, shadcn's `p-1`.
   final double menuPadding;
@@ -466,6 +471,28 @@ class ShadStyleTokens {
   /// Padding inside the menubar strip around its triggers, shadcn's `p-1`.
   /// A bracketed literal in some styles (`p-[3px]`), so it is not scaled.
   final double menubarPadding;
+
+  // --- Calendar -----------------------------------------------------------
+
+  /// The calendar's `--cell-size`: the square day cells, the navigation
+  /// buttons and the caption row are all this tall. `--spacing(8)` in most
+  /// styles, `--spacing(7)` in `nova`/`lyra`, `--spacing(6)` in `mira`.
+  final double calendarCellSize;
+
+  /// The calendar's `--cell-radius`, rounding day cells and the month/year
+  /// dropdown triggers. Deliberately its own token: `vega`'s buttons are
+  /// `rounded-lg` while its calendar cells are `rounded-md`.
+  final ShadRadiusToken calendarCellRadius;
+
+  /// Padding around the whole calendar, `.cn-calendar`'s `p-3` —
+  /// `p-2` in `nova` and `lyra`.
+  final double calendarPadding;
+
+  /// Height of the month/year dropdown triggers,
+  /// `.cn-calendar-caption-label`'s `h-8` — `h-6` in `nova`/`lyra`,
+  /// `h-7` in `mira`. Independent of [calendarCellSize]: `mira`'s caption
+  /// is taller than its cells.
+  final double calendarCaptionHeight;
 
   // --- Command palette ----------------------------------------------------
 
@@ -640,6 +667,9 @@ class ShadStyleTokens {
   /// which is what a theme uses when none is given.
   static const nova = ShadStyleTokens(
     name: 'nova',
+    calendarCellSize: 28,
+    calendarPadding: 8,
+    calendarCaptionHeight: 24,
     // `leading-snug` on the card title.
     title: ShadTextRole(
       fontSize: 16,
@@ -681,6 +711,7 @@ class ShadStyleTokens {
   /// Pill-shaped and roomy.
   static const maia = ShadStyleTokens(
     name: 'maia',
+    calendarCellRadius: ShadRadiusToken.xl4,
     commandItemDialogRadius: ShadRadiusToken.xl2,
     commandSearchRadius: ShadRadiusToken.xl4,
     commandSearchHeight: 36,
@@ -731,6 +762,10 @@ class ShadStyleTokens {
   /// Square and compact.
   static const lyra = ShadStyleTokens(
     name: 'lyra',
+    calendarCellSize: 28,
+    calendarCellRadius: ShadRadiusToken.none,
+    calendarPadding: 8,
+    calendarCaptionHeight: 24,
     commandItemDialogRadius: ShadRadiusToken.none,
     commandSearchRadius: ShadRadiusToken.none,
     commandPadding: 0,
@@ -787,6 +822,8 @@ class ShadStyleTokens {
   /// The densest of the eight: 28px controls.
   static const mira = ShadStyleTokens(
     name: 'mira',
+    calendarCellSize: 24,
+    calendarCaptionHeight: 28,
     commandItemDialogRadius: ShadRadiusToken.md,
     commandSearchRadius: ShadRadiusToken.md,
     commandSearchFill: ShadSurfaceFill.input20,
@@ -833,7 +870,6 @@ class ShadStyleTokens {
     textareaPaddingX: 8,
     textareaPaddingY: 8,
     selectPaddingX: 8,
-    selectPaddingY: 6,
     itemPaddingY: 4,
     switchWidth: 28,
     switchHeight: 16.6,
@@ -857,6 +893,7 @@ class ShadStyleTokens {
   /// Soft and pill-shaped, with a wide switch and a thick slider.
   static const luma = ShadStyleTokens(
     name: 'luma',
+    calendarCellRadius: ShadRadiusToken.xl4,
     commandRadius: ShadRadiusToken.xl4,
     commandItemDialogRadius: ShadRadiusToken.xl3,
     commandSearchRadius: ShadRadiusToken.xl4,
@@ -929,6 +966,7 @@ class ShadStyleTokens {
   /// Editorial: square, uppercase, letter-spaced, and the largest of the eight.
   static const sera = ShadStyleTokens(
     name: 'sera',
+    calendarCellRadius: ShadRadiusToken.none,
     commandRadius: ShadRadiusToken.none,
     commandItemDialogRadius: ShadRadiusToken.none,
     commandSearchRadius: ShadRadiusToken.none,
@@ -1053,6 +1091,7 @@ class ShadStyleTokens {
   /// Rounded and compact.
   static const rhea = ShadStyleTokens(
     name: 'rhea',
+    calendarCellRadius: ShadRadiusToken.xl2,
     commandRadius: ShadRadiusToken.xl3,
     commandItemDialogRadius: ShadRadiusToken.xl2,
     commandSearchRadius: ShadRadiusToken.xl2,
@@ -1202,13 +1241,16 @@ class ShadStyleTokens {
     ShadSurfaceFill? fieldFillDark,
     bool? fieldBorderless,
     double? selectPaddingX,
-    double? selectPaddingY,
     double? menuPadding,
     double? menuMinWidth,
     double? itemPaddingX,
     double? itemPaddingY,
     double? menubarHeight,
     double? menubarPadding,
+    double? calendarCellSize,
+    ShadRadiusToken? calendarCellRadius,
+    double? calendarPadding,
+    double? calendarCaptionHeight,
     double? commandPadding,
     double? commandGroupPadding,
     double? commandSearchHeight,
@@ -1333,13 +1375,17 @@ class ShadStyleTokens {
       fieldFillDark: fieldFillDark ?? this.fieldFillDark,
       fieldBorderless: fieldBorderless ?? this.fieldBorderless,
       selectPaddingX: selectPaddingX ?? this.selectPaddingX,
-      selectPaddingY: selectPaddingY ?? this.selectPaddingY,
       menuPadding: menuPadding ?? this.menuPadding,
       menuMinWidth: menuMinWidth ?? this.menuMinWidth,
       itemPaddingX: itemPaddingX ?? this.itemPaddingX,
       itemPaddingY: itemPaddingY ?? this.itemPaddingY,
       menubarHeight: menubarHeight ?? this.menubarHeight,
       menubarPadding: menubarPadding ?? this.menubarPadding,
+      calendarCellSize: calendarCellSize ?? this.calendarCellSize,
+      calendarCellRadius: calendarCellRadius ?? this.calendarCellRadius,
+      calendarPadding: calendarPadding ?? this.calendarPadding,
+      calendarCaptionHeight:
+          calendarCaptionHeight ?? this.calendarCaptionHeight,
       commandPadding: commandPadding ?? this.commandPadding,
       commandGroupPadding: commandGroupPadding ?? this.commandGroupPadding,
       commandSearchHeight: commandSearchHeight ?? this.commandSearchHeight,
@@ -1464,7 +1510,6 @@ class ShadStyleTokens {
     fieldFillDark,
     fieldBorderless,
     selectPaddingX,
-    selectPaddingY,
     menuPadding,
     menuMinWidth,
     itemPaddingX,
@@ -1476,6 +1521,10 @@ class ShadStyleTokens {
     sidebarSubItemPaddingX,
     menubarHeight,
     menubarPadding,
+    calendarCellSize,
+    calendarCellRadius,
+    calendarPadding,
+    calendarCaptionHeight,
     commandPadding,
     commandGroupPadding,
     commandSearchHeight,

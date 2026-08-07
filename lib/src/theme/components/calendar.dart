@@ -37,6 +37,8 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
     this.weekNumbersTextStyle,
     this.weekNumbersTextAlign,
     this.dayButtonSize,
+    this.dayButtonRadius,
+    this.selectorMinHeight,
     this.dayButtonOutsideMonthOpacity,
     this.dayButtonPadding,
     this.dayButtonDecoration,
@@ -155,6 +157,16 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
 
   /// {@macro ShadCalendar.dayButtonSize}
   final double? dayButtonSize;
+
+  /// The corner radius of day cells and of the month/year dropdown triggers,
+  /// shadcn's `--cell-radius`. Its own knob because the styles keep it apart
+  /// from the button radius (`vega` buttons are `lg`, its cells `md`).
+  final BorderRadius? dayButtonRadius;
+
+  /// The minimum height of the month/year dropdown triggers,
+  /// `.cn-calendar-caption-label`'s `h-8`. Without it the triggers would take
+  /// the select theme's field height, which is taller than a calendar row.
+  final double? selectorMinHeight;
 
   /// {@macro ShadCalendar.dayButtonOutsideMonthOpacity}
   final double? dayButtonOutsideMonthOpacity;

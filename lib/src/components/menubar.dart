@@ -131,7 +131,11 @@ class _ShadMenubarState extends State<ShadMenubar> {
       // `(oldState) => oldState.data != this` was always false, i.e. exactly
       // ShadProvider's default.
       data: this,
-      child: DecoratedBox(
+      // A Container rather than DecoratedBox + Padding: Container counts its
+      // decoration's border into the padding, which is what makes the strip
+      // border-box — `h-9` in the reference includes the hairline, and the
+      // theme's trigger height is derived assuming it does.
+      child: Container(
         decoration: BoxDecoration(
           color: effectiveBackgroundColor,
           border: effectiveBorder.toBorder(),
@@ -143,16 +147,14 @@ class _ShadMenubarState extends State<ShadMenubar> {
               ? null
               : theme.style.controlShadow,
         ),
-        child: Padding(
-          padding: effectivePadding,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: widget.items
-                .mapIndexed(
-                  (i, item) => ShadIndexProvider(index: i, child: item),
-                )
-                .toList(),
-          ),
+        padding: effectivePadding,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: widget.items
+              .mapIndexed(
+                (i, item) => ShadIndexProvider(index: i, child: item),
+              )
+              .toList(),
         ),
       ),
     );

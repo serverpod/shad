@@ -20,6 +20,7 @@ class ShadSelectTheme with _$ShadSelectTheme {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.padding,
     this.optionsPadding,
     this.showScrollToTopChevron,
@@ -57,6 +58,9 @@ class ShadSelectTheme with _$ShadSelectTheme {
 
   /// {@macro ShadSelect.maxHeight}
   final double? maxHeight;
+
+  /// {@macro ShadSelect.minHeight}
+  final double? minHeight;
 
   /// {@macro ShadSelect.padding}
   final EdgeInsetsGeometry? padding;

@@ -196,12 +196,16 @@ void main() {
       );
       expect(constrainedBox.constraints.minWidth, customWidth);
 
-      // Find the Padding widget
-      final paddingFinder = find.descendant(
-        of: constrainedBoxFinder,
-        matching: find.byType(Padding),
-      );
-      expect(paddingFinder, findsOneWidget);
+      // The content padding is the nearest Padding above the label. The
+      // decorator sits inside the ConstrainedBox (the button's size is
+      // border-box), so matching every Padding under it would also catch the
+      // decorator's own zero-padding wrappers.
+      final paddingFinder = find
+          .ancestor(
+            of: find.text('Styled Button'),
+            matching: find.byType(Padding),
+          )
+          .first;
       final padding = tester.widget<Padding>(paddingFinder);
       expect(padding.padding, customPadding);
 

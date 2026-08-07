@@ -1268,10 +1268,27 @@ class _ShadCalendarState extends State<ShadCalendar> {
         theme.calendarTheme.runSpacingBetweenMonths ??
         16;
 
+    final effectiveDayButtonSize =
+        widget.dayButtonSize ?? theme.calendarTheme.dayButtonSize ?? 36;
+
+    // `--cell-radius` and `.cn-calendar-caption-label`'s height; theme-driven
+    // (the variant derives both from the style tokens), with the theme's
+    // global radius and the select's own height as the standalone fallbacks.
+    final effectiveDayButtonRadius =
+        theme.calendarTheme.dayButtonRadius ?? theme.radius;
+    final effectiveSelectorMinHeight = theme.calendarTheme.selectorMinHeight;
+
+    // Seven day columns, plus one more of the same width when week numbers
+    // are shown (`w-(--cell-size)`) — a fixed width would squeeze the day
+    // cells whenever the extra column appears.
     final effectiveMonthConstraints =
         widget.monthConstraints ??
         theme.calendarTheme.monthConstraints ??
-        const BoxConstraints(maxWidth: 252);
+        BoxConstraints(
+          maxWidth:
+              (7 + (effectiveShowWeekNumbers ? 1 : 0)) *
+              effectiveDayButtonSize,
+        );
 
     final effectiveHeaderHeight =
         widget.headerHeight ?? theme.calendarTheme.headerHeight ?? 38;
@@ -1373,8 +1390,6 @@ class _ShadCalendarState extends State<ShadCalendar> {
               color: theme.colorScheme.mutedForeground,
             );
 
-    final effectiveDayButtonSize =
-        widget.dayButtonSize ?? theme.calendarTheme.dayButtonSize ?? 36;
 
     final effectiveDayButtonOutsideMonthOpacity =
         widget.dayButtonOutsideMonthOpacity ??
@@ -1425,7 +1440,11 @@ class _ShadCalendarState extends State<ShadCalendar> {
       initialValue: currentMonth.year,
       groupId: widget.groupId,
       padding: effectiveYearSelectorPadding,
+      minHeight: effectiveSelectorMinHeight,
       decoration: ShadDecoration(
+        // The dropdown trigger rounds with the cells
+        // (`rounded-(--cell-radius)`), not with the field radius.
+        border: ShadBorder(radius: effectiveDayButtonRadius),
         secondaryFocusedBorder: ShadBorder.all(
           color: theme.colorScheme.ring.withValues(alpha: .5),
         ),
@@ -1452,7 +1471,9 @@ class _ShadCalendarState extends State<ShadCalendar> {
     final monthSelector = ShadSelect<int>(
       initialValue: currentMonth.month,
       groupId: widget.groupId,
+      minHeight: effectiveSelectorMinHeight,
       decoration: ShadDecoration(
+        border: ShadBorder(radius: effectiveDayButtonRadius),
         secondaryFocusedBorder: ShadBorder.all(
           color: theme.colorScheme.ring.withValues(alpha: .5),
         ),
@@ -1804,6 +1825,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
                             (index - (effectiveShowWeekNumbers ? 1 : 0)) % 7 ==
                             6;
 
+                        final cellRadius = effectiveDayButtonRadius;
                         final effectiveDayButtonDecoration =
                             ShadDecoration(
                                   secondaryBorder: const ShadBorder(
@@ -1816,24 +1838,24 @@ class _ShadCalendarState extends State<ShadCalendar> {
                                       ? isFirstOfRow
                                             ? ShadBorder(
                                                 radius: BorderRadius.only(
-                                                  topLeft: theme.radius.topLeft,
+                                                  topLeft: cellRadius.topLeft,
                                                   bottomLeft:
-                                                      theme.radius.bottomLeft,
+                                                      cellRadius.bottomLeft,
                                                 ),
                                               )
                                             : isLastOfRow
                                             ? ShadBorder(
                                                 radius: BorderRadius.only(
                                                   topRight:
-                                                      theme.radius.topRight,
+                                                      cellRadius.topRight,
                                                   bottomRight:
-                                                      theme.radius.bottomRight,
+                                                      cellRadius.bottomRight,
                                                 ),
                                               )
                                             : const ShadBorder(
                                                 radius: BorderRadius.zero,
                                               )
-                                      : null,
+                                      : ShadBorder(radius: cellRadius),
                                   secondaryFocusedBorder: ShadBorder.all(
                                     offset: 2,
                                     color: theme.colorScheme.ring.withValues(

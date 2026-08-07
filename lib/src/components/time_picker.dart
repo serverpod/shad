@@ -5,7 +5,6 @@ import 'package:shad/src/components/select.dart';
 import 'package:shad/src/i18n/localizations_delegate.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
-import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
 
@@ -548,25 +547,15 @@ class ShadTimePicker extends StatefulWidget {
   final double? gap;
 
   /// {@template ShadTimePicker.style}
-  /// The style of the label. Defaults to
-  /// ```dart
-  /// theme.textTheme.muted.copyWith(
-  ///   color: theme.colorScheme.foreground,
-  ///   fontSize: 16,
-  ///   height: 24 / 16,
-  /// ),
-  /// ```
+  /// The style of the digits. Defaults to the theme's time picker style,
+  /// which uses the style's field text role — the same text a
+  /// [ShadInput] shows.
   /// {@endtemplate}
   final TextStyle? style;
 
   /// {@template ShadTimePicker.placeholderStyle}
-  /// The style of the placeholder. Defaults to
-  /// ```dart
-  /// theme.textTheme.muted.copyWith(
-  ///   fontSize: 16,
-  ///   height: 24 / 16,
-  /// ),
-  /// ```
+  /// The style of the placeholder. Defaults to the theme's time picker
+  /// placeholder style, which uses the style's field text role.
   /// {@endtemplate}
   final TextStyle? placeholderStyle;
 
@@ -819,11 +808,7 @@ class _ShadTimePickerState extends State<ShadTimePicker> {
         const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
 
     final effectiveStyle = theme.textTheme.muted
-        .copyWith(
-          color: theme.colorScheme.foreground,
-          fontSize: 16,
-          height: 24 / 16,
-        )
+        .copyWith(color: theme.colorScheme.foreground)
         .merge(theme.timePickerTheme.style)
         .merge(widget.style);
 
@@ -833,14 +818,11 @@ class _ShadTimePickerState extends State<ShadTimePicker> {
         .merge(widget.labelStyle)
         .fallback(color: theme.colorScheme.foreground);
 
+    // Like ShadInput: the theme's field decoration is the whole base — a
+    // hardcoded all-sides border here would resurface under styles whose
+    // fields underline instead of outlining.
     final effectiveFieldDecoration =
-        ShadDecoration(
-              border: ShadBorder.all(
-                color: theme.colorScheme.border,
-                radius: theme.radius,
-              ),
-            )
-            .merge(theme.timePickerTheme.fieldDecoration)
+        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration())
             .merge(widget.fieldDecoration);
 
     final effectivePeriodDecoration =
@@ -1111,39 +1093,36 @@ class _ShadTimePickerFieldState extends State<ShadTimePickerField> {
     final theme = ShadTheme.of(context);
     final effectiveGap = widget.gap ?? 2;
 
-    final defaultStyle = theme.textTheme.muted.copyWith(
-      color: theme.colorScheme.foreground,
-      fontSize: 16,
-      height: 24 / 16,
-    );
+    // The theme's field text/decoration are the base so a bare
+    // ShadTimePickerField matches one built by ShadTimePicker — the digits
+    // read in the style's field role, like a text field's.
+    final defaultStyle = theme.textTheme.muted
+        .copyWith(color: theme.colorScheme.foreground)
+        .merge(theme.timePickerTheme.style);
 
     final effectiveStyle = defaultStyle.merge(widget.style);
 
-    final defaultPlaceholderStyle = theme.textTheme.muted.copyWith(
-      fontSize: 16,
-      height: 24 / 16,
-    );
-
-    final effectivePlaceholderStyle = defaultPlaceholderStyle
+    final effectivePlaceholderStyle = theme.textTheme.muted
         .merge(theme.timePickerTheme.placeholderStyle)
         .merge(controller.placeholderStyle);
 
-    final defaultLabelStyle = theme.textTheme.small.copyWith(fontSize: 12);
+    final defaultLabelStyle = theme.textTheme.small
+        .copyWith(fontSize: 12)
+        .merge(theme.timePickerTheme.labelStyle);
     final effectiveLabelStyle = defaultLabelStyle.merge(widget.labelStyle);
     // A time field is a fixed box around two digits, so like an OTP slot it
     // has to grow with the text scale or the glyphs are clipped.
     final textScale = MediaQuery.textScalerOf(context).scale(1);
-    final effectiveWidth = (widget.width ?? 58) * textScale;
+    final effectiveWidth =
+        (widget.width ?? theme.timePickerTheme.fieldWidth ?? 48) * textScale;
     final effectivePadding =
         widget.padding ??
-        const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
+        theme.timePickerTheme.fieldPadding ??
+        EdgeInsets.zero;
 
-    final effectiveDecoration = ShadDecoration(
-      border: ShadBorder.all(
-        color: theme.colorScheme.border,
-        radius: theme.radius,
-      ),
-    ).merge(widget.decoration);
+    final effectiveDecoration =
+        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration())
+            .merge(widget.decoration);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

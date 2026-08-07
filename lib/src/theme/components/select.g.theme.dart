@@ -44,6 +44,7 @@ mixin _$ShadSelectTheme {
       minWidth: lerpDouble$(a.minWidth, b.minWidth, t),
       maxWidth: lerpDouble$(a.maxWidth, b.maxWidth, t),
       maxHeight: lerpDouble$(a.maxHeight, b.maxHeight, t),
+      minHeight: lerpDouble$(a.minHeight, b.minHeight, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       optionsPadding: EdgeInsetsGeometry.lerp(
         a.optionsPadding,
@@ -81,6 +82,7 @@ mixin _$ShadSelectTheme {
     double? minWidth,
     double? maxWidth,
     double? maxHeight,
+    double? minHeight,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? optionsPadding,
     bool? showScrollToTopChevron,
@@ -103,6 +105,7 @@ mixin _$ShadSelectTheme {
       minWidth: minWidth ?? _this.minWidth,
       maxWidth: maxWidth ?? _this.maxWidth,
       maxHeight: maxHeight ?? _this.maxHeight,
+      minHeight: minHeight ?? _this.minHeight,
       padding: padding ?? _this.padding,
       optionsPadding: optionsPadding ?? _this.optionsPadding,
       showScrollToTopChevron:
@@ -139,6 +142,7 @@ mixin _$ShadSelectTheme {
       minWidth: other.minWidth,
       maxWidth: other.maxWidth,
       maxHeight: other.maxHeight,
+      minHeight: other.minHeight,
       padding: other.padding,
       optionsPadding: other.optionsPadding,
       showScrollToTopChevron: other.showScrollToTopChevron,
@@ -174,6 +178,7 @@ mixin _$ShadSelectTheme {
         _other.minWidth == _this.minWidth &&
         _other.maxWidth == _this.maxWidth &&
         _other.maxHeight == _this.maxHeight &&
+        _other.minHeight == _this.minHeight &&
         _other.padding == _this.padding &&
         _other.optionsPadding == _this.optionsPadding &&
         _other.showScrollToTopChevron == _this.showScrollToTopChevron &&
@@ -199,6 +204,7 @@ mixin _$ShadSelectTheme {
       _this.minWidth,
       _this.maxWidth,
       _this.maxHeight,
+      _this.minHeight,
       _this.padding,
       _this.optionsPadding,
       _this.showScrollToTopChevron,

@@ -36,6 +36,7 @@ class ThemePreviewPanel extends StatelessWidget {
               spacing: 16,
               children: const [
                 _ContributionHistoryCard(),
+                _WireTransferCard(),
                 _PayoutThresholdCard(),
                 _SavingsTargetsCard(),
                 _ClaimableBalanceCard(),
@@ -704,6 +705,61 @@ class _BuyInvestmentCardState extends State<_BuyInvestmentCard> {
             'Trades are typically executed within market hours.',
             style: theme.textTheme.muted,
             textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A field, a select and a button share one row here on purpose: the
+/// reference gives all three the same border-box height per style, so any
+/// regression in a control's height shows up immediately as a ragged row.
+class _WireTransferCard extends StatefulWidget {
+  const _WireTransferCard();
+
+  @override
+  State<_WireTransferCard> createState() => _WireTransferCardState();
+}
+
+class _WireTransferCardState extends State<_WireTransferCard> {
+  String currency = 'usd';
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+    return _PreviewCard(
+      title: 'Wire Transfer',
+      description: 'Same-day settlement to any linked account.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: ShadInput(placeholder: Text('Amount')),
+              ),
+              const SizedBox(width: 8),
+              ShadSelect<String>(
+                minWidth: 96,
+                initialValue: currency,
+                onChanged: (v) => setState(() => currency = v ?? currency),
+                options: const [
+                  ShadOption(value: 'usd', child: Text('USD')),
+                  ShadOption(value: 'eur', child: Text('EUR')),
+                  ShadOption(value: 'sek', child: Text('SEK')),
+                ],
+                selectedOptionBuilder: (context, value) =>
+                    Text(value.toUpperCase()),
+              ),
+              const SizedBox(width: 8),
+              ShadButton(onPressed: () {}, child: const Text('Send')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Fees are waived for transfers over \$1,000.',
+            style: theme.textTheme.muted,
           ),
         ],
       ),

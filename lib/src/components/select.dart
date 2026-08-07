@@ -62,6 +62,7 @@ class ShadSelect<T> extends StatefulWidget {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.decoration,
     this.trailing,
     this.padding,
@@ -128,6 +129,7 @@ class ShadSelect<T> extends StatefulWidget {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.decoration,
     this.trailing,
     this.padding,
@@ -184,6 +186,7 @@ class ShadSelect<T> extends StatefulWidget {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.decoration,
     this.trailing,
     this.padding,
@@ -251,6 +254,7 @@ class ShadSelect<T> extends StatefulWidget {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.decoration,
     this.trailing,
     this.padding,
@@ -319,6 +323,7 @@ class ShadSelect<T> extends StatefulWidget {
     this.minWidth,
     this.maxWidth,
     this.maxHeight,
+    this.minHeight,
     this.decoration,
     this.trailing,
     this.padding,
@@ -503,6 +508,15 @@ class ShadSelect<T> extends StatefulWidget {
   /// Defaults to `kDefaultSelectMaxHeight`.
   /// {@endtemplate}
   final double? maxHeight;
+
+  /// {@template ShadSelect.minHeight}
+  /// The minimum height of the select trigger, border included, so it lines
+  /// up with the text field and button heights of the current style.
+  ///
+  /// Defaults to the theme's value, which the built-in styles pin to their
+  /// field height.
+  /// {@endtemplate}
+  final double? minHeight;
 
   /// {@template ShadSelect.decoration}
   /// The visual decoration of the select input.
@@ -1048,6 +1062,7 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
         widget.maxHeight ??
         theme.selectTheme.maxHeight ??
         kDefaultSelectMaxHeight;
+    final effectiveMinHeight = widget.minHeight ?? theme.selectTheme.minHeight;
     final effectiveOptionsPadding =
         widget.optionsPadding ??
         theme.selectTheme.optionsPadding ??
@@ -1162,10 +1177,19 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                 canRequestFocus: widget.enabled,
                 focusNode: focusNode,
                 builder: (context, focused, child) {
-                  return ShadDecorator(
+                  final decorated = ShadDecorator(
                     focused: focused,
                     decoration: effectiveDecoration,
                     child: child,
+                  );
+                  if (effectiveMinHeight == null) return decorated;
+                  // The reference pins the trigger's height (`h-9` and
+                  // friends), border included, and centres the content in
+                  // it. Constraining outside the decorator counts the
+                  // border's implicit padding in, like CSS border-box.
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: effectiveMinHeight),
+                    child: decorated,
                   );
                 },
                 child: ShadGestureDetector(

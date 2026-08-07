@@ -140,6 +140,26 @@ locks the chain; add to it rather than trusting a local check.
 
 ## Flutter gotchas hit in this codebase
 
+- **CSS heights are border-box; `Container` adds its decoration's border as
+  padding around the child** (`DecoratedBox` does not — the menubar strip
+  relied on one and came out 2px short). A height constraint applied *inside*
+  a `ShadDecorator` comes out `2 × border` too tall — that made outline
+  buttons and toggles 2px taller than their borderless variants and every
+  control 4px taller in the no-secondary-border variant (focus reserve).
+  Size constraints go *outside* the decorator;
+  `test/src/components/control_heights_test.dart` locks input, select
+  trigger, buttons, toggles, date/time picker, OTP slots, the menubar and
+  the calendar's geometry (cell size, nav buttons, caption dropdowns —
+  `calendarCellSize`/`calendarCellRadius`/`calendarPadding`/
+  `calendarCaptionHeight` tokens) to the style values in both variants.
+  Calendar tests use single-glyph captions and small day text: the test
+  font's em-wide glyphs wrap or overflow inside cells that fit real fonts
+  comfortably. Related: the select trigger's `py-2`
+  never acts in the reference (its height is pinned by `data-[size]:h-*`),
+  so there is no `selectPaddingY` token — only `selectPaddingX` and
+  `ShadSelectTheme.minHeight`. The time picker has no reference counterpart;
+  its fields deliberately borrow the input's text role, decoration and
+  height rather than carrying their own metrics.
 - **`Border` requires colour-uniform sides to paint a radius**, and
   `BorderSide.none` carries opaque black. `ShadBorderSide.toBorderSide()`
   therefore keeps its colour at zero width. Any component that draws only some

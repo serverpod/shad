@@ -1184,10 +1184,34 @@ class _ShadButtonState extends State<ShadButton> {
                         autofocus: widget.autofocus,
                         focusNode: focusNode,
                         onFocusChange: widget.onFocusChange,
-                        builder: (context, focused, child) => ShadDecorator(
-                          decoration: updatedDecoration,
-                          focused: focused,
-                          child: child,
+                        // The size constraints sit *outside* the decorator so
+                        // the border — and the focus reserve of the
+                        // no-secondary-border variant — is counted into the
+                        // button's height, the way CSS `h-9` is border-box.
+                        // Constraining inside made an outline button 2px
+                        // taller than a primary one.
+                        builder: (context, focused, child) => ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: effectiveWidth,
+                            // When the width is 0 or null, maxWidth goes to
+                            // infinity so the button sizes itself from its
+                            // child.
+                            maxWidth: effectiveWidth == 0
+                                ? double.infinity
+                                : effectiveWidth,
+                            minHeight: effectiveHeight,
+                            // When the height is 0, we set maxHeight to
+                            // infinity to allow the button to size itself
+                            // based on its child.
+                            maxHeight: effectiveHeight == 0
+                                ? double.infinity
+                                : effectiveHeight,
+                          ),
+                          child: ShadDecorator(
+                            decoration: updatedDecoration,
+                            focused: focused,
+                            child: child,
+                          ),
                         ),
                         child: ShadGestureDetector(
                           behavior: HitTestBehavior.opaque,
@@ -1230,38 +1254,18 @@ class _ShadButtonState extends State<ShadButton> {
                           onLongPressStart: widget.onLongPressStart,
                           longPressDuration: effectiveLongPressDuration,
                           child: SelectionContainer.disabled(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                minWidth: effectiveWidth,
-                                // When the width is 0 or null, maxWidth goes
-                                // to infinity so the button sizes itself
-                                // from its child.
-                                maxWidth: effectiveWidth == 0
-                                    ? double.infinity
-                                    : effectiveWidth,
-                                minHeight: effectiveHeight,
-                                // When the height is 0, we set maxHeight to
-                                // infinity to allow the button to size itself
-                                // based on its child.
-                                maxHeight: effectiveHeight == 0
-                                    ? double.infinity
-                                    : effectiveHeight,
-                              ),
-                              child: Padding(
-                                padding: padding(theme),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment:
-                                      effectiveCrossAxisAlignment,
-                                  mainAxisAlignment: effectiveMainAxisAlignment,
-                                  textDirection: effectiveTextDirection,
-                                  children: [
-                                    if (widget.leading != null) widget.leading!,
-                                    if (widget.child != null) child!,
-                                    if (widget.trailing != null)
-                                      widget.trailing!,
-                                  ].separatedBy(SizedBox(width: effectiveGap)),
-                                ),
+                            child: Padding(
+                              padding: padding(theme),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: effectiveCrossAxisAlignment,
+                                mainAxisAlignment: effectiveMainAxisAlignment,
+                                textDirection: effectiveTextDirection,
+                                children: [
+                                  if (widget.leading != null) widget.leading!,
+                                  if (widget.child != null) child!,
+                                  if (widget.trailing != null) widget.trailing!,
+                                ].separatedBy(SizedBox(width: effectiveGap)),
                               ),
                             ),
                           ),

@@ -303,10 +303,21 @@ class _ShadToggleState extends State<ShadToggle> {
       onFocusChange: widget.onFocusChange,
       canRequestFocus: enabled,
       builder: (context, focused, child) {
-        return ShadDecorator(
-          focused: focused,
-          decoration: effectiveDecoration,
-          child: child,
+        // The size constraints sit *outside* the decorator so the outline
+        // variant's border — and the no-secondary-border variant's focus
+        // reserve — is counted into the toggle's height, the way CSS `h-9`
+        // is border-box. Constraining inside made an outline toggle 2px
+        // taller than a default one.
+        return ConstrainedBox(
+          constraints: BoxConstraints.tightFor(
+            height: effectiveHeight,
+            width: widget.width,
+          ),
+          child: ShadDecorator(
+            focused: focused,
+            decoration: effectiveDecoration,
+            child: child,
+          ),
         );
       },
       child: ShadGestureDetector(
@@ -321,8 +332,6 @@ class _ShadToggleState extends State<ShadToggle> {
             final hovered = enabled && states.contains(ShadState.hovered);
             final foreground = foregroundFor(hovered: hovered);
             return Container(
-              height: effectiveHeight,
-              width: widget.width,
               padding: effectivePadding,
               alignment: Alignment.center,
               decoration: BoxDecoration(
