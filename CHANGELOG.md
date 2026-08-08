@@ -1,4 +1,4 @@
-## Unreleased
+## 0.99.2
 
 - Fixes outer shadows being clipped to the wrong shape. Dialogs, sheets, cards,
   popovers, toasts, menus, the sidebar and every decorated control lost the

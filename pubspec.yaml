@@ -1,6 +1,6 @@
 name: shad
 description: High fidelity Flutter port of shadcn/ui, with components and theme editor.
-version: 0.99.1
+version: 0.99.2
 homepage: https://serverpod.dev/open-source
 repository: https://github.com/serverpod/shad
 documentation: https://serverpod.github.io/shad/
