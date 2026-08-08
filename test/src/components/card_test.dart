@@ -4,6 +4,8 @@ import 'package:shad/src/app.dart';
 import 'package:shad/src/components/card.dart'; // Adjust import path based on your project structure
 import 'package:shad/src/theme/theme.dart';
 
+import '../../decoration_finders.dart';
+
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
   Widget createTestWidget(Widget child) {
@@ -112,7 +114,7 @@ void main() {
       final containerFinder = find.byType(Container);
       expect(containerFinder, findsOneWidget);
       final container = tester.widget<Container>(containerFinder);
-      final decoration = container.decoration as BoxDecoration?;
+      final decoration = boxDecorationOf(container.decoration);
       expect(decoration?.color, customBackgroundColor);
       expect(decoration?.borderRadius, customRadius);
     });
@@ -216,7 +218,7 @@ void main() {
       final containerFinder = find.byType(Container);
       expect(containerFinder, findsOneWidget);
       final container = tester.widget<Container>(containerFinder);
-      final decoration = container.decoration as BoxDecoration?;
+      final decoration = boxDecorationOf(container.decoration);
       // The default style is nova, whose `--card-spacing` is `--spacing(4)`.
       expect(container.padding, const EdgeInsets.all(16));
       expect(

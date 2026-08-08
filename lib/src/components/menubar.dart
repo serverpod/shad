@@ -14,6 +14,7 @@ import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/provider.dart';
 import 'package:shad/src/utils/provider_index.dart';
+import 'package:shad/src/utils/shadow.dart';
 import 'package:shad/src/utils/states_controller.dart';
 
 /// {@template ShadMenubarController}
@@ -136,16 +137,14 @@ class _ShadMenubarState extends State<ShadMenubar> {
       // border-box — `h-9` in the reference includes the hairline, and the
       // theme's trigger height is derived assuming it does.
       child: Container(
-        decoration: BoxDecoration(
+        decoration: ShadShadowDecoration.box(
           color: effectiveBackgroundColor,
           border: effectiveBorder.toBorder(),
           borderRadius: effectiveRadius,
           // The strip's `shadow-xs`; only styles that shadow their controls
           // keep it. `ShadMenubarTheme.shadows` belongs to the item popovers,
           // so the strip reads the token directly.
-          boxShadow: theme.style.controlShadow.isEmpty
-              ? null
-              : theme.style.controlShadow,
+          shadows: theme.style.controlShadow,
         ),
         padding: effectivePadding,
         child: Row(

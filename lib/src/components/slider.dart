@@ -7,6 +7,7 @@ import 'package:shad/src/raw_components/focusable.dart';
 import 'package:shad/src/theme/components/slider.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// Possible ways for a user to interact with a [ShadSlider].
 enum ShadSliderInteraction {
@@ -1049,7 +1050,7 @@ class _ShadSliderCoreState extends State<_ShadSliderCore> {
                         onEnter: (_) => _setHovered(index),
                         onExit: (_) => _setHovered(null),
                         child: Container(
-                          decoration: BoxDecoration(
+                          decoration: ShadShadowDecoration.box(
                             shape: BoxShape.circle,
                             color: resolvedThumbColor,
                             border: Border.all(
@@ -1059,14 +1060,14 @@ class _ShadSliderCoreState extends State<_ShadSliderCore> {
                             // A spread-only shadow is a ring: it grows
                             // outward without moving anything, which is
                             // what `hover:ring-4` does.
-                            boxShadow: ringVisible
+                            shadows: ringVisible
                                 ? [
                                     BoxShadow(
                                       color: ringColor,
                                       spreadRadius: ringWidth,
                                     ),
                                   ]
-                                : null,
+                                : const <BoxShadow>[],
                           ),
                         ),
                       ),

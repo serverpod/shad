@@ -6,6 +6,8 @@ import 'package:shad/src/components/sheet.dart';
 import 'package:shad/src/components/sidebar.dart';
 import 'package:shad/src/theme/theme.dart';
 
+import '../../decoration_finders.dart';
+
 void main() {
   // Wider than the md breakpoint, so the sidebar renders inline.
   const desktopSize = Size(1200, 800);
@@ -181,9 +183,8 @@ void main() {
         ),
       );
       final hasAccentFill = containers.any((c) {
-        final decoration = c.decoration;
-        return decoration is BoxDecoration &&
-            decoration.color == theme.colorScheme.sidebarAccent;
+        final decoration = boxDecorationOf(c.decoration);
+        return decoration?.color == theme.colorScheme.sidebarAccent;
       });
       expect(hasAccentFill, isTrue);
     });

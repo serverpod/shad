@@ -3,6 +3,7 @@ import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 // A customizable card widget for displaying structured content.
 ///
@@ -241,11 +242,11 @@ class ShadCard extends StatelessWidget {
       height: height,
       padding: effectivePadding,
       clipBehavior: effectiveClipBehavior,
-      decoration: BoxDecoration(
+      decoration: ShadShadowDecoration.box(
         color: effectiveBackgroundColor,
         borderRadius: effectiveRadius,
         border: effectiveBorder.toBorder(),
-        boxShadow: effectiveShadows,
+        shadows: effectiveShadows ?? const [],
       ),
       child: Row(
         mainAxisSize: effectiveRowMainAxisSize,

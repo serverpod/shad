@@ -10,6 +10,7 @@ import 'package:shad/src/theme/themes/shadows.dart';
 import 'package:shad/src/utils/animate.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/mouse_area.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// Controls the visibility of a [ShadPopover].
 class ShadPopoverController extends ChangeNotifier {
@@ -364,9 +365,9 @@ class _ShadPopoverState extends State<ShadPopover>
       final shadows = effectiveDecoration.shadows;
       if (shadows != null && shadows.isNotEmpty) {
         popover = DecoratedBox(
-          decoration: BoxDecoration(
+          decoration: ShadShadowDecoration.box(
             borderRadius: effectiveFilterRadius,
-            boxShadow: shadows,
+            shadows: shadows,
           ),
           child: popover,
         );

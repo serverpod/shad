@@ -6,6 +6,8 @@ import 'package:shad/src/app.dart';
 import 'package:shad/src/components/slider.dart';
 import 'package:shad/src/theme/theme.dart';
 
+import '../../decoration_finders.dart';
+
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
   Widget createTestWidget(Widget child) {
@@ -58,16 +60,16 @@ void main() {
         ),
       );
 
-      BoxDecoration thumbDecoration() {
+      Decoration thumbDecoration() {
         final containers = tester
             .widgetList<Container>(find.byType(Container))
-            .where((c) => c.decoration is BoxDecoration)
-            .map((c) => c.decoration! as BoxDecoration)
-            .where((d) => d.shape == BoxShape.circle);
-        return containers.first;
+            .where(
+              (c) => boxDecorationOf(c.decoration)?.shape == BoxShape.circle,
+            );
+        return containers.first.decoration!;
       }
 
-      expect(thumbDecoration().boxShadow, isNull);
+      expect(shadowsOf(thumbDecoration()), isNull);
 
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer();
@@ -77,7 +79,7 @@ void main() {
 
       final theme = ShadTheme.of(tester.element(find.byType(ShadSlider)));
       final ring = theme.decoration.secondaryFocusedBorder!.top!;
-      final shadow = thumbDecoration().boxShadow!.single;
+      final shadow = shadowsOf(thumbDecoration())!.single;
 
       // Same colour, opacity and width as a focused field's ring.
       expect(shadow.color, ring.color);
@@ -96,25 +98,26 @@ void main() {
         ),
       );
 
-      BoxDecoration thumb() => tester
+      Decoration thumb() => tester
           .widgetList<Container>(find.byType(Container))
           .map((c) => c.decoration)
-          .whereType<BoxDecoration>()
-          .firstWhere((d) => d.shape == BoxShape.circle);
+          .firstWhere(
+            (d) => boxDecorationOf(d)?.shape == BoxShape.circle,
+          )!;
 
       final centre = tester.getCenter(find.byType(ShadSlider));
       final gesture = await tester.startGesture(centre);
       await tester.pump();
-      expect(thumb().boxShadow, isNotNull);
+      expect(shadowsOf(thumb()), isNotNull);
 
       // Well outside the slider's bounds.
       await gesture.moveBy(const Offset(0, 400));
       await tester.pump();
-      expect(thumb().boxShadow, isNotNull);
+      expect(shadowsOf(thumb()), isNotNull);
 
       await gesture.up();
       await tester.pump();
-      expect(thumb().boxShadow, isNull);
+      expect(shadowsOf(thumb()), isNull);
     });
 
     testWidgets('a fat track wins over a small thumb', (tester) async {
@@ -143,8 +146,7 @@ void main() {
     Finder thumbs() => find.byWidgetPredicate(
       (widget) =>
           widget is Container &&
-          widget.decoration is BoxDecoration &&
-          (widget.decoration! as BoxDecoration).shape == BoxShape.circle,
+          boxDecorationOf(widget.decoration)?.shape == BoxShape.circle,
     );
 
     /// The filled part of the track: the only box with the primary colour.
@@ -152,7 +154,7 @@ void main() {
       final finder = find.byWidgetPredicate(
         (widget) =>
             widget is DecoratedBox &&
-            (widget.decoration as BoxDecoration).color == color,
+            boxDecorationOf(widget.decoration)?.color == color,
       );
       return tester.getRect(finder);
     }
@@ -372,7 +374,7 @@ void main() {
 
       List<BoxShadow?> shadows() => tester
           .widgetList<Container>(thumbs())
-          .map((c) => (c.decoration! as BoxDecoration).boxShadow?.single)
+          .map((c) => shadowsOf(c.decoration)?.single)
           .toList();
 
       expect(shadows(), [null, null]);

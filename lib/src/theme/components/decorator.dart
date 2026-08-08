@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/shadow.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 part 'decorator.g.theme.dart';
@@ -157,30 +158,33 @@ class ShadDecorator extends StatelessWidget {
           fallbackSecondaryBorder ?? effectiveDecoration.secondaryBorder;
     }
 
-    final primaryDecoration = switch (border) {
-      final ShadRoundedSuperellipseBorder border => ShapeDecoration(
-        color: effectiveDecoration.color,
-        image: effectiveDecoration.image,
-        shadows: effectiveDecoration.shadows,
-        gradient: effectiveDecoration.gradient,
-        shape: border.toBorder(
-          textDirection: textDirection,
-          defaultRadius: theme.radius,
+    // The shadows go on the wrapper rather than the decoration itself so they
+    // are clipped to the control's own outline; see [ShadShadowDecoration].
+    final primaryDecoration = ShadShadowDecoration(
+      shadows: effectiveDecoration.shadows ?? const [],
+      decoration: switch (border) {
+        final ShadRoundedSuperellipseBorder border => ShapeDecoration(
+          color: effectiveDecoration.color,
+          image: effectiveDecoration.image,
+          gradient: effectiveDecoration.gradient,
+          shape: border.toBorder(
+            textDirection: textDirection,
+            defaultRadius: theme.radius,
+          ),
         ),
-      ),
-      final ShadBorder? border => BoxDecoration(
-        border: true == border?.hasBorder ? border?.toBorder() : null,
-        borderRadius: effectiveDecoration.shape == BoxShape.circle
-            ? null
-            : border?.radius,
-        color: effectiveDecoration.color,
-        shape: effectiveDecoration.shape ?? BoxShape.rectangle,
-        backgroundBlendMode: effectiveDecoration.backgroundBlendMode,
-        boxShadow: effectiveDecoration.shadows,
-        gradient: effectiveDecoration.gradient,
-        image: effectiveDecoration.image,
-      ),
-    };
+        final ShadBorder? border => BoxDecoration(
+          border: true == border?.hasBorder ? border?.toBorder() : null,
+          borderRadius: effectiveDecoration.shape == BoxShape.circle
+              ? null
+              : border?.radius,
+          color: effectiveDecoration.color,
+          shape: effectiveDecoration.shape ?? BoxShape.rectangle,
+          backgroundBlendMode: effectiveDecoration.backgroundBlendMode,
+          gradient: effectiveDecoration.gradient,
+          image: effectiveDecoration.image,
+        ),
+      },
+    );
 
     Widget decorated = Container(
       decoration: primaryDecoration,

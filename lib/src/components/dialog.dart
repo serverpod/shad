@@ -13,6 +13,7 @@ import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/position.dart';
 import 'package:shad/src/utils/responsive.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// {@template ShadDialogRoute}
 /// A custom dialog route that allows specifying a `reverseTransitionDuration`.
@@ -905,13 +906,13 @@ class ShadDialog extends StatelessWidget {
           }
 
           return DecoratedBox(
-            decoration: BoxDecoration(
+            decoration: ShadShadowDecoration.box(
               color: effectiveBackgroundColor,
               borderRadius: (!sm && effectiveRemoveBorderRadiusWhenTiny)
                   ? null
                   : effectiveRadius,
               border: effectiveBorder,
-              boxShadow: effectiveShadows,
+              shadows: effectiveShadows,
             ),
             child: widget,
           );

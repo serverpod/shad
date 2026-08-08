@@ -10,6 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/components/dialog.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/position.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// Tailwind's `max-w-sm` (24rem) — the width cap shadcn applies to left/right
 /// sheets from the `sm` breakpoint up.
@@ -1637,11 +1638,11 @@ class _ShadSheetState extends State<ShadSheet> with TickerProviderStateMixin {
       width: isVertical ? null : compositePx,
       child: DecoratedBox(
         key: const ValueKey('shad_sheet_expandable_fill'),
-        decoration: BoxDecoration(
+        decoration: ShadShadowDecoration.box(
           color: backgroundColor,
           borderRadius: radius,
           border: border,
-          boxShadow: shadows,
+          shadows: shadows ?? const [],
         ),
         child: paddedComposite,
       ),

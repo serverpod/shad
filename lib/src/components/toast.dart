@@ -10,6 +10,7 @@ import 'package:shad/src/utils/animate.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/position.dart';
 import 'package:shad/src/utils/responsive.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// The default duration for toasts to remain visible.
 const kDefaultToastDuration = Duration(seconds: 5);
@@ -676,10 +677,10 @@ class _ShadToastState extends State<ShadToast> {
           return ConstrainedBox(
             constraints: effectiveConstraints,
             child: DecoratedBox(
-              decoration: BoxDecoration(
+              decoration: ShadShadowDecoration.box(
                 border: effectiveBorder.toBorder(),
                 borderRadius: effectiveBorderRadius,
-                boxShadow: effectiveShadows,
+                shadows: effectiveShadows,
                 color: effectiveBackgroundColor,
               ),
               child: Stack(

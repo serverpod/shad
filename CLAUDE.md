@@ -169,12 +169,24 @@ locks the chain; add to it rather than trusting a local check.
   the ring's edge instead. The ring is still drawn *outside* the slot (slots
   are transparent, so only their hairlines cross it); don't move it inside —
   that reads as a different control from every other field.
-- **CSS clips outer box-shadows to outside the border box**; Flutter's default
-  `BlurStyle.normal` paints the shadow behind the whole box, which shows
-  through any transparent or translucent fill as a grey wash. Every outward
-  shadow in `Shadows` therefore uses `BlurStyle.outer`. If a control with a
-  transparent fill ever looks "slightly grey", check for a stray plain
-  `BoxShadow` first.
+- **CSS clips outer box-shadows to outside the border box, and Flutter cannot
+  express that with a `BoxShadow`.** `BlurStyle.normal` paints the shadow
+  behind the whole box, which shows through any transparent or translucent
+  fill as a grey wash; `BlurStyle.outer` cuts the hole out of
+  `rect.shift(offset).inflate(spreadRadius)` — the *shadow's* rectangle, not
+  the element's — so with any offset or spread the shadow disappears next to
+  the element and then restarts with a hard edge a few pixels out. A
+  `shadow-lg` dialog lost the 7px directly beneath it that way. Outer shadows
+  therefore go through `ShadShadowDecoration` (`lib/src/utils/shadow.dart`),
+  which blurs normally and clips to the region outside the wrapped
+  decoration's own `getClipPath`. **Never put an outward shadow in a
+  `BoxDecoration.boxShadow` here** — use `ShadShadowDecoration.box(...)`, which
+  takes the same arguments. `test/src/utils/shadow_test.dart` locks the
+  profile (monotone falloff, nothing inside the element, a crisp hairline for
+  the spread-only shadows used as outlines) by rasterising and sampling; it
+  flips `debugDisableShadows` off, which flutter_test otherwise leaves on.
+  Tests that introspect a component's fill or border go through
+  `test/decoration_finders.dart` to look past the wrapper.
 - `ShadButton` centres its label (`TextAlign.center` in its DefaultTextStyle).
   Anything button-based that should read as a row — menu items — must merge
   `TextAlign.start` back in below the button.

@@ -14,6 +14,7 @@ import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/debug_check.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 /// Which edge of the layout the sidebar sits on.
 ///
@@ -436,10 +437,10 @@ class _ShadSidebarScaffoldState extends State<ShadSidebarScaffold> {
           bottom: margin.bottom,
         ),
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
+        decoration: ShadShadowDecoration.box(
           color: theme.colorScheme.background,
           borderRadius: sidebarTheme.insetRadius,
-          boxShadow: sidebarTheme.insetShadows,
+          shadows: sidebarTheme.insetShadows ?? const [],
         ),
         child: content,
       );
@@ -675,11 +676,11 @@ class ShadSidebar extends StatelessWidget {
           padding: floatingMargin,
           child: Container(
             clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
+            decoration: ShadShadowDecoration.box(
               color: effectiveBackgroundColor,
               borderRadius: sidebarTheme.floatingRadius,
               border: Border.all(color: effectiveBorderColor),
-              boxShadow: sidebarTheme.floatingShadows,
+              shadows: sidebarTheme.floatingShadows ?? const [],
             ),
             child: content,
           ),
@@ -1238,22 +1239,24 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
               width: collapsed ? collapsedSize : expandedWidth,
               height: height,
               padding: padding,
-              decoration: BoxDecoration(
+              decoration: ShadShadowDecoration.box(
                 color: highlighted
                     ? accent
                     : outline
                     ? theme.colorScheme.background
                     : null,
                 borderRadius: radius,
-                boxShadow: outline
+                // `shadow-[0_0_0_1px_...]`: a spread-only shadow, which the
+                // CSS clip turns into a crisp hairline ring outside the
+                // button without taking part in layout.
+                shadows: outline
                     ? [
                         BoxShadow(
                           color: highlighted ? accent : borderColor,
                           spreadRadius: 1,
-                          blurStyle: BlurStyle.outer,
                         ),
                       ]
-                    : null,
+                    : const <BoxShadow>[],
               ),
               child: row,
             );

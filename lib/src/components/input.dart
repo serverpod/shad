@@ -23,6 +23,7 @@ import 'package:shad/src/theme/themes/shadows.dart';
 import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
+import 'package:shad/src/utils/shadow.dart';
 
 String? _localizedLabel(
   ContextMenuButtonType type,
@@ -1486,11 +1487,11 @@ class ShadTextSelectionToolbar extends StatelessWidget {
       delegate: DesktopTextSelectionToolbarLayoutDelegate(anchor: anchor),
       child: Container(
         clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
+        decoration: ShadShadowDecoration.box(
           color: effectiveBackgroundColor,
           border: effectiveBorder,
           borderRadius: effectiveBorderRadius,
-          boxShadow: effectiveShadows,
+          shadows: effectiveShadows,
         ),
         child: IntrinsicWidth(
           child: Column(
