@@ -1,3 +1,10 @@
+## 0.99.3
+
+- Fixes the tooltip arrow pointing at nothing when the bubble is near a window
+  edge. The bubble slides inward to stay on screen; the arrow now slides back
+  with it and keeps pointing at the trigger, stopping short of the bubble's
+  rounded corners.
+
 ## 0.99.2
 
 - Fixes outer shadows being clipped to the wrong shape. Dialogs, sheets, cards,

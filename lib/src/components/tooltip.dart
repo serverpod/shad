@@ -397,6 +397,14 @@ class _ShadTooltipState extends State<ShadTooltip>
                   radius: theme.tooltipTheme.arrowRadius ?? 2,
                   color:
                       effectiveDecoration.color ?? theme.colorScheme.foreground,
+                  // The bubble slides along the viewport edge to stay on
+                  // screen; the arrow slides back the same distance so it
+                  // keeps pointing at the trigger.
+                  shift: ShadPortalPlacement.shiftOf(context),
+                  cornerRadius: _cornerRadius(
+                    effectiveDecoration,
+                    Directionality.of(context),
+                  ),
                   child: tooltip,
                 );
               }
@@ -424,6 +432,19 @@ class _ShadTooltipState extends State<ShadTooltip>
   }
 }
 
+/// The largest corner radius of the tooltip's own surface, which is how far
+/// along an edge the arrow has to stay before it starts eating into a corner.
+double _cornerRadius(ShadDecoration decoration, TextDirection textDirection) {
+  final radius = decoration.border?.radius?.resolve(textDirection);
+  if (radius == null) return 0;
+  return [
+    radius.topLeft.x,
+    radius.topRight.x,
+    radius.bottomLeft.x,
+    radius.bottomRight.x,
+  ].reduce(math.max);
+}
+
 /// The arrow pointing from the tooltip at its trigger, shadcn/ui's
 /// `TooltipArrow`: a `size-2.5` square rotated 45°, filled like the surface,
 /// its tip rounded by `rounded-[2px]`.
@@ -432,12 +453,20 @@ class _ShadTooltipState extends State<ShadTooltip>
 /// (`translate-y-[calc(-50%-2px)]`), so about half its diagonal — 5px —
 /// pokes out across the anchor gap. It is painted under the bubble and in
 /// the same colour, so the overlap never shows.
+///
+/// Along its edge the arrow tracks the trigger rather than the bubble: a
+/// tooltip near the side of the window is pushed inward to stay on screen
+/// (see [ShadPortalPlacement.shift]) and a centred arrow would then point
+/// somewhere the trigger is not. It stops short of the bubble's corners,
+/// where a rounded surface has no straight edge left to sit on.
 class _ShadTooltipArrow extends StatelessWidget {
   const _ShadTooltipArrow({
     required this.direction,
     required this.size,
     required this.radius,
     required this.color,
+    required this.shift,
+    required this.cornerRadius,
     required this.child,
   });
 
@@ -445,11 +474,46 @@ class _ShadTooltipArrow extends StatelessWidget {
   final double size;
   final double radius;
   final Color color;
+
+  /// How far the bubble was moved off its anchor, from
+  /// [ShadPortalPlacement.shift]. The arrow moves back by as much of this as
+  /// its edge has room for.
+  final Offset shift;
+
+  /// The bubble's corner radius, which the arrow keeps clear of.
+  final double cornerRadius;
+
   final Widget child;
+
+  /// How far from the centre of an edge of [extent] the arrow may sit.
+  double _travel(double extent) {
+    // The rotated square is `size * sqrt2` across, so its own half-diagonal
+    // has to clear the corner too.
+    final keepClear = cornerRadius + size * math.sqrt2 / 2;
+    return math.max(0, extent / 2 - keepClear);
+  }
+
+  Widget _alongEdge(bool horizontal, Widget diamond) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final travel = _travel(
+          horizontal ? constraints.maxWidth : constraints.maxHeight,
+        );
+        final offset = horizontal
+            ? Offset((-shift.dx).clamp(-travel, travel), 0)
+            : Offset(0, (-shift.dy).clamp(-travel, travel));
+        return Center(
+          child: Transform.translate(offset: offset, child: diamond),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final diamond = Transform.rotate(
+      // Keyed so a test can measure where the tip actually landed.
+      key: const ValueKey('shad_tooltip_arrow'),
       angle: math.pi / 4,
       child: Container(
         width: size,
@@ -468,25 +532,25 @@ class _ShadTooltipArrow extends StatelessWidget {
         bottom: inset,
         left: 0,
         right: 0,
-        child: Center(child: diamond),
+        child: _alongEdge(true, diamond),
       ),
       AxisDirection.up => Positioned(
         top: inset,
         left: 0,
         right: 0,
-        child: Center(child: diamond),
+        child: _alongEdge(true, diamond),
       ),
       AxisDirection.left => Positioned(
         left: inset,
         top: 0,
         bottom: 0,
-        child: Center(child: diamond),
+        child: _alongEdge(false, diamond),
       ),
       AxisDirection.right => Positioned(
         right: inset,
         top: 0,
         bottom: 0,
-        child: Center(child: diamond),
+        child: _alongEdge(false, diamond),
       ),
     };
 

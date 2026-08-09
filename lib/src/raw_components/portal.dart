@@ -152,10 +152,19 @@ class ShadPortalPlacement extends InheritedWidget {
     super.key,
     required this.usedFallback,
     required super.child,
+    this.shift = Offset.zero,
   });
 
   /// Whether the overlay is positioned by the anchor's fallback.
   final bool usedFallback;
+
+  /// How far the overlay had to move off its anchor point to stay on screen,
+  /// as `actual centre - anchored centre`.
+  ///
+  /// An overlay that points back at its trigger — a tooltip's arrow — has to
+  /// subtract this, or it keeps pointing at the middle of a bubble that is no
+  /// longer over the trigger.
+  final Offset shift;
 
   /// Whether the nearest portal above [context] fell back to its anchor's
   /// [ShadAnchorAuto.fallback] position.
@@ -165,9 +174,17 @@ class ShadPortalPlacement extends InheritedWidget {
           ?.usedFallback ??
       false;
 
+  /// The [shift] of the nearest portal above [context], or [Offset.zero]
+  /// outside an auto-anchored portal.
+  static Offset shiftOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<ShadPortalPlacement>()
+          ?.shift ??
+      Offset.zero;
+
   @override
   bool updateShouldNotify(ShadPortalPlacement oldWidget) =>
-      usedFallback != oldWidget.usedFallback;
+      usedFallback != oldWidget.usedFallback || shift != oldWidget.shift;
 }
 
 class ShadPortal extends StatefulWidget {
@@ -194,6 +211,7 @@ class _ShadPortalState extends State<ShadPortal> {
   final overlayKey = GlobalKey();
   Offset? _calculatedTarget;
   bool _usedFallback = false;
+  Offset _shift = Offset.zero;
   // When scrolling, recalculate the position
   ScrollNotificationObserverState? _scrollNotificationObserver;
   bool _autoPositionUpdateScheduled = false;
@@ -305,6 +323,7 @@ class _ShadPortalState extends State<ShadPortal> {
             _calculatedTarget = null;
             // The next open starts from the primary position again.
             _usedFallback = false;
+            _shift = Offset.zero;
           });
         }
         hide();
@@ -430,11 +449,35 @@ class _ShadPortalState extends State<ShadPortal> {
       }
     }
 
-    if (target != _calculatedTarget || usedFallback != _usedFallback) {
+    // How far [ShadPositionDelegate] will push the overlay off its anchor to
+    // keep it on screen. Worked out here rather than in the delegate because
+    // the arrow that needs it is built, not laid out — and `overlaySize` is
+    // one frame stale in exactly the way `target` already is.
+    var shift = Offset.zero;
+    if (overlay != null && overlay.hasSize) {
+      shift =
+          ShadPositionDelegate.positionFor(
+            size: overlayAncestor.size,
+            childSize: overlaySize,
+            target: target,
+            verticalOffset: 0,
+            preferBelow: true,
+          ) -
+          ShadPositionDelegate.anchoredPositionFor(
+            childSize: overlaySize,
+            target: target,
+            verticalOffset: 0,
+          );
+    }
+
+    if (target != _calculatedTarget ||
+        usedFallback != _usedFallback ||
+        shift != _shift) {
       if (mounted) {
         setState(() {
           _calculatedTarget = target;
           _usedFallback = usedFallback;
+          _shift = shift;
         });
       }
     } else if (overlay == null) {
@@ -487,6 +530,7 @@ class _ShadPortalState extends State<ShadPortal> {
             ignoring: overlay == null,
             child: ShadPortalPlacement(
               usedFallback: _usedFallback,
+              shift: _shift,
               child: Builder(builder: widget.portalBuilder),
             ),
           ),
@@ -576,12 +620,17 @@ class ShadPositionDelegate extends SingleChildLayoutDelegate {
   /// direction, the tooltip will be displayed in the opposite direction.
   final bool preferBelow;
 
-  @override
-  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
-      constraints.loosen();
-
-  @override
-  Offset getPositionForChild(Size size, Size childSize) {
+  /// Where an overlay of [childSize] lands inside [size].
+  ///
+  /// Exposed so [ShadPortal] can work out how far this pushed the overlay off
+  /// its anchor without re-deriving the rule; see [ShadPortalPlacement.shift].
+  static Offset positionFor({
+    required Size size,
+    required Size childSize,
+    required Offset target,
+    required double verticalOffset,
+    required bool preferBelow,
+  }) {
     return positionDependentBox(
       size: size,
       childSize: childSize,
@@ -589,6 +638,34 @@ class ShadPositionDelegate extends SingleChildLayoutDelegate {
       verticalOffset: verticalOffset,
       preferBelow: preferBelow,
       margin: 0,
+    );
+  }
+
+  /// Where an overlay of [childSize] would land if the screen never ran out,
+  /// i.e. anchored on [target] with nothing clamped.
+  static Offset anchoredPositionFor({
+    required Size childSize,
+    required Offset target,
+    required double verticalOffset,
+  }) {
+    return Offset(
+      target.dx - childSize.width / 2,
+      target.dy + verticalOffset,
+    );
+  }
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
+      constraints.loosen();
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    return positionFor(
+      size: size,
+      childSize: childSize,
+      target: target,
+      verticalOffset: verticalOffset,
+      preferBelow: preferBelow,
     );
   }
 

@@ -169,6 +169,19 @@ locks the chain; add to it rather than trusting a local check.
   the ring's edge instead. The ring is still drawn *outside* the slot (slots
   are transparent, so only their hairlines cross it); don't move it inside —
   that reads as a different control from every other field.
+- **The portal's overlay is nudged after it is anchored, and anything drawn
+  against the anchor has to follow.** `ShadPositionDelegate` runs Flutter's
+  `positionDependentBox`, which clamps the overlay into the viewport at layout
+  time — so a tooltip near the window edge is slid inward while its arrow, a
+  `Center` inside the bubble, stayed put and pointed at empty space. The
+  portal now computes the same placement in `_calculatePosition` (through
+  `ShadPositionDelegate.positionFor`, so the two cannot drift apart) and
+  publishes the displacement as `ShadPortalPlacement.shift`; the arrow
+  subtracts it, clamped to keep the bubble's corner radius plus its own
+  half-diagonal clear of each end. Doing this at *paint* time instead
+  (`localToGlobal` from the arrow) looks simpler and is wrong: the entrance
+  `ScaleEffect` wraps the arrow, so the measurement moves while the tooltip
+  animates in.
 - **CSS clips outer box-shadows to outside the border box, and Flutter cannot
   express that with a `BoxShadow`.** `BlurStyle.normal` paints the shadow
   behind the whole box, which shows through any transparent or translucent
