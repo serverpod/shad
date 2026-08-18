@@ -223,6 +223,20 @@ locks the chain; add to it rather than trusting a local check.
   `DefaultTextStyle` inside a builder's captured `child` cannot see hover.
 - `ShadTextarea` has its own theme; it previously read `ShadInputTheme` for
   padding and alignment, which made every textarea-specific value dead.
+- **A loop that only ever `await`s a synchronously-completed future never
+  returns to the event loop.** Dart drains the *whole* microtask queue before
+  taking the next event, so such a loop freezes the app outright: no frames,
+  no pointer input, and no response to a window resize (the resize path is
+  `scheduleForcedFrame`, which still needs an event-loop turn). This is not
+  hypothetical — `ShadSelect`'s hover-to-scroll chevrons hit it. A second
+  `animateTo` on a `ScrollPosition` calls `beginActivity`, which disposes the
+  previous activity, and `DrivenScrollActivity.dispose` completes its
+  completer **synchronously**; two loops therefore cancel each other in an
+  unbroken microtask chain, and because the offset only advances on a frame
+  that never comes, neither exit condition is ever met. Any driver loop here
+  needs a re-entrancy guard *and* a real yield (`Future.delayed(Duration.zero)`)
+  per iteration. `test/src/components/select_auto_scroll_test.dart` locks the
+  guard. On web this reads as a browser bug, which is how it went unnoticed.
 - **A fully transparent `ColoredBox` still hit-tests as opaque** (it extends
   `RenderProxyBoxWithHitTestBehavior` with `behavior: opaque`). The dialog
   route's full-screen barrier-blur layer uses one to give its

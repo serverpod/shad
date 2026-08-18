@@ -77,12 +77,23 @@ class CodeHighlighter {
     _dart = Highlighter(language: 'dart', theme: theme);
   }
 
+  /// Tokenized sources, keyed by the source itself.
+  ///
+  /// Highlighting runs a TextMate grammar over a whole file and builds a
+  /// multi-thousand-node span tree. [CodeBlock] is a StatelessWidget that
+  /// depends on [ShadTheme], and [ShadTabs] keeps unselected tabs mounted, so
+  /// without this every code block on a page — visible or not — was
+  /// re-tokenized on every theme notification. The corpus is the bundled
+  /// examples, so the map is bounded by the docs themselves.
+  static final _cache = <String, TextSpan>{};
+
   static TextSpan highlight(String code) {
     final highlighter = _dart;
     if (highlighter == null) {
+      // Not cached: the grammar is still loading and this is the raw fallback.
       return TextSpan(text: code);
     }
-    return highlighter.highlight(code);
+    return _cache[code] ??= highlighter.highlight(code);
   }
 }
 

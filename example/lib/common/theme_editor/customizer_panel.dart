@@ -30,16 +30,21 @@ class ThemeCustomizerPanel extends StatelessWidget {
   /// Width of the docked panel on a wide viewport.
   static const width = 272.0;
 
+  /// Chrome, not content: a fixed dark palette at a fixed text size, so the
+  /// panel stays readable whatever the configuration under it does.
+  ///
+  /// Built once. The factory bakes ~54 component themes, and this one never
+  /// varies, so rebuilding it per panel build was pure cost.
+  static final _chrome = ShadThemeData(
+    brightness: Brightness.dark,
+    colorScheme: const ShadNeutralColorScheme.dark(),
+    radius: const BorderRadius.all(Radius.circular(8)),
+  );
+
   @override
   Widget build(BuildContext context) {
-    // Chrome, not content: a fixed dark palette at a fixed text size, so it
-    // stays readable whatever the configuration under it does.
     return ShadThemeScope(
-      data: ShadThemeData(
-        brightness: Brightness.dark,
-        colorScheme: const ShadNeutralColorScheme.dark(),
-        radius: const BorderRadius.all(Radius.circular(8)),
-      ),
+      data: _chrome,
       child: MediaQuery(
         data: MediaQuery.of(
           context,

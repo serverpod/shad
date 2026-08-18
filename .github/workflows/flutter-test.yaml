@@ -49,6 +49,15 @@ jobs:
       - name: Test package
         run: flutter test -r github --fail-fast
 
+      # Web-only regressions (files tagged @TestOn('browser')) need a real
+      # browser: the VM run above skips them. ubuntu-latest ships Chrome.
+      # Only the *_web_test.dart files run here — the rest of the suite
+      # (goldens especially) is written for the VM.
+      - name: Test package on Chrome
+        run: |
+          find test -name '*_web_test.dart' -print0 \
+            | xargs -0 flutter test -r github --fail-fast --platform chrome
+
       - name: Install and analyze example
         working-directory: example
         run: |

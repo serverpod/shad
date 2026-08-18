@@ -227,6 +227,47 @@ class ThemeEditorConfig {
     );
   }
 
+  /// A value type, so a no-op edit — re-picking the option that is already
+  /// selected, a slider settling on the value it started from — does not
+  /// notify the config signal and rebuild the whole app for nothing.
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ThemeEditorConfig &&
+        other.brightness == brightness &&
+        other.style == style &&
+        other.baseColor == baseColor &&
+        other.accentColor == accentColor &&
+        other.chartColor == chartColor &&
+        other.headingFontTitle == headingFontTitle &&
+        other.fontTitle == fontTitle &&
+        other.radius == radius &&
+        other.customRadius == customRadius &&
+        other.menuColor == menuColor &&
+        other.menuFinish == menuFinish &&
+        other.menuAccent == menuAccent &&
+        other.textScale == textScale &&
+        other.spacingStep == spacingStep;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    brightness,
+    style,
+    baseColor,
+    accentColor,
+    chartColor,
+    headingFontTitle,
+    fontTitle,
+    radius,
+    customRadius,
+    menuColor,
+    menuFinish,
+    menuAccent,
+    textScale,
+    spacingStep,
+  );
+
   /// The palette, fully resolved for [brightness]: base, accent, then chart.
   ShadColorScheme get colorScheme => _scheme(brightness);
 

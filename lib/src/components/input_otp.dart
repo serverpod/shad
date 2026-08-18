@@ -92,6 +92,9 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   final registeredOTPs =
       <({FocusNode focusNode, TextEditingController controller})>[];
 
+  /// Per-slot listeners, kept so a slot can be dropped when it unmounts.
+  final _slotListeners = <TextEditingController, VoidCallback>{};
+
   /// The focus ring of the currently focused slot, painted by the strip.
   ///
   /// shadcn lifts the active slot with `z-10` so its ring overlaps the
@@ -160,6 +163,19 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     return index;
   }
 
+  /// Drops a slot that has unmounted.
+  ///
+  /// Registration is otherwise append-only, so a strip whose slots remount —
+  /// re-keyed, reordered, rebuilt behind an [AnimatedSwitcher] — grows past
+  /// [ShadInputOTP.maxLength] and then writes out of range in [listenToSlot].
+  void unregisterSlot(TextEditingController controller) {
+    final listener = _slotListeners.remove(controller);
+    if (listener != null) controller.removeListener(listener);
+    registeredOTPs.removeWhere(
+      (slot) => identical(slot.controller, controller),
+    );
+  }
+
   @override
   void didUpdateWidget(covariant ShadInputOTP oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -181,26 +197,41 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   int registerGroup() {
     groups++;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {});
+      if (mounted) setState(() {});
     });
     return groups - 1;
+  }
+
+  /// Drops a group that has unmounted; the pair of [registerGroup].
+  void unregisterGroup() {
+    if (groups > 0) groups--;
   }
 
   void listenToSlot(int index) {
     final slot = registeredOTPs[index];
 
-    slot.controller.addListener(() {
+    void listener() {
+      // Resolved per notification rather than captured: unregistering an
+      // earlier slot shifts every later one down.
+      final currentIndex = registeredOTPs.indexWhere(
+        (s) => identical(s.controller, slot.controller),
+      );
+      if (currentIndex < 0 || currentIndex >= values.length) return;
+
       final text =
           (slot.controller.text.split('').lastOrNull ?? kInvisibleCharCode)
               .replaceAll(kInvisibleCharCode, ' ');
-      values[index] = text;
+      values[currentIndex] = text;
 
       final wholeValue = values.reduce((value, element) {
         final parsedElement = element.isEmpty ? ' ' : element;
         return value + parsedElement;
       });
       result.value = wholeValue;
-    });
+    }
+
+    _slotListeners[slot.controller] = listener;
+    slot.controller.addListener(listener);
   }
 
   void jumpToSlot(int index, {bool clear = false}) {
@@ -277,6 +308,12 @@ class _ShadInputOTPGroupState extends State<ShadInputOTPGroup> {
   void initState() {
     super.initState();
     otpProvider.registerGroup();
+  }
+
+  @override
+  void dispose() {
+    otpProvider.unregisterGroup();
+    super.dispose();
   }
 
   @override
@@ -471,7 +508,9 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
   @override
   void dispose() {
     focusNode.removeListener(_syncRing);
-    otpProvider._hideRing(context);
+    otpProvider
+      .._hideRing(context)
+      ..unregisterSlot(controller);
     _focusNode?.dispose();
     _controller?.dispose();
     super.dispose();

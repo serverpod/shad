@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/components/button.dart';
@@ -11,6 +9,7 @@ import 'package:shad/src/raw_components/portal.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/browser_context_menu/browser_context_menu.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/mouse_area.dart';
@@ -131,8 +130,6 @@ class _ShadContextMenuRegionState extends State<ShadContextMenuRegion> {
       ));
   Offset? offset;
 
-  final isContextMenuAlreadyDisabled = kIsWeb && !BrowserContextMenu.enabled;
-
   @override
   void didUpdateWidget(covariant ShadContextMenuRegion oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -207,20 +204,21 @@ class _ShadContextMenuRegionState extends State<ShadContextMenuRegion> {
             hide();
           }
         },
-        onSecondaryTapDown: (d) async {
-          if (kIsWeb && !isContextMenuAlreadyDisabled) {
-            await BrowserContextMenu.disableContextMenu();
-          }
+        // The browser's native menu is cancelled per event, never by
+        // flipping `BrowserContextMenu`'s global flag: `SelectionArea`
+        // changes its tree shape on that flag, and remounting its selection
+        // container mid-flight trips `SelectableRegion`'s
+        // `assert(_selectable == null)`. See suppressBrowserContextMenu.
+        onSecondaryTapDown: (d) {
+          if (kIsWeb) suppressBrowserContextMenu();
           if (!isWindows) show(d.globalPosition);
         },
-        onSecondaryTapUp: (d) async {
-          if (isWindows) {
-            show(d.globalPosition);
-            await Future<void>.delayed(Duration.zero);
-          }
-          if (kIsWeb && !isContextMenuAlreadyDisabled) {
-            await BrowserContextMenu.enableContextMenu();
-          }
+        onSecondaryTapUp: (d) {
+          // On Windows the browser fires `contextmenu` on button up, which
+          // can be arbitrarily long after the down — re-arm so a slow click
+          // stays covered, and only then open the menu.
+          if (kIsWeb) suppressBrowserContextMenu();
+          if (isWindows) show(d.globalPosition);
         },
         onLongPressStart: effectiveLongPressEnabled
             ? (d) {

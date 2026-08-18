@@ -19,7 +19,16 @@ final themeModeProvider = Provider((_) => Signal(ThemeMode.light));
 final directionalityProvider = Provider((context) => Signal(TextDirection.ltr));
 
 /// The theme the whole app is built from, edited by the customizer panel.
-final themeConfigProvider = Provider((_) => Signal(const ThemeEditorConfig()));
+///
+/// Compared by value, not by identity: a write here rebuilds two full
+/// [ShadThemeData]s and restarts a 200 ms lerp across every component theme,
+/// which is far too expensive to spend on a `copyWith` that changed nothing.
+final themeConfigProvider = Provider(
+  (_) => Signal(
+    const ThemeEditorConfig(),
+    comparator: (a, b) => a == b,
+  ),
+);
 
 /// Whether that panel is docked beside the app. [AppShell] opens it by
 /// default on viewports wide enough to dock it.

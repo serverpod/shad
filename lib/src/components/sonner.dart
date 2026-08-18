@@ -316,6 +316,11 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
       if (_temporarelyHiddenToasts.isNotEmpty &&
           _toasts.length < visibleToastsAmount) {
         final hiddenToast = _temporarelyHiddenToasts.removeLast();
+        // show() mints a fresh controller for the requeued toast, so the one
+        // this entry carried while hidden has to go — it is never reachable
+        // again, and ShadSonner wraps the whole app, so these accumulate for
+        // the entire session.
+        hiddenToast.controller.dispose();
         show(hiddenToast.toast, append: false);
       }
     });
@@ -333,6 +338,10 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     if (!mounted) return;
     setState(() {
       toastInfo.temporarelyHide = true;
+      // A queued toast must not count down while it is off screen; show()
+      // gives it a fresh timer when it comes back.
+      toastInfo.timer?.cancel();
+      toastInfo.timer = null;
       _toasts.remove(toastInfo);
       _temporarelyHiddenToasts.add(toastInfo);
     });

@@ -84,15 +84,29 @@ class _AppShellState extends State<AppShell> {
           body: LayoutBuilder(
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < _narrow;
+              // IndexedStack keeps both sections alive (see below) but
+              // installs no TickerMode, so the offstage one's skeletons,
+              // spinners and progress bars keep asking for a frame every
+              // 16ms for the whole session — the app never idles, and every
+              // per-frame allocation compounds instead of being absorbed.
+              Widget onlyTicksWhenActive(AppSection self, Widget child) =>
+                  TickerMode(enabled: section == self, child: child);
+
               final body = IndexedStack(
                 index: section.index,
                 children: [
-                  const PlaygroundScreen(),
-                  ComponentsScreen(
-                    key: _docsKey,
-                    onSelectionChanged: (group) => setState(() {
-                      _viewingComponents = group.title == 'Components';
-                    }),
+                  onlyTicksWhenActive(
+                    AppSection.playground,
+                    const PlaygroundScreen(),
+                  ),
+                  onlyTicksWhenActive(
+                    AppSection.docs,
+                    ComponentsScreen(
+                      key: _docsKey,
+                      onSelectionChanged: (group) => setState(() {
+                        _viewingComponents = group.title == 'Components';
+                      }),
+                    ),
                   ),
                 ],
               );

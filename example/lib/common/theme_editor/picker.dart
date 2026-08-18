@@ -109,7 +109,11 @@ class _ThemePickerState<T> extends State<ThemePicker<T>> {
                   swatch: option.swatch,
                   selected: option.value == widget.value,
                   onTap: () {
-                    widget.onChanged(option.value);
+                    // Re-picking the current option would otherwise rebuild
+                    // both app themes to arrive back where it started.
+                    if (option.value != widget.value) {
+                      widget.onChanged(option.value);
+                    }
                     controller.hide();
                   },
                 ),

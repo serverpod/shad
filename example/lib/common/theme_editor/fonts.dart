@@ -30,11 +30,22 @@ class EditorFont {
 
   final FontCategory category;
 
+  /// One builder and one text theme per family.
+  ///
+  /// `ShadTextTheme` compares `googleFontBuilder` by closure identity, and two
+  /// closure literals are never `==`. Minting a fresh one per access made
+  /// `ShadThemeData` unequal to itself, which restarts `ShadAnimatedTheme`'s
+  /// 200 ms lerp across ~54 component themes on every rebuild and drags every
+  /// `ShadTheme.of` dependent along with it — the equality invariant CLAUDE.md
+  /// calls load-bearing. Keyed by family, since `EditorFont` is const.
+  static final _builders = <String, GoogleFontBuilder>{};
+  static final _textThemes = <String, ShadTextTheme>{};
+
   /// Wraps `GoogleFonts.getFont` into the all-named shape `GoogleFontBuilder`
   /// expects.
   ///
   /// `getFont` takes the family positionally, so it cannot be passed directly.
-  GoogleFontBuilder get builder =>
+  GoogleFontBuilder get builder => _builders[family] ??=
       ({
         TextStyle? textStyle,
         Color? color,
@@ -80,10 +91,9 @@ class EditorFont {
 
   /// Builds the text theme for this font.
   ShadTextTheme textTheme() {
-    if (bundled) {
-      return ShadTextTheme(family: family, package: 'shad');
-    }
-    return ShadTextTheme.fromGoogleFont(builder);
+    return _textThemes[family] ??= bundled
+        ? ShadTextTheme(family: family, package: 'shad')
+        : ShadTextTheme.fromGoogleFont(builder);
   }
 
   /// shadcn/ui's font list, in its order. Inter and the two Geist faces are

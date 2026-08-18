@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
@@ -762,8 +763,19 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
   /// [showScrollToBottom], so a rebuilt popover does not queue one per build.
   bool _scrollChevronSyncScheduled = false;
 
-  bool shouldAnimateToTop = false;
-  bool shouldAnimateToBottom = false;
+  /// Invalidation token for the chevron auto-scroll loop. Bumping it retires
+  /// the running loop and any start still sitting in its opening delay.
+  int _autoScrollToken = 0;
+
+  /// Whether an auto-scroll loop currently owns [scrollController].
+  ///
+  /// Only one may run. A second `animateTo` on a scroll position disposes the
+  /// first one's activity, and `DrivenScrollActivity.dispose` completes its
+  /// future synchronously — so two loops cancel each other as microtasks with
+  /// the offset never moving, and neither exit condition ever becomes true.
+  /// Dart drains the whole microtask queue before returning to the embedder,
+  /// so that chain freezes the app outright: no frames, no input, no resize.
+  bool _autoScrolling = false;
 
   FocusNode get focusNode => widget.focusNode ?? internalFocusNode!;
   FocusNode get searchFocusNode =>
@@ -864,6 +876,8 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
 
   @override
   void dispose() {
+    stopAutoScroll();
+
     final popoverControllerListener = _popoverControllerListener;
     if (popoverControllerListener != null) {
       popoverController.removeListener(popoverControllerListener);
@@ -885,31 +899,49 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
     super.dispose();
   }
 
-  Future<void> animateToTop() async {
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-    while (shouldAnimateToTop) {
-      shouldAnimateToTop = scrollController.offset > 0;
-      await scrollController.animateTo(
-        max(scrollController.offset - 30, 0),
-        duration: const Duration(milliseconds: 20),
-        curve: Curves.easeInOutCubic,
-      );
-    }
+  /// Starts scrolling the option list while a chevron is hovered.
+  ///
+  /// A no-op while a loop is already running, so hovering off and back on
+  /// within the opening delay cannot leave two of them fighting over
+  /// [scrollController]. See [_autoScrolling].
+  void startAutoScroll({required bool toTop}) {
+    if (_autoScrolling) return;
+    _autoScrolling = true;
+    final token = ++_autoScrollToken;
+    unawaited(_autoScroll(toTop: toTop, token: token));
   }
 
-  Future<void> animateToBottom() async {
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-    while (shouldAnimateToBottom) {
-      shouldAnimateToBottom =
-          scrollController.offset < scrollController.position.maxScrollExtent;
-      await scrollController.animateTo(
-        min(
-          scrollController.offset + 30,
-          scrollController.position.maxScrollExtent,
-        ),
-        duration: const Duration(milliseconds: 20),
-        curve: Curves.easeInOutCubic,
-      );
+  /// Retires the running loop, and any start still in its opening delay.
+  void stopAutoScroll() => _autoScrollToken++;
+
+  @visibleForTesting
+  bool get isAutoScrolling => _autoScrolling;
+
+  Future<void> _autoScroll({required bool toTop, required int token}) async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      while (mounted &&
+          token == _autoScrollToken &&
+          scrollController.hasClients) {
+        final position = scrollController.position;
+        final target = toTop
+            ? max(position.pixels - 30, position.minScrollExtent)
+            : min(position.pixels + 30, position.maxScrollExtent);
+        // Already at the end: `animateTo` would resolve without moving.
+        if (target == position.pixels) break;
+        await scrollController.animateTo(
+          target,
+          duration: const Duration(milliseconds: 20),
+          curve: Curves.easeInOutCubic,
+        );
+        // Yield to the event loop rather than only to the microtask queue.
+        // `animateTo` resolves synchronously when its activity is cancelled,
+        // and a loop that only ever awaits microtasks starves frames, input
+        // and resize.
+        await Future<void>.delayed(Duration.zero);
+      }
+    } finally {
+      _autoScrolling = false;
     }
   }
 
@@ -1233,11 +1265,8 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                         duration: const Duration(milliseconds: 300),
                         child: show
                             ? MouseRegion(
-                                onEnter: (_) {
-                                  shouldAnimateToTop = true;
-                                  animateToTop();
-                                },
-                                onExit: (_) => shouldAnimateToTop = false,
+                                onEnter: (_) => startAutoScroll(toTop: true),
+                                onExit: (_) => stopAutoScroll(),
                                 child: Container(
                                   width: calculatedMinWidth,
                                   padding: const EdgeInsets.symmetric(
@@ -1264,11 +1293,8 @@ class ShadSelectState<T> extends State<ShadSelect<T>> {
                         duration: const Duration(milliseconds: 300),
                         child: show
                             ? MouseRegion(
-                                onEnter: (_) {
-                                  shouldAnimateToBottom = true;
-                                  animateToBottom();
-                                },
-                                onExit: (_) => shouldAnimateToBottom = false,
+                                onEnter: (_) => startAutoScroll(toTop: false),
+                                onExit: (_) => stopAutoScroll(),
                                 child: Container(
                                   width: calculatedMinWidth,
                                   padding: const EdgeInsets.symmetric(

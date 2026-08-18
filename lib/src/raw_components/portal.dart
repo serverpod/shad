@@ -402,9 +402,10 @@ class _ShadPortalState extends State<ShadPortal> {
         overlayAncestor.hasSize;
 
     if (!ready) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _calculatePosition();
-      });
+      // Through the guard, not a bare callback: retrying directly queues one
+      // immortal chain per caller, and each survives until the portal is
+      // unmounted or hidden.
+      _scheduleAutoPositionUpdate();
       return;
     }
 
