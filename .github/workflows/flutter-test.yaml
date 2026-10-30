@@ -85,9 +85,13 @@ jobs:
         working-directory: example
         run: flutter test -r github --fail-fast
 
+      # example/web is not committed (see .gitignore), so generate it first,
+      # as deploy-pages.yaml does.
       - name: Build example for web
         working-directory: example
-        run: flutter build web --release
+        run: |
+          flutter create . --platforms web
+          flutter build web --release
 
       - name: Downgrade dependencies
         run: |
