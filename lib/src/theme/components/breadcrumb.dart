@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'breadcrumb.g.theme.dart';
 
+/// {@template ShadBreadcrumbTheme}
+/// Theme for the `ShadBreadcrumb` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadBreadcrumbTheme with _$ShadBreadcrumbTheme {
+  /// {@macro ShadBreadcrumbTheme}
   const ShadBreadcrumbTheme({
     bool canMerge = true,
     this.separator,
@@ -37,10 +41,11 @@ class ShadBreadcrumbTheme with _$ShadBreadcrumbTheme {
   @override
   bool get canMerge => _canMerge;
 
-  /// {@macro ShadBreadcrumb.separator}
+  /// The widget between items. Defaults to `ShadBreadcrumbSeparator`.
   final Widget? separator;
 
-  /// {@macro ShadBreadcrumb.ellipsis}
+  /// The widget `ShadBreadcrumbEllipsis` shows for collapsed items. Defaults
+  /// to Lucide's ellipsis icon at `ellipsisSize`.
   final Widget? ellipsis;
 
   /// {@macro ShadBreadcrumb.separatorSize}
@@ -97,6 +102,7 @@ class ShadBreadcrumbTheme with _$ShadBreadcrumbTheme {
   /// {@macro ShadBreadcrumb.showDropdownArrow}
   final bool? showDropdownArrow;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadBreadcrumbTheme? lerp(
     ShadBreadcrumbTheme? a,
     ShadBreadcrumbTheme? b,

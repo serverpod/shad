@@ -249,7 +249,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadAccordion<String>),
         matchesGoldenFile('goldens/accordion.png'),
       );

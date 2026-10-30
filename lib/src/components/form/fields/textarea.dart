@@ -8,7 +8,10 @@ import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 
-class ShadTextareaFormField extends ShadFormBuilderField<String> {
+/// A [ShadTextarea] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadTextareaFormField extends ShadFormField<String> {
+  /// Creates a textarea form field.
   ShadTextareaFormField({
     super.key,
     super.id,
@@ -23,11 +26,6 @@ class ShadTextareaFormField extends ShadFormBuilderField<String> {
     super.label,
     super.error,
     super.description,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -209,7 +207,11 @@ class ShadTextareaFormField extends ShadFormBuilderField<String> {
     /// {@macro ShadInput.bottom}
     Widget? bottom,
 
-    /// {@macro ShadInput.onLineCountChange}
+    /// {@macro ShadInput.onLineCountChanged}
+    ValueChanged<int>? onLineCountChanged,
+    @Deprecated(
+      'Use onLineCountChanged. Will be removed in the next major version.',
+    )
     ValueChanged<int>? onLineCountChange,
 
     /// {@macro ShadInput.verticalGap}
@@ -232,7 +234,7 @@ class ShadTextareaFormField extends ShadFormBuilderField<String> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderTextareaState;
+           state as ShadTextareaFormFieldState;
            return ShadTextarea(
              key: state.textareaKey,
              controller: state.controller,
@@ -297,7 +299,7 @@ class ShadTextareaFormField extends ShadFormBuilderField<String> {
              bottom: bottom,
              leading: leading,
              trailing: trailing,
-             onLineCountChange: onLineCountChange,
+             onLineCountChanged: onLineCountChanged ?? onLineCountChange,
              verticalGap: verticalGap,
              useBrowserContextMenu: useBrowserContextMenu,
              onPasteFiles: onPasteFiles,
@@ -306,18 +308,23 @@ class ShadTextareaFormField extends ShadFormBuilderField<String> {
          },
        );
 
+  /// Controls the text. When null, the field creates its own controller.
   final TextEditingController? controller;
 
   @override
-  ShadFormBuilderFieldState<ShadTextareaFormField, String> createState() =>
-      ShadFormBuilderTextareaState();
+  ShadFormFieldState<ShadTextareaFormField, String> createState() =>
+      ShadTextareaFormFieldState();
 }
 
-class ShadFormBuilderTextareaState
-    extends ShadFormBuilderFieldState<ShadTextareaFormField, String> {
+/// The state of a [ShadTextareaFormField].
+class ShadTextareaFormFieldState
+    extends ShadFormFieldState<ShadTextareaFormField, String> {
+  /// The key of the inner [ShadTextarea].
   final GlobalKey<State<StatefulWidget>> textareaKey = GlobalKey();
   TextEditingController? _controller;
 
+  /// The controller in use: [ShadTextareaFormField.controller] when given,
+  /// otherwise an internal one.
   TextEditingController get controller => widget.controller ?? _controller!;
 
   @override
@@ -339,12 +346,17 @@ class ShadFormBuilderTextareaState
   @override
   void didUpdateWidget(covariant ShadTextareaFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller == null && widget.controller != null) {
+    if (widget.controller == oldWidget.controller) return;
+    // Move the listener with the controller. It used to stay on the old one,
+    // and dispose() then removed it from the wrong controller.
+    (oldWidget.controller ?? _controller)?.removeListener(onControllerChanged);
+    if (widget.controller != null) {
       _controller?.dispose();
-    }
-    if (oldWidget.controller != null && widget.controller == null) {
+      _controller = null;
+    } else {
       _controller = TextEditingController(text: value);
     }
+    controller.addListener(onControllerChanged);
   }
 
   @override
@@ -362,9 +374,17 @@ class ShadFormBuilderTextareaState
     widget.onChanged?.call(controller.text);
   }
 
+  /// Copies the controller's text into the field's value.
   void onControllerChanged() {
     if (controller.text != value) {
       didChange(controller.text);
     }
   }
 }
+
+/// The old name of [ShadTextareaFormFieldState].
+@Deprecated(
+  'Use ShadTextareaFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderTextareaState = ShadTextareaFormFieldState;

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/components/button.dart';
 import 'package:shad/src/theme/components/button_sizes.dart';
@@ -13,6 +14,7 @@ part 'button.g.theme.dart';
 @themeGen
 @immutable
 class ShadButtonTheme with _$ShadButtonTheme {
+  /// Creates a [ShadButtonTheme].
   const ShadButtonTheme({
     bool canMerge = true,
     this.cursor,
@@ -135,6 +137,7 @@ class ShadButtonTheme with _$ShadButtonTheme {
   /// {@macro ShadButton.textStyle}
   final TextStyle? textStyle;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadButtonTheme? lerp(
     ShadButtonTheme? a,
     ShadButtonTheme? b,
@@ -142,4 +145,21 @@ class ShadButtonTheme with _$ShadButtonTheme {
   ) {
     return _$ShadButtonTheme.lerp(a, b, t);
   }
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadButtonTheme &&
+      listEquals(shadows, other.shadows) &&
+      super == other.copyWith(shadows: shadows);
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(shadows ?? const []),
+  );
 }

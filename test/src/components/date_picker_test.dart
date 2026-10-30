@@ -13,7 +13,7 @@ void main() {
     testWidgets('ShadDatePicker matches goldens', (tester) async {
       await tester.pumpWidget(createTestWidget(const ShadDatePicker()));
 
-      expect(
+      await expectLater(
         find.byType(ShadDatePicker),
         matchesGoldenFile('goldens/date_picker.png'),
       );

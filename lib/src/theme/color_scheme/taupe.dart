@@ -7,6 +7,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// value to sRGB.
 @immutable
 class ShadTaupeColorScheme extends ShadColorScheme {
+  /// Creates a [ShadTaupeColorScheme] from explicit colours.
+  ///
+  /// Use [ShadTaupeColorScheme.light] or [ShadTaupeColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadTaupeColorScheme({
     required super.background,
     required super.foreground,
@@ -44,6 +48,9 @@ class ShadTaupeColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadTaupeColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadTaupeColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff0c0a09),
@@ -81,6 +88,9 @@ class ShadTaupeColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadTaupeColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadTaupeColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfffbfaf9),

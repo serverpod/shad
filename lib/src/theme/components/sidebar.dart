@@ -1,11 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 part 'sidebar.g.theme.dart';
 
+/// {@template ShadSidebarTheme}
+/// Theme for the `ShadSidebar` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadSidebarTheme with _$ShadSidebarTheme {
+  /// {@macro ShadSidebarTheme}
   const ShadSidebarTheme({
     bool canMerge = true,
     this.width,
@@ -69,7 +74,8 @@ class ShadSidebarTheme with _$ShadSidebarTheme {
   /// {@macro ShadSidebar.backgroundColor}
   final Color? backgroundColor;
 
-  /// {@macro ShadSidebar.foregroundColor}
+  /// The text and icon colour of the sidebar. Defaults to the colour
+  /// scheme's `sidebarForeground`.
   final Color? foregroundColor;
 
   /// {@macro ShadSidebar.borderColor}
@@ -182,9 +188,33 @@ class ShadSidebarTheme with _$ShadSidebarTheme {
   /// Shadows of the content next to an inset sidebar, shadcn's `shadow-sm`.
   final List<BoxShadow>? insetShadows;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSidebarTheme? lerp(
     ShadSidebarTheme? a,
     ShadSidebarTheme? b,
     double t,
   ) => _$ShadSidebarTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadSidebarTheme &&
+      listEquals(floatingShadows, other.floatingShadows) &&
+      listEquals(insetShadows, other.insetShadows) &&
+      super ==
+          other.copyWith(
+            floatingShadows: floatingShadows,
+            insetShadows: insetShadows,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(floatingShadows ?? const []),
+    Object.hashAll(insetShadows ?? const []),
+  );
 }

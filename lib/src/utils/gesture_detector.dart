@@ -4,8 +4,14 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/extensions/tap_details.dart';
 
+/// Decides which gestures turn the hover state on and off on devices without
+/// a mouse.
+///
+/// [ShadGestureDetector] uses it to give touch devices a hover state. When a
+/// mouse pointer is inside the detector, the strategies are ignored.
 @immutable
 class ShadHoverStrategies {
+  /// Creates a set of hover strategies.
   const ShadHoverStrategies({
     this.hover = const {},
     this.unhover = const {},
@@ -13,9 +19,21 @@ class ShadHoverStrategies {
     this.onHoverChange,
   });
 
+  /// The gestures that turn the hover state on. Defaults to none.
+  ///
+  /// A gesture that is in both [hover] and [unhover] toggles the state.
   final Set<ShadHoverStrategy> hover;
+
+  /// The gestures that turn the hover state off. Defaults to none.
   final Set<ShadHoverStrategy> unhover;
+
+  /// How long a press must last to count as a long press.
+  ///
+  /// [ShadGestureDetector.longPressDuration] takes precedence. When both are
+  /// null, the detector uses [kLongPressTimeout].
   final Duration? longPressDuration;
+
+  /// Called with the new hover state each time it changes.
   final ValueChanged<bool>? onHoverChange;
 
   @override
@@ -37,6 +55,7 @@ class ShadHoverStrategies {
         onHoverChange.hashCode;
   }
 
+  /// Returns a copy with the given fields replaced.
   ShadHoverStrategies copyWith({
     Set<ShadHoverStrategy>? hover,
     Set<ShadHoverStrategy>? unhover,
@@ -52,20 +71,55 @@ class ShadHoverStrategies {
   }
 }
 
+/// A gesture that can change the hover state of a [ShadGestureDetector].
+///
+/// Use these values in [ShadHoverStrategies.hover] and
+/// [ShadHoverStrategies.unhover].
 enum ShadHoverStrategy {
+  /// A primary pointer touches down for a tap.
   onTapDown,
+
+  /// A primary pointer lifts up after a tap.
   onTapUp,
+
+  /// A tap does not complete.
   onTapCancel,
+
+  /// A long press starts.
   onLongPressStart,
+
+  /// A long press does not complete.
   onLongPressCancel,
+
+  /// The pointer lifts up after a long press.
   onLongPressUp,
+
+  /// A pointer touches down that can become a long press.
   onLongPressDown,
+
+  /// A long press ends.
   onLongPressEnd,
+
+  /// A pointer touches down for a second tap.
   onDoubleTapDown,
+
+  /// A double tap does not complete.
   onDoubleTapCancel,
+
+  /// A force press starts.
+  ///
+  /// [ShadGestureDetector] does not read this value at the moment.
   onForcePressStart,
+
+  /// A force press ends.
+  ///
+  /// [ShadGestureDetector] does not read this value at the moment.
   onForcePressEnd,
+
+  /// A tap completes.
   onTap,
+
+  /// The user taps outside the widget.
   onTapOutside,
 }
 
@@ -76,6 +130,7 @@ enum ShadHoverStrategy {
 /// If the device supports mouse, the [hoverStrategies] will be ignored and
 /// [MouseRegion] will be used instead.
 class ShadGestureDetector extends StatefulWidget {
+  /// Creates a gesture detector that also tracks the hover state.
   const ShadGestureDetector({
     super.key,
     required this.child,
@@ -120,31 +175,89 @@ class ShadGestureDetector extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
   });
 
+  /// The strategies that set the hover state on devices without a mouse.
+  ///
+  /// Defaults to the `hoverStrategies` of the current [ShadTheme].
   final ShadHoverStrategies? hoverStrategies;
+
+  /// Called with the new hover state each time it changes.
+  ///
+  /// The hover state comes from the mouse when there is one, and from
+  /// [hoverStrategies] when there is not.
   final ValueChanged<bool>? onHoverChange;
+
+  /// The mouse cursor shown over the widget. Defaults to [MouseCursor.defer].
   final MouseCursor cursor;
+
+  /// The widget below this widget in the tree.
   final Widget child;
+
+  /// Called when a tap with the primary button completes.
   final VoidCallback? onTap;
 
   /// Called when the user taps outside the widget.
   final VoidCallback? onTapOutside;
+
+  /// Called when a pointer touches down for a primary tap.
+  ///
+  /// The global position in the details is relative to the nearest
+  /// [Navigator]'s overlay when that is not the root overlay.
   final ValueChanged<TapDownDetails>? onTapDown;
+
+  /// Called when a pointer lifts up after a primary tap.
+  ///
+  /// The global position follows the same rule as in [onTapDown].
   final ValueChanged<TapUpDetails>? onTapUp;
+
+  /// Called when a primary tap does not complete.
   final VoidCallback? onTapCancel;
+
+  /// Called when a tap with the secondary button completes.
   final VoidCallback? onSecondaryTap;
+
+  /// Called when a pointer touches down for a secondary tap.
   final ValueChanged<TapDownDetails>? onSecondaryTapDown;
+
+  /// Called when a pointer lifts up after a secondary tap.
   final ValueChanged<TapUpDetails>? onSecondaryTapUp;
+
+  /// Called when a secondary tap does not complete.
   final VoidCallback? onSecondaryTapCancel;
+
+  /// Called when a long press is recognized.
   final VoidCallback? onLongPress;
+
+  /// Called when a long press starts, with the pointer position.
   final ValueChanged<LongPressStartDetails>? onLongPressStart;
+
+  /// Called when a long press does not complete.
   final VoidCallback? onLongPressCancel;
+
+  /// Called when the pointer lifts up after a long press.
   final VoidCallback? onLongPressUp;
+
+  /// Called when the pointer moves during a long press.
   final ValueChanged<LongPressMoveUpdateDetails>? onLongPressMoveUpdate;
+
+  /// Called when a pointer touches down that can become a long press.
   final ValueChanged<LongPressDownDetails>? onLongPressDown;
+
+  /// Called when a long press ends, with the pointer position and velocity.
   final ValueChanged<LongPressEndDetails>? onLongPressEnd;
+
+  /// Called when a double tap completes.
   final VoidCallback? onDoubleTap;
+
+  /// Called when a pointer touches down for the second tap of a double tap.
   final ValueChanged<TapDownDetails>? onDoubleTapDown;
+
+  /// Called when a double tap does not complete.
   final VoidCallback? onDoubleTapCancel;
+
+  /// How long a press must last to count as a long press.
+  ///
+  /// When null, uses [ShadHoverStrategies.longPressDuration], then
+  /// [kLongPressTimeout].
   final Duration? longPressDuration;
 
   /// The kind of devices that are allowed to be recognized.
@@ -185,8 +298,19 @@ class ShadGestureDetector extends StatefulWidget {
   /// detecting screens.
   final GestureForcePressEndCallback? onForcePressEnd;
 
+  /// The pressure at which a force press starts. Defaults to 0.4.
+  ///
+  /// See [ForcePressGestureRecognizer.startPressure].
   final double forceStartPressure;
+
+  /// The pressure at which a force press reaches its peak. Defaults to 0.85.
+  ///
+  /// See [ForcePressGestureRecognizer.peakPressure].
   final double forcePeakPressure;
+
+  /// How the detector behaves during hit testing.
+  ///
+  /// When null, uses the default of [RawGestureDetector].
   final HitTestBehavior? behavior;
 
   /// Whether to exclude these gestures from the semantics tree. For

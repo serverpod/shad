@@ -538,17 +538,26 @@ void main() {
       expect(EditorFont.all.map((f) => f.title), contains('Playfair Display'));
     });
 
-    test('bundled fonts use the asset family, Google fonts use a builder', () {
-      // Inter is the package default and is bundled alongside the two Geist
-      // faces; the rest come from Google Fonts.
-      expect(EditorFont.byTitle('Inter').bundled, isTrue);
-      expect(EditorFont.byTitle('Geist').bundled, isTrue);
-      expect(EditorFont.byTitle('Roboto').bundled, isFalse);
-      // Both kinds must yield a usable text theme.
-      expect(EditorFont.byTitle('Inter').textTheme().family, isNotEmpty);
-      expect(
-        EditorFont.byTitle('Roboto').textTheme().googleFontBuilder,
-        isNotNull,
+    test('every font comes from Google Fonts through a cached builder', () {
+      // shad bundles no fonts, so every option, Inter included, resolves
+      // through google_fonts.
+      for (final font in EditorFont.all) {
+        expect(
+          font.textTheme().googleFontBuilder,
+          isNotNull,
+          reason: font.title,
+        );
+      }
+      // The builder and theme are cached: a fresh closure per access would
+      // make ShadThemeData unequal to itself.
+      final inter = EditorFont.byTitle('Inter');
+      expect(identical(inter.builder, inter.builder), isTrue);
+      expect(identical(inter.textTheme(), inter.textTheme()), isTrue);
+    });
+
+    test('load completes when runtime fetching is disabled', () async {
+      await EditorFont.byTitle('Roboto').load(
+        timeout: const Duration(milliseconds: 200),
       );
     });
 
@@ -567,7 +576,10 @@ void main() {
 
     test('"same as body" leaves the text theme alone', () {
       const config = ThemeEditorConfig(fontTitle: 'Geist');
-      expect(config.textTheme.h1.fontFamily, config.textTheme.p.fontFamily);
+      // google_fonts registers one family per weight (`Geist_800`), so compare
+      // the family the weights belong to.
+      String base(TextStyle s) => s.fontFamily!.split('_').first;
+      expect(base(config.textTheme.h1), base(config.textTheme.p));
     });
 
     test('picking a font changes the theme text', () {

@@ -3,7 +3,10 @@ import 'package:shad/src/components/form/field.dart';
 import 'package:shad/src/components/time_picker.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 
-class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
+/// A [ShadTimePicker] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadTimePickerFormField extends ShadFormField<ShadTimeOfDay> {
+  /// Creates a 24-hour time picker form field.
   ShadTimePickerFormField({
     super.id,
     super.key,
@@ -12,11 +15,6 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     super.label,
     super.error,
     super.description,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -32,7 +30,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     /// {@macro ShadTimePicker.initialValue}
     super.initialValue,
 
-    /// @macro ShadTimePicker.controller
+    /// {@macro ShadTimePicker.controller}
     this.controller,
 
     /// {@macro ShadTimePicker.axis}
@@ -126,7 +124,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     this.showSeconds,
   }) : super(
          builder: (state) {
-           state as ShadFormBuilderTimePickerState;
+           state as ShadTimePickerFormFieldState;
            return ShadTimePicker(
              controller: state.controller,
              onChanged: state.didChange,
@@ -168,6 +166,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
          },
        );
 
+  /// Creates a 12-hour time picker form field with an AM/PM selector.
   ShadTimePickerFormField.period({
     super.id,
     super.key,
@@ -176,11 +175,6 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     super.error,
     super.description,
     super.forceErrorText,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -195,7 +189,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     /// {@macro ShadTimePicker.initialValue}
     super.initialValue,
 
-    /// @macro ShadTimePicker.controller
+    /// {@macro ShadTimePicker.controller}
     this.controller,
 
     /// {@macro ShadTimePicker.axis}
@@ -307,7 +301,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     this.showSeconds,
   }) : super(
          builder: (state) {
-           state as ShadFormBuilderTimePickerState;
+           state as ShadTimePickerFormFieldState;
            return ShadTimePicker.period(
              controller: state.controller,
              onChanged: state.didChange,
@@ -355,6 +349,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
          },
        );
 
+  /// Creates a time picker form field with an explicit [variant].
   ShadTimePickerFormField.raw({
     required ShadTimePickerVariant variant,
     super.id,
@@ -364,11 +359,6 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     super.error,
     super.description,
     super.forceErrorText,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -383,7 +373,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     /// {@macro ShadTimePicker.initialValue}
     super.initialValue,
 
-    /// @macro ShadTimePicker.controller
+    /// {@macro ShadTimePicker.controller}
     this.controller,
 
     /// {@macro ShadTimePicker.axis}
@@ -495,7 +485,7 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
     this.showSeconds,
   }) : super(
          builder: (state) {
-           state as ShadFormBuilderTimePickerState;
+           state as ShadTimePickerFormFieldState;
            return ShadTimePicker.raw(
              variant: variant,
              controller: state.controller,
@@ -545,9 +535,10 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
        );
 
   @override
-  ShadFormBuilderFieldState<ShadTimePickerFormField, ShadTimeOfDay>
-  createState() => ShadFormBuilderTimePickerState();
+  ShadFormFieldState<ShadTimePickerFormField, ShadTimeOfDay> createState() =>
+      ShadTimePickerFormFieldState();
 
+  /// {@macro ShadTimePicker.controller}
   final ShadTimePickerController? controller;
 
   /// {@macro ShadTimePicker.showHours}
@@ -560,14 +551,22 @@ class ShadTimePickerFormField extends ShadFormBuilderField<ShadTimeOfDay> {
   final bool? showSeconds;
 }
 
-class ShadFormBuilderTimePickerState
-    extends ShadFormBuilderFieldState<ShadTimePickerFormField, ShadTimeOfDay> {
-  // ignore: use_late_for_private_fields_and_variables
+/// The state of a [ShadTimePickerFormField].
+class ShadTimePickerFormFieldState
+    extends ShadFormFieldState<ShadTimePickerFormField, ShadTimeOfDay> {
   ShadTimePickerController? _controller;
+
+  /// The controller in use: [ShadTimePickerFormField.controller] when given,
+  /// otherwise an internal one created from the initial value.
   ShadTimePickerController get controller => widget.controller ?? _controller!;
 
+  /// Whether the seconds field shows. Defaults to true.
   bool get showSeconds => widget.showSeconds ?? true;
+
+  /// Whether the hours field shows. Defaults to true.
   bool get showHours => widget.showHours ?? true;
+
+  /// Whether the minutes field shows. Defaults to true.
   bool get showMinutes => widget.showMinutes ?? true;
 
   @override
@@ -585,6 +584,12 @@ class ShadFormBuilderTimePickerState
   void reset() {
     super.reset();
     controller.value = initialValue;
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
   }
 
   @override
@@ -609,3 +614,10 @@ class ShadFormBuilderTimePickerState
     }
   }
 }
+
+/// The old name of [ShadTimePickerFormFieldState].
+@Deprecated(
+  'Use ShadTimePickerFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderTimePickerState = ShadTimePickerFormFieldState;

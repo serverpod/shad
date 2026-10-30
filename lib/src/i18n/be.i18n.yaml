@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Гатова"
+
+dialog:
+  close: "Закрыць"
+  dismiss: "Адхіліць"

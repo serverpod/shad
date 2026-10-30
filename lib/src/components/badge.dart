@@ -8,9 +8,16 @@ import 'package:shad/src/utils/gesture_detector.dart';
 
 /// Variants available for the [ShadBadge] widget.
 enum ShadBadgeVariant {
+  /// Filled with the primary colour. The default.
   primary,
+
+  /// Filled with the secondary colour.
   secondary,
+
+  /// No fill, with a border.
   outline,
+
+  /// In the destructive colour, for errors and warnings.
   destructive,
 }
 
@@ -266,10 +273,16 @@ class _ShadBadgeState extends State<ShadBadge> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              DefaultTextStyle(
-                style: textStyle(theme).copyWith(color: foreground(theme)),
-                textAlign: TextAlign.center,
-                child: widget.child,
+              IconTheme.merge(
+                data: IconThemeData(
+                  size: badgeTheme(theme).iconSize ?? 12,
+                  color: foreground(theme),
+                ),
+                child: DefaultTextStyle(
+                  style: textStyle(theme).copyWith(color: foreground(theme)),
+                  textAlign: TextAlign.center,
+                  child: widget.child,
+                ),
               ),
             ],
           ),

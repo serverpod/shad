@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Xong"
+
+dialog:
+  close: "Đóng"
+  dismiss: "Bỏ qua"

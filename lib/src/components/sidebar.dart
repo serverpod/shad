@@ -19,7 +19,13 @@ import 'package:shad/src/utils/shadow.dart';
 /// Which edge of the layout the sidebar sits on.
 ///
 /// Directional: `start` is the left edge in LTR and the right edge in RTL.
-enum ShadSidebarSide { start, end }
+enum ShadSidebarSide {
+  /// The start edge: left in LTR, right in RTL.
+  start,
+
+  /// The end edge: right in LTR, left in RTL.
+  end,
+}
 
 /// The visual treatment of a [ShadSidebar], mirroring shadcn/ui's `variant`.
 enum ShadSidebarVariant {
@@ -47,7 +53,16 @@ enum ShadSidebarCollapsible {
 }
 
 /// The size of a [ShadSidebarMenuButton].
-enum ShadSidebarMenuButtonSize { sm, regular, lg }
+enum ShadSidebarMenuButtonSize {
+  /// A short row with smaller text, shadcn's `h-7`.
+  sm,
+
+  /// The default row, shadcn's `h-8`.
+  regular,
+
+  /// A tall row, shadcn's `h-12`.
+  lg,
+}
 
 /// The visual variant of a [ShadSidebarMenuButton].
 enum ShadSidebarMenuButtonVariant {
@@ -64,12 +79,17 @@ enum ShadSidebarMenuButtonVariant {
 /// the inline sidebar, [openMobile] the modal sheet shown under the
 /// breakpoint.
 class ShadSidebarController extends ChangeNotifier {
+  /// Creates a controller. The desktop sidebar starts expanded when [open] is
+  /// true, the default. The mobile sheet starts closed.
   ShadSidebarController({bool open = true}) : _open = open;
 
   bool _open;
 
   /// Whether the inline (desktop) sidebar is expanded.
   bool get open => _open;
+
+  /// The same as [open], under the name `ShadPopoverController` uses.
+  bool get isOpen => _open;
 
   set open(bool value) {
     if (_open == value) return;
@@ -100,6 +120,7 @@ class ShadSidebarController extends ChangeNotifier {
 /// Obtained with [ShadSidebarScope.of] — [ShadSidebarTrigger] uses it to
 /// toggle, menu widgets use it to render their collapsed (icon-rail) form.
 class ShadSidebarScope extends InheritedWidget {
+  /// Creates a scope. [ShadSidebarScaffold] builds one, so you rarely need to.
   const ShadSidebarScope({
     super.key,
     required this.controller,
@@ -113,6 +134,7 @@ class ShadSidebarScope extends InheritedWidget {
     required super.child,
   });
 
+  /// The controller that holds the open state.
   final ShadSidebarController controller;
 
   /// Whether the host layout is below the mobile breakpoint.
@@ -124,8 +146,13 @@ class ShadSidebarScope extends InheritedWidget {
   /// The open state this scope was built with.
   final bool open;
 
+  /// The edge of the layout that the sidebar sits on.
   final ShadSidebarSide side;
+
+  /// The visual variant of the sidebar.
   final ShadSidebarVariant variant;
+
+  /// How the sidebar collapses.
   final ShadSidebarCollapsible collapsible;
 
   /// The resolved icon-rail width, so descendants shrink to the same rail the
@@ -140,9 +167,13 @@ class ShadSidebarScope extends InheritedWidget {
   /// Flips the sidebar for the current form factor.
   void toggle() => controller.toggle(isMobile: isMobile);
 
+  /// Returns the nearest scope, or null when there is none.
   static ShadSidebarScope? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<ShadSidebarScope>();
 
+  /// Returns the nearest scope.
+  ///
+  /// Asserts that a [ShadSidebarScaffold] is an ancestor.
   static ShadSidebarScope of(BuildContext context) {
     final scope = maybeOf(context);
     assert(
@@ -529,8 +560,14 @@ class ShadSidebar extends StatelessWidget {
     this.scrollController,
   });
 
+  /// The edge of the layout that the sidebar sits on. Defaults to
+  /// [ShadSidebarSide.start].
   final ShadSidebarSide side;
+
+  /// The visual variant. Defaults to [ShadSidebarVariant.sidebar].
   final ShadSidebarVariant variant;
+
+  /// How the sidebar collapses. Defaults to [ShadSidebarCollapsible.offcanvas].
   final ShadSidebarCollapsible collapsible;
 
   /// Pinned above the scrollable content, shadcn's `SidebarHeader`.
@@ -790,6 +827,7 @@ class _SidebarColumn extends StatelessWidget {
 /// A ghost icon button that toggles the enclosing sidebar, shadcn/ui's
 /// `SidebarTrigger`.
 class ShadSidebarTrigger extends StatefulWidget {
+  /// Creates a trigger for the enclosing sidebar.
   const ShadSidebarTrigger({super.key, this.icon, this.onPressed});
 
   /// The icon, defaults to `PanelLeft`.
@@ -911,6 +949,7 @@ class ShadSidebarGroup extends StatelessWidget {
   /// `SidebarGroupAction`.
   final Widget? action;
 
+  /// The content of the group, typically a [ShadSidebarMenu].
   final List<Widget> children;
 
   @override
@@ -993,8 +1032,10 @@ class _GroupLabelRow extends StatelessWidget {
 
 /// A vertical list of menu rows, shadcn/ui's `SidebarMenu`.
 class ShadSidebarMenu extends StatelessWidget {
+  /// Creates a menu with the given rows.
   const ShadSidebarMenu({super.key, required this.children});
 
+  /// The rows, typically [ShadSidebarMenuButton]s.
   final List<Widget> children;
 
   @override
@@ -1036,6 +1077,7 @@ class ShadSidebarMenuButton extends StatefulWidget {
     this.enabled = true,
   });
 
+  /// Called when the row is tapped. Not called when [enabled] is false.
   final VoidCallback? onPressed;
 
   /// The icon at the start of the row.
@@ -1050,15 +1092,21 @@ class ShadSidebarMenuButton extends StatefulWidget {
   /// Whether this row is the current one; keeps the accent highlight.
   final bool isActive;
 
+  /// The height and text size of the row. Defaults to
+  /// [ShadSidebarMenuButtonSize.regular].
   final ShadSidebarMenuButtonSize size;
 
+  /// The visual variant. Defaults to [ShadSidebarMenuButtonVariant.standard].
   final ShadSidebarMenuButtonVariant variant;
 
   /// Shown next to the icon rail when collapsed.
   final String? tooltip;
 
+  /// The focus node of the row. When null, the row creates its own.
   final FocusNode? focusNode;
 
+  /// Whether the row reacts to input. A disabled row is faded and cannot get
+  /// focus. Defaults to true.
   final bool enabled;
 
   /// {@template ShadSidebarMenuButton.height}
@@ -1313,8 +1361,10 @@ class _ShadSidebarMenuButtonState extends State<ShadSidebarMenuButton> {
 /// A count or status marker at the end of a menu row, shadcn/ui's
 /// `SidebarMenuBadge`.
 class ShadSidebarMenuBadge extends StatelessWidget {
+  /// Creates a badge that shows [child].
   const ShadSidebarMenuBadge({super.key, required this.child});
 
+  /// The content of the badge, usually a short text.
   final Widget child;
 
   @override
@@ -1338,6 +1388,7 @@ class ShadSidebarMenuBadge extends StatelessWidget {
 /// `SidebarGroupAction`: put it in a menu button's `trailing` or a group's
 /// `action` slot.
 class ShadSidebarMenuAction extends StatefulWidget {
+  /// Creates an action button that shows [icon].
   const ShadSidebarMenuAction({
     super.key,
     required this.icon,
@@ -1345,8 +1396,13 @@ class ShadSidebarMenuAction extends StatefulWidget {
     this.semanticLabel,
   });
 
+  /// The icon to show, sized by the sidebar theme's icon size.
   final Widget icon;
+
+  /// Called when the action is tapped.
   final VoidCallback? onPressed;
+
+  /// The label read by screen readers.
   final String? semanticLabel;
 
   @override
@@ -1398,8 +1454,10 @@ class _ShadSidebarMenuActionState extends State<ShadSidebarMenuAction> {
 /// An indented, bordered list nested under a menu row, shadcn/ui's
 /// `SidebarMenuSub`. Hidden entirely in the icon rail.
 class ShadSidebarMenuSub extends StatelessWidget {
+  /// Creates a sub-menu with the given rows.
   const ShadSidebarMenuSub({super.key, required this.children});
 
+  /// The rows, typically [ShadSidebarMenuSubButton]s.
   final List<Widget> children;
 
   @override
@@ -1438,6 +1496,7 @@ class ShadSidebarMenuSub extends StatelessWidget {
 
 /// A row inside a [ShadSidebarMenuSub], shadcn/ui's `SidebarMenuSubButton`.
 class ShadSidebarMenuSubButton extends StatefulWidget {
+  /// Creates a sub-menu row.
   const ShadSidebarMenuSubButton({
     super.key,
     this.onPressed,
@@ -1448,14 +1507,23 @@ class ShadSidebarMenuSubButton extends StatefulWidget {
     this.focusNode,
   });
 
+  /// Called when the row is tapped.
   final VoidCallback? onPressed;
+
+  /// The icon at the start of the row.
   final Widget? leading;
+
+  /// The label.
   final Widget child;
+
+  /// Whether this row is the current one; keeps the accent highlight.
+  /// Defaults to false.
   final bool isActive;
 
   /// Whether to render at the `sm` (text-xs) size.
   final bool small;
 
+  /// The focus node of the row. When null, the row creates its own.
   final FocusNode? focusNode;
 
   @override
@@ -1556,8 +1624,10 @@ class _ShadSidebarMenuSubButtonState extends State<ShadSidebarMenuSubButton> {
 /// A placeholder menu row while content loads, shadcn/ui's
 /// `SidebarMenuSkeleton`.
 class ShadSidebarMenuSkeleton extends StatefulWidget {
+  /// Creates a placeholder row.
   const ShadSidebarMenuSkeleton({super.key, this.showIcon = false});
 
+  /// Whether to show a square placeholder for the icon. Defaults to false.
   final bool showIcon;
 
   @override
@@ -1600,6 +1670,7 @@ class _ShadSidebarMenuSkeletonState extends State<ShadSidebarMenuSkeleton> {
 
 /// A hairline between sidebar sections, shadcn/ui's `SidebarSeparator`.
 class ShadSidebarSeparator extends StatelessWidget {
+  /// Creates a separator.
   const ShadSidebarSeparator({super.key});
 
   @override

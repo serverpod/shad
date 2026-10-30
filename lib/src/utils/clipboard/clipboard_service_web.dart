@@ -57,20 +57,26 @@ Future<List<ShadClipboardItem>> _extractFiles(web.DataTransfer data) async {
   return results;
 }
 
+/// Calls [callback] with the files of each paste event in the document.
+///
+/// Paste events without files do not call it.
 void addPasteFilesListener(ShadPasteFilesCallback callback) {
   _ensureInitialized();
   _listeners.add(callback);
 }
 
+/// Removes a callback added with [addPasteFilesListener].
 void removePasteFilesListener(ShadPasteFilesCallback callback) {
   _listeners.remove(callback);
 }
 
+/// Calls [callback] when reading the files of a paste event fails.
 void addPasteFilesErrorListener(ShadPasteFilesErrorCallback callback) {
   _ensureInitialized();
   _errorListeners.add(callback);
 }
 
+/// Removes a callback added with [addPasteFilesErrorListener].
 void removePasteFilesErrorListener(ShadPasteFilesErrorCallback callback) {
   _errorListeners.remove(callback);
 }

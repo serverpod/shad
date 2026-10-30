@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "完成"
+
+dialog:
+  close: "关闭"
+  dismiss: "关闭"

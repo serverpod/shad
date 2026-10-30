@@ -7,6 +7,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// value to sRGB.
 @immutable
 class ShadStoneColorScheme extends ShadColorScheme {
+  /// Creates a [ShadStoneColorScheme] from explicit colours.
+  ///
+  /// Use [ShadStoneColorScheme.light] or [ShadStoneColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadStoneColorScheme({
     required super.background,
     required super.foreground,
@@ -44,6 +48,9 @@ class ShadStoneColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadStoneColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadStoneColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff0c0a09),
@@ -81,6 +88,9 @@ class ShadStoneColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadStoneColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadStoneColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfffafaf9),

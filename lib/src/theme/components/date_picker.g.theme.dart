@@ -200,9 +200,9 @@ mixin _$ShadDatePickerTheme {
       dayButtonOutsideMonthVariant: t < 0.5
           ? a.dayButtonOutsideMonthVariant
           : b.dayButtonOutsideMonthVariant,
-      selectedDayButtonOusideMonthVariant: t < 0.5
-          ? a.selectedDayButtonOusideMonthVariant
-          : b.selectedDayButtonOusideMonthVariant,
+      selectedDayButtonOutsideMonthVariant: t < 0.5
+          ? a.selectedDayButtonOutsideMonthVariant
+          : b.selectedDayButtonOutsideMonthVariant,
       captionLayout: t < 0.5 ? a.captionLayout : b.captionLayout,
       hideWeekdayNames: t < 0.5 ? a.hideWeekdayNames : b.hideWeekdayNames,
       showOutsideDays: t < 0.5 ? a.showOutsideDays : b.showOutsideDays,
@@ -342,7 +342,7 @@ mixin _$ShadDatePickerTheme {
     double? gridCrossAxisSpacing,
     TextStyle? dayButtonOutsideMonthTextStyle,
     ShadButtonVariant? dayButtonOutsideMonthVariant,
-    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
     ShadCalendarCaptionLayout? captionLayout,
     bool? hideWeekdayNames,
     bool? showOutsideDays,
@@ -457,9 +457,9 @@ mixin _$ShadDatePickerTheme {
           _this.dayButtonOutsideMonthTextStyle,
       dayButtonOutsideMonthVariant:
           dayButtonOutsideMonthVariant ?? _this.dayButtonOutsideMonthVariant,
-      selectedDayButtonOusideMonthVariant:
-          selectedDayButtonOusideMonthVariant ??
-          _this.selectedDayButtonOusideMonthVariant,
+      selectedDayButtonOutsideMonthVariant:
+          selectedDayButtonOutsideMonthVariant ??
+          _this.selectedDayButtonOutsideMonthVariant,
       captionLayout: captionLayout ?? _this.captionLayout,
       hideWeekdayNames: hideWeekdayNames ?? _this.hideWeekdayNames,
       showOutsideDays: showOutsideDays ?? _this.showOutsideDays,
@@ -596,8 +596,8 @@ mixin _$ShadDatePickerTheme {
           ) ??
           other.dayButtonOutsideMonthTextStyle,
       dayButtonOutsideMonthVariant: other.dayButtonOutsideMonthVariant,
-      selectedDayButtonOusideMonthVariant:
-          other.selectedDayButtonOusideMonthVariant,
+      selectedDayButtonOutsideMonthVariant:
+          other.selectedDayButtonOutsideMonthVariant,
       captionLayout: other.captionLayout,
       hideWeekdayNames: other.hideWeekdayNames,
       showOutsideDays: other.showOutsideDays,
@@ -717,8 +717,8 @@ mixin _$ShadDatePickerTheme {
             _this.dayButtonOutsideMonthTextStyle &&
         _other.dayButtonOutsideMonthVariant ==
             _this.dayButtonOutsideMonthVariant &&
-        _other.selectedDayButtonOusideMonthVariant ==
-            _this.selectedDayButtonOusideMonthVariant &&
+        _other.selectedDayButtonOutsideMonthVariant ==
+            _this.selectedDayButtonOutsideMonthVariant &&
         _other.captionLayout == _this.captionLayout &&
         _other.hideWeekdayNames == _this.hideWeekdayNames &&
         _other.showOutsideDays == _this.showOutsideDays &&
@@ -816,7 +816,7 @@ mixin _$ShadDatePickerTheme {
       _this.gridCrossAxisSpacing,
       _this.dayButtonOutsideMonthTextStyle,
       _this.dayButtonOutsideMonthVariant,
-      _this.selectedDayButtonOusideMonthVariant,
+      _this.selectedDayButtonOutsideMonthVariant,
       _this.captionLayout,
       _this.hideWeekdayNames,
       _this.showOutsideDays,

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ہو گیا"
+
+dialog:
+  close: "بند کریں"
+  dismiss: "برخاست کریں"

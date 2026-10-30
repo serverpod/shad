@@ -8,6 +8,7 @@ import 'package:shad/src/i18n/strings.g.dart';
 /// through `WidgetsApp.localizationsDelegates`.
 class GlobalShadLocalizations
     extends LocalizationsDelegate<ShadLocalizationsData> {
+  /// Creates the delegate. Prefer the shared [delegate] instance.
   const GlobalShadLocalizations();
 
   /// The singleton instance of this delegate.

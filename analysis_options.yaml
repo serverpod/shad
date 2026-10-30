@@ -1,19 +1,23 @@
+include: package:very_good_analysis/analysis_options.yaml
+
 analyzer:
   errors:
     specify_nonobvious_property_types: ignore
     discarded_futures: ignore
     cascade_invocations: ignore
-include: package:very_good_analysis/analysis_options.yaml
-exclude:
-  - "**/*.g.dart"
-  - "**/*.g.theme.dart"
+  exclude:
+    - build/**
+    - reference/**
+    - test_fixes/**
+    - "**/*.g.dart"
+    - "**/*.g.theme.dart"
 
 formatter:
   trailing_commas: preserve
 
 linter:
   rules:
-    public_member_api_docs: false
+    public_member_api_docs: true
     always_put_required_named_parameters_first: false
     prefer_asserts_with_message: false
     prefer_constructors_over_static_methods: false

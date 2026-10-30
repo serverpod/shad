@@ -3,13 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'separator.g.theme.dart';
 
-/// {@template ShadDividerTheme}
+/// {@template ShadSeparatorTheme}
 /// Theme for the `ShadSeparator` widget.
 /// {@endtemplate}
 @themeGen
 @immutable
 class ShadSeparatorTheme with _$ShadSeparatorTheme {
-  /// {@macro ShadDividerTheme}
+  /// {@macro ShadSeparatorTheme}
   const ShadSeparatorTheme({
     bool canMerge = true,
     this.verticalMargin,
@@ -25,10 +25,10 @@ class ShadSeparatorTheme with _$ShadSeparatorTheme {
   @override
   bool get canMerge => _canMerge;
 
-  /// {@macro ShadDivider.color}
+  /// {@macro ShadSeparator.color}
   final Color? color;
 
-  /// {@macro ShadDivider.thickness}
+  /// {@macro ShadSeparator.thickness}
   final double? thickness;
 
   /// The margin (or space) around the vertical divider.
@@ -37,9 +37,10 @@ class ShadSeparatorTheme with _$ShadSeparatorTheme {
   /// The margin (or space) around the horizontal divider.
   final EdgeInsetsGeometry? horizontalMargin;
 
-  /// {@macro ShadDivider.radius}
+  /// {@macro ShadSeparator.radius}
   final BorderRadiusGeometry? radius;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSeparatorTheme? lerp(
     ShadSeparatorTheme? a,
     ShadSeparatorTheme? b,

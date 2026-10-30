@@ -281,7 +281,10 @@ class ShadSlider extends StatefulWidget {
   final bool showDivisionMarks;
 
   /// {@template ShadSlider.label}
-  /// A label to display above the slider when the thumb is pressed.
+  /// The slider's accessible name, announced by assistive technologies
+  /// together with its value.
+  ///
+  /// shadcn's slider shows no value bubble, so this is not drawn.
   /// {@endtemplate}
   final String? label;
 
@@ -337,7 +340,7 @@ class _ShadSliderState extends State<ShadSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    final slider = ValueListenableBuilder(
       valueListenable: controller,
       builder: (context, value, child) {
         return _ShadSliderCore(
@@ -377,6 +380,8 @@ class _ShadSliderState extends State<ShadSlider> {
         );
       },
     );
+    if (widget.label == null) return slider;
+    return Semantics(label: widget.label, child: slider);
   }
 }
 

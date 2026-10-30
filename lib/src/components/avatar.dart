@@ -1,39 +1,72 @@
 import 'package:flutter/widgets.dart';
-import 'package:shad/src/theme/data.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/debug_check.dart';
-import 'package:universal_image/universal_image.dart';
 
 /// A widget that displays an avatar image with customizable size, shape, and
 /// fallback.
 ///
 /// The [ShadAvatar] widget renders an image from a provided source, falling
-/// back to a placeholder if the image fails to load or is still loading.
+/// back to [fallback] while the image loads, if it fails to load, or when
+/// there is no source.
 class ShadAvatar extends StatelessWidget {
-  /// Creates an avatar widget with a specified image source.
+  /// Creates an avatar showing the image at [src], a URL or an asset path.
+  ///
+  /// A `String` starting with `http://` or `https://` is loaded with a
+  /// [NetworkImage]; any other is loaded as an asset with [AssetImage], from
+  /// [package] if set. Null or an empty string shows [fallback].
   const ShadAvatar(
     this.src, {
     super.key,
-    this.placeholder,
+    Widget? fallback,
+    @Deprecated(
+      'Use fallback, as shadcn names it (AvatarFallback). '
+      'Will be removed in the next major version.',
+    )
+    Widget? placeholder,
     this.size,
     this.shape,
     this.backgroundColor,
     this.package,
     this.fit,
-  });
+  }) : image = null,
+       fallback = fallback ?? placeholder;
+
+  /// Creates an avatar showing [image], for any other source: a file, memory
+  /// bytes, a cached network image, or an SVG rasterised by an
+  /// `ImageProvider`. Null shows [fallback].
+  const ShadAvatar.image(
+    this.image, {
+    super.key,
+    this.fallback,
+    this.size,
+    this.shape,
+    this.backgroundColor,
+    this.fit,
+  }) : src = null,
+       package = null;
 
   /// {@template ShadAvatar.src}
-  /// The source of the image to display, which can be a network URL, asset
-  /// path, or other supported types.
-  /// Handled by [UniversalImage] for rendering.
+  /// The URL or asset path of the image, for the default constructor.
   /// {@endtemplate}
-  final dynamic src;
+  final String? src;
 
-  /// {@template ShadAvatar.placeholder}
-  /// The widget to display while the image is loading or if it fails to load.
-  /// Defaults to an empty [SizedBox] if not provided.
+  /// {@template ShadAvatar.image}
+  /// The image, for [ShadAvatar.image].
   /// {@endtemplate}
-  final Widget? placeholder;
+  final ImageProvider? image;
+
+  /// {@template ShadAvatar.fallback}
+  /// The widget shown while the image loads, if it fails to load, or when
+  /// there is no image. Usually initials or an icon.
+  /// {@endtemplate}
+  final Widget? fallback;
+
+  /// The old name of [fallback].
+  @Deprecated(
+    'Use fallback, as shadcn names it (AvatarFallback). '
+    'Will be removed in the next major version.',
+  )
+  Widget? get placeholder => fallback;
 
   /// {@template ShadAvatar.size}
   /// The size of the avatar, overriding the theme default if specified.
@@ -68,60 +101,53 @@ class ShadAvatar extends StatelessWidget {
   /// {@endtemplate}
   final BoxFit? fit;
 
-  Size effectiveSize(ShadThemeData theme) {
-    return size ?? theme.avatarTheme.size ?? const Size.square(40);
-  }
-
-  ShapeBorder effectiveShape(ShadThemeData theme) {
-    return shape ?? theme.avatarTheme.shape ?? const CircleBorder();
-  }
-
-  Color? effectiveBackgroundColor(ShadThemeData theme) {
-    return backgroundColor ??
-        theme.avatarTheme.backgroundColor ??
-        theme.colorScheme.muted;
-  }
-
-  BoxFit? effectiveFit(ShadThemeData theme) {
-    return fit ?? theme.avatarTheme.fit;
-  }
-
-  bool get _hasImageSource {
-    if (src == null) return false;
-    if (src is String) return src.toString().trim().isNotEmpty;
-    return true;
-  }
-
-  Widget? _fallback(BuildContext context) {
-    if (placeholder == null) return null;
-    return Center(child: placeholder);
+  /// The provider to load, or null when there is nothing to load.
+  ImageProvider? get _image {
+    if (image != null) return image;
+    final value = src?.trim() ?? '';
+    if (value.isEmpty) return null;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return NetworkImage(value);
+    }
+    return AssetImage(value, package: package);
   }
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasShadTheme(context));
     final theme = ShadTheme.of(context);
-    final size = effectiveSize(theme);
-    final fallback = _fallback(context);
+    final avatarTheme = theme.avatarTheme;
+    final size = this.size ?? avatarTheme.size ?? const Size.square(40);
+    final shape = this.shape ?? avatarTheme.shape ?? const CircleBorder();
+    final backgroundColor =
+        this.backgroundColor ??
+        avatarTheme.backgroundColor ??
+        theme.colorScheme.muted;
+    final fit = this.fit ?? avatarTheme.fit;
+    final fallback = this.fallback == null
+        ? null
+        : Center(child: this.fallback);
+    final image = _image;
 
     return Container(
       width: size.width,
       height: size.height,
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      decoration: ShapeDecoration(
-        shape: effectiveShape(theme),
-        color: effectiveBackgroundColor(theme),
-      ),
-      child: !_hasImageSource
+      decoration: ShapeDecoration(shape: shape, color: backgroundColor),
+      child: image == null
           ? fallback
-          : UniversalImage(
-              src,
+          : Image(
+              image: image,
               width: size.width,
               height: size.height,
-              placeholder: fallback,
-              errorPlaceholder: fallback,
-              fit: effectiveFit(theme),
+              fit: fit,
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (wasSynchronouslyLoaded || frame != null) return child;
+                return fallback ?? const SizedBox.shrink();
+              },
+              errorBuilder: (context, error, stackTrace) =>
+                  fallback ?? const SizedBox.shrink(),
             ),
     );
   }

@@ -5,9 +5,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'time_picker.g.theme.dart';
 
+/// {@template ShadTimePickerTheme}
+/// Theme for the `ShadTimePicker` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadTimePickerTheme with _$ShadTimePickerTheme {
+  /// {@macro ShadTimePickerTheme}
   const ShadTimePickerTheme({
     bool canMerge = true,
     this.axis,
@@ -122,6 +126,7 @@ class ShadTimePickerTheme with _$ShadTimePickerTheme {
   /// {@macro ShadTimePicker.periodPlaceholder}
   final Widget? periodPlaceholder;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTimePickerTheme? lerp(
     ShadTimePickerTheme? a,
     ShadTimePickerTheme? b,

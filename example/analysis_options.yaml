@@ -9,3 +9,8 @@ formatter:
 linter:
   rules:
     avoid_print: false
+analyzer:
+  exclude:
+    - build/**
+    - web/**
+    - macos/**

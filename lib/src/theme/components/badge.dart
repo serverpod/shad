@@ -3,9 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'badge.g.theme.dart';
 
+/// {@template ShadBadgeTheme}
+/// Theme for the `ShadBadge` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadBadgeTheme with _$ShadBadgeTheme {
+  /// {@macro ShadBadgeTheme}
   const ShadBadgeTheme({
     bool canMerge = true,
     this.shape,
@@ -15,6 +19,7 @@ class ShadBadgeTheme with _$ShadBadgeTheme {
     this.padding,
     this.cursor,
     this.textStyle,
+    this.iconSize,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -44,6 +49,10 @@ class ShadBadgeTheme with _$ShadBadgeTheme {
   /// {@macro ShadBadge.textStyle}
   final TextStyle? textStyle;
 
+  /// The size of the badge's icons. Defaults to 12.
+  final double? iconSize;
+
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadBadgeTheme? lerp(
     ShadBadgeTheme? a,
     ShadBadgeTheme? b,

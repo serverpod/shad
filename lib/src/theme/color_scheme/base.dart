@@ -18,8 +18,19 @@ import 'package:shad/src/theme/color_scheme/violet.dart';
 import 'package:shad/src/theme/color_scheme/yellow.dart';
 import 'package:shad/src/theme/color_scheme/zinc.dart';
 
+/// The colour tokens of a theme, one field per shadcn/ui CSS variable.
+///
+/// A scheme bundles a neutral base palette and the hue-carrying tokens of an
+/// accent. Use one of the shipped schemes, such as
+/// [ShadNeutralColorScheme.light], and [applyAccentScheme] to change its hue.
+/// The `--chart-*` and `--sidebar-*` tokens are optional and fall back to the
+/// closest core token.
 @immutable
 class ShadColorScheme {
+  /// Creates a colour scheme from explicit colours.
+  ///
+  /// Set [canMerge] to false so that merging this scheme into another one
+  /// returns it unchanged.
   const ShadColorScheme({
     bool canMerge = true,
     required this.background,
@@ -71,6 +82,10 @@ class ShadColorScheme {
        _sidebarBorder = sidebarBorder,
        _sidebarRing = sidebarRing;
 
+  /// Returns the light or dark scheme shadcn/ui calls [name], such as `zinc` or
+  /// `slate`.
+  ///
+  /// Throws an [Exception] for an unknown name.
   factory ShadColorScheme.fromName(
     String name, {
     Brightness brightness = Brightness.light,
@@ -146,28 +161,76 @@ class ShadColorScheme {
 
   final bool _canMerge;
 
+  /// Whether this scheme combines with the one it is merged into.
+  ///
+  /// When false, `other.merge(this)` returns this scheme unchanged.
   bool get canMerge => _canMerge;
 
+  /// The page background, `--background`.
   final Color background;
+
+  /// The default text and icon colour, `--foreground`.
   final Color foreground;
+
+  /// The card surface, `--card`.
   final Color card;
+
+  /// The text and icon colour on [card], `--card-foreground`.
   final Color cardForeground;
+
+  /// The surface of popovers, menus and tooltips, `--popover`.
   final Color popover;
+
+  /// The text and icon colour on [popover], `--popover-foreground`.
   final Color popoverForeground;
+
+  /// The main brand colour, `--primary`. Fills primary buttons, checked
+  /// controls and badges.
   final Color primary;
+
+  /// The text and icon colour on [primary], `--primary-foreground`.
   final Color primaryForeground;
+
+  /// The colour of secondary buttons and badges, `--secondary`.
   final Color secondary;
+
+  /// The text and icon colour on [secondary], `--secondary-foreground`.
   final Color secondaryForeground;
+
+  /// A low-contrast surface for tracks, skeletons and hovered rows, `--muted`.
   final Color muted;
+
+  /// Low-contrast text such as descriptions and placeholders,
+  /// `--muted-foreground`.
   final Color mutedForeground;
+
+  /// The highlight of hovered and focused menu rows, `--accent`.
   final Color accent;
+
+  /// The text and icon colour on [accent], `--accent-foreground`.
   final Color accentForeground;
+
+  /// The colour of destructive actions and errors, `--destructive`.
   final Color destructive;
+
+  /// The text and icon colour on [destructive], `--destructive-foreground`.
   final Color destructiveForeground;
+
+  /// The hairline colour of separators and surfaces, `--border`.
   final Color border;
+
+  /// The outline colour of fields, checkboxes, radios and OTP slots, `--input`.
   final Color input;
+
+  /// The focus ring colour, `--ring`.
   final Color ring;
+
+  /// The background of selected text.
   final Color selection;
+
+  /// Extra colours an app defines on top of the shadcn/ui tokens, by name.
+  ///
+  /// [lerp] and [merge] carry them along. Empty by default.
   final Map<String, Color> custom;
 
   // shadcn/ui's `--chart-1`..`--chart-5` and `--sidebar-*` tokens.
@@ -196,12 +259,19 @@ class ShadColorScheme {
   /// so an unspecified scheme still yields a usable, ordered ramp.
   Color get chart1 => _chart1 ?? primary;
 
+  /// The second chart colour, `--chart-2`. Defaults to a quarter of the way
+  /// from [primary] to [mutedForeground].
   Color get chart2 => _chart2 ?? Color.lerp(primary, mutedForeground, .25)!;
 
+  /// The third chart colour, `--chart-3`. Defaults to halfway between [primary]
+  /// and [mutedForeground].
   Color get chart3 => _chart3 ?? Color.lerp(primary, mutedForeground, .5)!;
 
+  /// The fourth chart colour, `--chart-4`. Defaults to three quarters of the
+  /// way from [primary] to [mutedForeground].
   Color get chart4 => _chart4 ?? Color.lerp(primary, mutedForeground, .75)!;
 
+  /// The fifth chart colour, `--chart-5`. Defaults to [mutedForeground].
   Color get chart5 => _chart5 ?? mutedForeground;
 
   /// The chart ramp in order, handy for feeding a series list.
@@ -210,22 +280,38 @@ class ShadColorScheme {
   /// The sidebar surface. Defaults to [card].
   Color get sidebar => _sidebar ?? card;
 
+  /// The text and icon colour on [sidebar], `--sidebar-foreground`. Defaults to
+  /// [cardForeground].
   Color get sidebarForeground => _sidebarForeground ?? cardForeground;
 
+  /// The sidebar's primary colour, `--sidebar-primary`. Defaults to [primary].
   Color get sidebarPrimary => _sidebarPrimary ?? primary;
 
+  /// The text and icon colour on [sidebarPrimary],
+  /// `--sidebar-primary-foreground`. Defaults to [primaryForeground].
   Color get sidebarPrimaryForeground =>
       _sidebarPrimaryForeground ?? primaryForeground;
 
+  /// The highlight of hovered sidebar items, `--sidebar-accent`. Defaults to
+  /// [accent].
   Color get sidebarAccent => _sidebarAccent ?? accent;
 
+  /// The text and icon colour on [sidebarAccent],
+  /// `--sidebar-accent-foreground`. Defaults to [accentForeground].
   Color get sidebarAccentForeground =>
       _sidebarAccentForeground ?? accentForeground;
 
+  /// The sidebar's hairline colour, `--sidebar-border`. Defaults to [border].
   Color get sidebarBorder => _sidebarBorder ?? border;
 
+  /// The focus ring colour inside the sidebar, `--sidebar-ring`. Defaults to
+  /// [ring].
   Color get sidebarRing => _sidebarRing ?? ring;
 
+  /// Linearly interpolates between [a] and [b] by [t].
+  ///
+  /// A custom colour that only one scheme defines is interpolated against the
+  /// other scheme's [foreground].
   static ShadColorScheme lerp(
     ShadColorScheme a,
     ShadColorScheme b,

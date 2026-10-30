@@ -1,8 +1,17 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `slate` colour scheme.
+///
+/// shadcn/ui v4 no longer ships this palette. It is kept for
+/// compatibility.
+/// `ShadThemeData` still uses it by default.
 @immutable
 class ShadSlateColorScheme extends ShadColorScheme {
+  /// Creates a [ShadSlateColorScheme] from explicit colours.
+  ///
+  /// Use [ShadSlateColorScheme.light] or [ShadSlateColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadSlateColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +36,9 @@ class ShadSlateColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadSlateColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadSlateColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff020817),
@@ -51,6 +63,9 @@ class ShadSlateColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadSlateColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadSlateColorScheme.dark({
     super.background = const Color(0xff020817),
     super.foreground = const Color(0xfff8fafc),

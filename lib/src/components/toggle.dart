@@ -12,10 +12,15 @@ import 'package:shad/src/utils/states_controller.dart';
 /// Variants available for the [ShadToggle] widget.
 enum ShadToggleVariant {
   /// A borderless toggle with a muted fill when pressed.
-  default_,
+  primary,
 
   /// A bordered toggle with a subtle shadow.
-  outline,
+  outline;
+
+  /// The old name of [primary]. Every other component calls its default
+  /// variant `primary`.
+  @Deprecated('Use primary. Will be removed in the next major version.')
+  static const default_ = primary;
 }
 
 /// {@template ShadToggle}
@@ -64,7 +69,7 @@ class ShadToggle extends StatefulWidget {
     this.onFocusChange,
     this.statesController,
     this.semanticLabel,
-  }) : variant = ShadToggleVariant.default_;
+  }) : variant = ShadToggleVariant.primary;
 
   /// A bordered toggle, matching shadcn/ui's `variant="outline"`.
   const ShadToggle.outline({
@@ -123,6 +128,9 @@ class ShadToggle extends StatefulWidget {
     this.semanticLabel,
   });
 
+  /// The visual style of the toggle. Set by the constructor:
+  /// [ShadToggleVariant.primary] for [ShadToggle.new] and
+  /// [ShadToggleVariant.outline] for [ShadToggle.outline].
   final ShadToggleVariant variant;
 
   /// Whether the toggle is on.
@@ -201,9 +209,18 @@ class ShadToggle extends StatefulWidget {
   /// The width of the toggle. Null sizes to the content.
   final double? width;
 
+  /// The focus node of the toggle. When null, the toggle creates its own.
   final FocusNode? focusNode;
+
+  /// Whether to take focus when first built, if nothing else has focus.
+  /// Defaults to false.
   final bool autofocus;
+
+  /// Called with the new focus state each time it changes.
   final ValueChanged<bool>? onFocusChange;
+
+  /// Holds the interaction states of the toggle, such as hovered and pressed.
+  /// When null, the toggle creates its own.
   final ShadStatesController? statesController;
 
   /// The accessible name, needed when [child] is icon-only.
@@ -245,7 +262,7 @@ class _ShadToggleState extends State<ShadToggle> {
     assert(debugCheckHasShadTheme(context));
     final theme = ShadTheme.of(context);
     final toggleTheme = switch (widget.variant) {
-      ShadToggleVariant.default_ => theme.toggleTheme,
+      ShadToggleVariant.primary => theme.toggleTheme,
       ShadToggleVariant.outline => theme.outlineToggleTheme,
     };
 
@@ -294,6 +311,7 @@ class _ShadToggleState extends State<ShadToggle> {
                 theme.colorScheme.foreground;
     }
 
+    final effectiveIconSize = toggleTheme.iconSize ?? 16;
     final effectiveTextStyle = (toggleTheme.textStyle ?? theme.textTheme.small)
         .merge(widget.textStyle);
 
@@ -340,7 +358,10 @@ class _ShadToggleState extends State<ShadToggle> {
                     effectiveDecoration.border?.radius ?? theme.radius,
               ),
               child: IconTheme(
-                data: IconThemeData(size: 16, color: foreground),
+                data: IconThemeData(
+                  size: effectiveIconSize,
+                  color: foreground,
+                ),
                 child: DefaultTextStyle(
                   style: effectiveTextStyle.copyWith(color: foreground),
                   child: Row(
@@ -392,6 +413,9 @@ enum ShadToggleGroupVariant {
 
 /// A controller for the selection of a [ShadToggleGroup].
 class ShadToggleGroupController<T> extends ChangeNotifier {
+  /// Creates a controller for a group of the given [variant].
+  ///
+  /// A single-variant group can start with at most one value selected.
   ShadToggleGroupController({
     required this.variant,
     Set<T>? initialValue,
@@ -404,6 +428,7 @@ class ShadToggleGroupController<T> extends ChangeNotifier {
     );
   }
 
+  /// Whether one or many items can be selected.
   final ShadToggleGroupVariant variant;
 
   /// Whether tapping the selected item in a [ShadToggleGroupVariant.single]
@@ -421,8 +446,14 @@ class ShadToggleGroupController<T> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Whether [item] is selected.
   bool isSelected(T item) => _value.contains(item);
 
+  /// Selects [item], or removes it from the selection.
+  ///
+  /// In a single-variant group, selecting an item replaces the selection, and
+  /// toggling the selected item clears it only when [allowDeselection] is
+  /// true.
   void toggle(T item) {
     final selected = _value.contains(item);
     switch (variant) {
@@ -465,7 +496,7 @@ class ShadToggleGroup<T> extends StatefulWidget {
     this.controller,
     this.allowDeselection = true,
     this.enabled = true,
-    this.toggleVariant = ShadToggleVariant.default_,
+    this.toggleVariant = ShadToggleVariant.primary,
     this.gap,
     this.axis = Axis.horizontal,
     this.mainAxisSize = MainAxisSize.min,
@@ -479,13 +510,16 @@ class ShadToggleGroup<T> extends StatefulWidget {
     this.onChanged,
     this.controller,
     this.enabled = true,
-    this.toggleVariant = ShadToggleVariant.default_,
+    this.toggleVariant = ShadToggleVariant.primary,
     this.gap,
     this.axis = Axis.horizontal,
     this.mainAxisSize = MainAxisSize.min,
   }) : variant = ShadToggleGroupVariant.multiple,
        allowDeselection = true;
 
+  /// Whether one or many items can be selected. Set by the constructor:
+  /// [ShadToggleGroupVariant.single] for [ShadToggleGroup.new] and
+  /// [ShadToggleGroupVariant.multiple] for [ShadToggleGroup.multiple].
   final ShadToggleGroupVariant variant;
 
   /// The visual style shared by every toggle in the group.
@@ -515,6 +549,8 @@ class ShadToggleGroup<T> extends StatefulWidget {
   /// The direction the items are laid out in.
   final Axis axis;
 
+  /// How much space the group takes on its main axis. Defaults to
+  /// [MainAxisSize.min].
   final MainAxisSize mainAxisSize;
 
   @override
@@ -614,6 +650,7 @@ class _ShadToggleGroupState<T> extends State<ShadToggleGroup<T>> {
 /// a [ShadToggle] from it so that selection stays in one place.
 @immutable
 class ShadToggleGroupItem<T> {
+  /// Creates an item for [value] that shows [child].
   const ShadToggleGroupItem({
     required this.value,
     required this.child,

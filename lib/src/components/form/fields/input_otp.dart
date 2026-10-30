@@ -3,14 +3,17 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/components/form/field.dart';
 import 'package:shad/src/components/input_otp.dart';
 
-class ShadInputOTPFormField extends ShadFormBuilderField<String> {
+/// A [ShadInputOTP] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadInputOTPFormField extends ShadFormField<String> {
+  /// Creates a one-time password form field with [maxLength] characters.
   ShadInputOTPFormField({
     super.id,
     super.key,
     super.onSaved,
     super.forceErrorText,
 
-    /// {@macro ShadFormBuilderField.validator}
+    /// Returns an error message for the value, or null when it is valid.
     String? Function(String)? validator,
 
     /// {@macro ShadInputOTP.initialValue}
@@ -26,11 +29,6 @@ class ShadInputOTPFormField extends ShadFormBuilderField<String> {
 
     /// {@macro ShadInputOTP.onChanged}
     void Function(String)? onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -61,7 +59,7 @@ class ShadInputOTPFormField extends ShadFormBuilderField<String> {
              ? null
              : (v) => onChanged(v ?? ''.padRight(maxLength)),
          builder: (state) {
-           state as ShadFormBuilderInputOTPState;
+           state as ShadInputOTPFormFieldState;
            return ShadInputOTP(
              enabled: state.enabled,
              keyboardType: keyboardType,
@@ -77,9 +75,17 @@ class ShadInputOTPFormField extends ShadFormBuilderField<String> {
        );
 
   @override
-  ShadFormBuilderFieldState<ShadInputOTPFormField, String> createState() =>
-      ShadFormBuilderInputOTPState();
+  ShadFormFieldState<ShadInputOTPFormField, String> createState() =>
+      ShadInputOTPFormFieldState();
 }
 
-class ShadFormBuilderInputOTPState
-    extends ShadFormBuilderFieldState<ShadInputOTPFormField, String> {}
+/// The state of a [ShadInputOTPFormField].
+class ShadInputOTPFormFieldState
+    extends ShadFormFieldState<ShadInputOTPFormField, String> {}
+
+/// The old name of [ShadInputOTPFormFieldState].
+@Deprecated(
+  'Use ShadInputOTPFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderInputOTPState = ShadInputOTPFormFieldState;

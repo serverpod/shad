@@ -883,7 +883,7 @@ class _TeamActivityCardState extends State<_TeamActivityCard> {
             children: [
               const ShadAvatar(
                 'https://avatars.githubusercontent.com/u/124599?v=4',
-                placeholder: Text('CN'),
+                fallback: Text('CN'),
               ),
               const SizedBox(width: 8),
               Expanded(

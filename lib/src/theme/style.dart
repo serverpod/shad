@@ -75,6 +75,8 @@ enum ShadSurfaceFill {
 /// is [nova] — shadcn's own `DEFAULT_CONFIG.style`.
 @immutable
 class ShadStyleTokens {
+  /// Creates a style. Only [name] is required; every other field defaults to
+  /// [vega]'s value.
   const ShadStyleTokens({
     required this.name,
     // Radii.
@@ -112,11 +114,11 @@ class ShadStyleTokens {
       fontWeight: FontWeight.w500,
     ),
     this.field = const ShadTextRole(fontSize: 14),
-    // Shadows.
-    this.cardShadow = Shadows.xs,
-    this.popoverShadow = Shadows.md,
-    this.dialogShadow = Shadows.none,
-    this.sheetShadow = Shadows.lg,
+    // ShadShadows.
+    this.cardShadow = ShadShadows.xs,
+    this.popoverShadow = ShadShadows.md,
+    this.dialogShadow = ShadShadows.none,
+    this.sheetShadow = ShadShadows.lg,
     // Buttons and toggles.
     this.outlineButtonFill = ShadSurfaceFill.background,
     this.outlineButtonFillDark = ShadSurfaceFill.input30,
@@ -125,7 +127,7 @@ class ShadStyleTokens {
     this.outlineButtonDarkInputBorder = true,
     this.linkUnderline = false,
     this.flatBadges = false,
-    this.controlShadow = Shadows.xs,
+    this.controlShadow = ShadShadows.xs,
     this.buttonHeight = 36,
     this.buttonHeightSm = 32,
     this.buttonHeightLg = 40,
@@ -136,6 +138,8 @@ class ShadStyleTokens {
     this.buttonIconSize = 16,
     this.buttonIconSizeSm = 16,
     this.buttonIconSizeLg = 16,
+    this.toggleIconSize = 16,
+    this.badgeIconSize = 12,
     this.iconButtonSize = 36,
     this.iconButtonSizeSm = 32,
     this.iconButtonSizeLg = 40,
@@ -203,7 +207,7 @@ class ShadStyleTokens {
     this.tabsListPadding = 3,
     this.tabsListRadius = ShadRadiusToken.lg,
     this.tabRadius = ShadRadiusToken.md,
-    this.tabSelectedShadow = Shadows.sm,
+    this.tabSelectedShadow = ShadShadows.sm,
     this.tabPaddingX = 8,
     this.tabPaddingY = 4,
     this.accordionTitlePaddingY = 16,
@@ -332,9 +336,16 @@ class ShadStyleTokens {
 
   // --- Shadows ------------------------------------------------------------
 
+  /// The shadow under a card, `shadow-xs` by default.
   final List<BoxShadow> cardShadow;
+
+  /// The shadow under popovers and menus, `shadow-md` by default.
   final List<BoxShadow> popoverShadow;
+
+  /// The shadow under a dialog. None by default.
   final List<BoxShadow> dialogShadow;
+
+  /// The shadow under a sheet, `shadow-lg` by default.
   final List<BoxShadow> sheetShadow;
 
   // --- Buttons ------------------------------------------------------------
@@ -376,12 +387,20 @@ class ShadStyleTokens {
 
   /// Height of a default-size button, shadcn's `h-9`.
   final double buttonHeight;
+
+  /// Height of a small button, shadcn's `h-8`.
   final double buttonHeightSm;
+
+  /// Height of a large button, shadcn's `h-10`.
   final double buttonHeightLg;
 
   /// Horizontal padding of a default-size button, shadcn's `px-2.5`.
   final double buttonPaddingX;
+
+  /// Horizontal padding of a small button, shadcn's `px-2.5`.
   final double buttonPaddingXSm;
+
+  /// Horizontal padding of a large button, shadcn's `px-2.5`.
   final double buttonPaddingXLg;
 
   /// Space between a button's icon and its label, shadcn's `gap-1.5`.
@@ -395,12 +414,28 @@ class ShadStyleTokens {
   /// styles keep 16 at every size; `mira` and `sera` shrink it, and `lyra`,
   /// `mira` and `nova` shrink it further on the small button only.
   final double buttonIconSize;
+
+  /// Side of an icon inside a small button. See [buttonIconSize].
   final double buttonIconSizeSm;
+
+  /// Side of an icon inside a large button. See [buttonIconSize].
   final double buttonIconSizeLg;
+
+  /// Icon size inside a toggle: `.cn-toggle`'s
+  /// `[&_svg:not([class*='size-'])]:size-*`. 16 in every style but sera (14).
+  final double toggleIconSize;
+
+  /// Icon size inside a badge: `.cn-badge`'s `[&>svg]:size-*`. 12 in every
+  /// style but mira (10).
+  final double badgeIconSize;
 
   /// Side of a square icon button, shadcn's `size-9`.
   final double iconButtonSize;
+
+  /// Side of a small icon button, shadcn's `size-8`.
   final double iconButtonSizeSm;
+
+  /// Side of a large icon button, shadcn's `size-10`.
   final double iconButtonSizeLg;
 
   /// Side of the icon inside one.
@@ -410,16 +445,25 @@ class ShadStyleTokens {
   /// glyph: a 28px icon button keeps the 16px icon that a 28px text button
   /// shrinks to 14.
   final double iconButtonIconSize;
+
+  /// Side of the icon inside a small icon button. See [iconButtonIconSize].
   final double iconButtonIconSizeSm;
+
+  /// Side of the icon inside a large icon button. See [iconButtonIconSize].
   final double iconButtonIconSizeLg;
 
   // --- Text fields --------------------------------------------------------
 
   /// Minimum height of a single-line input.
   final double inputHeight;
+
+  /// Horizontal padding of a single-line input, shadcn's `px-2.5`.
   final double inputPaddingX;
+
+  /// Vertical padding of a single-line input, shadcn's `py-1`.
   final double inputPaddingY;
 
+  /// Horizontal padding of a textarea, shadcn's `px-2.5`.
   final double textareaPaddingX;
 
   /// Vertical padding of a textarea.
@@ -463,6 +507,8 @@ class ShadStyleTokens {
 
   /// Padding of a single menu or select row.
   final double itemPaddingX;
+
+  /// Vertical padding of a single menu or select row, shadcn's `py-1.5`.
   final double itemPaddingY;
 
   /// Height of the menubar strip, shadcn's `h-9`.
@@ -527,7 +573,11 @@ class ShadStyleTokens {
   /// Height of a sidebar menu button, shadcn's `h-8` (`h-9` in the roomier
   /// styles). The sm/lg sizes shift with it.
   final double sidebarItemHeight;
+
+  /// Height of a small sidebar menu button, shadcn's `h-7`.
   final double sidebarItemHeightSm;
+
+  /// Height of a large sidebar menu button, shadcn's `h-12`.
   final double sidebarItemHeightLg;
 
   /// Horizontal padding of a sidebar menu button and group label, shadcn's
@@ -559,17 +609,25 @@ class ShadStyleTokens {
   /// `sera` does this (`data-checked:border-foreground`).
   final bool radioCheckedOutline;
 
+  /// Side of a checkbox, shadcn's `size-4`.
   final double checkboxSize;
+
+  /// Side of a radio button, shadcn's `size-4`.
   final double radioSize;
 
   /// Track dimensions of a switch.
   final double switchWidth;
+
+  /// Height of a switch track, shadcn's `h-[18.4px]`. Not scaled.
   final double switchHeight;
 
   /// Diameter of a switch thumb; the inset is what is left over.
   final double switchThumbSize;
 
+  /// Thickness of a slider track, shadcn's `h-1.5`.
   final double sliderTrackHeight;
+
+  /// Diameter of a slider thumb, shadcn's `size-4`.
   final double sliderThumbSize;
 
   /// The slider's inactive track, `bg-muted` (`input/90` in `luma` and
@@ -588,6 +646,7 @@ class ShadStyleTokens {
   /// Space between a card's title, description, content and footer.
   final double cardGap;
 
+  /// Padding inside a dialog, shadcn's `p-6`.
   final double dialogPadding;
 
   /// Space between a dialog's stacked children — title, description, body and
@@ -598,6 +657,7 @@ class ShadStyleTokens {
   /// uniformly, so this carries the header value, which is the one that shows.
   final double dialogGap;
 
+  /// Padding inside a popover, shadcn's `p-4`.
   final double popoverPadding;
 
   // --- Everything else ----------------------------------------------------
@@ -616,7 +676,10 @@ class ShadStyleTokens {
   /// and `nova` keep it.
   final List<BoxShadow> tabSelectedShadow;
 
+  /// Horizontal padding of a single tab, shadcn's `px-2`.
   final double tabPaddingX;
+
+  /// Vertical padding of a single tab, shadcn's `py-1`.
   final double tabPaddingY;
 
   /// Vertical padding of an accordion's title row.
@@ -626,7 +689,10 @@ class ShadStyleTokens {
   /// most styles.
   final ShadRadiusToken alertRadius;
 
+  /// Horizontal padding of an alert, shadcn's `px-4`.
   final double alertPaddingX;
+
+  /// Vertical padding of an alert, shadcn's `py-3`.
   final double alertPaddingY;
 
   /// Vertical gap between an alert's title and description, `gap-0.5`.
@@ -651,7 +717,10 @@ class ShadStyleTokens {
   /// Padding inside a table cell, shadcn's `p-2`.
   final double tableCellPadding;
 
+  /// Height of a keyboard key, shadcn's `h-5`.
   final double kbdHeight;
+
+  /// Horizontal padding of a keyboard key, shadcn's `px-1`.
   final double kbdPaddingX;
 
   /// Thickness of a progress bar, shadcn's `h-1.5`.
@@ -676,8 +745,8 @@ class ShadStyleTokens {
       fontWeight: FontWeight.w500,
       height: 1.375,
     ),
-    cardShadow: Shadows.none,
-    controlShadow: Shadows.none,
+    cardShadow: ShadShadows.none,
+    controlShadow: ShadShadows.none,
     buttonRadius: ShadRadiusToken.lg,
     popoverRadius: ShadRadiusToken.lg,
     textareaRadius: ShadRadiusToken.lg,
@@ -716,9 +785,9 @@ class ShadStyleTokens {
     commandSearchRadius: ShadRadiusToken.xl4,
     commandSearchHeight: 36,
     commandSearchBorderOpacity: 1,
-    cardShadow: Shadows.none,
-    controlShadow: Shadows.none,
-    popoverShadow: Shadows.xl2,
+    cardShadow: ShadShadows.none,
+    controlShadow: ShadShadows.none,
+    popoverShadow: ShadShadows.xl2,
     buttonRadius: ShadRadiusToken.xl4,
     cardRadius: ShadRadiusToken.xl2,
     commandRadius: ShadRadiusToken.xl4,
@@ -738,7 +807,7 @@ class ShadStyleTokens {
     fieldFill: ShadSurfaceFill.input30,
     tabsListRadius: ShadRadiusToken.xl4,
     tabRadius: ShadRadiusToken.xl,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     menuMinWidth: 192,
     buttonPaddingX: 12,
     buttonPaddingXSm: 12,
@@ -786,8 +855,8 @@ class ShadStyleTokens {
     label: ShadTextRole(fontSize: 12, fontWeight: FontWeight.w500),
     body: ShadTextRole(fontSize: 12),
     field: ShadTextRole(fontSize: 12),
-    cardShadow: Shadows.none,
-    controlShadow: Shadows.none,
+    cardShadow: ShadShadows.none,
+    controlShadow: ShadShadows.none,
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
@@ -801,7 +870,7 @@ class ShadStyleTokens {
     menubarHeight: 32,
     tabsListRadius: ShadRadiusToken.none,
     tabRadius: ShadRadiusToken.none,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     sliderTrackHeight: 4,
     sliderThumbSize: 12,
     cardPadding: 16,
@@ -843,13 +912,13 @@ class ShadStyleTokens {
     body: ShadTextRole(fontSize: 12, height: 1.625),
     caption: ShadTextRole(fontSize: 10, fontWeight: FontWeight.w500),
     field: ShadTextRole(fontSize: 12, height: 1.625),
-    cardShadow: Shadows.none,
-    controlShadow: Shadows.none,
+    cardShadow: ShadShadows.none,
+    controlShadow: ShadShadows.none,
     outlineButtonFill: ShadSurfaceFill.none,
     outlineButtonHoverFill: ShadSurfaceFill.input50,
     outlineButtonDarkInputBorder: false,
     fieldFill: ShadSurfaceFill.input20,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     buttonHeight: 28,
     buttonHeightSm: 24,
     buttonHeightLg: 32,
@@ -859,6 +928,7 @@ class ShadStyleTokens {
     // The only style whose icons follow the size step all the way down.
     buttonIconSize: 14,
     buttonIconSizeSm: 12,
+    badgeIconSize: 10,
     iconButtonSize: 28,
     iconButtonSizeSm: 24,
     iconButtonSizeLg: 32,
@@ -917,11 +987,11 @@ class ShadStyleTokens {
     surfaceBorderOpacityDark: .1,
     ringOpacity: .3,
     cardGap: 6,
-    cardShadow: Shadows.md,
-    controlShadow: Shadows.none,
-    popoverShadow: Shadows.lg,
-    dialogShadow: Shadows.xl,
-    sheetShadow: Shadows.xl,
+    cardShadow: ShadShadows.md,
+    controlShadow: ShadShadows.none,
+    popoverShadow: ShadShadows.lg,
+    dialogShadow: ShadShadows.xl,
+    sheetShadow: ShadShadows.xl,
     outlineButtonFillDark: ShadSurfaceFill.none,
     outlineButtonHoverFillDark: ShadSurfaceFill.input30,
     outlineButtonDarkInputBorder: false,
@@ -934,7 +1004,7 @@ class ShadStyleTokens {
     sliderTrackFill: ShadSurfaceFill.input90,
     tabsListRadius: ShadRadiusToken.full,
     tabRadius: ShadRadiusToken.full,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     buttonPaddingX: 12,
     buttonPaddingXSm: 12,
     buttonPaddingXLg: 16,
@@ -1018,10 +1088,10 @@ class ShadStyleTokens {
       letterSpacing: 0.6,
       uppercase: true,
     ),
-    cardShadow: Shadows.sm,
-    controlShadow: Shadows.none,
-    dialogShadow: Shadows.md,
-    sheetShadow: Shadows.md,
+    cardShadow: ShadShadows.sm,
+    controlShadow: ShadShadows.none,
+    dialogShadow: ShadShadows.md,
+    sheetShadow: ShadShadows.md,
     outlineButtonFill: ShadSurfaceFill.none,
     outlineButtonFillDark: ShadSurfaceFill.none,
     outlineButtonHoverFillDark: ShadSurfaceFill.input30,
@@ -1035,7 +1105,7 @@ class ShadStyleTokens {
     sliderThumbFilled: true,
     tabsListRadius: ShadRadiusToken.none,
     tabRadius: ShadRadiusToken.none,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     buttonHeight: 40,
     buttonHeightSm: 36,
     buttonHeightLg: 44,
@@ -1044,6 +1114,7 @@ class ShadStyleTokens {
     buttonPaddingXLg: 32,
     // The one style whose base glyph is `size-3.5` rather than `size-4`.
     buttonIconSize: 14,
+    toggleIconSize: 14,
     buttonIconSizeSm: 14,
     buttonIconSizeLg: 14,
     iconButtonSize: 40,
@@ -1115,11 +1186,11 @@ class ShadStyleTokens {
     surfaceBorderOpacity: .05,
     surfaceBorderOpacityDark: .1,
     ringOpacity: .3,
-    cardShadow: Shadows.sm,
-    controlShadow: Shadows.none,
-    popoverShadow: Shadows.lg,
-    dialogShadow: Shadows.xl,
-    sheetShadow: Shadows.xl,
+    cardShadow: ShadShadows.sm,
+    controlShadow: ShadShadows.none,
+    popoverShadow: ShadShadows.lg,
+    dialogShadow: ShadShadows.xl,
+    sheetShadow: ShadShadows.xl,
     outlineButtonFillDark: ShadSurfaceFill.none,
     outlineButtonHoverFillDark: ShadSurfaceFill.input30,
     outlineButtonDarkInputBorder: false,
@@ -1132,7 +1203,7 @@ class ShadStyleTokens {
     sliderTrackFill: ShadSurfaceFill.input90,
     tabsListRadius: ShadRadiusToken.xl2,
     tabRadius: ShadRadiusToken.xl2,
-    tabSelectedShadow: Shadows.none,
+    tabSelectedShadow: ShadShadows.none,
     buttonHeight: 32,
     buttonHeightSm: 28,
     buttonHeightLg: 36,
@@ -1170,11 +1241,15 @@ class ShadStyleTokens {
     rhea,
   ];
 
+  /// Returns the style shadcn/ui calls [name], such as `nova`.
+  ///
+  /// Throws an [ArgumentError] for an unknown name.
   static ShadStyleTokens fromName(String name) => all.firstWhere(
     (s) => s.name == name,
     orElse: () => throw ArgumentError.value(name, 'name', 'Unknown style'),
   );
 
+  /// Creates a copy of this style with the given fields replaced.
   ShadStyleTokens copyWith({
     String? name,
     ShadRadiusToken? buttonRadius,
@@ -1225,6 +1300,8 @@ class ShadStyleTokens {
     double? buttonIconSize,
     double? buttonIconSizeSm,
     double? buttonIconSizeLg,
+    double? toggleIconSize,
+    double? badgeIconSize,
     double? iconButtonSize,
     double? iconButtonSizeSm,
     double? iconButtonSizeLg,
@@ -1359,6 +1436,8 @@ class ShadStyleTokens {
       buttonIconSize: buttonIconSize ?? this.buttonIconSize,
       buttonIconSizeSm: buttonIconSizeSm ?? this.buttonIconSizeSm,
       buttonIconSizeLg: buttonIconSizeLg ?? this.buttonIconSizeLg,
+      toggleIconSize: toggleIconSize ?? this.toggleIconSize,
+      badgeIconSize: badgeIconSize ?? this.badgeIconSize,
       iconButtonSize: iconButtonSize ?? this.iconButtonSize,
       iconButtonSizeSm: iconButtonSizeSm ?? this.iconButtonSizeSm,
       iconButtonSizeLg: iconButtonSizeLg ?? this.iconButtonSizeLg,
@@ -1494,6 +1573,8 @@ class ShadStyleTokens {
     buttonIconSize,
     buttonIconSizeSm,
     buttonIconSizeLg,
+    toggleIconSize,
+    badgeIconSize,
     iconButtonSize,
     iconButtonSizeSm,
     iconButtonSizeLg,

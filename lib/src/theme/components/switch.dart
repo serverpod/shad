@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'switch.g.theme.dart';
 
+/// {@template ShadSwitchTheme}
+/// Theme for the `ShadSwitch` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadSwitchTheme with _$ShadSwitchTheme {
+  /// {@macro ShadSwitchTheme}
   const ShadSwitchTheme({
     bool canMerge = true,
     this.thumbColor,
@@ -53,6 +57,7 @@ class ShadSwitchTheme with _$ShadSwitchTheme {
   /// {@macro ShadSwitch.padding}
   final EdgeInsetsGeometry? padding;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSwitchTheme? lerp(
     ShadSwitchTheme? a,
     ShadSwitchTheme? b,

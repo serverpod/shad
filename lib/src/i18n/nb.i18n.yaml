@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Ferdig"
+
+dialog:
+  close: "Lukk"
+  dismiss: "Avvis"

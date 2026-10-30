@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Дайын"
+
+dialog:
+  close: "Жабу"
+  dismiss: "Жабу"

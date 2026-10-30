@@ -56,9 +56,16 @@ themes. Understanding this order prevents most theming bugs.
   merged input. That is what applies the style's text roles to `small`, `muted`,
   `p`, `list` and `large`. Reading the raw input here once made a style change
   resize components but leave every font size alone.
-- `copyWith` forwards the already-resolved component themes, so it **cannot
-  re-derive them**. `copyWith(radius: X)` moves the theme's `radius` field but
-  not the components'. Rebuild the theme instead.
+- `ShadThemeData` records the caller's raw factory arguments (`_inputs`,
+  `@ignore`d by the generator) and its hand-written `copyWith` re-runs the
+  factory from them, so `copyWith(radius:/colorScheme:/style:/...)` re-derives
+  every component theme. The generated mixin's `copyWith` is shadowed; its
+  generated `merge` and `lerp` still go through the factory. **Adding a
+  factory parameter means adding it to `_ShadThemeInputs` and `copyWith`
+  too** — `test/src/theme/theme_data_copy_with_test.dart` catches the common
+  ones.
+- With no `brightness`, `ShadThemeData` takes it from the scheme's
+  background luminance.
 - There are **two variants**, but no longer two copies:
   `ShadDefaultThemeNoSecondaryBorderVariant` subclasses
   `ShadDefaultThemeVariant` and overrides only the focus treatment (a 2px
@@ -76,6 +83,14 @@ themes. Understanding this order prevents most theming bugs.
 
 ### Theme equality is load-bearing
 
+The generator compares `List` fields by identity. Every theme class with a
+list field overrides `==`/`hashCode` to compare them by value and defer to the
+generated `==` for the rest (see the comment in any of them, e.g.
+`ShadPopoverTheme`). A new list field needs adding to that override.
+`flutter_animate` `Effect`s have no `==`, so effects lists only compare equal
+when they are const.
+
+
 `ShadAnimatedTheme` is an `ImplicitlyAnimatedWidget`: if `ShadThemeData !=` the
 previous one, it starts a 200 ms lerp across ~54 component themes on every
 rebuild. Anything that breaks value equality — a method tear-off in `==`, a
@@ -88,7 +103,7 @@ locks the chain; add to it rather than trusting a local check.
 - `ShadRadii` — the `none/sm/md/lg/xl/2xl/4xl/full` scale, derived from
   `ShadThemeData.radius` (which is the **md** step). At the default 8: 6, 8, 10,
   14, 16, 32.
-- `ShadStyleTokens` — one of shadcn's eight styles as 65 measured fields:
+- `ShadStyleTokens` — one of shadcn's eight styles as 67 measured fields:
   radii per surface class, ring width/opacity, border opacities, control and
   field metrics, selection-control dimensions, surface padding, shadows, and
   six `ShadTextRole`s (`title`, `label`, `body`, `caption`, `overline`, `field`).
@@ -113,6 +128,16 @@ locks the chain; add to it rather than trusting a local check.
   Only `mira` follows the step all the way down and only `sera` has a
   `size-3.5` base; `ShadButtonSizesTheme` carries `iconSm`/`iconLg` slots so
   an icon button never borrows a text button's metrics.
+
+## Fonts
+
+shad bundles **no fonts** since 1.0: `ShadTextTheme`'s default `family` is
+null (the platform font). Inter/Geist/GeistMono used to ship in `fonts/`;
+that cost every app ~1.2 MB and the web downloaded them at startup.
+`kDefaultFontFamily`/`Mono` remain, deprecated, pointing at nothing. Nothing
+under `lib/` may name a `packages/shad/` asset (CI greps for it).
+`ShadInputOTP` uses tabular figures, not a mono face — the reference's slots
+are not `font-mono`. The example loads every font through `google_fonts`.
 
 ## Colour tokens (v4)
 
@@ -221,6 +246,11 @@ locks the chain; add to it rather than trusting a local check.
   column's `mainAxisAlignment`**, not by an inner `Align`.
 - State-dependent text colour must be resolved where the state is known. A
   `DefaultTextStyle` inside a builder's captured `child` cannot see hover.
+- **Anchors take a fallback chain** (`ShadAnchorAuto.fallback`, recursively);
+  the portal keeps the candidate that overflows the screen least, then
+  shifts. Submenus and `ShadDropdownMenu` rely on it to flip horizontally.
+  `ShadGlobalAnchor.followerAnchor` picks the overlay point placed at the
+  global offset; context menus use `topStart` (corner at the pointer).
 - `ShadTextarea` has its own theme; it previously read `ShadInputTheme` for
   padding and alignment, which made every textarea-specific value dead.
 - **A loop that only ever `await`s a synchronously-completed future never
@@ -237,6 +267,23 @@ locks the chain; add to it rather than trusting a local check.
   needs a re-entrancy guard *and* a real yield (`Future.delayed(Duration.zero)`)
   per iteration. `test/src/components/select_auto_scroll_test.dart` locks the
   guard. On web this reads as a browser bug, which is how it went unnoticed.
+- **Escape must not be bound unconditionally.** A `CallbackShortcuts` for
+  Escape consumes the key even while its overlay is closed, so the enclosing
+  dialog never closes. Use `ShadDismissShortcut` (`lib/src/utils/`), whose
+  action reports itself disabled — and the key unhandled — while inactive.
+- **Each root context menu has its own tap-region group**, shared with its
+  submenus (`ShadContextMenuState.tapRegionGroupId`). A single global group
+  made a tap on another menu's trigger count as inside, so the open menu
+  never closed.
+- **Dialog routes follow the app theme live** unless opened from a locally
+  re-themed subtree; capturing `ShadTheme.of(context)` at push time froze open
+  dialogs and sheets in the old theme across a light/dark switch.
+- **Private field promotion is per library.** Two classes in one file with a
+  same-named private field, one of them non-final, disable promotion of both
+  (`ShadTimeOfDay._period` broke when the controller gained a `_period`).
+- `calendar.dart` used to contain a literal NUL byte in a cache key, which
+  made `grep` treat it as binary and silently skip it. It is `\u0000` now;
+  keep NULs escaped.
 - **A fully transparent `ColoredBox` still hit-tests as opaque** (it extends
   `RenderProxyBoxWithHitTestBehavior` with `behavior: opaque`). The dialog
   route's full-screen barrier-blur layer uses one to give its
@@ -246,14 +293,19 @@ locks the chain; add to it rather than trusting a local check.
 
 ## Testing
 
-- **Most golden tests do not actually compare.** They use
-  `expect(finder, matchesGoldenFile(...))`, and that matcher is asynchronous —
-  an unawaited `expect` never reports the mismatch. Only `sheet_test.dart` uses
-  `await expectLater(...)`, which is why those six are the only goldens that
-  ever fail. Converting the rest is a known, unstarted job: it will surface
-  every accumulated diff at once and require regenerating ~50 PNGs.
-- Goldens in the working tree were regenerated on **macOS**; CI runs on Linux.
-  Treat a local regeneration as provisional.
+- **Every golden is `await expectLater(...)`.** `matchesGoldenFile` is
+  asynchronous; inside a plain `expect` a mismatch is never reported, which is
+  how 52 of 58 goldens went stale unnoticed until 1.0.
+  `test/goldens_are_awaited_test.dart` fails on an unawaited one.
+- **Goldens are Linux-only.** They are generated by the `update-goldens`
+  workflow (`gh workflow run update-goldens.yml --ref <branch>`, then
+  `gh run download <id> -n updated-goldens` and copy `test/` over) and
+  compared only on Linux: `test/flutter_test_config.dart` (through
+  `golden_config_io.dart`, behind a conditional import so the Chrome tests
+  still compile) skips pixel comparison elsewhere — macOS differs by several percent on these small
+  images — and makes `--update-goldens` a no-op there, so macOS pixels can
+  never be committed. `SHAD_COMPARE_GOLDENS=1` forces comparison;
+  `SHAD_SKIP_GOLDENS=1` skips it on Linux too (the minimum-Flutter CI job).
 - Prefer asserting resolved *theme values* over pixels. For anything with modes
   (menu colour × finish × accent × brightness) walk the whole matrix in one test
   and assert luminance contrast — that found a real collision (light + inverted
@@ -281,8 +333,20 @@ locks the chain; add to it rather than trusting a local check.
   are the only exemptions (Material/Cupertino interop), and
   `.github/workflows/check-imports.yaml` enforces it. This is why `ShadSpinner`
   is a `CustomPainter` rather than a wrapped `CircularProgressIndicator`.
+- Renames keep the old name `@Deprecated('Use X. Will be removed in the next
+  major version.')` and get an entry in `lib/fix_data.yaml`; add a line to
+  `test_fixes/shad.dart(.expect)` and run
+  `dart fix --compare-to-golden test_fixes` (CI does). Data-driven fixes only
+  trigger on reported diagnostics, which is why `test_fixes/` enables
+  `deprecated_member_use_from_same_package`.
+- `test/readme_snippet_test.dart` and `example/test/example_md_test.dart` hold
+  verbatim copies of the README and `example/example.md` snippets and check
+  they still match.
+- Releases: bump `pubspec.yaml` + `CHANGELOG.md` on main; after tests pass
+  `create-release.yaml` tags `v<version>`, and `publish.yaml` publishes that
+  tag to pub.dev (OIDC).
 - Verify with: `flutter analyze` and `flutter test` at the root, then the same
-  in `example/`, then `dart analyze` in `cli/`. The example consumes the
+  in `example/`. The example consumes the
   package through the public barrel, so it catches export breakage that the
   root analyzer does not. There is no separate `playground/` app any more —
   it was a standalone Flutter web project superseded by the example app's own
@@ -395,5 +459,10 @@ deliberately:
   never opens.
 - Menu colours are derived from the **menu's own opaque surface**, never from
   the page's `--accent`, which vanishes on an inverted or translucent menu.
+- Fonts all come from `google_fonts` at runtime. `EditorFont.load()` fetches
+  the weights the text roles use; `main()` awaits the default font before
+  `runApp`, and the font pickers load a face *before* applying it, so text
+  reflows once, not twice. Builders and text themes are cached per family
+  (closure identity is part of theme equality).
 - `fl_chart` and `google_fonts` are example-only dependencies. The package
   itself has neither.

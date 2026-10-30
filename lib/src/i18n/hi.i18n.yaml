@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "हो गया"
+
+dialog:
+  close: "बंद करें"
+  dismiss: "खारिज करें"

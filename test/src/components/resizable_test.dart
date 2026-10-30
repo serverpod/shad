@@ -294,7 +294,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadResizablePanelGroup),
         matchesGoldenFile('goldens/resizable.png'),
       );

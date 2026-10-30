@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Klaar"
+
+dialog:
+  close: "Maak toe"
+  dismiss: "Maak toe"

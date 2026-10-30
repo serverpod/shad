@@ -24,6 +24,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// takes a plain [Color] instead.
 @immutable
 class ShadAccentScheme {
+  /// Creates an accent overlay.
+  ///
+  /// Only [name], [primary] and [primaryForeground] are required. A null
+  /// optional token leaves the base scheme's value in place.
   const ShadAccentScheme({
     required this.name,
     required this.primary,
@@ -42,20 +46,38 @@ class ShadAccentScheme {
   /// The shadcn/ui name of this accent, e.g. `violet`.
   final String name;
 
+  /// The `--primary` colour.
   final Color primary;
+
+  /// The text and icon colour on [primary], `--primary-foreground`.
   final Color primaryForeground;
 
   /// Overridden only by accents that also restyle the secondary pair.
   final Color? secondary;
+
+  /// The text and icon colour on [secondary], `--secondary-foreground`.
   final Color? secondaryForeground;
 
+  /// The first chart colour, `--chart-1`.
   final Color? chart1;
+
+  /// The second chart colour, `--chart-2`.
   final Color? chart2;
+
+  /// The third chart colour, `--chart-3`.
   final Color? chart3;
+
+  /// The fourth chart colour, `--chart-4`.
   final Color? chart4;
+
+  /// The fifth chart colour, `--chart-5`.
   final Color? chart5;
 
+  /// The sidebar's primary colour, `--sidebar-primary`.
   final Color? sidebarPrimary;
+
+  /// The text and icon colour on [sidebarPrimary],
+  /// `--sidebar-primary-foreground`.
   final Color? sidebarPrimaryForeground;
 
   /// Every accent, in the order shadcn/ui lists them.

@@ -106,6 +106,8 @@ class ShadPagination extends StatelessWidget {
   /// {@endtemplate}
   final MainAxisAlignment? mainAxisAlignment;
 
+  /// How much space the row takes on its main axis. Defaults to
+  /// [MainAxisSize.min].
   final MainAxisSize mainAxisSize;
 
   /// Overrides the localized "Previous" label.
@@ -298,6 +300,7 @@ class ShadPagination extends StatelessWidget {
 /// Useful in a toolbar or beneath a data table, where a full run of page
 /// numbers does not fit.
 class ShadPaginationCompact extends StatelessWidget {
+  /// Creates a compact pagination for [page] of [pageCount].
   const ShadPaginationCompact({
     super.key,
     required this.page,
@@ -308,13 +311,24 @@ class ShadPaginationCompact extends StatelessWidget {
     this.labelBuilder,
   }) : assert(page >= 1, 'page is 1-based, so it must be >= 1');
 
+  /// The current page, starting at 1.
   final int page;
+
+  /// The total number of pages.
   final int pageCount;
+
+  /// Called with the new page when a button is pressed. When null, both
+  /// buttons are disabled.
   final ValueChanged<int>? onPageChanged;
+
+  /// The gap between the buttons and the label. Defaults to the theme's gap,
+  /// then 4.
   final double? gap;
+
+  /// Whether the buttons react to input. Defaults to true.
   final bool enabled;
 
-  /// Builds the label between the two buttons. Defaults to "Page 1 of 10".
+  /// Builds the label between the two buttons. Defaults to "Page 1 / 10".
   final Widget Function(BuildContext context, int page, int pageCount)?
   labelBuilder;
 

@@ -3,7 +3,13 @@ import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 
+/// Lays out a form field: a [label] above [child], then a [description] and an
+/// [error] below it.
+///
+/// Styles and paddings come from [decoration] merged over
+/// `ShadThemeData.decoration`.
 class ShadInputDecorator extends StatelessWidget {
+  /// Creates an input decorator.
   const ShadInputDecorator({
     super.key,
     this.child,
@@ -13,10 +19,19 @@ class ShadInputDecorator extends StatelessWidget {
     this.decoration,
   });
 
+  /// The field itself.
   final Widget? child;
+
+  /// The label shown above [child].
   final Widget? label;
+
+  /// The error message shown below [child].
   final Widget? error;
+
+  /// The help text shown below [child], above [error].
   final Widget? description;
+
+  /// Overrides for the label, description and error styles and paddings.
   final ShadDecoration? decoration;
 
   @override
@@ -68,10 +83,12 @@ class ShadInputDecorator extends StatelessWidget {
             padding:
                 effectiveDecoration.labelPadding ??
                 const EdgeInsets.only(bottom: 8),
-            child: DefaultTextStyle(
-              style: effectiveLabelStyle!,
-              child: label!,
-            ),
+            // With fallbackToLabelStyle off and no label style set, the
+            // label keeps the ambient style; this used to throw on a null
+            // check.
+            child: effectiveLabelStyle == null
+                ? label!
+                : DefaultTextStyle(style: effectiveLabelStyle, child: label!),
           ),
         ?child,
         if (description != null)

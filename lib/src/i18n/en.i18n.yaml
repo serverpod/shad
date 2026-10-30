@@ -28,3 +28,7 @@ pagination:
   next: "Next"
   morePages: "More pages"
   page: "Page"
+
+dialog:
+  close: "Close"
+  dismiss: "Dismiss"

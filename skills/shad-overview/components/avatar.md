@@ -21,10 +21,10 @@ class AvatarDefaultExample extends StatelessWidget {
       children: [
         ShadAvatar(
           'https://avatars.githubusercontent.com/u/124599?v=4',
-          placeholder: Text('CN'),
+          fallback: Text('CN'),
         ),
         // The placeholder shows while loading, or if the image fails.
-        ShadAvatar('', placeholder: Text('AB')),
+        ShadAvatar('', fallback: Text('AB')),
       ],
     );
   }

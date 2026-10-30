@@ -1,14 +1,31 @@
 import 'package:flutter/widgets.dart';
 
-// Inter, matching shadcn/ui's default (`DEFAULT_CONFIG.font: "inter"`).
-// Geist is still bundled and selectable via `ShadTextTheme(family: 'Geist',
-// package: 'shad')`.
+/// The font family shad bundled before 1.0.
+@Deprecated(
+  'shad no longer bundles fonts, so this family resolves to nothing and text '
+  'falls back to the platform font. Set ShadTextTheme(family: ...) to a font '
+  'your app declares, or use ShadTextTheme.fromGoogleFont. '
+  'Will be removed in the next major version.',
+)
 const kDefaultFontFamily = 'packages/shad/Inter';
+
+/// The monospace font family shad bundled before 1.0.
+@Deprecated(
+  'shad no longer bundles fonts, so this family resolves to nothing and text '
+  'falls back to the platform font. Use a monospace family your app declares. '
+  'Will be removed in the next major version.',
+)
 const kDefaultFontFamilyMono = 'packages/shad/GeistMono';
 
+/// The default text styles of a `ShadTextTheme`, before a style's text roles
+/// are applied.
+///
+/// `family` is null by default, so text uses the platform font unless the
+/// app sets one.
 abstract class ShadTextDefaultTheme {
+  /// The display heading: 48px, extra-bold.
   static TextStyle h1Large({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 48,
@@ -23,8 +40,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// The `h1` heading: 36px, extra-bold.
   static TextStyle h1({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 36,
@@ -39,8 +57,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// The `h2` heading: 30px, semibold.
   static TextStyle h2({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 30,
@@ -55,8 +74,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// The `h3` heading: 24px, semibold.
   static TextStyle h3({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 24,
@@ -71,8 +91,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// The `h4` heading: 20px, semibold.
   static TextStyle h4({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 20,
@@ -87,8 +108,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Body paragraph text: 16px with a 28px line height.
   static TextStyle p({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 16,
@@ -103,8 +125,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Blockquote text: 16px italic.
   static TextStyle blockquote({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 16,
@@ -119,8 +142,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Table header text: 16px bold.
   static TextStyle table({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 16,
@@ -135,8 +159,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// List item text: 16px.
   static TextStyle list({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 16,
@@ -151,8 +176,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Lead paragraph text: 20px.
   static TextStyle lead({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 20,
@@ -167,8 +193,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Large text: 18px, semibold.
   static TextStyle large({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 18,
@@ -183,8 +210,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Small text: 14px, medium weight, with a line height equal to the size.
   static TextStyle small({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 14,
@@ -199,8 +227,9 @@ abstract class ShadTextDefaultTheme {
     );
   }
 
+  /// Muted text: 14px with a 20px line height.
   static TextStyle muted({
-    required String family,
+    String? family,
   }) {
     return TextStyle(
       fontSize: 14,

@@ -52,6 +52,7 @@ class ShadEmptyTheme with _$ShadEmptyTheme {
   /// {@macro ShadEmpty.mainAxisAlignment}
   final MainAxisAlignment? mainAxisAlignment;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadEmptyTheme? lerp(
     ShadEmptyTheme? a,
     ShadEmptyTheme? b,

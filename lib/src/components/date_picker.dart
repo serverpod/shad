@@ -18,7 +18,13 @@ import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/states_controller.dart';
 
 /// Variants available for the [ShadDatePicker] widget.
-enum ShadDatePickerVariant { single, range }
+enum ShadDatePickerVariant {
+  /// Picks one date.
+  single,
+
+  /// Picks a start date and an end date.
+  range,
+}
 
 /// A customizable date picker widget with a button and popover calendar.
 ///
@@ -45,6 +51,10 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverPadding,
     this.multipleSelected,
     this.onChanged,
+    @Deprecated(
+      'ShadDatePicker has no multiple-selection mode, so this is never '
+      'called. Will be removed in the next major version.',
+    )
     this.onMultipleChanged,
     this.showOutsideDays,
     this.initialMonth,
@@ -107,7 +117,12 @@ class ShadDatePicker extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.closeOnTapOutside = true,
     this.focusNode,
     this.anchor,
@@ -169,7 +184,10 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverReverseDuration,
     this.buttonTextStyle,
     this.trailing,
-  }) : variant = ShadDatePickerVariant.single,
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       variant = ShadDatePickerVariant.single,
        formatDateRange = null,
        selectedRange = null;
 
@@ -189,6 +207,10 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverPadding,
     this.multipleSelected,
     this.onChanged,
+    @Deprecated(
+      'ShadDatePicker has no multiple-selection mode, so this is never '
+      'called. Will be removed in the next major version.',
+    )
     this.onMultipleChanged,
     this.showOutsideDays,
     this.initialMonth,
@@ -251,7 +273,12 @@ class ShadDatePicker extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.closeOnTapOutside = true,
     this.focusNode,
     this.anchor,
@@ -313,7 +340,10 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverReverseDuration,
     this.buttonTextStyle,
     this.trailing,
-  }) : variant = ShadDatePickerVariant.range,
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       variant = ShadDatePickerVariant.range,
        selected = null,
        formatDate = null,
        selectedRange = selected;
@@ -336,6 +366,10 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverPadding,
     this.multipleSelected,
     this.onChanged,
+    @Deprecated(
+      'ShadDatePicker has no multiple-selection mode, so this is never '
+      'called. Will be removed in the next major version.',
+    )
     this.onMultipleChanged,
     this.showOutsideDays,
     this.initialMonth,
@@ -398,7 +432,12 @@ class ShadDatePicker extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.closeOnTapOutside = true,
     this.focusNode,
     this.anchor,
@@ -462,7 +501,9 @@ class ShadDatePicker extends StatefulWidget {
     this.popoverReverseDuration,
     this.buttonTextStyle,
     this.trailing,
-  });
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant;
 
   /// {@template ShadDatePicker.placeholder}
   /// The placeholder of the date picker, shown when no date is selected.
@@ -538,7 +579,11 @@ class ShadDatePicker extends StatefulWidget {
   /// {@macro ShadCalendar.onChanged}
   final ValueChanged<DateTime?>? onChanged;
 
-  /// {@macro ShadCalendar.onMultipleChanged}
+  /// Never called: [ShadDatePicker] has no multiple-selection mode.
+  @Deprecated(
+    'ShadDatePicker has no multiple-selection mode, so this is never called. '
+    'Will be removed in the next major version.',
+  )
   final ValueChanged<List<DateTime>>? onMultipleChanged;
 
   /// {@macro ShadCalendar.showOutsideDays}
@@ -724,8 +769,16 @@ class ShadDatePicker extends StatefulWidget {
   /// {@macro ShadCalendar.dayButtonOutsideMonthVariant}
   final ShadButtonVariant? dayButtonOutsideMonthVariant;
 
-  /// {@macro ShadCalendar.selectedDayButtonOusideMonthVariant}
-  final ShadButtonVariant? selectedDayButtonOusideMonthVariant;
+  /// {@macro ShadCalendar.selectedDayButtonOutsideMonthVariant}
+  final ShadButtonVariant? selectedDayButtonOutsideMonthVariant;
+
+  /// The old, misspelled name of [selectedDayButtonOutsideMonthVariant].
+  @Deprecated(
+    'Use selectedDayButtonOutsideMonthVariant. '
+    'Will be removed in the next major version.',
+  )
+  ShadButtonVariant? get selectedDayButtonOusideMonthVariant =>
+      selectedDayButtonOutsideMonthVariant;
 
   // ---
   // POPOVER
@@ -1222,9 +1275,9 @@ class _ShadDatePickerState extends State<ShadDatePicker> {
               selectedDayButtonTextStyle:
                   widget.selectedDayButtonTextStyle ??
                   theme.datePickerTheme.selectedDayButtonTextStyle,
-              selectedDayButtonOusideMonthVariant:
-                  widget.selectedDayButtonOusideMonthVariant ??
-                  theme.datePickerTheme.selectedDayButtonOusideMonthVariant,
+              selectedDayButtonOutsideMonthVariant:
+                  widget.selectedDayButtonOutsideMonthVariant ??
+                  theme.datePickerTheme.selectedDayButtonOutsideMonthVariant,
               insideRangeDayButtonVariant:
                   widget.insideRangeDayButtonVariant ??
                   theme.datePickerTheme.insideRangeDayButtonVariant,

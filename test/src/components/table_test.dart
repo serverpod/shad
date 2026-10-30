@@ -112,7 +112,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadTable),
         matchesGoldenFile('goldens/table.png'),
       );

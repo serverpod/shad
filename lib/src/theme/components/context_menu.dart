@@ -1,18 +1,22 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/components/button.dart';
 import 'package:shad/src/raw_components/portal.dart';
-
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 part 'context_menu.g.theme.dart';
 
+/// {@template ShadContextMenuTheme}
+/// Theme for the `ShadContextMenu` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadContextMenuTheme with _$ShadContextMenuTheme {
+  /// {@macro ShadContextMenuTheme}
   const ShadContextMenuTheme({
     bool canMerge = true,
     this.constraints,
@@ -109,7 +113,7 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
   /// (`/20` in dark mode).
   final Color? destructiveSelectedBackgroundColor;
 
-  /// {@macro ShadContextMenu.constraints}
+  /// Constraints applied to every item row.
   final BoxConstraints? itemConstraints;
 
   /// {@macro ShadContextMenu.padding}
@@ -136,9 +140,29 @@ class ShadContextMenuTheme with _$ShadContextMenuTheme {
   /// {@macro ShadPopover.filter}
   final ImageFilter? filter;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadContextMenuTheme? lerp(
     ShadContextMenuTheme? a,
     ShadContextMenuTheme? b,
     double t,
   ) => _$ShadContextMenuTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadContextMenuTheme &&
+      listEquals(effects, other.effects) &&
+      listEquals(shadows, other.shadows) &&
+      super == other.copyWith(effects: effects, shadows: shadows);
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(effects ?? const []),
+    Object.hashAll(shadows ?? const []),
+  );
 }

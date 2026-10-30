@@ -3,9 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'avatar.g.theme.dart';
 
+/// {@template ShadAvatarTheme}
+/// Theme for the `ShadAvatar` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadAvatarTheme with _$ShadAvatarTheme {
+  /// {@macro ShadAvatarTheme}
   const ShadAvatarTheme({
     bool canMerge = true,
     this.size,
@@ -32,6 +36,7 @@ class ShadAvatarTheme with _$ShadAvatarTheme {
   /// {@macro ShadAvatar.fit}
   final BoxFit? fit;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadAvatarTheme? lerp(
     ShadAvatarTheme? a,
     ShadAvatarTheme? b,

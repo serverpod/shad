@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Tayyor"
+
+dialog:
+  close: "Yopish"
+  dismiss: "Yopish"

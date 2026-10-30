@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `gray` colour scheme.
+///
+/// shadcn/ui v4 no longer ships this palette. It is kept for
+/// compatibility.
 @immutable
 class ShadGrayColorScheme extends ShadColorScheme {
+  /// Creates a [ShadGrayColorScheme] from explicit colours.
+  ///
+  /// Use [ShadGrayColorScheme.light] or [ShadGrayColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadGrayColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadGrayColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadGrayColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadGrayColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff030712),
@@ -51,6 +62,9 @@ class ShadGrayColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadGrayColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadGrayColorScheme.dark({
     super.background = const Color(0xff030712),
     super.foreground = const Color(0xfff9fafb),

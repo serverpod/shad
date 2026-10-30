@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ਹੋ ਗਿਆ"
+
+dialog:
+  close: "ਬੰਦ ਕਰੋ"
+  dismiss: "ਖਾਰਜ ਕਰੋ"

@@ -16,22 +16,22 @@ class ShadLocalizationsDataTa extends ShadLocalizationsData with BaseTranslation
 	/// Constructing via the enum [ShadLocale.build] is preferred.
 	ShadLocalizationsDataTa({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<ShadLocale, ShadLocalizationsData>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: ShadLocale.ta,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ),
 		  super(cardinalResolver: cardinalResolver, ordinalResolver: ordinalResolver) {
-		super.$meta.setFlatMapFunction($meta.getTranslation); // copy base translations to super.$meta
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <ta>.
-	@override final TranslationMetadata<ShadLocale, ShadLocalizationsData> $meta;
+	final TranslationMetadata<ShadLocale, ShadLocalizationsData> _meta;
+	@override TranslationMetadata<ShadLocale, ShadLocalizationsData> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key) ?? super.$meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key) ?? super[key];
 
 	late final ShadLocalizationsDataTa _root = this; // ignore: unused_field
 
@@ -43,6 +43,7 @@ class ShadLocalizationsDataTa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ta datePicker = _ShadLocalizationsData$datePicker$ta._(_root);
 	@override late final _ShadLocalizationsData$input$ta input = _ShadLocalizationsData$input$ta._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ta keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ta._(_root);
+	@override late final _ShadLocalizationsData$dialog$ta dialog = _ShadLocalizationsData$dialog$ta._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ta extends ShadLocalizationsData$ke
 	@override String get done => 'முடிந்தது';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ta extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ta._(ShadLocalizationsDataTa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataTa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'மூடுக';
+	@override String get dismiss => 'நிராகரிக்கும்';
+}
+
 /// The flat map containing all translations for locale <ta>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataTa {
 			'input.paste' => 'ஒட்டு',
 			'input.selectAll' => 'அனைத்தையும் தேர்ந்தெடு',
 			'keyboardToolbar.done' => 'முடிந்தது',
+			'dialog.close' => 'மூடுக',
+			'dialog.dismiss' => 'நிராகரிக்கும்',
 			_ => null,
 		};
 	}

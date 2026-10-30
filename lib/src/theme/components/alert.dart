@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'alert.g.theme.dart';
 
+/// {@template ShadAlertTheme}
+/// Theme for the `ShadAlert` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadAlertTheme with _$ShadAlertTheme {
+  /// {@macro ShadAlertTheme}
   const ShadAlertTheme({
     bool canMerge = true,
     this.decoration,
@@ -53,6 +57,7 @@ class ShadAlertTheme with _$ShadAlertTheme {
   /// {@macro ShadAlert.gap}
   final double? gap;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadAlertTheme? lerp(
     ShadAlertTheme? a,
     ShadAlertTheme? b,

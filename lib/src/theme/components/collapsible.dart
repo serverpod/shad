@@ -40,6 +40,7 @@ class ShadCollapsibleTheme with _$ShadCollapsibleTheme {
   /// {@macro ShadCollapsible.crossAxisAlignment}
   final CrossAxisAlignment? crossAxisAlignment;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadCollapsibleTheme? lerp(
     ShadCollapsibleTheme? a,
     ShadCollapsibleTheme? b,

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/components/icon_button.dart';
+import 'package:shad/src/i18n/localizations_delegate.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/theme/theme_scope.dart';
 import 'package:shad/src/theme/themes/shadows.dart';
@@ -17,7 +18,7 @@ import 'package:shad/src/utils/shadow.dart';
 
 /// {@template ShadDialogRoute}
 /// A custom dialog route that allows specifying a `reverseTransitionDuration`.
-/// {@macro flutter.widgets.ModalRoute.barrierDismissible}
+/// Tapping the barrier pops the route when [barrierDismissible] is true.
 ///
 /// Used internally by [showShadDialog].
 /// {@endtemplate}
@@ -37,6 +38,7 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
     super.settings,
   });
 
+  /// Builds the content of the route, usually a [ShadDialog].
   final WidgetBuilder pageBuilder;
 
   @override
@@ -63,8 +65,11 @@ class ShadDialogRoute<T> extends PopupRoute<T> {
   @override
   final Duration reverseTransitionDuration;
 
+  /// Builds the enter and exit transition. Defaults to a fade.
   final RouteTransitionsBuilder? transitionBuilder;
 
+  /// Not used by this route. It is kept to match the arguments of
+  /// [showShadDialog].
   final Offset? anchorPoint;
 
   @override
@@ -145,9 +150,9 @@ Future<T?> showShadDialog<T>({
   /// Defaults to `ShadDialogTheme.barrierBlurSigma`.
   double? barrierBlurSigma,
 
-  /// The accessibility label for the barrier.
-  /// Defaults to an empty string.
-  String barrierLabel = '',
+  /// The accessibility label for the barrier, which dismisses the dialog.
+  /// Defaults to the localized "Dismiss".
+  String? barrierLabel,
 
   /// Whether to use the root navigator for routing.
   /// Defaults to true.
@@ -216,17 +221,32 @@ Future<T?> showShadDialog<T>({
   }
 
   // A route is built under the Navigator, so it does not see a ShadTheme that
-  // was applied to a subtree — only the app-level one. Capture the theme at
-  // the call site and republish it inside the route, so a dialog opened from a
-  // re-themed panel (see ShadThemeScope) matches its surroundings.
+  // was applied to a subtree — only the app-level one. When the call site is
+  // re-themed (see ShadThemeScope), republish its theme inside the route so
+  // the dialog matches its surroundings. Otherwise follow the app-level theme
+  // live: capturing it here froze an open dialog or sheet in the theme it was
+  // opened with, so a light/dark switch left it behind.
   final ambientTheme = ShadTheme.of(context, listen: false);
+  final navigator = Navigator.of(context, rootNavigator: useRootNavigator);
+  final themedLocally =
+      ambientTheme != ShadTheme.maybeOf(navigator.context, listen: false);
+  final opener = context;
 
-  return Navigator.of(context, rootNavigator: useRootNavigator).push(
+  return navigator.push(
     ShadDialogRoute(
-      pageBuilder: (context) => ShadThemeScope(
-        data: ambientTheme,
-        child: Builder(builder: builder),
-      ),
+      pageBuilder: (routeContext) {
+        // Depend on the app-level theme in both cases, so the route rebuilds
+        // when it changes; a re-themed opener is re-read at that point.
+        final appTheme = ShadTheme.maybeOf(routeContext);
+        return ShadThemeScope(
+          data: !themedLocally && appTheme != null
+              ? appTheme
+              : opener.mounted
+              ? ShadTheme.of(opener, listen: false)
+              : ambientTheme,
+          child: Builder(builder: builder),
+        );
+      },
       barrierColor:
           barrierColor ??
           ambientTheme.primaryDialogTheme.barrierColor ??
@@ -236,7 +256,8 @@ Future<T?> showShadDialog<T>({
           ambientTheme.primaryDialogTheme.barrierBlurSigma ??
           2,
       barrierDismissible: barrierDismissible,
-      barrierLabel: barrierLabel,
+      barrierLabel:
+          barrierLabel ?? ShadLocalizations.of(context).dialog.dismiss,
       anchorPoint: anchorPoint,
       settings: routeSettings,
       opaque: opaque,
@@ -258,7 +279,11 @@ Future<T?> showShadDialog<T>({
 
 /// Variants available for the [ShadDialog] widget.
 enum ShadDialogVariant {
+  /// A standard dialog with a close button.
   primary,
+
+  /// A dialog that needs a response. It has no close button by default, so the
+  /// user picks one of the actions. Styled by `alertDialogTheme`.
   alert,
 }
 
@@ -279,6 +304,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.onClose,
     this.semanticLabel,
     this.closeIconPosition,
     this.radius,
@@ -320,6 +346,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.onClose,
     this.semanticLabel,
     this.closeIconPosition,
     this.radius,
@@ -362,6 +389,7 @@ class ShadDialog extends StatelessWidget {
     this.actions = const [],
     this.closeIcon,
     this.closeIconData,
+    this.onClose,
     this.semanticLabel,
     this.closeIconPosition,
     this.radius,
@@ -437,6 +465,13 @@ class ShadDialog extends StatelessWidget {
   /// Used if [closeIcon] is null; defaults to [LucideIcons.x] if not specified.
   /// {@endtemplate}
   final IconData? closeIconData;
+
+  /// {@template ShadDialog.onClose}
+  /// Called when the default close button is pressed. Defaults to
+  /// `Navigator.maybePop`, which respects a `PopScope` around the dialog.
+  /// Not used when [closeIcon] replaces the button.
+  /// {@endtemplate}
+  final VoidCallback? onClose;
 
   /// {@template ShadDialog.semanticLabel}
   /// The accessible name of the dialog, announced when it opens.
@@ -656,7 +691,8 @@ class ShadDialog extends StatelessWidget {
                 hoverBackgroundColor: const Color(0x00000000),
                 hoverForegroundColor: theme.colorScheme.foreground,
                 pressedForegroundColor: theme.colorScheme.foreground,
-                onPressed: () => Navigator.of(context).pop(),
+                semanticLabel: ShadLocalizations.of(context).dialog.close,
+                onPressed: onClose ?? () => Navigator.of(context).maybePop(),
               ));
 
     final effectiveCloseIconPosition =
@@ -687,7 +723,7 @@ class ShadDialog extends StatelessWidget {
         Border.all(color: theme.colorScheme.border);
 
     final effectiveShadows =
-        shadows ?? effectiveDialogTheme.shadows ?? Shadows.lg;
+        shadows ?? effectiveDialogTheme.shadows ?? ShadShadows.lg;
 
     final effectiveRemoveBorderRadiusWhenTiny =
         removeBorderRadiusWhenTiny ??
@@ -801,21 +837,33 @@ class ShadDialog extends StatelessWidget {
               data: theme.copyWith(
                 primaryButtonTheme: theme.primaryButtonTheme.copyWith(
                   width: double.infinity,
+                  expands: true,
                 ),
                 secondaryButtonTheme: theme.secondaryButtonTheme.copyWith(
                   width: double.infinity,
+                  expands: true,
                 ),
                 outlineButtonTheme: theme.outlineButtonTheme.copyWith(
                   width: double.infinity,
+                  expands: true,
                 ),
                 ghostButtonTheme: theme.ghostButtonTheme.copyWith(
                   width: double.infinity,
+                  expands: true,
                 ),
                 destructiveButtonTheme: theme.destructiveButtonTheme.copyWith(
                   width: double.infinity,
+                  expands: true,
                 ),
               ),
-              child: effectiveActions,
+              // Full-width buttons give their labels the button's width, so
+              // a long label ellipsizes instead of overflowing the button.
+              child: DefaultTextStyle.merge(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                child: effectiveActions,
+              ),
             );
           }
 

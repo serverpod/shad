@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Déanta"
+
+dialog:
+  close: "Dún"
+  dismiss: "Ruaig"

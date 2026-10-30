@@ -8,16 +8,29 @@ import 'package:flutter/widgets.dart';
 /// buttons, menu items proportionally tighter, and changing the theme radius
 /// moves all of them together.
 enum ShadRadiusToken {
+  /// No rounding, `rounded-none`.
   none,
+
+  /// `rounded-sm`: 0.75 × `md`, 6px by default.
   sm,
 
   /// The base step. `ShadThemeData.radius` is this one — it is what buttons,
   /// inputs and popovers use.
   md,
+
+  /// `rounded-lg`: 1.25 × `md`, 10px by default.
   lg,
+
+  /// `rounded-xl`: 1.75 × `md`, 14px by default.
   xl,
+
+  /// `rounded-2xl`: 2 × `md`, 16px by default.
   xl2,
+
+  /// `rounded-3xl`: 3 × `md`, 24px by default.
   xl3,
+
+  /// `rounded-4xl`: 4 × `md`, 32px by default.
   xl4,
 
   /// Fully rounded, for pills and circles.
@@ -49,20 +62,28 @@ class ShadRadii {
   /// The `md` step, i.e. the theme's component radius.
   final BorderRadius md;
 
+  /// Square corners, `rounded-none`.
   BorderRadius get none => BorderRadius.zero;
 
+  /// `rounded-sm`: 0.75 × [md], 6px by default.
   BorderRadius get sm => _scale(0.75);
 
+  /// `rounded-lg`: 1.25 × [md], 10px by default.
   BorderRadius get lg => _scale(1.25);
 
+  /// `rounded-xl`: 1.75 × [md], 14px by default.
   BorderRadius get xl => _scale(1.75);
 
+  /// `rounded-2xl`: 2 × [md], 16px by default.
   BorderRadius get xl2 => _scale(2);
 
+  /// `rounded-3xl`: 3 × [md], 24px by default.
   BorderRadius get xl3 => _scale(3);
 
+  /// `rounded-4xl`: 4 × [md], 32px by default.
   BorderRadius get xl4 => _scale(4);
 
+  /// Fully rounded, `rounded-full`, for pills and circles.
   BorderRadius get full => const BorderRadius.all(Radius.circular(9999));
 
   /// The radius for [token].

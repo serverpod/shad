@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "完了"
+
+dialog:
+  close: "閉じる"
+  dismiss: "閉じる"

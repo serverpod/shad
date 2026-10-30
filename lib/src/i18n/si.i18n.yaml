@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "සිදු විය"
+
+dialog:
+  close: "වසන්න"
+  dismiss: "ඉවත ලන්න"

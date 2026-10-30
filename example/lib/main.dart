@@ -1,6 +1,7 @@
 import 'package:disco/disco.dart';
 import 'package:example/common/app_shell.dart';
 import 'package:example/common/theme_editor/editor_config.dart';
+import 'package:example/common/theme_editor/fonts.dart';
 import 'package:example/docs/docs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
@@ -11,6 +12,11 @@ Future<void> main() async {
   SolidartConfig.devToolsEnabled = false;
   // The docs' code blocks need the Dart grammar and highlighter theme.
   await CodeHighlighter.ensureInitialized();
+  // shad bundles no fonts. Fetch the editor's default face before the first
+  // frame, so the app does not open in the fallback font and then reflow.
+  await EditorFont.byTitle(const ThemeEditorConfig().fontTitle).load(
+    timeout: const Duration(seconds: 3),
+  );
   runApp(const App());
 }
 

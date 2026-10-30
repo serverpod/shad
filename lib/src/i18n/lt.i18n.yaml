@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Atlikta"
+
+dialog:
+  close: "Uždaryti"
+  dismiss: "Atsisakyti"

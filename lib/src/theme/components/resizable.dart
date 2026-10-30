@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'resizable.g.theme.dart';
 
+/// {@template ShadResizableTheme}
+/// Theme for the `ShadResizablePanelGroup` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadResizableTheme with _$ShadResizableTheme {
+  /// {@macro ShadResizableTheme}
   const ShadResizableTheme({
     bool canMerge = true,
     this.mainAxisAlignment,
@@ -73,6 +77,7 @@ class ShadResizableTheme with _$ShadResizableTheme {
   /// {@macro ShadResizablePanelGroup.dividerColor}
   final Color? dividerColor;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadResizableTheme? lerp(
     ShadResizableTheme? a,
     ShadResizableTheme? b,

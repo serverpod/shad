@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+/// Adds [fallback] to [TextStyle].
 extension TextStyleExtension on TextStyle {
   /// Returns a new TextStyle where any null property is replaced by the
   /// corresponding property if passed as a parameter. If both are null, the

@@ -336,7 +336,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCheckbox),
         matchesGoldenFile('goldens/checkbox_on.png'),
       );
@@ -354,7 +354,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCheckbox),
         matchesGoldenFile('goldens/checkbox_off.png'),
       );

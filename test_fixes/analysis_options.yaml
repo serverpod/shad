@@ -1,0 +1,7 @@
+# The files here use deprecated and removed shad APIs on purpose: they are the
+# input to `dart fix --compare-to-golden test_fixes`. dart fix only rewrites
+# what the analyzer reports, and use of a deprecated member from the package
+# that declares it is only reported by this lint.
+linter:
+  rules:
+    - deprecated_member_use_from_same_package

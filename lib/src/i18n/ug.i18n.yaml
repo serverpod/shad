@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "تامام"
+
+dialog:
+  close: "يېپىش"
+  dismiss: "بىكار قىلىش"

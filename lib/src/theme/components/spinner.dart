@@ -40,6 +40,7 @@ class ShadSpinnerTheme with _$ShadSpinnerTheme {
   /// {@macro ShadSpinner.duration}
   final Duration? duration;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSpinnerTheme? lerp(
     ShadSpinnerTheme? a,
     ShadSpinnerTheme? b,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -7,9 +8,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'sheet.g.theme.dart';
 
+/// {@template ShadSheetTheme}
+/// Theme for the `ShadSheet` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadSheetTheme with _$ShadSheetTheme {
+  /// {@macro ShadSheetTheme}
   const ShadSheetTheme({
     bool canMerge = true,
     this.constraints,
@@ -133,10 +138,12 @@ class ShadSheetTheme with _$ShadSheetTheme {
   /// {@macro ShadSheet.descriptionTextAlign}
   final TextAlign? descriptionTextAlign;
 
-  /// {@macro ShadSheet.animateIn}
+  /// The effects played when the sheet appears. Defaults to a slide in
+  /// from its side.
   final List<Effect<dynamic>>? animateIn;
 
-  /// {@macro ShadSheet.animateOut}
+  /// The effects played when the sheet disappears. Defaults to a slide out
+  /// to its side.
   final List<Effect<dynamic>>? animateOut;
 
   /// {@macro ShadSheet.mainAxisAlignment}
@@ -220,9 +227,39 @@ class ShadSheetTheme with _$ShadSheetTheme {
   /// {@macro ShadSheet.dragHandleExtent}
   final double? dragHandleExtent;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSheetTheme? lerp(
     ShadSheetTheme? a,
     ShadSheetTheme? b,
     double t,
   ) => _$ShadSheetTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadSheetTheme &&
+      listEquals(shadows, other.shadows) &&
+      listEquals(animateIn, other.animateIn) &&
+      listEquals(animateOut, other.animateOut) &&
+      listEquals(snapSizes, other.snapSizes) &&
+      super ==
+          other.copyWith(
+            shadows: shadows,
+            animateIn: animateIn,
+            animateOut: animateOut,
+            snapSizes: snapSizes,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(shadows ?? const []),
+    Object.hashAll(animateIn ?? const []),
+    Object.hashAll(animateOut ?? const []),
+    Object.hashAll(snapSizes ?? const []),
+  );
 }

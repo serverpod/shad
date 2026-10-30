@@ -379,17 +379,13 @@ class ThemeEditorConfig {
     buffer.writeln(
       '  radius: BorderRadius.circular(${effectiveRadius.toStringAsFixed(1)}),',
     );
-    if (font.bundled) {
-      buffer.writeln(
-        "  textTheme: ShadTextTheme(family: '${font.family}', "
-        "package: 'shad'),",
-      );
-    } else {
-      buffer.writeln(
-        '  textTheme: ShadTextTheme.fromGoogleFont('
-        "GoogleFonts.${_camel(font.family)}),",
-      );
-    }
+    // Every editor font comes from Google Fonts. An app can also bundle the
+    // face itself and pass `ShadTextTheme(family: 'Inter')`.
+    buffer.writeln(
+      '  // flutter pub add google_fonts\n'
+      '  textTheme: ShadTextTheme.fromGoogleFont('
+      "GoogleFonts.${_camel(font.family)}),",
+    );
     buffer.writeln('  style: ShadStyleTokens.${style.name},');
     if (spacingStep != 4) {
       buffer.writeln(

@@ -18,7 +18,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadTextarea),
         matchesGoldenFile('goldens/textarea.png'),
       );

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "سم دی"
+
+dialog:
+  close: "تړل"
+  dismiss: "رد کړه"

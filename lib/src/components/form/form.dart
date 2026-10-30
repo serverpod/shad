@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/components/form/field.dart';
 import 'package:shad/src/utils/extensions/map.dart';
 
-/// Used to configure the auto validation of [FormField and [ShadForm]
+/// Used to configure the auto validation of [FormField] and [ShadForm]
 /// widgets.
 enum ShadAutovalidateMode {
   /// No auto validation will occur.
@@ -23,23 +23,16 @@ enum ShadAutovalidateMode {
 
 /// A typedef representing a map of form field states with dynamic values.
 typedef ShadFormFields =
-    Map<
-      String,
-      ShadFormBuilderFieldState<ShadFormBuilderField<dynamic>, dynamic>
-    >;
+    Map<String, ShadFormFieldState<ShadFormField<dynamic>, dynamic>>;
 
 /// A stateful widget that manages a form with validation and field management.
 class ShadForm extends StatefulWidget {
+  /// Creates a form around [child].
   const ShadForm({
     super.key,
     required this.child,
     this.onChanged,
     this.canPop,
-    @Deprecated(
-      'Use onPopInvokedWithResult instead. '
-      'This parameter will be removed in v1.0.0.',
-    )
-    this.onPopInvoked,
     this.onPopInvokedWithResult,
     this.autovalidateMode = ShadAutovalidateMode.alwaysAfterFirstValidation,
     this.initialValue = const {},
@@ -54,11 +47,6 @@ class ShadForm extends StatefulWidget {
 
   /// Whether the form can be popped from navigation
   final bool? canPop;
-  @Deprecated(
-    'Use onPopInvokedWithResult instead. '
-    'This parameter will be removed in v1.0.0.',
-  )
-  final void Function(bool)? onPopInvoked;
 
   /// Callback when form is popped with a result
   final PopInvokedWithResultCallback<Object?>? onPopInvokedWithResult;
@@ -75,7 +63,8 @@ class ShadForm extends StatefulWidget {
   /// Whether the form fields are enabled
   final bool enabled;
 
-  /// Whether to skip disabled fields during validation
+  /// Whether disabled fields are skipped during validation: they always count
+  /// as valid and show no error. Defaults to false.
   final bool skipDisabled;
 
   /// Whether to clear the value of fields when they are unregistered, defaults
@@ -118,6 +107,12 @@ class ShadFormState extends State<ShadForm> {
   final Map<String, dynamic> _value = {};
   final Map<String, Function> _toValueTransformers = {};
   final Map<String, Function> _fromValueTransformers = {};
+
+  /// The validation mode passed to the inner [Form].
+  ///
+  /// It starts from [ShadForm.autovalidateMode]. With
+  /// [ShadAutovalidateMode.alwaysAfterFirstValidation] it switches to
+  /// [AutovalidateMode.always] on the first [validate], and back on [reset].
   late final ValueNotifier<AutovalidateMode> autovalidateMode;
 
   /// Returns the registered form fields
@@ -180,7 +175,7 @@ class ShadFormState extends State<ShadForm> {
   /// Registers a form field with the specified id
   void registerField(
     String id,
-    ShadFormBuilderFieldState<ShadFormBuilderField<dynamic>, dynamic> field,
+    ShadFormFieldState<ShadFormField<dynamic>, dynamic> field,
   ) {
     _fields[id] = field;
 
@@ -289,7 +284,7 @@ class ShadFormState extends State<ShadForm> {
   /// Unregisters a form field
   void unregisterField(
     String id,
-    ShadFormBuilderFieldState<ShadFormBuilderField<dynamic>, dynamic> field,
+    ShadFormFieldState<ShadFormField<dynamic>, dynamic> field,
   ) {
     _fields.remove(id);
     _toValueTransformers.remove(id);
@@ -364,8 +359,6 @@ class ShadFormState extends State<ShadForm> {
         return Form(
           key: _formKey,
           autovalidateMode: mode,
-          // ignore: deprecated_member_use_from_same_package, deprecated_member_use
-          onPopInvoked: widget.onPopInvoked,
           onPopInvokedWithResult: widget.onPopInvokedWithResult,
           canPop: widget.canPop,
           onChanged: widget.onChanged,
@@ -385,6 +378,7 @@ class ShadFormState extends State<ShadForm> {
 
 /// An inherited widget that provides access to the [ShadFormState]
 class ShadFormScope extends InheritedWidget {
+  /// Creates a scope that gives [child] access to `formState`.
   const ShadFormScope({
     super.key,
     required super.child,

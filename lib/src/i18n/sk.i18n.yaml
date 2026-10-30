@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Hotovo"
+
+dialog:
+  close: "Zavrieť"
+  dismiss: "Odmietnuť"

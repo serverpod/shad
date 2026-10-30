@@ -91,7 +91,16 @@ class ShadCalendarModel {
 }
 
 /// Variants available for the [ShadCalendar] widget.
-enum ShadCalendarVariant { single, multiple, range }
+enum ShadCalendarVariant {
+  /// Selects one date.
+  single,
+
+  /// Selects any number of separate dates.
+  multiple,
+
+  /// Selects a start date, an end date and the days between them.
+  range,
+}
 
 /// Caption layout options for the [ShadCalendar] widget.
 enum ShadCalendarCaptionLayout {
@@ -180,12 +189,20 @@ class ShadCalendar extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.allowDeselection,
     this.groupId,
     this.dropdownFormatMonth,
     this.dropdownFormatYear,
-  }) : variant = ShadCalendarVariant.single,
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       variant = ShadCalendarVariant.single,
        multipleSelected = null,
        onMultipleChanged = null,
        min = null,
@@ -258,11 +275,19 @@ class ShadCalendar extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.groupId,
     this.dropdownFormatMonth,
     this.dropdownFormatYear,
-  }) : variant = ShadCalendarVariant.multiple,
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       variant = ShadCalendarVariant.multiple,
        multipleSelected = selected,
        selected = null,
        onMultipleChanged = onChanged,
@@ -336,12 +361,20 @@ class ShadCalendar extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.allowDeselection,
     this.groupId,
     this.dropdownFormatMonth,
     this.dropdownFormatYear,
-  }) : variant = ShadCalendarVariant.range,
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       variant = ShadCalendarVariant.range,
        multipleSelected = null,
        selected = null,
        onMultipleChanged = null,
@@ -420,12 +453,19 @@ class ShadCalendar extends StatefulWidget {
     this.gridCrossAxisSpacing,
     this.dayButtonOutsideMonthTextStyle,
     this.dayButtonOutsideMonthVariant,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.allowDeselection,
     this.groupId,
     this.dropdownFormatMonth,
     this.dropdownFormatYear,
-  });
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant;
 
   /// {@template ShadCalendar.variant}
   /// The variant of the calendar to use.
@@ -850,11 +890,19 @@ class ShadCalendar extends StatefulWidget {
   /// {@endtemplate}
   final ShadButtonVariant? dayButtonOutsideMonthVariant;
 
-  /// {@template ShadCalendar.selectedDayButtonOusideMonthVariant}
+  /// {@template ShadCalendar.selectedDayButtonOutsideMonthVariant}
   /// The variant of the selected day buttons outside the month, defaults to
   /// [ShadButtonVariant.secondary]
   /// {@endtemplate}
-  final ShadButtonVariant? selectedDayButtonOusideMonthVariant;
+  final ShadButtonVariant? selectedDayButtonOutsideMonthVariant;
+
+  /// The old, misspelled name of [selectedDayButtonOutsideMonthVariant].
+  @Deprecated(
+    'Use selectedDayButtonOutsideMonthVariant. '
+    'Will be removed in the next major version.',
+  )
+  ShadButtonVariant? get selectedDayButtonOusideMonthVariant =>
+      selectedDayButtonOutsideMonthVariant;
 
   /// {@template ShadCalendar.allowDeselection}
   /// Whether to allow deselection of the selected date, defaults to false.
@@ -1112,7 +1160,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
   DateFormat _dateFormat(String pattern, Locale locale) {
     final languageTag = locale.toLanguageTag();
     return _dateFormats.putIfAbsent(
-      '$pattern $languageTag',
+      '$pattern\u0000$languageTag',
       () => DateFormat(pattern, languageTag),
     );
   }
@@ -1286,8 +1334,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
         theme.calendarTheme.monthConstraints ??
         BoxConstraints(
           maxWidth:
-              (7 + (effectiveShowWeekNumbers ? 1 : 0)) *
-              effectiveDayButtonSize,
+              (7 + (effectiveShowWeekNumbers ? 1 : 0)) * effectiveDayButtonSize,
         );
 
     final effectiveHeaderHeight =
@@ -1390,6 +1437,10 @@ class _ShadCalendarState extends State<ShadCalendar> {
               color: theme.colorScheme.mutedForeground,
             );
 
+    final effectiveWeekNumbersTextAlign =
+        widget.weekNumbersTextAlign ??
+        theme.calendarTheme.weekNumbersTextAlign ??
+        TextAlign.center;
 
     final effectiveDayButtonOutsideMonthOpacity =
         widget.dayButtonOutsideMonthOpacity ??
@@ -1421,9 +1472,9 @@ class _ShadCalendarState extends State<ShadCalendar> {
         theme.calendarTheme.dayButtonOutsideMonthVariant ??
         ShadButtonVariant.ghost;
 
-    final effectiveSelectedDayButtonOusideMonthVariant =
-        widget.selectedDayButtonOusideMonthVariant ??
-        theme.calendarTheme.selectedDayButtonOusideMonthVariant ??
+    final effectiveSelectedOutsideMonthVariant =
+        widget.selectedDayButtonOutsideMonthVariant ??
+        theme.calendarTheme.selectedDayButtonOutsideMonthVariant ??
         ShadButtonVariant.secondary;
 
     final effectiveTodayButtonVariant =
@@ -1804,7 +1855,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
                                   : effectiveDayButtonVariant,
                             false =>
                               selected
-                                  ? effectiveSelectedDayButtonOusideMonthVariant
+                                  ? effectiveSelectedOutsideMonthVariant
                                   : effectiveDayButtonOutsideMonthVariant,
                           },
                         };
@@ -1814,6 +1865,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
                             child: Text(
                               date.weekNumber.toString(),
                               style: effectiveWeekNumbersTextStyle,
+                              textAlign: effectiveWeekNumbersTextAlign,
                             ),
                           );
                         }
@@ -1846,8 +1898,7 @@ class _ShadCalendarState extends State<ShadCalendar> {
                                             : isLastOfRow
                                             ? ShadBorder(
                                                 radius: BorderRadius.only(
-                                                  topRight:
-                                                      cellRadius.topRight,
+                                                  topRight: cellRadius.topRight,
                                                   bottomRight:
                                                       cellRadius.bottomRight,
                                                 ),

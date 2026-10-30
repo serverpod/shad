@@ -7,6 +7,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// value to sRGB.
 @immutable
 class ShadMistColorScheme extends ShadColorScheme {
+  /// Creates a [ShadMistColorScheme] from explicit colours.
+  ///
+  /// Use [ShadMistColorScheme.light] or [ShadMistColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadMistColorScheme({
     required super.background,
     required super.foreground,
@@ -44,6 +48,9 @@ class ShadMistColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadMistColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadMistColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff090b0c),
@@ -81,6 +88,9 @@ class ShadMistColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadMistColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadMistColorScheme.dark({
     super.background = const Color(0xff090b0c),
     super.foreground = const Color(0xfff9fbfb),

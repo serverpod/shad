@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Kész"
+
+dialog:
+  close: "Bezárás"
+  dismiss: "Elvetés"

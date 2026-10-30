@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Imekamilika"
+
+dialog:
+  close: "Funga"
+  dismiss: "Ondoa"

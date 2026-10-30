@@ -25,6 +25,7 @@ class ShadToggleTheme with _$ShadToggleTheme {
     this.textStyle,
     this.gap,
     this.height,
+    this.iconSize,
   }) : _canMerge = canMerge;
 
   @ignore
@@ -69,6 +70,10 @@ class ShadToggleTheme with _$ShadToggleTheme {
   /// The height of the toggle.
   final double? height;
 
+  /// The size of the toggle's icons. Defaults to 16.
+  final double? iconSize;
+
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadToggleTheme? lerp(
     ShadToggleTheme? a,
     ShadToggleTheme? b,

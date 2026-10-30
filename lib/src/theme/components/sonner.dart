@@ -3,12 +3,20 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'sonner.g.theme.dart';
 
+/// {@template ShadSonnerTheme}
+/// Theme for the `ShadSonner` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadSonnerTheme with _$ShadSonnerTheme {
+  /// {@macro ShadSonnerTheme}
   const ShadSonnerTheme({
     bool canMerge = true,
-    this.visibleToastsAmount,
+    int? maxVisibleToasts,
+    @Deprecated(
+      'Use maxVisibleToasts. Will be removed in the next major version.',
+    )
+    int? visibleToastsAmount,
     this.alignment,
     this.padding,
     this.expandedGap,
@@ -16,7 +24,8 @@ class ShadSonnerTheme with _$ShadSonnerTheme {
     this.scaleFactor,
     this.animationDuration,
     this.animationCurve,
-  }) : _canMerge = canMerge;
+  }) : maxVisibleToasts = maxVisibleToasts ?? visibleToastsAmount,
+       _canMerge = canMerge;
 
   @ignore
   final bool _canMerge;
@@ -25,7 +34,13 @@ class ShadSonnerTheme with _$ShadSonnerTheme {
   bool get canMerge => _canMerge;
 
   /// {@macro ShadSonner.visible_toasts_amount}
-  final int? visibleToastsAmount;
+  final int? maxVisibleToasts;
+
+  /// The old name of [maxVisibleToasts].
+  @Deprecated(
+    'Use maxVisibleToasts. Will be removed in the next major version.',
+  )
+  int? get visibleToastsAmount => maxVisibleToasts;
 
   /// {@macro ShadSonner.alignment}
   final AlignmentGeometry? alignment;
@@ -48,6 +63,7 @@ class ShadSonnerTheme with _$ShadSonnerTheme {
   /// {@macro ShadSonner.animationCurve}
   final Curve? animationCurve;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSonnerTheme? lerp(
     ShadSonnerTheme? a,
     ShadSonnerTheme? b,

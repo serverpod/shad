@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/raw_components/portal.dart';
@@ -7,9 +8,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'tooltip.g.theme.dart';
 
+/// {@template ShadTooltipTheme}
+/// Theme for the `ShadTooltip` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadTooltipTheme with _$ShadTooltipTheme {
+  /// {@macro ShadTooltipTheme}
   const ShadTooltipTheme({
     bool canMerge = true,
     this.waitDuration,
@@ -82,9 +87,27 @@ class ShadTooltipTheme with _$ShadTooltipTheme {
   /// square styles.
   final double? arrowRadius;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTooltipTheme? lerp(
     ShadTooltipTheme? a,
     ShadTooltipTheme? b,
     double t,
   ) => _$ShadTooltipTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadTooltipTheme &&
+      listEquals(effects, other.effects) &&
+      super == other.copyWith(effects: effects);
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(effects ?? const []),
+  );
 }

@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `violet` theme: a neutral base with a violet primary.
+///
+/// Kept for compatibility. In v4, apply `ShadAccentScheme.violetLight` or
+/// `ShadAccentScheme.violetDark` to a base colour scheme instead.
 @immutable
 class ShadVioletColorScheme extends ShadColorScheme {
+  /// Creates a [ShadVioletColorScheme] from explicit colours.
+  ///
+  /// Use [ShadVioletColorScheme.light] or [ShadVioletColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadVioletColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadVioletColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadVioletColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadVioletColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff030712),
@@ -51,6 +62,9 @@ class ShadVioletColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadVioletColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadVioletColorScheme.dark({
     super.background = const Color(0xff030712),
     super.foreground = const Color(0xfff9fafb),

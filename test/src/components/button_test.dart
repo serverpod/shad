@@ -373,7 +373,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button.png'),
       );
@@ -390,7 +390,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button_destructive.png'),
       );
@@ -407,7 +407,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button_outline.png'),
       );
@@ -424,7 +424,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button_secondary.png'),
       );
@@ -441,7 +441,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button_ghost.png'),
       );
@@ -458,7 +458,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadButton),
         matchesGoldenFile('goldens/button_link.png'),
       );

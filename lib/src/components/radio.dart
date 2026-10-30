@@ -8,12 +8,19 @@ import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/debug_check.dart';
 import 'package:shad/src/utils/provider.dart';
 
+/// Holds the selected value of a [ShadRadioGroup] and whether the group is
+/// enabled.
 class ShadRadioController<T> extends ValueNotifier<T?> {
+  /// Creates a controller with the selected [value], null by default.
+  /// The group is enabled by default.
   ShadRadioController({T? value, bool enabled = true})
     : _enabled = enabled,
       super(value);
 
   late bool _enabled;
+
+  /// Whether the radios of the group react to input. Setting it notifies
+  /// listeners.
   bool get enabled => _enabled;
   set enabled(bool value) {
     if (_enabled == value) return;
@@ -113,9 +120,12 @@ class ShadRadioGroup<T> extends StatefulWidget {
   State<ShadRadioGroup<T>> createState() => ShadRadioGroupState<T>();
 }
 
+/// The state of a [ShadRadioGroup].
 class ShadRadioGroupState<T> extends State<ShadRadioGroup<T>> {
   ShadRadioController<T>? _controller;
 
+  /// The controller in use: [ShadRadioGroup.controller], or an internal one
+  /// when that is null.
   ShadRadioController<T> get effectiveController =>
       widget.controller ??
       (_controller ??= ShadRadioController<T>(
@@ -141,7 +151,9 @@ class ShadRadioGroupState<T> extends State<ShadRadioGroup<T>> {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.controller != widget.controller) {
-      effectiveController.removeListener(onValueChanged);
+      // The old controller, not effectiveController: that already resolves
+      // to the new one, which left the listener on the old controller.
+      (oldWidget.controller ?? _controller)?.removeListener(onValueChanged);
       if (oldWidget.controller == null && widget.controller != null) {
         _controller?.dispose();
         _controller = null;
@@ -158,6 +170,10 @@ class ShadRadioGroupState<T> extends State<ShadRadioGroup<T>> {
     }
   }
 
+  /// Calls [ShadRadioGroup.onChanged] with the value of the controller.
+  ///
+  /// It runs on every change of the controller, including changes made in
+  /// code.
   void onValueChanged() {
     widget.onChanged?.call(effectiveController.value);
   }

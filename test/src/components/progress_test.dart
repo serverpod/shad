@@ -13,7 +13,7 @@ void main() {
     testWidgets('ShadProgress indeterminate matches goldens', (tester) async {
       await tester.pumpWidget(createTestWidget(const ShadProgress()));
 
-      expect(
+      await expectLater(
         find.byType(ShadProgress),
         matchesGoldenFile('goldens/progress_indeterminate.png'),
       );
@@ -22,7 +22,7 @@ void main() {
     testWidgets('ShadProgress determinate matches goldens', (tester) async {
       await tester.pumpWidget(createTestWidget(const ShadProgress(value: 0.5)));
 
-      expect(
+      await expectLater(
         find.byType(ShadProgress),
         matchesGoldenFile('goldens/progress_determinate.png'),
       );

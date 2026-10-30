@@ -5,9 +5,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'input.g.theme.dart';
 
+/// {@template ShadInputTheme}
+/// Theme for the `ShadInput` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadInputTheme with _$ShadInputTheme {
+  /// {@macro ShadInputTheme}
   const ShadInputTheme({
     bool canMerge = true,
     this.decoration,
@@ -94,6 +98,7 @@ class ShadInputTheme with _$ShadInputTheme {
   /// {@macro ShadInput.useBrowserContextMenu}
   final bool? useBrowserContextMenu;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadInputTheme? lerp(
     ShadInputTheme? a,
     ShadInputTheme? b,

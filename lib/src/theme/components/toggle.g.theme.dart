@@ -62,6 +62,7 @@ mixin _$ShadToggleTheme {
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
       gap: lerpDouble$(a.gap, b.gap, t),
       height: lerpDouble$(a.height, b.height, t),
+      iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
     );
   }
 
@@ -78,6 +79,7 @@ mixin _$ShadToggleTheme {
     TextStyle? textStyle,
     double? gap,
     double? height,
+    double? iconSize,
   }) {
     final _this = (this as ShadToggleTheme);
 
@@ -97,6 +99,7 @@ mixin _$ShadToggleTheme {
       textStyle: textStyle ?? _this.textStyle,
       gap: gap ?? _this.gap,
       height: height ?? _this.height,
+      iconSize: iconSize ?? _this.iconSize,
     );
   }
 
@@ -124,6 +127,7 @@ mixin _$ShadToggleTheme {
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
       gap: other.gap,
       height: other.height,
+      iconSize: other.iconSize,
     );
   }
 
@@ -152,7 +156,8 @@ mixin _$ShadToggleTheme {
         _other.decoration == _this.decoration &&
         _other.textStyle == _this.textStyle &&
         _other.gap == _this.gap &&
-        _other.height == _this.height;
+        _other.height == _this.height &&
+        _other.iconSize == _this.iconSize;
   }
 
   @override
@@ -173,6 +178,7 @@ mixin _$ShadToggleTheme {
       _this.textStyle,
       _this.gap,
       _this.height,
+      _this.iconSize,
     );
   }
 }

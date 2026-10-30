@@ -6,11 +6,11 @@ on:
       test_path:
         description: Test file or directory to run
         required: false
-        default: test/src/components/sheet_test.dart
+        default: test
       test_name:
-        description: Optional --plain-name filter
+        description: Optional --plain-name filter (empty runs every test)
         required: false
-        default: golden: expandable bottom sheet at initial size
+        default: ""
 
 jobs:
   update-goldens:
@@ -25,12 +25,18 @@ jobs:
 
       - name: Regenerate goldens on Linux
         run: |
-          flutter test "${{ inputs.test_path }}" \
-            --plain-name "${{ inputs.test_name }}" \
-            --update-goldens
+          if [ -n "${{ inputs.test_name }}" ]; then
+            flutter test "${{ inputs.test_path }}" \
+              --plain-name "${{ inputs.test_name }}" \
+              --update-goldens
+          else
+            flutter test "${{ inputs.test_path }}" --update-goldens
+          fi
 
       - name: Upload updated goldens
-        uses: actions/upload-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: updated-goldens
-          path: test/src/components/goldens/
+          path: |
+            test/**/goldens/**
+            example/test/**/goldens/**

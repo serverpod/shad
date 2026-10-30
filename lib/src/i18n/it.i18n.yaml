@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Fine"
+
+dialog:
+  close: "Chiudi"
+  dismiss: "Ignora"

@@ -13,7 +13,11 @@ import 'package:shad/src/utils/responsive.dart';
 import 'package:shad/src/utils/shadow.dart';
 
 /// The default duration for toasts to remain visible.
-const kDefaultToastDuration = Duration(seconds: 5);
+/// How long a toast stays on screen when it sets no duration.
+@Deprecated(
+  'Use ShadToast.defaultDuration. Will be removed in the next major version.',
+)
+const kDefaultToastDuration = ShadToast.defaultDuration;
 
 /// A widget that manages and displays toasts within the widget tree.
 ///
@@ -80,15 +84,20 @@ class ShadToasterState extends State<ShadToaster>
     super.dispose();
   }
 
+  /// Shows [toast], replacing the one on screen, and hides it after its display
+  /// duration.
   void show(ShadToast toast) {
     _timer?.cancel();
     _shown.value = true;
     _visibleToast.value = toast;
     _controller.forward(from: 0);
-    final effectiveDuration = toast.duration ?? kDefaultToastDuration;
-    _timer = Timer(effectiveDuration, hide);
+    _timer = Timer(toast.resolveDisplayDuration(context), hide);
   }
 
+  /// Hides the toast on screen.
+  ///
+  /// When [animate] is true, the default, the future completes after the exit
+  /// animation.
   Future<void> hide({bool animate = true}) async {
     _timer?.cancel();
     _shown.value = false;
@@ -279,7 +288,10 @@ class ShadToasterScope extends InheritedWidget {
 
 /// Variants available for the [ShadToast] widget.
 enum ShadToastVariant {
+  /// The default toast. Styled by `ShadThemeData.primaryToastTheme`.
   primary,
+
+  /// A toast for errors. Styled by `ShadThemeData.destructiveToastTheme`.
   destructive,
 }
 
@@ -301,7 +313,11 @@ class ShadToast extends StatefulWidget {
     this.closeIconData,
     this.alignment,
     this.offset,
-    this.duration,
+    Duration? displayDuration,
+    @Deprecated(
+      'Use displayDuration. Will be removed in the next major version.',
+    )
+    Duration? duration,
     this.textDirection,
     this.animateIn,
     this.animateOut,
@@ -319,7 +335,8 @@ class ShadToast extends StatefulWidget {
     this.constraints,
     this.mainAxisAlignment,
     this.mainAxisSize,
-  }) : variant = ShadToastVariant.primary;
+  }) : displayDuration = displayDuration ?? duration,
+       variant = ShadToastVariant.primary;
 
   /// Creates a destructive variant toast widget, typically for error or warning
   /// messages.
@@ -333,7 +350,11 @@ class ShadToast extends StatefulWidget {
     this.closeIconData,
     this.alignment,
     this.offset,
-    this.duration,
+    Duration? displayDuration,
+    @Deprecated(
+      'Use displayDuration. Will be removed in the next major version.',
+    )
+    Duration? duration,
     this.textDirection,
     this.animateIn,
     this.animateOut,
@@ -351,7 +372,8 @@ class ShadToast extends StatefulWidget {
     this.constraints,
     this.mainAxisAlignment,
     this.mainAxisSize,
-  }) : variant = ShadToastVariant.destructive;
+  }) : displayDuration = displayDuration ?? duration,
+       variant = ShadToastVariant.destructive;
 
   /// Creates a toast widget with a specified [variant], offering full
   /// customization.
@@ -366,7 +388,11 @@ class ShadToast extends StatefulWidget {
     this.closeIconData,
     this.alignment,
     this.offset,
-    this.duration,
+    Duration? displayDuration,
+    @Deprecated(
+      'Use displayDuration. Will be removed in the next major version.',
+    )
+    Duration? duration,
     this.textDirection,
     this.animateIn,
     this.animateOut,
@@ -384,7 +410,7 @@ class ShadToast extends StatefulWidget {
     this.constraints,
     this.mainAxisAlignment,
     this.mainAxisSize,
-  });
+  }) : displayDuration = displayDuration ?? duration;
 
   /// {@template ShadToast.id}
   /// The unique identifier for the toast, used for tracking and managing
@@ -435,11 +461,16 @@ class ShadToast extends StatefulWidget {
   /// {@endtemplate}
   final Offset? offset;
 
-  /// {@template ShadToast.duration}
-  /// The duration the toast remains visible before auto-hiding.
-  /// Defaults to [kDefaultToastDuration] (5 seconds) if not specified.
+  /// {@template ShadToast.displayDuration}
+  /// How long the toast stays visible before it hides itself. Defaults to
+  /// the theme's value, then to [ShadToast.defaultDuration] (5 seconds).
   /// {@endtemplate}
-  final Duration? duration;
+  final Duration? displayDuration;
+
+  /// The old name of [displayDuration]. Everywhere else in shad, `duration`
+  /// is the length of an animation.
+  @Deprecated('Use displayDuration. Will be removed in the next major version.')
+  Duration? get duration => displayDuration;
 
   /// {@template ShadToast.textDirection}
   /// The directionality of the toast’s content (e.g., LTR or RTL).
@@ -553,6 +584,21 @@ class ShadToast extends StatefulWidget {
   /// {@endtemplate}
   final MainAxisSize? mainAxisSize;
 
+  /// How long a toast stays on screen when neither it nor its theme sets a
+  /// duration.
+  static const defaultDuration = Duration(seconds: 5);
+
+  /// How long this toast stays on screen: [displayDuration], else its
+  /// variant's theme, else [defaultDuration].
+  Duration resolveDisplayDuration(BuildContext context) {
+    final theme = ShadTheme.of(context, listen: false);
+    final variantTheme = switch (variant) {
+      ShadToastVariant.primary => theme.primaryToastTheme,
+      ShadToastVariant.destructive => theme.destructiveToastTheme,
+    };
+    return displayDuration ?? variantTheme.displayDuration ?? defaultDuration;
+  }
+
   @override
   State<ShadToast> createState() => _ShadToastState();
 }
@@ -622,7 +668,7 @@ class _ShadToastState extends State<ShadToast> {
     final effectiveBorderRadius =
         widget.radius ?? effectiveToastTheme.radius ?? theme.radius;
     final effectiveShadows =
-        widget.shadows ?? effectiveToastTheme.shadows ?? Shadows.lg;
+        widget.shadows ?? effectiveToastTheme.shadows ?? ShadShadows.lg;
     final effectiveBackgroundColor =
         widget.backgroundColor ??
         effectiveToastTheme.backgroundColor ??

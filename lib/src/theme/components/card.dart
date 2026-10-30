@@ -1,12 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:theme_extensions_builder_annotation/theme_extensions_builder_annotation.dart';
 
 part 'card.g.theme.dart';
 
+/// {@template ShadCardTheme}
+/// Theme for the `ShadCard` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadCardTheme with _$ShadCardTheme {
+  /// {@macro ShadCardTheme}
   const ShadCardTheme({
     bool canMerge = true,
     this.backgroundColor,
@@ -91,9 +96,27 @@ class ShadCardTheme with _$ShadCardTheme {
   /// title and its description. Null falls back to [gap].
   final double? sectionGap;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadCardTheme? lerp(
     ShadCardTheme? a,
     ShadCardTheme? b,
     double t,
   ) => _$ShadCardTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadCardTheme &&
+      listEquals(shadows, other.shadows) &&
+      super == other.copyWith(shadows: shadows);
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(shadows ?? const []),
+  );
 }

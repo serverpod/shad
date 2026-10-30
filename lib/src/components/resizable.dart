@@ -11,13 +11,22 @@ import 'package:shad/src/utils/provider.dart';
 
 /// The result of resizing a panel
 enum ShadResizeResult {
+  /// The whole drag distance was applied.
   success,
+
+  /// The leading panels could not shrink or grow enough, so only part of a
+  /// backward drag was applied.
   failedLeading,
+
+  /// The trailing panels could not shrink or grow enough, so only part of a
+  /// forward drag was applied.
   failedTrailing,
 }
 
 /// The size information of a panel
 class ShadPanelInfo {
+  /// Creates the size information of a panel. All sizes are fractions of the
+  /// group, from 0 to 1.
   ShadPanelInfo({
     required this.id,
     required this.defaultSize,
@@ -34,6 +43,9 @@ class ShadPanelInfo {
        ),
        assert(defaultSize >= 0 && defaultSize <= 1);
 
+  /// The current size of the panel, as a fraction of the group.
+  ///
+  /// Setting a value below [minSize] or above [maxSize] throws.
   double get size => _size;
 
   set size(double value) {
@@ -73,10 +85,19 @@ class ShadPanelInfo {
   }
 }
 
+/// Holds the sizes of the panels in a [ShadResizablePanelGroup] and resizes
+/// them.
+///
+/// Pass one to [ShadResizablePanelGroup.controller] to read or change the
+/// sizes from outside. When none is given, the group creates its own.
 class ShadResizableController extends ChangeNotifier {
+  /// Creates a controller with no panels.
   ShadResizableController();
 
+  /// The size information of each panel, in layout order.
   final panelsInfo = <ShadPanelInfo>[];
+
+  /// The default size of each panel, in layout order. Used to reset sizes.
   final defaultSizes = <double>[];
 
   /// {@template ShadResizableController.registerPanel}
@@ -88,12 +109,16 @@ class ShadResizableController extends ChangeNotifier {
     return panelsInfo.length - 1;
   }
 
+  /// Inserts a panel at [index] and notifies listeners.
   void insertPanel(int index, ShadPanelInfo info) {
     panelsInfo.insert(index, info);
     defaultSizes.insert(index, info.defaultSize);
     notifyListeners();
   }
 
+  /// Removes the panel with the given [id] and notifies listeners.
+  ///
+  /// Does nothing if no panel has that id.
   void unregisterPanel(Object id) {
     final index = panelsInfo.indexWhere((e) => e.id == id);
     if (index == -1) return;
@@ -312,6 +337,10 @@ class ShadResizableController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The size of the group along its axis, in logical pixels.
+  ///
+  /// The group sets this value during layout. It converts drag distances into
+  /// fractions.
   double totalAvailableWidth = 0;
 
   /// The total size of all registered panels, used to calculate available
@@ -466,13 +495,19 @@ class ShadResizablePanelGroup extends StatefulWidget {
   ShadResizablePanelGroupState createState() => ShadResizablePanelGroupState();
 }
 
+/// The state of a [ShadResizablePanelGroup].
 class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
   ShadResizableController? _internalController;
 
+  /// Sets the mouse cursor while a divider is dragged.
   late final mouseCursorController = context.read<ShadMouseCursorController>();
 
+  /// Whether a divider is being dragged.
+  @protected
   final dragging = ValueNotifier<bool>(false);
 
+  /// The constraints of the group from the last layout.
+  @protected
   BoxConstraints? currentConstraints;
 
   /// Snapshot of panel sizes at drag start (absolute-delta approach).
@@ -481,12 +516,17 @@ class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
   /// Global pointer position at drag start.
   double? _pointerDownPosition;
 
+  /// Whether the panels are laid out in a row.
   bool get isHorizontal => widget.axis == Axis.horizontal;
 
+  /// Whether the panels are laid out in a column.
   bool get isVertical => widget.axis == Axis.vertical;
 
+  /// The number of dividers, one fewer than the number of panels.
   int get dividersCount => widget.children.length - 1;
 
+  /// The controller in use: [ShadResizablePanelGroup.controller], or an
+  /// internal one when that is null.
   ShadResizableController get controller {
     if (widget.controller != null) return widget.controller!;
     return _internalController ??= ShadResizableController();
@@ -544,6 +584,7 @@ class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
     super.dispose();
   }
 
+  /// Registers every child panel with the [controller].
   void registerPanels() {
     for (final c in widget.children) {
       controller.registerPanel(
@@ -557,10 +598,15 @@ class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
     }
   }
 
+  /// {@macro ShadResizableController.registerPanel}
   int registerPanel(ShadPanelInfo info) => controller.registerPanel(info);
 
+  /// {@macro ShadResizableController.getPanelInfo}
   ShadPanelInfo getPanelInfo(int index) => controller.getPanelInfo(index);
 
+  /// Starts a drag of the divider after the panel at [index].
+  ///
+  /// Saves the current sizes, so each update can resize from them.
   void onHandleDragStart({
     required int index,
     required DragStartDetails details,
@@ -572,12 +618,18 @@ class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
         : details.globalPosition.dy;
   }
 
+  /// Ends the current divider drag.
   void onHandleDragEnd() {
     dragging.value = false;
     _initialLayout = null;
     _pointerDownPosition = null;
   }
 
+  /// Resizes the panels on each side of the divider after the panel at
+  /// [index], from the sizes saved at drag start.
+  ///
+  /// Also sets the mouse cursor to show in which directions the divider can
+  /// still move.
   void onHandleDragUpdate({
     required int index,
     required DragUpdateDetails details,
@@ -627,6 +679,9 @@ class ShadResizablePanelGroupState extends State<ShadResizablePanelGroup> {
     }
   }
 
+  /// Resets the two panels on each side of a divider to their default sizes.
+  ///
+  /// The indexes must be adjacent.
   void resetDefaultSizes(int leadingIndex, int trailingIndex) {
     assert((leadingIndex - trailingIndex).abs() == 1);
     controller.resetDefaultSizes(leadingIndex, trailingIndex);

@@ -71,7 +71,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadDialog),
         matchesGoldenFile('goldens/dialog.png'),
       );

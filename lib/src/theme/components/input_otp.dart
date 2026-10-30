@@ -5,9 +5,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'input_otp.g.theme.dart';
 
+/// {@template ShadInputOTPTheme}
+/// Theme for the `ShadInputOTP` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadInputOTPTheme with _$ShadInputOTPTheme {
+  /// {@macro ShadInputOTPTheme}
   const ShadInputOTPTheme({
     bool canMerge = true,
     this.gap,
@@ -58,6 +62,7 @@ class ShadInputOTPTheme with _$ShadInputOTPTheme {
   /// {@macro ShadInputOTPSlot.middleRadius}
   final BorderRadius? middleRadius;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadInputOTPTheme? lerp(
     ShadInputOTPTheme? a,
     ShadInputOTPTheme? b,

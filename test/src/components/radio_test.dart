@@ -421,7 +421,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadRadioGroup<bool>),
         matchesGoldenFile('goldens/radio.png'),
       );

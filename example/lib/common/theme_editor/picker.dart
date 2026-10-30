@@ -8,10 +8,15 @@ class PickerOption<T> {
     required this.value,
     required this.label,
     this.swatch,
+    this.labelStyle,
   });
 
   final T value;
   final String label;
+
+  /// Merged into the label's style in the list, e.g. to show a font option in
+  /// its own face.
+  final TextStyle? labelStyle;
 
   /// Shown as a colour dot before the label, as shadcn's colour pickers do.
   final Color? swatch;
@@ -43,6 +48,7 @@ class ThemePicker<T> extends StatefulWidget {
     required this.onChanged,
     this.enabled = true,
     this.icon,
+    this.busy = false,
   });
 
   final String label;
@@ -56,6 +62,10 @@ class ThemePicker<T> extends StatefulWidget {
   /// shadcn's customizer gives every row its own icon, which is what makes the
   /// list scannable without reading it.
   final IconData? icon;
+
+  /// Shows a spinner in place of [icon], while a choice is being prepared
+  /// (a font loading, for instance).
+  final bool busy;
 
   @override
   State<ThemePicker<T>> createState() => _ThemePickerState<T>();
@@ -106,6 +116,7 @@ class _ThemePickerState<T> extends State<ThemePicker<T>> {
               for (final option in widget.options)
                 _PickerItem(
                   label: option.label,
+                  labelStyle: option.labelStyle,
                   swatch: option.swatch,
                   selected: option.value == widget.value,
                   onTap: () {
@@ -155,7 +166,13 @@ class _ThemePickerState<T> extends State<ThemePicker<T>> {
                 // The row's indicator sits at the trailing edge, centred on
                 // the two-line stack — shadcn positions it `right-2.5
                 // top-1/2 -translate-y-1/2`.
-                if (selected.swatch != null) ...[
+                if (widget.busy) ...[
+                  const SizedBox(width: 8),
+                  ShadSpinner(
+                    size: 15,
+                    color: theme.colorScheme.mutedForeground,
+                  ),
+                ] else if (selected.swatch != null) ...[
                   const SizedBox(width: 8),
                   _Swatch(color: selected.swatch!),
                 ] else if (widget.icon != null) ...[
@@ -181,9 +198,11 @@ class _PickerItem extends StatefulWidget {
     required this.selected,
     required this.onTap,
     this.swatch,
+    this.labelStyle,
   });
 
   final String label;
+  final TextStyle? labelStyle;
   final bool selected;
   final VoidCallback onTap;
   final Color? swatch;
@@ -215,7 +234,12 @@ class _PickerItemState extends State<_PickerItem> {
               _Swatch(color: widget.swatch!),
               const SizedBox(width: 8),
             ],
-            Expanded(child: Text(widget.label, style: theme.textTheme.small)),
+            Expanded(
+              child: Text(
+                widget.label,
+                style: theme.textTheme.small.merge(widget.labelStyle),
+              ),
+            ),
             if (widget.selected)
               Icon(
                 LucideIcons.check,

@@ -1,13 +1,20 @@
 import 'package:flutter/widgets.dart';
 
+/// Creates an [AnimationController] and rebuilds [builder] on every tick of
+/// it.
 class ShadAnimationBuilder extends StatefulWidget {
+  /// Creates an animation builder with a controller of the given [duration].
   const ShadAnimationBuilder({
     super.key,
     required this.duration,
     required this.builder,
   });
 
+  /// The duration of the controller. A change updates the existing controller.
   final Duration duration;
+
+  /// Builds the child with the controller. Called on every tick of the
+  /// controller.
   final Widget Function(BuildContext context, AnimationController controller)
   builder;
 

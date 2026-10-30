@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'textarea.g.theme.dart';
 
+/// {@template ShadTextareaTheme}
+/// Theme for the `ShadTextarea` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadTextareaTheme with _$ShadTextareaTheme {
+  /// {@macro ShadTextareaTheme}
   const ShadTextareaTheme({
     bool canMerge = true,
     this.decoration,
@@ -81,6 +85,7 @@ class ShadTextareaTheme with _$ShadTextareaTheme {
   /// {@macro ShadTextarea.scrollbarPadding}
   final EdgeInsetsGeometry? scrollbarPadding;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTextareaTheme? lerp(
     ShadTextareaTheme? a,
     ShadTextareaTheme? b,

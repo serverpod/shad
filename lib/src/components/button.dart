@@ -14,11 +14,22 @@ import 'package:shad/src/utils/states_controller.dart';
 
 /// Variants available for the [ShadButton] widget.
 enum ShadButtonVariant {
+  /// Filled with the primary colour. The default.
   primary,
+
+  /// In the destructive colour, for actions such as delete.
   destructive,
+
+  /// A button with a border.
   outline,
+
+  /// Filled with the secondary colour.
   secondary,
+
+  /// No fill and no border until hovered.
   ghost,
+
+  /// Looks like a text link, underlined on hover.
   link,
 }
 
@@ -29,8 +40,13 @@ enum ShadButtonVariant {
 ///
 /// The concrete metrics for each size come from `ShadButtonSizesTheme`.
 enum ShadButtonSize {
+  /// The default size, shadcn's `default`.
   regular,
+
+  /// A smaller, denser button.
   sm,
+
+  /// A larger button.
   lg,
 
   /// A square button sized for a single icon, matching
@@ -834,7 +850,21 @@ class _ShadButtonState extends State<ShadButton> {
   void didUpdateWidget(covariant ShadButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.enabled != widget.enabled) {
-      statesController.update(ShadState.disabled, !widget.enabled);
+      if (widget.statesController == null) {
+        // Our own controller's only listener is the builder below us, which
+        // may be marked dirty while we update.
+        statesController.update(ShadState.disabled, !widget.enabled);
+      } else {
+        // An external controller may have listeners elsewhere in the tree
+        // (a menu item's trailing icon); notifying them now, mid-build, is
+        // "setState() called during build". The button itself reads
+        // widget.enabled, so it is correct this frame regardless.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            statesController.update(ShadState.disabled, !widget.enabled);
+          }
+        });
+      }
     }
     if (oldWidget.focusNode != null && widget.focusNode == null) {
       oldWidget.focusNode!.removeListener(onFocusChange);
@@ -1102,7 +1132,8 @@ class _ShadButtonState extends State<ShadButton> {
         builder: (context, states, _) {
           final pressed = states.contains(ShadState.pressed);
           final hovered = states.contains(ShadState.hovered);
-          final enabled = !states.contains(ShadState.disabled);
+          final enabled =
+              widget.enabled && !states.contains(ShadState.disabled);
 
           final effectiveBackgroundColor = hasPressedBackgroundColor && pressed
               ? pressedBackgroundColor(theme)

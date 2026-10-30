@@ -4,7 +4,10 @@ import 'package:shad/src/components/switch.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 
-class ShadSwitchFormField extends ShadFormBuilderField<bool> {
+/// A [ShadSwitch] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadSwitchFormField extends ShadFormField<bool> {
+  /// Creates a switch form field.
   ShadSwitchFormField({
     super.id,
     super.key,
@@ -14,11 +17,6 @@ class ShadSwitchFormField extends ShadFormBuilderField<bool> {
     super.error,
     super.description,
     void Function(bool)? onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -26,14 +24,14 @@ class ShadSwitchFormField extends ShadFormBuilderField<bool> {
     super.autovalidateMode,
     super.restorationId,
 
-    /// {@macro ShadFormBuilderField.initialValue}
+    /// Whether the switch starts on.
     required bool initialValue,
 
     /// {@macro ShadSwitch.decoration}
     ShadDecoration? decoration,
     super.focusNode,
 
-    /// {@macro ShadFormBuilderField.validator}
+    /// Returns an error message for the value, or null when it is valid.
     String? Function(bool)? validator,
 
     /// {@macro ShadSwitch.thumbColor}
@@ -54,10 +52,10 @@ class ShadSwitchFormField extends ShadFormBuilderField<bool> {
     /// {@macro ShadSwitch.duration}
     Duration? duration,
 
-    /// {@macro ShadSwitch.inputLabel}
+    /// {@macro ShadSwitch.label}
     Widget? inputLabel,
 
-    /// {@macro ShadSwitch.inputSublabel}
+    /// {@macro ShadSwitch.sublabel}
     Widget? inputSublabel,
 
     /// {@macro ShadSwitch.padding}
@@ -80,7 +78,7 @@ class ShadSwitchFormField extends ShadFormBuilderField<bool> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSwitchState;
+           state as ShadSwitchFormFieldState;
 
            return ShadSwitch(
              value: state.value!,
@@ -103,9 +101,17 @@ class ShadSwitchFormField extends ShadFormBuilderField<bool> {
        );
 
   @override
-  ShadFormBuilderFieldState<ShadSwitchFormField, bool> createState() =>
-      ShadFormBuilderSwitchState();
+  ShadFormFieldState<ShadSwitchFormField, bool> createState() =>
+      ShadSwitchFormFieldState();
 }
 
-class ShadFormBuilderSwitchState
-    extends ShadFormBuilderFieldState<ShadSwitchFormField, bool> {}
+/// The state of a [ShadSwitchFormField].
+class ShadSwitchFormFieldState
+    extends ShadFormFieldState<ShadSwitchFormField, bool> {}
+
+/// The old name of [ShadSwitchFormFieldState].
+@Deprecated(
+  'Use ShadSwitchFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderSwitchState = ShadSwitchFormFieldState;

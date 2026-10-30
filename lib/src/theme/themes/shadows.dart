@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 /// through one. Handing these to a plain [BoxDecoration] instead gives
 /// Flutter's own behaviour, which paints the whole blurred shape behind the
 /// box and so washes a transparent or translucent fill grey.
-abstract class Shadows {
+abstract final class ShadShadows {
   /// Tailwind's `shadow-none`.
   static const none = <BoxShadow>[];
 
@@ -21,6 +21,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-sm`.
   static const sm = [
     BoxShadow(
       color: Color(0x0d000000),
@@ -29,6 +30,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow`.
   static const regular = [
     BoxShadow(
       color: Color(0x1a000000),
@@ -43,6 +45,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-md`.
   static const md = [
     BoxShadow(
       color: Color(0x1a000000),
@@ -58,6 +61,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-lg`.
   static const lg = [
     BoxShadow(
       color: Color(0x1a000000),
@@ -73,6 +77,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-xl`.
   static const xl = [
     BoxShadow(
       color: Color(0x1a000000),
@@ -88,6 +93,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-2xl`.
   static const xl2 = [
     BoxShadow(
       color: Color(0x40000000),
@@ -97,6 +103,7 @@ abstract class Shadows {
     ),
   ];
 
+  /// Tailwind's `shadow-inner`.
   static const inner = [
     BoxShadow(
       color: Color(0x0d000000),
@@ -106,3 +113,7 @@ abstract class Shadows {
     ),
   ];
 }
+
+/// The old name of [ShadShadows].
+@Deprecated('Use ShadShadows. Will be removed in the next major version.')
+typedef Shadows = ShadShadows;

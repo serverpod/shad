@@ -111,7 +111,7 @@ void main() {
         await tester.pumpWidget(widget);
         await tester.pumpAndSettle();
 
-        expect(
+        await expectLater(
           find.byType(ShadSeparator),
           matchesGoldenFile('goldens/horizontal_separator.png'),
         );
@@ -228,7 +228,7 @@ void main() {
         await tester.pumpWidget(widget);
         await tester.pumpAndSettle();
 
-        expect(
+        await expectLater(
           find.byType(ShadSeparator),
           matchesGoldenFile('goldens/vertical_separator.png'),
         );

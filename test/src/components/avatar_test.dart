@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/avatar.dart'; // Adjust import path based on your project structure
-import 'package:universal_image/universal_image.dart';
 
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
@@ -34,14 +33,12 @@ void main() {
       expect(container.constraints?.maxWidth, customSize.width);
       expect(container.constraints?.maxHeight, customSize.height);
 
-      // Check UniversalImage uses the custom size
-      final universalImageFinder = find.byType(UniversalImage);
-      expect(universalImageFinder, findsOneWidget);
-      final universalImage = tester.widget<UniversalImage>(
-        universalImageFinder,
-      );
-      expect(universalImage.width, customSize.width);
-      expect(universalImage.height, customSize.height);
+      // Check the image uses the custom size
+      final imageFinder = find.byType(Image);
+      expect(imageFinder, findsOneWidget);
+      final image = tester.widget<Image>(imageFinder);
+      expect(image.width, customSize.width);
+      expect(image.height, customSize.height);
     });
 
     testWidgets('applies custom shape correctly', (WidgetTester tester) async {
@@ -97,13 +94,13 @@ void main() {
         ),
       );
 
-      // Check UniversalImage uses custom fit
-      final universalImageFinder = find.byType(UniversalImage);
-      expect(universalImageFinder, findsOneWidget);
-      final universalImage = tester.widget<UniversalImage>(
-        universalImageFinder,
+      // Check Image uses custom fit
+      final imageFinder = find.byType(Image);
+      expect(imageFinder, findsOneWidget);
+      final image = tester.widget<Image>(
+        imageFinder,
       );
-      expect(universalImage.fit, customFit);
+      expect(image.fit, customFit);
     });
 
     testWidgets('renders with default size when not specified', (
@@ -122,14 +119,14 @@ void main() {
       expect(container.constraints?.maxWidth, 32.0);
       expect(container.constraints?.maxHeight, 32.0);
 
-      // Check UniversalImage uses default size
-      final universalImageFinder = find.byType(UniversalImage);
-      expect(universalImageFinder, findsOneWidget);
-      final universalImage = tester.widget<UniversalImage>(
-        universalImageFinder,
+      // Check Image uses default size
+      final imageFinder = find.byType(Image);
+      expect(imageFinder, findsOneWidget);
+      final image = tester.widget<Image>(
+        imageFinder,
       );
-      expect(universalImage.width, 32.0);
-      expect(universalImage.height, 32.0);
+      expect(image.width, 32.0);
+      expect(image.height, 32.0);
     });
 
     testWidgets('renders with default circular shape when not specified', (
@@ -149,27 +146,27 @@ void main() {
       expect(decoration?.shape, isA<CircleBorder>());
     });
 
-    testWidgets('shows the placeholder when the source is missing', (
+    testWidgets('shows the fallback when the source is missing', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadAvatar('', placeholder: Text('AB')),
+          const ShadAvatar('', fallback: Text('AB')),
         ),
       );
 
       expect(find.text('AB'), findsOneWidget);
-      expect(find.byType(UniversalImage), findsNothing);
+      expect(find.byType(Image), findsNothing);
     });
 
-    testWidgets('shows the placeholder when the image fails to load', (
+    testWidgets('shows the fallback when the image fails to load', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
         createTestWidget(
           const ShadAvatar(
             'https://example.invalid/avatar.png',
-            placeholder: Text('AB'),
+            fallback: Text('AB'),
           ),
         ),
       );
@@ -179,14 +176,62 @@ void main() {
       expect(find.text('AB'), findsOneWidget);
     });
 
+    testWidgets('resolves a URL, an asset path and a provider', (
+      tester,
+    ) async {
+      ImageProvider? providerOf(Widget avatar) {
+        final image = find.descendant(
+          of: find.byWidget(avatar),
+          matching: find.byType(Image),
+        );
+        return tester.widget<Image>(image).image;
+      }
+
+      const network = ShadAvatar('https://example.invalid/a.png');
+      const asset = ShadAvatar('img/a.png', package: 'my_pkg');
+      const provider = ShadAvatar.image(AssetImage('img/b.png'));
+      await tester.pumpWidget(
+        createTestWidget(const Column(children: [network, asset, provider])),
+      );
+
+      expect(providerOf(network), isA<NetworkImage>());
+      expect(
+        providerOf(asset),
+        const AssetImage('img/a.png', package: 'my_pkg'),
+      );
+      expect(providerOf(provider), const AssetImage('img/b.png'));
+    });
+
+    testWidgets('ShadAvatar.image with no image shows the fallback', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(const ShadAvatar.image(null, fallback: Text('AB'))),
+      );
+      expect(find.text('AB'), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
+    });
+
+    testWidgets('placeholder still works as the deprecated name of fallback', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          // ignore: deprecated_member_use_from_same_package
+          const ShadAvatar(null, placeholder: Text('XY')),
+        ),
+      );
+      expect(find.text('XY'), findsOneWidget);
+    });
+
     testWidgets('ShadAvatar matches goldens', (tester) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadAvatar(LucideIcons.mail),
+          const ShadAvatar(null, fallback: Icon(LucideIcons.mail)),
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadAvatar),
         matchesGoldenFile('goldens/avatar.png'),
       );

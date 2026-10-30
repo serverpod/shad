@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 
+/// Adds [copyWith] to [TapDownDetails].
 extension TapDownDetailsExtension on TapDownDetails {
+  /// Returns a copy with the given fields replaced.
   TapDownDetails copyWith({
     Offset? globalPosition,
     Offset? localPosition,
@@ -14,7 +16,9 @@ extension TapDownDetailsExtension on TapDownDetails {
   }
 }
 
+/// Adds [copyWith] to [TapUpDetails].
 extension TapUpDetailsExtension on TapUpDetails {
+  /// Returns a copy with the given fields replaced.
   TapUpDetails copyWith({
     Offset? globalPosition,
     Offset? localPosition,
@@ -28,7 +32,9 @@ extension TapUpDetailsExtension on TapUpDetails {
   }
 }
 
+/// Adds [copyWith] to [LongPressStartDetails].
 extension LongPressStartDetailsExtension on LongPressStartDetails {
+  /// Returns a copy with the given fields replaced.
   LongPressStartDetails copyWith({
     Offset? globalPosition,
     Offset? localPosition,
@@ -40,7 +46,9 @@ extension LongPressStartDetailsExtension on LongPressStartDetails {
   }
 }
 
+/// Adds [copyWith] to [LongPressMoveUpdateDetails].
 extension LongPressMoveUpdateDetailsExtension on LongPressMoveUpdateDetails {
+  /// Returns a copy with the given fields replaced.
   LongPressMoveUpdateDetails copyWith({
     Offset? globalPosition,
     Offset? localPosition,
@@ -57,7 +65,9 @@ extension LongPressMoveUpdateDetailsExtension on LongPressMoveUpdateDetails {
   }
 }
 
+/// Adds [copyWith] to [LongPressEndDetails].
 extension LongPressEndDetailsExtension on LongPressEndDetails {
+  /// Returns a copy with the given fields replaced.
   LongPressEndDetails copyWith({
     Velocity? velocity,
     Offset? globalPosition,
@@ -71,7 +81,9 @@ extension LongPressEndDetailsExtension on LongPressEndDetails {
   }
 }
 
+/// Adds [copyWith] to [LongPressDownDetails].
 extension LongPressDownDetailsExtension on LongPressDownDetails {
+  /// Returns a copy with the given fields replaced.
   LongPressDownDetails copyWith({
     Offset? globalPosition,
     Offset? localPosition,

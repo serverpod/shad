@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/utils/border.dart';
@@ -7,16 +8,24 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'toast.g.theme.dart';
 
+/// {@template ShadToastTheme}
+/// Theme for the `ShadToast` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadToastTheme with _$ShadToastTheme {
+  /// {@macro ShadToastTheme}
   const ShadToastTheme({
     bool canMerge = true,
     this.backgroundColor,
     this.closeIconData,
     this.alignment,
     this.offset,
-    this.duration,
+    Duration? displayDuration,
+    @Deprecated(
+      'Use displayDuration. Will be removed in the next major version.',
+    )
+    Duration? duration,
     this.animateIn,
     this.animateOut,
     this.textDirection,
@@ -34,7 +43,8 @@ class ShadToastTheme with _$ShadToastTheme {
     this.closeIcon,
     this.mainAxisAlignment,
     this.mainAxisSize,
-  }) : _canMerge = canMerge;
+  }) : displayDuration = displayDuration ?? duration,
+       _canMerge = canMerge;
 
   @ignore
   final bool _canMerge;
@@ -54,8 +64,12 @@ class ShadToastTheme with _$ShadToastTheme {
   /// {@macro ShadToast.offset}
   final Offset? offset;
 
-  /// {@macro ShadToast.duration}
-  final Duration? duration;
+  /// {@macro ShadToast.displayDuration}
+  final Duration? displayDuration;
+
+  /// The old name of [displayDuration].
+  @Deprecated('Use displayDuration. Will be removed in the next major version.')
+  Duration? get duration => displayDuration;
 
   /// {@macro ShadToast.animateIn}
   final List<Effect<dynamic>>? animateIn;
@@ -108,9 +122,36 @@ class ShadToastTheme with _$ShadToastTheme {
   /// {@macro ShadToast.mainAxisSize}
   final MainAxisSize? mainAxisSize;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadToastTheme? lerp(
     ShadToastTheme? a,
     ShadToastTheme? b,
     double t,
   ) => _$ShadToastTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadToastTheme &&
+      listEquals(animateIn, other.animateIn) &&
+      listEquals(animateOut, other.animateOut) &&
+      listEquals(shadows, other.shadows) &&
+      super ==
+          other.copyWith(
+            animateIn: animateIn,
+            animateOut: animateOut,
+            shadows: shadows,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(animateIn ?? const []),
+    Object.hashAll(animateOut ?? const []),
+    Object.hashAll(shadows ?? const []),
+  );
 }

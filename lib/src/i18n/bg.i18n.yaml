@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Готово"
+
+dialog:
+  close: "Затваряне"
+  dismiss: "Отхвърляне"

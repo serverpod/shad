@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -6,27 +7,22 @@ import 'package:shad/shad.dart';
 
 /// A selectable font, mirroring shadcn/ui's `FONT_DEFINITIONS`.
 ///
-/// Everything except the two bundled Geist faces is resolved through
-/// `google_fonts` at runtime, which is why the list can be as long as the
-/// original's without shipping any font assets.
+/// Every face is resolved through `google_fonts` at runtime: shad bundles no
+/// fonts, and neither does this app, which is why the list can be as long as
+/// the original's without shipping any font assets.
 @immutable
 class EditorFont {
   const EditorFont({
     required this.title,
     required this.family,
-    this.bundled = false,
     this.category = FontCategory.sans,
   });
 
   /// The display name, and the Google Fonts family name.
   final String title;
 
-  /// The family as Flutter knows it. For bundled fonts this is the asset
-  /// family; for Google fonts it doubles as the lookup key.
+  /// The Google Fonts family name, as `GoogleFonts.getFont` takes it.
   final String family;
-
-  /// Whether the font ships with the package rather than coming from Google.
-  final bool bundled;
 
   final FontCategory category;
 
@@ -38,14 +34,14 @@ class EditorFont {
   /// 200 ms lerp across ~54 component themes on every rebuild and drags every
   /// `ShadTheme.of` dependent along with it — the equality invariant CLAUDE.md
   /// calls load-bearing. Keyed by family, since `EditorFont` is const.
-  static final _builders = <String, GoogleFontBuilder>{};
+  static final _builders = <String, ShadFontBuilder>{};
   static final _textThemes = <String, ShadTextTheme>{};
 
-  /// Wraps `GoogleFonts.getFont` into the all-named shape `GoogleFontBuilder`
+  /// Wraps `GoogleFonts.getFont` into the all-named shape `ShadFontBuilder`
   /// expects.
   ///
   /// `getFont` takes the family positionally, so it cannot be passed directly.
-  GoogleFontBuilder get builder => _builders[family] ??=
+  ShadFontBuilder get builder => _builders[family] ??=
       ({
         TextStyle? textStyle,
         Color? color,
@@ -90,17 +86,45 @@ class EditorFont {
       );
 
   /// Builds the text theme for this font.
-  ShadTextTheme textTheme() {
-    return _textThemes[family] ??= bundled
-        ? ShadTextTheme(family: family, package: 'shad')
-        : ShadTextTheme.fromGoogleFont(builder);
+  ShadTextTheme textTheme() =>
+      _textThemes[family] ??= ShadTextTheme.fromGoogleFont(builder);
+
+  /// The regular face, for showing the font's own name in a picker.
+  ///
+  /// Building a `Text` with it is what makes `google_fonts` fetch the face, so
+  /// a picker list loads only the rows it renders.
+  TextStyle previewStyle() => _previews[family] ??= GoogleFonts.getFont(family);
+  static final _previews = <String, TextStyle>{};
+
+  /// The weights the text roles use. Fetching them up front means switching
+  /// fonts reflows the text once, not once per weight as each arrives.
+  static const _weights = [
+    FontWeight.w400,
+    FontWeight.w500,
+    FontWeight.w600,
+    FontWeight.w700,
+    FontWeight.w800,
+  ];
+
+  /// Fetches this font's faces and completes once they are registered.
+  ///
+  /// Completes normally when fetching fails or is disabled (offline, tests):
+  /// the text then renders in the fallback face, which is the best there is.
+  Future<void> load({Duration timeout = const Duration(seconds: 5)}) async {
+    try {
+      for (final weight in _weights) {
+        GoogleFonts.getFont(family, fontWeight: weight);
+      }
+      await GoogleFonts.pendingFonts().timeout(timeout);
+    } on Object {
+      // Offline, blocked or runtime fetching disabled: keep the fallback.
+    }
   }
 
-  /// shadcn/ui's font list, in its order. Inter and the two Geist faces are
-  /// the ones this package bundles; the rest come from Google Fonts.
+  /// shadcn/ui's font list, in its order.
   static const all = <EditorFont>[
-    EditorFont(title: 'Inter', family: 'Inter', bundled: true),
-    EditorFont(title: 'Geist', family: 'Geist', bundled: true),
+    EditorFont(title: 'Inter', family: 'Inter'),
+    EditorFont(title: 'Geist', family: 'Geist'),
     EditorFont(title: 'Noto Sans', family: 'Noto Sans'),
     EditorFont(title: 'Nunito Sans', family: 'Nunito Sans'),
     EditorFont(title: 'Figtree', family: 'Figtree'),
@@ -123,8 +147,7 @@ class EditorFont {
     ),
     EditorFont(
       title: 'Geist Mono',
-      family: 'GeistMono',
-      bundled: true,
+      family: 'Geist Mono',
       category: FontCategory.mono,
     ),
     EditorFont(

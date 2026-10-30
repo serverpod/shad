@@ -1,13 +1,24 @@
 import 'package:flutter/widgets.dart';
 
+/// An interaction state of a widget.
 enum ShadState {
+  /// The widget has focus.
   focused,
+
+  /// A pointer is over the widget.
   hovered,
+
+  /// The widget is being pressed.
   pressed,
+
+  /// The widget does not react to input.
   disabled,
 }
 
+/// Holds the set of [ShadState]s of a widget and notifies listeners when it
+/// changes.
 class ShadStatesController extends ValueNotifier<Set<ShadState>> {
+  /// Creates a controller with the given states. Defaults to no states.
   ShadStatesController([Set<ShadState>? value]) : super(<ShadState>{...?value});
 
   /// Adds [state] to [value] if [add] is true, and removes it otherwise,

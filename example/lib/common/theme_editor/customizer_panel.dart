@@ -103,11 +103,6 @@ class _Settings extends StatelessWidget {
             ),
         ];
 
-    final fontOptions = [
-      for (final f in EditorFont.all)
-        PickerOption(value: f.title, label: f.title),
-    ];
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(14),
       child: Column(
@@ -151,29 +146,22 @@ class _Settings extends StatelessWidget {
             onChanged: (v) => onChanged(config.copyWith(chartColor: v)),
           ),
           const _Separator(),
-          ThemePicker<String>(
+          _FontPicker(
             label: 'Heading',
             icon: LucideIcons.heading,
             value: config.headingFontTitle ?? _sameAsBody,
-            options: [
-              const PickerOption(
-                value: _sameAsBody,
-                label: _sameAsBody,
-              ),
-              ...fontOptions,
-            ],
-            onChanged: (v) => onChanged(
+            includeSameAsBody: true,
+            onLoaded: (v) => onChanged(
               v == _sameAsBody
                   ? config.copyWith(clearHeadingFont: true)
                   : config.copyWith(headingFontTitle: v),
             ),
           ),
-          ThemePicker<String>(
+          _FontPicker(
             label: 'Font',
             icon: LucideIcons.type,
             value: config.fontTitle,
-            options: fontOptions,
-            onChanged: (v) => onChanged(config.copyWith(fontTitle: v)),
+            onLoaded: (v) => onChanged(config.copyWith(fontTitle: v)),
           ),
           const _Separator(),
           ThemePicker<RadiusPreset>(
@@ -338,8 +326,7 @@ class _Actions extends StatelessWidget {
             child: SelectableText(
               snippet,
               style: ShadTheme.of(context).textTheme.small.copyWith(
-                fontFamily: 'GeistMono',
-                package: 'shad',
+                fontFamily: 'JetBrainsMono',
               ),
             ),
           ),
@@ -356,6 +343,71 @@ class _Separator extends StatelessWidget {
   Widget build(BuildContext context) {
     return const ShadSeparator.horizontal(
       margin: EdgeInsets.symmetric(vertical: 2),
+    );
+  }
+}
+
+/// A font [ThemePicker] that fetches the picked font before applying it.
+///
+/// Applying first and loading after would lay every control out in the
+/// fallback face and then again when the real one arrives, so the text jumps
+/// twice. Each option is listed in its own face.
+class _FontPicker extends StatefulWidget {
+  const _FontPicker({
+    required this.label,
+    required this.icon,
+    required this.value,
+    required this.onLoaded,
+    this.includeSameAsBody = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final String value;
+  final ValueChanged<String> onLoaded;
+  final bool includeSameAsBody;
+
+  @override
+  State<_FontPicker> createState() => _FontPickerState();
+}
+
+class _FontPickerState extends State<_FontPicker> {
+  /// The title being loaded, if any. A newer pick supersedes an older one.
+  String? loading;
+
+  Future<void> pick(String title) async {
+    if (title == _Settings._sameAsBody) {
+      widget.onLoaded(title);
+      return;
+    }
+    setState(() => loading = title);
+    await EditorFont.byTitle(title).load();
+    if (!mounted || loading != title) return;
+    setState(() => loading = null);
+    widget.onLoaded(title);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ThemePicker<String>(
+      label: widget.label,
+      icon: widget.icon,
+      busy: loading != null,
+      value: loading ?? widget.value,
+      options: [
+        if (widget.includeSameAsBody)
+          const PickerOption(
+            value: _Settings._sameAsBody,
+            label: _Settings._sameAsBody,
+          ),
+        for (final f in EditorFont.all)
+          PickerOption(
+            value: f.title,
+            label: f.title,
+            labelStyle: f.previewStyle(),
+          ),
+      ],
+      onChanged: pick,
     );
   }
 }

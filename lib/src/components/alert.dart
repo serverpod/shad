@@ -5,7 +5,10 @@ import 'package:shad/src/utils/border.dart';
 
 /// Variants available for the [ShadAlert] widget.
 enum ShadAlertVariant {
+  /// The default alert, in the foreground colour.
   primary,
+
+  /// An alert in the destructive colour, for errors.
   destructive,
 }
 

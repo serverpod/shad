@@ -13,7 +13,7 @@ void main() {
     testWidgets('ShadSwitch true matches goldens', (tester) async {
       await tester.pumpWidget(createTestWidget(const ShadSwitch(value: true)));
 
-      expect(
+      await expectLater(
         find.byType(ShadSwitch),
         matchesGoldenFile('goldens/switch_on.png'),
       );
@@ -22,7 +22,7 @@ void main() {
     testWidgets('ShadSwitch false matches goldens', (tester) async {
       await tester.pumpWidget(createTestWidget(const ShadSwitch(value: false)));
 
-      expect(
+      await expectLater(
         find.byType(ShadSwitch),
         matchesGoldenFile('goldens/switch_off.png'),
       );

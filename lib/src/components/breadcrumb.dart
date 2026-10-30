@@ -307,6 +307,8 @@ class ShadBreadcrumbEllipsis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+    final custom = theme.breadcrumbTheme.ellipsis;
+    if (custom != null) return custom;
     final effectiveSize = size ?? theme.breadcrumbTheme.ellipsisSize ?? 16.0;
 
     return Icon(
@@ -506,7 +508,7 @@ class _ShadBreadcrumbDropdownState extends State<ShadBreadcrumbDropdown> {
 /// contain text, links, or other interactive elements.
 /// {@endtemplate}
 class ShadBreadcrumbDropMenuItem extends StatelessWidget {
-  /// {@macro ShadBreadcrumbDropMenuItem}
+  /// {@macro ShadBreadcrumb.DropMenuItem}
   const ShadBreadcrumbDropMenuItem({
     super.key,
     required this.child,

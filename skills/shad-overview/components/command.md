@@ -19,7 +19,7 @@ class CommandInlineExample extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 450),
       child: ShadCommand(
         autofocus: false,
-        decoration: const ShadDecoration(shadows: Shadows.md),
+        decoration: const ShadDecoration(shadows: ShadShadows.md),
         placeholder: const Text('Type a command or search…'),
         groups: [
           ShadCommandGroup(

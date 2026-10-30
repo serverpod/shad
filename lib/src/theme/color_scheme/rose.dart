@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `rose` theme: a neutral base with a rose primary.
+///
+/// Kept for compatibility. In v4, apply `ShadAccentScheme.roseLight` or
+/// `ShadAccentScheme.roseDark` to a base colour scheme instead.
 @immutable
 class ShadRoseColorScheme extends ShadColorScheme {
+  /// Creates a [ShadRoseColorScheme] from explicit colours.
+  ///
+  /// Use [ShadRoseColorScheme.light] or [ShadRoseColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadRoseColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadRoseColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadRoseColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadRoseColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff09090b),
@@ -51,6 +62,9 @@ class ShadRoseColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadRoseColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadRoseColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfff2f2f2),

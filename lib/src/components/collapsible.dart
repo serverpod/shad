@@ -4,6 +4,7 @@ import 'package:shad/src/utils/debug_check.dart';
 
 /// Controls the open state of a [ShadCollapsible].
 class ShadCollapsibleController extends ChangeNotifier {
+  /// Creates a controller. [open] sets whether the content starts shown.
   ShadCollapsibleController({bool open = false}) : _open = open;
 
   bool _open;
@@ -17,10 +18,16 @@ class ShadCollapsibleController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The same as [open], under the name `ShadPopoverController` uses.
+  bool get isOpen => _open;
+
+  /// Shows the content.
   void show() => open = true;
 
+  /// Hides the content.
   void hide() => open = false;
 
+  /// Shows the content if hidden, hides it if shown.
   void toggle() => open = !_open;
 }
 
@@ -125,10 +132,13 @@ class ShadCollapsible extends StatefulWidget {
   State<ShadCollapsible> createState() => ShadCollapsibleState();
 }
 
+/// The state of a [ShadCollapsible].
 class ShadCollapsibleState extends State<ShadCollapsible>
     with SingleTickerProviderStateMixin {
   ShadCollapsibleController? _internalController;
 
+  /// The controller in use: [ShadCollapsible.controller] when given, otherwise
+  /// an internal one.
   ShadCollapsibleController get controller =>
       widget.controller ?? _internalController!;
 
@@ -138,7 +148,7 @@ class ShadCollapsibleState extends State<ShadCollapsible>
     value: controller.open ? 1 : 0,
   );
 
-  late final Animation<double> _sizeFactor = CurvedAnimation(
+  late final CurvedAnimation _sizeFactor = CurvedAnimation(
     parent: _animationController,
     curve: Curves.easeInOut,
   );
@@ -170,6 +180,7 @@ class ShadCollapsibleState extends State<ShadCollapsible>
   void dispose() {
     controller.removeListener(_onOpenChanged);
     _internalController?.dispose();
+    _sizeFactor.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -197,6 +208,9 @@ class ShadCollapsibleState extends State<ShadCollapsible>
           const Duration(milliseconds: 200)
       ..reverseDuration =
           widget.reverseDuration ?? collapsibleTheme.reverseDuration;
+    _sizeFactor
+      ..curve = widget.curve ?? collapsibleTheme.curve ?? Curves.easeInOut
+      ..reverseCurve = widget.reverseCurve ?? collapsibleTheme.reverseCurve;
 
     final effectiveCrossAxisAlignment =
         widget.crossAxisAlignment ??

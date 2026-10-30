@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Болсон"
+
+dialog:
+  close: "Хаах"
+  dismiss: "Үл хэрэгсэх"

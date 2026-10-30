@@ -3,7 +3,14 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+/// Converts a [ShadBorderSide] to a Flutter [BorderSide].
 extension ShadBorderSideToBorderSide on ShadBorderSide {
+  /// Returns the Flutter [BorderSide] for this side.
+  ///
+  /// A side with no width becomes a zero-width side that keeps its color,
+  /// instead of [BorderSide.none]. A null color becomes transparent.
+  /// Otherwise the width defaults to 1, the style to [BorderStyle.solid] and
+  /// the stroke alignment to [BorderSide.strokeAlignInside].
   BorderSide toBorderSide() {
     if (width == null || width == 0) {
       // Deliberately not `BorderSide.none`: that carries an opaque black, and
@@ -25,7 +32,12 @@ extension ShadBorderSideToBorderSide on ShadBorderSide {
   }
 }
 
+/// Converts a [ShadBorder] to a Flutter [Border].
 extension ShadBorderToBorder on ShadBorder {
+  /// Returns a [ShadBoxBorder] with the four sides of this border.
+  ///
+  /// Missing sides become [BorderSide.none]. The radius, padding and offset are
+  /// not part of the result.
   Border toBorder() {
     return ShadBoxBorder(
       top: top?.toBorderSide() ?? BorderSide.none,
@@ -47,6 +59,7 @@ extension ShadBorderToBorder on ShadBorder {
 /// the corners are indistinguishable from the real thing, and the state only
 /// lasts for the frames of the transition.
 class ShadBoxBorder extends Border {
+  /// Creates a border with the given sides.
   const ShadBoxBorder({super.top, super.right, super.bottom, super.left});
 
   /// Mirrors the cases [Border.paint] can draw inside a radius itself: a
@@ -182,6 +195,9 @@ class ShadBorder {
     );
   }
 
+  /// Interpolates between two borders.
+  ///
+  /// The [canMerge] value comes from [b] when it is not null.
   static ShadBorder? lerp(ShadBorder? a, ShadBorder? b, double t) {
     if (identical(a, b)) return a;
     return ShadBorder(
@@ -212,12 +228,14 @@ class ShadBorder {
     );
   }
 
+  /// Whether any side has a width other than zero.
   bool get hasBorder =>
       (top?.width ?? 0) != 0 ||
       (right?.width ?? 0) != 0 ||
       (bottom?.width ?? 0) != 0 ||
       (left?.width ?? 0) != 0;
 
+  /// A border with no sides that replaces any border it is merged into.
   static const ShadBorder none = ShadBorder(canMerge: false);
 
   /// Creates a [ShadBorder] that represents the addition of the two given
@@ -250,6 +268,7 @@ class ShadBorder {
     );
   }
 
+  /// Returns a copy with the given fields replaced.
   ShadBorder copyWith({
     bool? canMerge,
     EdgeInsetsGeometry? padding,
@@ -287,6 +306,7 @@ class ShadBorder {
   /// The right side of this border.
   final ShadBorderSide? right;
 
+  /// The bottom side of this border.
   final ShadBorderSide? bottom;
 
   /// The left side of this border.
@@ -424,6 +444,9 @@ class ShadBorderSide with Diagnosticable {
     );
   }
 
+  /// Interpolates between two border sides.
+  ///
+  /// The style switches from [a] to [b] at the midpoint.
   static ShadBorderSide? lerp(ShadBorderSide? a, ShadBorderSide? b, double t) {
     if (identical(a, b)) return a;
     return ShadBorderSide(
@@ -496,7 +519,13 @@ class ShadBorderSide with Diagnosticable {
   }
 }
 
+/// Converts a [ShadRoundedSuperellipseBorder] to a Flutter [ShapeBorder].
 extension ShadRoundedSuperellipseBorderExt on ShadRoundedSuperellipseBorder {
+  /// Returns a [RoundedSuperellipseBorder] with the side and radius of this
+  /// border.
+  ///
+  /// [textDirection] resolves a directional radius and defaults to
+  /// [TextDirection.ltr]. [defaultRadius] is used when [radius] is null.
   ShapeBorder toBorder({
     TextDirection? textDirection,
     BorderRadius defaultRadius = BorderRadius.zero,
@@ -513,12 +542,14 @@ extension ShadRoundedSuperellipseBorderExt on ShadRoundedSuperellipseBorder {
 /// [RSuperellipse].
 @immutable
 class ShadRoundedSuperellipseBorder extends ShadBorder {
+  /// Creates a superellipse border with [side] on every edge.
   const ShadRoundedSuperellipseBorder({
     super.canMerge,
     this.side,
     super.radius,
   });
 
+  /// The side drawn on every edge.
   final ShadBorderSide? side;
 
   @override
