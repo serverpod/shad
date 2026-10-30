@@ -25,6 +25,18 @@ class DropdownMenuBasicExample extends StatelessWidget {
           items: [
             ShadContextMenuItem(child: Text('Email')),
             ShadContextMenuItem(child: Text('Message')),
+            ShadSeparator.horizontal(
+              margin: EdgeInsets.symmetric(vertical: 4),
+            ),
+            ShadContextMenuItem(
+              trailing: Icon(LucideIcons.chevronRight),
+              items: [
+                ShadContextMenuItem(child: Text('Slack')),
+                ShadContextMenuItem(child: Text('Discord')),
+                ShadContextMenuItem(child: Text('Copy Invite Link')),
+              ],
+              child: Text('More...'),
+            ),
           ],
           child: Text('Invite users'),
         ),

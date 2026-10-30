@@ -1,3 +1,18 @@
+## 1.0.2
+
+### Fixes
+
+- **Only one submenu is open at a time.** 1.0.0 added a 100ms grace
+  period (`showDelay`) before a menu item with a submenu un-highlights and
+  closes its submenu, and every pointer move restarted it, so items stayed
+  highlighted and several submenus stayed open while the pointer moved.
+  Now, when the pointer reaches another row of the same menu, the previous
+  row un-highlights and its submenu (with any nested submenu) closes at
+  once, without a fade-out. The grace period applies only when the pointer
+  leaves the rows, for example to cross to the submenu, and it starts
+  once. Submenus close without a fade-out by default; root menus still
+  fade. `ShadContextMenuTheme.popoverReverseDuration` now takes effect.
+
 ## 1.0.1
 
 ### Breaking changes

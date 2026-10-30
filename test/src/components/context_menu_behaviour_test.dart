@@ -258,4 +258,118 @@ void main() {
     // Beside the parent on its left, not slid over it.
     expect(submenu.right, lessThanOrEqualTo(parent.left + 9));
   });
+
+  group('moving to another row', () {
+    Future<TestGesture> openFirst(WidgetTester tester) async {
+      final controller = ShadContextMenuController();
+      addTearDown(controller.dispose);
+      await pumpMenu(
+        tester,
+        controller: controller,
+        items: const [
+          ShadContextMenuItem(
+            items: [
+              ShadContextMenuItem(
+                items: [ShadContextMenuItem(child: Text('Deep'))],
+                child: Text('Nested'),
+              ),
+            ],
+            child: Text('First'),
+          ),
+          ShadContextMenuItem(
+            items: [ShadContextMenuItem(child: Text('Second nested'))],
+            child: Text('Second'),
+          ),
+          ShadContextMenuItem(child: Text('Leaf')),
+        ],
+      );
+      controller.showAt(const Offset(100, 100));
+      await tester.pumpAndSettle();
+
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(tester.getCenter(find.text('First')));
+      await tester.pumpAndSettle();
+      expect(find.text('Nested'), findsOneWidget);
+      return mouse;
+    }
+
+    // The row rebuilds in one frame and the overlay goes in the next, with
+    // no time passing: no grace period and no fade-out.
+    Future<void> nextFrames(WidgetTester tester) async {
+      await tester.pump();
+      await tester.pump();
+    }
+
+    testWidgets('closes the previous submenu at once', (tester) async {
+      final mouse = await openFirst(tester);
+      await mouse.moveTo(tester.getCenter(find.text('Second')));
+      await nextFrames(tester);
+      expect(find.text('Nested'), findsNothing);
+      expect(find.text('Second nested'), findsOneWidget);
+    });
+
+    testWidgets('a plain row closes it at once too', (tester) async {
+      final mouse = await openFirst(tester);
+      await mouse.moveTo(tester.getCenter(find.text('Leaf')));
+      await nextFrames(tester);
+      expect(find.text('Nested'), findsNothing);
+    });
+
+    testWidgets('closes a nested submenu with it', (tester) async {
+      final mouse = await openFirst(tester);
+      await mouse.moveTo(tester.getCenter(find.text('Nested')));
+      await tester.pumpAndSettle();
+      expect(find.text('Deep'), findsOneWidget);
+
+      await mouse.moveTo(tester.getCenter(find.text('Second')));
+      await nextFrames(tester);
+      expect(find.text('Nested'), findsNothing);
+      expect(find.text('Deep'), findsNothing);
+    });
+  });
+
+  testWidgets('a submenu closes on time while the pointer keeps moving', (
+    tester,
+  ) async {
+    final controller = ShadContextMenuController();
+    addTearDown(controller.dispose);
+    await pumpMenu(
+      tester,
+      controller: controller,
+      items: const [
+        ShadContextMenuItem(
+          items: [ShadContextMenuItem(child: Text('First nested'))],
+          child: Text('First'),
+        ),
+        ShadContextMenuItem(
+          items: [ShadContextMenuItem(child: Text('Second nested'))],
+          child: Text('Second'),
+        ),
+      ],
+    );
+    controller.showAt(const Offset(100, 100));
+    await tester.pumpAndSettle();
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(find.text('First')));
+    await tester.pumpAndSettle();
+    expect(find.text('First nested'), findsOneWidget);
+
+    // Every pointer event outside an area reports an exit again. Those
+    // repeats must not restart the grace period, or the first item stays
+    // highlighted, its submenu open, for as long as the pointer moves.
+    final second = tester.getCenter(find.text('Second'));
+    for (var i = 0; i < 20; i++) {
+      await mouse.moveTo(second + Offset(i.isEven ? 1 : -1, 0));
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    // Checked before the pointer rests: 400ms of movement is well past the
+    // grace period and the close animation.
+    expect(find.text('First nested'), findsNothing);
+    expect(find.text('Second nested'), findsOneWidget);
+  });
 }

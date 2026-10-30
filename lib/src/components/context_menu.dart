@@ -471,6 +471,21 @@ class ShadContextMenuState extends State<ShadContextMenu> {
   /// arrow keys, Home/End and type-ahead work straight away, as in Radix.
   final _contentFocusNode = FocusNode(debugLabel: 'ShadContextMenu content');
 
+  /// The row of this menu level the pointer was last over.
+  _ShadContextMenuItemState? _hoveredItem;
+
+  /// Called when the pointer reaches [item], a row of this menu level. The
+  /// row it left gives up its highlight and closes its submenu at once,
+  /// without waiting for its grace period, so only one submenu is ever open.
+  void _itemHovered(_ShadContextMenuItemState item) {
+    final previous = _hoveredItem;
+    _hoveredItem = item;
+    if (previous == null || identical(previous, item) || !previous.mounted) {
+      return;
+    }
+    previous._unhoverNow();
+  }
+
   /// The characters typed in quick succession, for type-ahead.
   String _typeAhead = '';
   Timer? _typeAheadReset;
@@ -710,7 +725,13 @@ class ShadContextMenuState extends State<ShadContextMenu> {
       effects: effectiveEffects,
       shadows: effectiveShadows,
       filter: effectiveFilter,
-      reverseDuration: widget.popoverReverseDuration,
+      // A submenu that closes is being replaced by a sibling's, or the
+      // pointer has left the menu: it goes at once rather than fading out
+      // over the one that replaces it.
+      reverseDuration:
+          widget.popoverReverseDuration ??
+          theme.contextMenuTheme.popoverReverseDuration ??
+          (_root != null ? Duration.zero : null),
       useSameGroupIdForChild: false,
       popover: (context) {
         return ShadMouseArea(
@@ -817,6 +838,14 @@ class ShadContextMenuItemController extends ChangeNotifier {
   /// its submenu is.
   bool get selected =>
       _hovered || _focused || items.values.any((e) => e.selected);
+
+  /// Clears [hovered] on this item and on every item in its submenu.
+  void clearHovered() {
+    for (final item in items.values) {
+      item.clearHovered();
+    }
+    setHovered(false);
+  }
 
   /// Adds [controller] to the items of this item's submenu.
   void registerSubItem(ShadContextMenuItemController controller) {
@@ -1014,8 +1043,9 @@ class ShadContextMenuItem extends StatefulWidget {
   /// How long an item with a submenu stays highlighted, with its submenu
   /// open, after the pointer leaves it. Defaults to 100ms.
   ///
-  /// The grace period lets the pointer cross the gap to the submenu, or cut
-  /// a corner on the way, without the submenu closing under it.
+  /// The grace period lets the pointer cross the gap to the submenu without
+  /// the submenu closing under it. Reaching another row of the same menu
+  /// ends it at once.
   /// {@endtemplate}
   final Duration? showDelay;
 
@@ -1114,12 +1144,42 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
   /// gap to the submenu without closing it.
   Timer? _unhoverTimer;
 
-  void _onHoverArea(bool hovered, Duration grace) {
+  /// Ends the grace period now: drops the highlight and closes the submenu,
+  /// including any nested submenu still in its own grace period.
+  void _unhoverNow() {
     _unhoverTimer?.cancel();
+    _unhoverTimer = null;
+    controller.clearHovered();
+  }
+
+  bool _buttonHovered = false;
+
+  /// Tells the menu level when the pointer reaches this row, so the row it
+  /// came from lets go at once. The button's own hover is used because leaf
+  /// rows have no hover area of their own.
+  void _onStatesChanged() {
+    final hovered = statesController.value.contains(ShadState.hovered);
+    if (hovered == _buttonHovered) return;
+    _buttonHovered = hovered;
+    if (hovered) {
+      context
+          .getInheritedWidgetOfExactType<_ShadMenuLevel>()
+          ?.menu
+          ._itemHovered(this);
+    }
+  }
+
+  void _onHoverArea(bool hovered, Duration grace) {
     if (hovered || grace == Duration.zero) {
+      _unhoverTimer?.cancel();
+      _unhoverTimer = null;
       controller.setHovered(hovered);
       return;
     }
+    // The mouse area reports an exit on every pointer event outside it, not
+    // once. Restarting the timer on each would keep the item highlighted,
+    // and its submenu open, for as long as the pointer moves.
+    if (!controller.hovered || (_unhoverTimer?.isActive ?? false)) return;
     _unhoverTimer = Timer(grace, () {
       if (mounted) controller.setHovered(false);
     });
@@ -1128,6 +1188,7 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
   @override
   void initState() {
     super.initState();
+    statesController.addListener(_onStatesChanged);
     // register the subitem controller if this item is a submenu
     parentItemController?.registerSubItem(controller);
   }
