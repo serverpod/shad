@@ -424,9 +424,13 @@ class _ShadTooltipState extends State<ShadTooltip>
               // but a disabled button stops reporting, so its tooltip never
               // showed. Radix wraps disabled triggers for the same reason.
               // Listening here too covers any child; onHoverChange ignores
-              // the duplicate when both report.
+              // the duplicate when both report. A non-opaque MouseRegion
+              // reports a miss from hitTest even when its child is hit, which
+              // hid the trigger from a GestureDetector around the tooltip and
+              // let taps through to widgets behind it. Deferring to the child
+              // keeps the trigger's own hit test.
               child: MouseRegion(
-                opaque: false,
+                hitTestBehavior: HitTestBehavior.deferToChild,
                 onEnter: (_) => onHoverChange(true),
                 onExit: (_) => onHoverChange(false),
                 child: ShadTheme(

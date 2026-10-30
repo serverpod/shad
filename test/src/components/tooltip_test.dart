@@ -38,6 +38,70 @@ void main() {
     });
   });
 
+  group('hit testing', () {
+    const trigger = Key('trigger');
+
+    testWidgets(
+      'a GestureDetector around the tooltip receives taps on the trigger',
+      (tester) async {
+        var taps = 0;
+        await tester.pumpWidget(
+          createTestWidget(
+            Center(
+              child: GestureDetector(
+                onTap: () => taps++,
+                child: ShadTooltip(
+                  builder: (_) => const Text('Tooltip'),
+                  child: const SizedBox.square(
+                    key: trigger,
+                    dimension: 40,
+                    child: ColoredBox(color: Color(0xff000000)),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.byKey(trigger));
+        expect(taps, 1);
+      },
+    );
+
+    testWidgets('a tap on the trigger does not reach a widget behind it', (
+      tester,
+    ) async {
+      var behind = 0;
+      await tester.pumpWidget(
+        createTestWidget(
+          Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => behind++,
+                ),
+              ),
+              Center(
+                child: ShadTooltip(
+                  builder: (_) => const Text('Tooltip'),
+                  child: const SizedBox.square(
+                    key: trigger,
+                    dimension: 40,
+                    child: ColoredBox(color: Color(0xff000000)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(trigger));
+      expect(behind, 0);
+    });
+  });
+
   group('tooltip theme resolution', () {
     // `.cn-tooltip-content` is the inverted surface: `bg-foreground
     // text-background` at `text-xs`, borderless and shadowless, with a
