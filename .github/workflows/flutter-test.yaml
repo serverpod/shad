@@ -89,8 +89,11 @@ jobs:
       # as deploy-pages.yaml does.
       - name: Build example for web
         working-directory: example
+        # `flutter create` also adds a template test/widget_test.dart (for a
+        # MyApp that does not exist), which later analyze steps would trip on.
         run: |
           flutter create . --platforms web
+          rm -f test/widget_test.dart
           flutter build web --release
 
       - name: Downgrade dependencies
