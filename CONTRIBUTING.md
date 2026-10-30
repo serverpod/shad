@@ -127,6 +127,7 @@ class ShadAlert extends StatelessWidget {
 - New behavior needs a test. Bug fixes should include a test that fails before the fix and passes after.
 - Prefer asserting resolved theme values over pixels or golden images.
 - Use `matchesGoldenFile` only with `await expectLater(...)`. An unawaited `expect` never reports a mismatch.
+- Goldens are generated and compared on Linux only. On macOS and Windows the suite skips pixel comparison. To update goldens, run the **Update goldens (Linux)** workflow on your branch and commit the `updated-goldens` artifact.
 - Popover-based components animate their entrance behind an `IgnorePointer`. Pump about 12 frames of 50 ms before interacting with one in a test.
 
 ## Commit and pull request process
