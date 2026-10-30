@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 /// Every outward shadow has to go through [ShadShadowDecoration] so it is
@@ -51,6 +52,7 @@ void main() {
 
       await tester.pumpWidget(
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           theme: ShadThemeData(
             colorScheme: const ShadSlateColorScheme.light(),
             style: style,

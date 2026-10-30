@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 /// The arrow points at the trigger, not at the middle of the bubble.
@@ -28,6 +29,7 @@ void main() {
 
     await tester.pumpWidget(
       ShadApp(
+        builder: (context, child) => ShadMaterial(child: child!),
         home: Scaffold(
           body: Align(
             alignment: triggerAlignment,

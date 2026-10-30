@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 /// The reference gives fields, select triggers and every button variant the
@@ -19,6 +20,7 @@ void main() {
         );
         await tester.pumpWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             theme: theme,
             home: Scaffold(
               // A Wrap rather than a Row: the roster is wider than the test
@@ -162,6 +164,7 @@ void main() {
         );
         await tester.pumpWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             theme: theme,
             home: Scaffold(
               body: Center(

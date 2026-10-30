@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 void main() {
@@ -38,8 +39,9 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadContextMenuRegion(
               items: [
                 ShadContextMenuItem(child: Text('Copy')),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/pagination.dart';
 
 void main() {
   Widget wrap(Widget child) => ShadApp(
+    builder: (context, child) => ShadMaterial(child: child!),
     home: Scaffold(body: Center(child: child)),
   );
 

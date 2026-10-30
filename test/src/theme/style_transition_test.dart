@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/input.dart';
 import 'package:shad/src/components/input_otp.dart';
@@ -18,6 +19,7 @@ void main() {
     tester,
   ) async {
     Widget app(ShadStyleTokens style) => ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       theme: ShadThemeData(style: style),
       home: const Scaffold(
         body: Column(
