@@ -31,9 +31,9 @@ dependencies:
     sdk: flutter
   intl: ^0.20.0
   lucide_icons_flutter: ^4.0.1
-  slang: ^4.13.0
-  slang_flutter: ^4.13.0
-  theme_extensions_builder_annotation: ^7.1.0
+  slang: ^4.19.0
+  slang_flutter: ^4.19.0
+  theme_extensions_builder_annotation: ^7.5.0
   # Re-exported in part: ShadTableCell extends TableViewCell.
   two_dimensional_scrollables: ^0.5.3
   web: ^1.1.1
@@ -43,7 +43,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
-  slang_build_runner: ^4.13.0
-  theme_extensions_builder: ^7.1.0
+  slang_build_runner: ^4.19.0
+  theme_extensions_builder: ^7.5.1
   very_good_analysis: ^10.0.0
 
