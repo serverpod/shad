@@ -1,3 +1,39 @@
+## 1.0.1
+
+### Breaking changes
+
+1.0.0 was available for less than an hour. This release fixes an API that
+would otherwise have stayed until 2.0.
+
+- **The core library no longer depends on Material or Cupertino.** Flutter
+  is moving them out of the SDK into the `material_ui` and `cupertino_ui`
+  packages. `package:shad/shad.dart` now imports only the widgets layer, so
+  it is unaffected by that move. Interop is opt-in:
+  - `ShadApp.themeMode` takes the new `ShadThemeMode` (`system`, `light`,
+    `dark`). shad no longer re-exports Material's `ThemeMode`, so an app
+    that imports both `shad` and `material_ui` does not get an ambiguous
+    import.
+  - `ShadApp` no longer installs a Material theme or the Material and
+    Cupertino localizations. To use Material or Cupertino widgets, import
+    `package:shad/material.dart` and wrap them in the new `ShadMaterial`,
+    usually through `ShadApp(builder: (context, child) => ShadMaterial(child: child!))`.
+    It installs the derived Material theme, a transparent `Material` and
+    the missing localizations.
+  - `shadMaterialThemeFrom` moves to `package:shad/material.dart`.
+  - `ShadApp.materialThemeBuilder` moves to `ShadMaterial.themeBuilder`.
+    The never-called `ShadApp.cupertinoThemeBuilder` is removed.
+  - `ShadThemeScope.applyMaterialTheme` is removed. Put a `ShadMaterial`
+    inside the scope.
+  - `ShadApp` builds pages with the new `ShadPageRoute`, a short fade,
+    instead of `MaterialPageRoute`. Pass `pageRouteBuilder` to keep
+    Material or Cupertino transitions.
+  - `ShadScrollBehavior` draws a `ShadScrollbar` on desktop and iOS
+    instead of Material's `Scrollbar` and `CupertinoScrollbar`.
+
+`ShadApp` and `ShadThemeScope` still set the icon theme (16, foreground)
+and the text selection colours from the shad theme, which the Material
+theme used to do. See MIGRATION.md.
+
 ## 1.0.0
 
 The first stable release. From here on `shad` follows semantic versioning:

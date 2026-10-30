@@ -37,7 +37,7 @@ export 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart'
         TableVicinity,
         TableViewCell;
 
-export 'src/app.dart' hide applyGoogleFontToTextTheme;
+export 'src/app.dart';
 // Components
 export 'src/components/accordion.dart';
 export 'src/components/alert.dart';
@@ -192,7 +192,7 @@ export 'src/theme/text_role.dart';
 export 'src/theme/text_theme/text_styles_default.dart';
 export 'src/theme/text_theme/theme.dart' hide OmitFamilyAndPackageExtension;
 export 'src/theme/theme.dart' hide ShadInheritedTheme;
-export 'src/theme/theme_scope.dart';
+export 'src/theme/theme_scope.dart' hide ShadDefaultStyles;
 export 'src/theme/themes/base.dart';
 export 'src/theme/themes/default_theme_no_secondary_border_variant.dart';
 export 'src/theme/themes/default_theme_variant.dart';

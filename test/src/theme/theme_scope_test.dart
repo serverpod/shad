@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 void main() {
@@ -69,26 +70,26 @@ void main() {
       expect(icons.color, darkTheme.colorScheme.foreground);
     });
 
-    testWidgets('installs a matching Material theme', (tester) async {
-      late ThemeData material;
+    testWidgets('sets the selection colours', (tester) async {
+      late DefaultSelectionStyle selection;
       await tester.pumpWidget(
         ShadApp(
           home: ShadThemeScope(
             data: darkTheme,
             child: Builder(
               builder: (context) {
-                material = Theme.of(context);
+                selection = DefaultSelectionStyle.of(context);
                 return const SizedBox.shrink();
               },
             ),
           ),
         ),
       );
-      expect(material.brightness, Brightness.dark);
-      expect(material.colorScheme.surface, darkTheme.colorScheme.background);
+      expect(selection.cursorColor, darkTheme.colorScheme.primary);
+      expect(selection.selectionColor, darkTheme.colorScheme.selection);
     });
 
-    testWidgets('applyMaterialTheme: false leaves Material alone', (
+    testWidgets('a ShadMaterial inside follows the scoped theme', (
       tester,
     ) async {
       late ThemeData material;
@@ -96,17 +97,19 @@ void main() {
         ShadApp(
           home: ShadThemeScope(
             data: darkTheme,
-            applyMaterialTheme: false,
-            child: Builder(
-              builder: (context) {
-                material = Theme.of(context);
-                return const SizedBox.shrink();
-              },
+            child: ShadMaterial(
+              child: Builder(
+                builder: (context) {
+                  material = Theme.of(context);
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
           ),
         ),
       );
-      expect(material.brightness, Brightness.light);
+      expect(material.brightness, Brightness.dark);
+      expect(material.colorScheme.surface, darkTheme.colorScheme.background);
     });
   });
 

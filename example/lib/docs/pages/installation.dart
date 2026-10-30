@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
           CodeBlock(
             code: '''
 ShadApp(
-  themeMode: ThemeMode.system,
+  themeMode: ShadThemeMode.system,
   theme: ShadThemeData(),
   darkTheme: ShadThemeData(
     brightness: Brightness.dark,

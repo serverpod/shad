@@ -3,8 +3,9 @@ import 'package:example/common/app_shell.dart';
 import 'package:example/common/theme_editor/editor_config.dart';
 import 'package:example/common/theme_editor/fonts.dart';
 import 'package:example/docs/docs.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 Future<void> main() async {
@@ -20,7 +21,7 @@ Future<void> main() async {
   runApp(const App());
 }
 
-final themeModeProvider = Provider((_) => Signal(ThemeMode.light));
+final themeModeProvider = Provider((_) => Signal(ShadThemeMode.light));
 
 final directionalityProvider = Provider((context) => Signal(TextDirection.ltr));
 
@@ -47,7 +48,9 @@ Map<String, TextStyle> appCustomTextStyles(Brightness brightness) => {
   'myCustomStyle': TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w400,
-    color: brightness == Brightness.light ? Colors.blue : Colors.green,
+    color: brightness == Brightness.light
+        ? const Color(0xFF2196F3)
+        : const Color(0xFF4CAF50),
   ),
 };
 
@@ -85,6 +88,9 @@ class App extends StatelessWidget {
                 ),
             home: const AppShell(),
             builder: (context, child) {
+              // The docs and the theme editor use a few Material widgets
+              // (Slider, SelectionArea); ShadMaterial themes them from the
+              // shad theme and adds their localizations.
               return Directionality(
                 textDirection: directionality,
                 // The editor's text scale applies to the whole app; the
@@ -93,7 +99,7 @@ class App extends StatelessWidget {
                   data: MediaQuery.of(context).copyWith(
                     textScaler: TextScaler.linear(config.textScale),
                   ),
-                  child: child!,
+                  child: ShadMaterial(child: child!),
                 ),
               );
             },

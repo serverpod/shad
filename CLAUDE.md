@@ -329,10 +329,17 @@ are not `font-mono`. The example loads every font through `google_fonts`.
   `build_runner`. Only `lib/src/i18n/en.i18n.yaml` needs editing; other locales
   inherit from English.
 - **Nothing under `lib/` may import `material.dart`, `cupertino.dart` or the
-  package's own barrel** — `lib/src/app.dart` and `lib/src/theme/theme_scope.dart`
-  are the only exemptions (Material/Cupertino interop), and
-  `.github/workflows/check-imports.yaml` enforces it. This is why `ShadSpinner`
-  is a `CustomPainter` rather than a wrapped `CircularProgressIndicator`.
+  package's own barrel** — `lib/material.dart` (the opt-in interop library)
+  is the only exemption, and both `.github/workflows/check-imports.yaml` and
+  `test/src/material_interop_test.dart` enforce it. Flutter is moving
+  Material and Cupertino out of the SDK into `material_ui`/`cupertino_ui`;
+  since 1.0.1 the core does not touch them at all. `ShadApp` therefore has
+  its own `ShadThemeMode`, `ShadPageRoute` and `ShadScrollbar`-based scroll
+  behaviour, and `ShadDefaultStyles` sets the root icon theme and selection
+  colours that a Material `Theme` used to. Material widgets in an app need
+  a `ShadMaterial` (theme + transparent `Material` + localizations); the
+  example wraps its whole app in one. This is why `ShadSpinner` is a
+  `CustomPainter` rather than a wrapped `CircularProgressIndicator`.
 - Renames keep the old name `@Deprecated('Use X. Will be removed in the next
   major version.')` and get an entry in `lib/fix_data.yaml`; add a line to
   `test_fixes/shad.dart(.expect)` and run

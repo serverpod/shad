@@ -1,6 +1,6 @@
 import 'package:example/docs/docs.dart';
 import 'package:example/screens/components_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shad/shad.dart';
 
 /// A grid of every component doc page — the landing page for the Components

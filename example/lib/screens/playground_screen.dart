@@ -1,5 +1,5 @@
 import 'package:example/common/theme_editor/preview_panel.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// The playground: shadcn/ui's `/create` preview, themed by whatever the
 /// customizer panel is currently configured to.

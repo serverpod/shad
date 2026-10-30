@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ComponentView extends StatelessWidget {
   const ComponentView({super.key, required this.label, required this.child});

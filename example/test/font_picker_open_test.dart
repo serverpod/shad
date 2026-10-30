@@ -3,6 +3,7 @@ import 'package:example/common/theme_editor/editor_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 void main() {
@@ -14,6 +15,7 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ShadApp(
+        builder: (context, child) => ShadMaterial(child: child!),
         home: Scaffold(
           body: Align(
             alignment: Alignment.centerRight,

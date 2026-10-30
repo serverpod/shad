@@ -2,7 +2,7 @@ name: shad
 description: >-
   A high-fidelity Flutter port of shadcn/ui: 40+ components, all eight shadcn
   styles and 16 color schemes, with no Material or Cupertino dependency.
-version: 1.0.0
+version: 1.0.1
 homepage: https://shad.serverpod.dev/
 repository: https://github.com/serverpod/shad
 issue_tracker: https://github.com/serverpod/shad/issues
