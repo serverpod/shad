@@ -25,8 +25,18 @@ class MenubarBasicExample extends StatelessWidget {
               items: [
                 ShadContextMenuItem(child: Text('Email Link')),
                 ShadContextMenuItem(child: Text('Messages')),
+                ShadContextMenuItem(child: Text('Notes')),
               ],
               child: Text('Share'),
+            ),
+            ShadContextMenuItem(
+              trailing: Icon(LucideIcons.chevronRight),
+              items: [
+                ShadContextMenuItem(child: Text('PDF')),
+                ShadContextMenuItem(child: Text('HTML')),
+                ShadContextMenuItem(child: Text('Plain Text')),
+              ],
+              child: Text('Export As'),
             ),
             divider,
             ShadContextMenuItem(child: Text('Print...')),
@@ -37,6 +47,18 @@ class MenubarBasicExample extends StatelessWidget {
           items: [
             ShadContextMenuItem(child: Text('Undo')),
             ShadContextMenuItem(child: Text('Redo')),
+            divider,
+            ShadContextMenuItem(
+              trailing: Icon(LucideIcons.chevronRight),
+              items: [
+                ShadContextMenuItem(child: Text('Search the Web')),
+                divider,
+                ShadContextMenuItem(child: Text('Find...')),
+                ShadContextMenuItem(child: Text('Find Next')),
+                ShadContextMenuItem(child: Text('Find Previous')),
+              ],
+              child: Text('Find'),
+            ),
             divider,
             ShadContextMenuItem(child: Text('Cut')),
             ShadContextMenuItem(child: Text('Copy')),

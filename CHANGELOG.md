@@ -1,3 +1,14 @@
+## 1.0.2
+
+### Fixes
+
+- **A menu item with a submenu no longer stays highlighted while the
+  pointer moves on.** 1.0.0 added a 100ms grace period (`showDelay`)
+  before such an item un-highlights and closes its submenu. Every pointer
+  move outside the item restarted that period, so the item stayed
+  highlighted, and several submenus stayed open, until the pointer
+  stopped. The period now starts once.
+
 ## 1.0.1
 
 ### Breaking changes
@@ -42,12 +53,6 @@ theme used to do. See MIGRATION.md.
   test, so a `GestureDetector` around a `ShadTooltip` never received taps
   on the trigger, and taps reached widgets behind it. The region now
   defers to its child. Tooltips on disabled buttons still show.
-- **A menu item with a submenu no longer stays highlighted while the
-  pointer moves on.** 1.0.0 added a 100ms grace period (`showDelay`)
-  before such an item un-highlights and closes its submenu. Every pointer
-  move outside the item restarted that period, so the item stayed
-  highlighted, and several submenus stayed open, until the pointer
-  stopped. The period now starts once.
 - **An expanding `ShadButton` accepts a `Flexible` or `Expanded` child.**
   With `expands: true` the button wrapped its child in `Expanded`, so a
   `Flexible(child: Text(..., overflow: TextOverflow.ellipsis))` child threw

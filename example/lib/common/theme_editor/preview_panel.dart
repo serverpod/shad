@@ -1328,6 +1328,39 @@ class _WorkspaceCardState extends State<_WorkspaceCard> {
                 items: const [
                   ShadContextMenuItem(child: Text('New Invoice')),
                   ShadContextMenuItem(child: Text('Import…')),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('INV-001')),
+                      ShadContextMenuItem(child: Text('INV-002')),
+                      ShadContextMenuItem(child: Text('INV-003')),
+                    ],
+                    child: Text('Open Recent'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('PDF')),
+                      ShadContextMenuItem(child: Text('CSV')),
+                      ShadContextMenuItem(
+                        trailing: Icon(LucideIcons.chevronRight),
+                        items: [
+                          ShadContextMenuItem(child: Text('Xero')),
+                          ShadContextMenuItem(child: Text('QuickBooks')),
+                        ],
+                        child: Text('Accounting'),
+                      ),
+                    ],
+                    child: Text('Export As'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Email')),
+                      ShadContextMenuItem(child: Text('Copy Link')),
+                    ],
+                    child: Text('Share'),
+                  ),
                 ],
                 child: const Text('File'),
               ),
@@ -1335,6 +1368,24 @@ class _WorkspaceCardState extends State<_WorkspaceCard> {
                 items: const [
                   ShadContextMenuItem(child: Text('Undo')),
                   ShadContextMenuItem(child: Text('Redo')),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Find…')),
+                      ShadContextMenuItem(child: Text('Find Next')),
+                      ShadContextMenuItem(child: Text('Find Previous')),
+                    ],
+                    child: Text('Find'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Paid')),
+                      ShadContextMenuItem(child: Text('Pending')),
+                      ShadContextMenuItem(child: Text('Unpaid')),
+                    ],
+                    child: Text('Mark As'),
+                  ),
                 ],
                 child: const Text('Edit'),
               ),
