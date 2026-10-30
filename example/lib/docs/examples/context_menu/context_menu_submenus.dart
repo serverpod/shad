@@ -30,7 +30,6 @@ class ContextMenuSubmenusExample extends StatelessWidget {
           ],
           child: Text('Open With'),
         ),
-        divider,
         ShadContextMenuItem(
           leading: Icon(LucideIcons.share2),
           trailing: more,
@@ -103,6 +102,27 @@ class ContextMenuSubmenusExample extends StatelessWidget {
             ShadContextMenuItem(child: Text('Gallery')),
           ],
           child: Text('View As'),
+        ),
+        ShadContextMenuItem(
+          leading: Icon(LucideIcons.copy),
+          trailing: more,
+          items: [
+            ShadContextMenuItem(child: Text('Duplicate')),
+            ShadContextMenuItem(child: Text('Copy Path')),
+            ShadContextMenuItem(child: Text('Copy Name')),
+          ],
+          child: Text('Copy'),
+        ),
+        ShadContextMenuItem(
+          leading: Icon(LucideIcons.zap),
+          trailing: more,
+          items: [
+            ShadContextMenuItem(child: Text('Compress')),
+            ShadContextMenuItem(child: Text('Convert Image')),
+            ShadContextMenuItem(child: Text('Remove Background')),
+            ShadContextMenuItem(child: Text('Create PDF')),
+          ],
+          child: Text('Quick Actions'),
         ),
         divider,
         ShadContextMenuItem(

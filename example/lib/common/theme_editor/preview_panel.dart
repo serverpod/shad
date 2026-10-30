@@ -1389,6 +1389,68 @@ class _WorkspaceCardState extends State<_WorkspaceCard> {
                 ],
                 child: const Text('Edit'),
               ),
+              ShadMenubarItem(
+                items: const [
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Status')),
+                      ShadContextMenuItem(child: Text('Customer')),
+                      ShadContextMenuItem(child: Text('Month')),
+                    ],
+                    child: Text('Group By'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Date')),
+                      ShadContextMenuItem(child: Text('Amount')),
+                      ShadContextMenuItem(child: Text('Customer')),
+                    ],
+                    child: Text('Sort By'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Invoice')),
+                      ShadContextMenuItem(child: Text('Status')),
+                      ShadContextMenuItem(child: Text('Amount')),
+                      ShadContextMenuItem(child: Text('Due Date')),
+                    ],
+                    child: Text('Columns'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('Compact')),
+                      ShadContextMenuItem(child: Text('Default')),
+                      ShadContextMenuItem(child: Text('Comfortable')),
+                    ],
+                    child: Text('Density'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('USD')),
+                      ShadContextMenuItem(child: Text('EUR')),
+                      ShadContextMenuItem(child: Text('SEK')),
+                      ShadContextMenuItem(child: Text('GBP')),
+                    ],
+                    child: Text('Currency'),
+                  ),
+                  ShadContextMenuItem(
+                    trailing: Icon(LucideIcons.chevronRight),
+                    items: [
+                      ShadContextMenuItem(child: Text('75%')),
+                      ShadContextMenuItem(child: Text('100%')),
+                      ShadContextMenuItem(child: Text('125%')),
+                      ShadContextMenuItem(child: Text('150%')),
+                    ],
+                    child: Text('Zoom'),
+                  ),
+                ],
+                child: const Text('View'),
+              ),
             ],
           ),
           ShadTabs<String>(

@@ -19,9 +19,9 @@ final contextMenuDoc = ComponentDoc(
       id: 'context_menu_submenus',
       title: 'Submenus',
       description:
-          'Most rows open a submenu, and two of them nest a second level. '
-          'Sweep the pointer down the list: each submenu closes as the next '
-          'one opens.',
+          'Eight rows in a row open a submenu, and two of them nest a '
+          'second level. Sweep the pointer down the list: each submenu '
+          'closes the moment the next row is reached.',
       minPreviewHeight: 280,
       builder: (_) => const ContextMenuSubmenusExample(),
     ),
