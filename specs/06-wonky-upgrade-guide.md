@@ -300,7 +300,7 @@ existing widget name if that keeps call sites unchanged.
 
 ## Step 4 — Upgrade to 1.0
 
-Bump the eight constraints to `^1.0.0`. After steps 1–3 the only breaking
+Bump the eight constraints to `^1.0.1`. After steps 1–3 the only breaking
 changes in 1.0 that could reach wonky are these:
 
 | Change | Wonky impact |
@@ -312,6 +312,32 @@ changes in 1.0 that could reach wonky are these:
 | Internals hidden (01 §A9) | none, but see below |
 | `lucide_icons_flutter` 3 → 4 | **check renamed icons**, see below |
 | `ShadAvatar` drops `universal_image`: `ShadAvatar(String? src)` for URLs and asset paths, `ShadAvatar.image(ImageProvider?)` for the rest | none: wonky passes a URL string |
+| 1.0.1: Material/Cupertino opt-in, `ShadThemeMode` | **`themeMode` and a `ShadMaterial`**, see below |
+
+**Material and Cupertino (1.0.1).** shad's core no longer imports them, so
+`ShadApp` stops providing a Material theme and Material localizations.
+Wonky uses Material widgets (`Material` in `image_lightbox.dart` and
+`file_preview_screen.dart`, and Material imports across `wonky_write`'s
+editor), so:
+
+1. In `wonky_app/lib/src/shell/wonky_shell.dart`, wrap the app:
+   `ShadApp.router(builder: (context, child) => ShadMaterial(child: child!), ...)`,
+   with `import 'package:shad/material.dart';`. If the shell already passes
+   a `builder`, put the `ShadMaterial` innermost, inside any
+   `Directionality` or `MediaQuery` it sets.
+2. `PreferencesController.themeMode` returns Material's `ThemeMode`. Make it
+   return `ShadThemeMode` (same three values), or convert where `ShadApp`
+   takes it.
+3. Do the same in `wonky_ui`'s `WonkyPreviewApp` and `testing.dart`, and in
+   every test that pumps its own `ShadApp` (`wonky_write/test/...`:
+   `screen_pump.dart`, `screen_harness.dart`, the theme-editor, print-preview,
+   a11y, AI-overlay and perf tests). Those that import
+   `ThemeMode` from `material.dart` switch to `ShadThemeMode`.
+4. Search for `materialThemeBuilder`, `shadMaterialThemeFrom` and
+   `applyMaterialTheme`. There were no uses at the time of writing.
+
+Any test that fails with "No MaterialLocalizations found" or "No Material
+widget found" is missing the `ShadMaterial`.
 
 **`ShadInputState.editableTextKey` stays public.** It was on the list of
 internals to hide, but `wonky_slides/lib/features/outline_view/outline_view.dart:752, 1029`

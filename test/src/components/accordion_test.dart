@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/accordion.dart';
 
@@ -9,6 +10,7 @@ void main() {
   /// testing.
   Widget createTestWidget(Widget child) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(
         body: child,
       ),

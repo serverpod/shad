@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 /// The chevron auto-scroll loops drive a single [ScrollController]. A second
@@ -9,7 +10,10 @@ import 'package:shad/shad.dart';
 /// whole microtask queue before returning to the embedder, which freezes the
 /// app: no frames, no input, no resize. Only one loop may ever run.
 void main() {
-  Widget wrap(Widget child) => ShadApp(home: Scaffold(body: child));
+  Widget wrap(Widget child) => ShadApp(
+    builder: (context, child) => ShadMaterial(child: child!),
+    home: Scaffold(body: child),
+  );
 
   Widget select(GlobalKey<ShadSelectState<String>> key) => ShadSelect<String>(
     key: key,

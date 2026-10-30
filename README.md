@@ -18,7 +18,7 @@ Live component browser and docs: **<https://shad.serverpod.dev/>**
 - **Theming.** One `ShadThemeData` resolves color, typography, radius, spacing, and every component's own theme. You can override any level without losing the rest.
 - **Forms.** `ShadForm` and a `*FormField` widget for every input, with per-field validation.
 - **Localization.** 82 locales, built on `slang`.
-- **Material and Cupertino interop.** `ShadApp.custom` renders `shad` components inside a `MaterialApp` or `CupertinoApp`, so both widget sets can share one page.
+- **Material and Cupertino interop, opt-in.** `package:shad/material.dart` themes Material and Cupertino widgets from the `shad` theme, so both widget sets can share one page.
 
 ## Installation
 
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         colorScheme: const ShadZincColorScheme.dark(),
         style: ShadStyleTokens.nova,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ShadThemeMode.system,
       home: const HomePage(),
     );
   }
@@ -116,6 +116,22 @@ ShadThemeData(
 ```
 
 shadcn/ui's own default font is [Inter](https://rsms.me/inter/). The Vercel look is [Geist and Geist Mono](https://vercel.com/font).
+
+## Material and Cupertino
+
+`package:shad/shad.dart` does not import Material or Cupertino, which Flutter is moving out of the SDK into the [`material_ui`](https://pub.dev/packages/material_ui) and [`cupertino_ui`](https://pub.dev/packages/cupertino_ui) packages. To use Material or Cupertino widgets in a `shad` app, also import `package:shad/material.dart` and wrap the app in a `ShadMaterial`:
+
+```dart
+import 'package:shad/material.dart';
+import 'package:shad/shad.dart';
+
+ShadApp(
+  builder: (context, child) => ShadMaterial(child: child!),
+  home: const HomePage(),
+)
+```
+
+`ShadMaterial` derives a Material theme from the `shad` theme. It also adds the Material and Cupertino localizations and a transparent `Material`, which widgets such as `TextField` and `Slider` need. To put `shad` widgets inside your own `MaterialApp`, use `ShadApp.custom` and `shadMaterialThemeFrom(ShadTheme.of(context))`. `package:shad/material.dart` uses the Material and Cupertino libraries that ship in the Flutter SDK.
 
 ## Platform support
 

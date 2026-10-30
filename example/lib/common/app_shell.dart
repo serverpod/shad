@@ -3,7 +3,7 @@ import 'package:example/docs/registry.dart';
 import 'package:example/main.dart';
 import 'package:example/screens/components_screen.dart';
 import 'package:example/screens/playground_screen.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:shad/shad.dart';
 
@@ -80,78 +80,76 @@ class _AppShellState extends State<AppShell> {
               showLeadingBorder: showLeadingBorder,
             );
 
-        return Scaffold(
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final narrow = constraints.maxWidth < _narrow;
-              // IndexedStack keeps both sections alive (see below) but
-              // installs no TickerMode, so the offstage one's skeletons,
-              // spinners and progress bars keep asking for a frame every
-              // 16ms for the whole session — the app never idles, and every
-              // per-frame allocation compounds instead of being absorbed.
-              Widget onlyTicksWhenActive(AppSection self, Widget child) =>
-                  TickerMode(enabled: section == self, child: child);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final narrow = constraints.maxWidth < _narrow;
+            // IndexedStack keeps both sections alive (see below) but
+            // installs no TickerMode, so the offstage one's skeletons,
+            // spinners and progress bars keep asking for a frame every
+            // 16ms for the whole session — the app never idles, and every
+            // per-frame allocation compounds instead of being absorbed.
+            Widget onlyTicksWhenActive(AppSection self, Widget child) =>
+                TickerMode(enabled: section == self, child: child);
 
-              final body = IndexedStack(
-                index: section.index,
-                children: [
-                  onlyTicksWhenActive(
-                    AppSection.playground,
-                    const PlaygroundScreen(),
+            final body = IndexedStack(
+              index: section.index,
+              children: [
+                onlyTicksWhenActive(
+                  AppSection.playground,
+                  const PlaygroundScreen(),
+                ),
+                onlyTicksWhenActive(
+                  AppSection.docs,
+                  ComponentsScreen(
+                    key: _docsKey,
+                    onSelectionChanged: (group) => setState(() {
+                      _viewingComponents = group.title == 'Components';
+                    }),
                   ),
-                  onlyTicksWhenActive(
-                    AppSection.docs,
-                    ComponentsScreen(
-                      key: _docsKey,
-                      onSelectionChanged: (group) => setState(() {
-                        _viewingComponents = group.title == 'Components';
-                      }),
-                    ),
-                  ),
-                ],
-              );
+                ),
+              ],
+            );
 
-              return Column(
-                children: [
-                  _TopNav(
-                    active: _activeNavItem,
-                    onSelect: _selectNavItem,
-                  ),
-                  // The page is always the first child of both the Stack and
-                  // the Row, so opening the panel never reshapes the element
-                  // above it. Building it conditionally instead threw away
-                  // the docs browser's state — which read as "the editor does
-                  // not affect this page", since it also bounced you back to
-                  // the first component.
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Row(
-                            children: [
-                              Expanded(child: body),
-                              if (open && !narrow)
-                                SizedBox(
-                                  width: ThemeCustomizerPanel.width,
-                                  child: panel(showLeadingBorder: true),
-                                ),
-                            ],
-                          ),
+            return Column(
+              children: [
+                _TopNav(
+                  active: _activeNavItem,
+                  onSelect: _selectNavItem,
+                ),
+                // The page is always the first child of both the Stack and
+                // the Row, so opening the panel never reshapes the element
+                // above it. Building it conditionally instead threw away
+                // the docs browser's state — which read as "the editor does
+                // not affect this page", since it also bounced you back to
+                // the first component.
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Row(
+                          children: [
+                            Expanded(child: body),
+                            if (open && !narrow)
+                              SizedBox(
+                                width: ThemeCustomizerPanel.width,
+                                child: panel(showLeadingBorder: true),
+                              ),
+                          ],
                         ),
-                        // Narrow: the panel covers the page rather than
-                        // squeezing it. The top navigation stays put, so its
-                        // toggle is still there to close it again.
-                        if (open && narrow)
-                          Positioned.fill(
-                            child: panel(showLeadingBorder: false),
-                          ),
-                      ],
-                    ),
+                      ),
+                      // Narrow: the panel covers the page rather than
+                      // squeezing it. The top navigation stays put, so its
+                      // toggle is still there to close it again.
+                      if (open && narrow)
+                        Positioned.fill(
+                          child: panel(showLeadingBorder: false),
+                        ),
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -337,7 +335,7 @@ class _ThemeModeButton extends StatelessWidget {
     return SignalBuilder(
       builder: (context, _) {
         final mode = themeModeProvider.of(context).value;
-        final isLight = mode == ThemeMode.light;
+        final isLight = mode == ShadThemeMode.light;
         return ShadIconButton.ghost(
           icon: Icon(
             isLight ? LucideIcons.sun : LucideIcons.moon,
@@ -349,9 +347,9 @@ class _ThemeModeButton extends StatelessWidget {
             themeModeProvider
                 .of(context)
                 .updateValue(
-                  (value) => value == ThemeMode.light
-                      ? ThemeMode.dark
-                      : ThemeMode.light,
+                  (value) => value == ShadThemeMode.light
+                      ? ShadThemeMode.dark
+                      : ShadThemeMode.light,
                 );
           },
         );

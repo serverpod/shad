@@ -112,10 +112,27 @@ ShadThemeData(
 
 ## Interop with Material and Cupertino
 
-`ShadApp.custom` renders shadcn components inside a `MaterialApp` or `CupertinoApp`, so both widget sets can share one page. Add the localizations delegate for each set you use and wrap `builder` in a `ShadAppBuilder`:
+`package:shad/shad.dart` does not import Material or Cupertino. To use their widgets in a shad app, import `package:shad/material.dart` too and wrap the app in a `ShadMaterial`. It derives a Material theme from the shad theme (Cupertino widgets read theirs from it), adds a transparent `Material`, and adds the Material and Cupertino localizations when no ancestor provides them:
+
+```dart
+import 'package:shad/material.dart';
+import 'package:shad/shad.dart';
+
+ShadApp(
+  themeMode: ShadThemeMode.system,
+  builder: (context, child) => ShadMaterial(child: child!),
+  home: const HomePage(),
+)
+```
+
+`ShadMaterial.themeBuilder` adjusts the derived `ThemeData`. Inside a `ShadThemeScope`, a `ShadMaterial` follows that scope's theme.
+
+To put shad widgets inside your own `MaterialApp` or `CupertinoApp`, use `ShadApp.custom`. Theme the app with `shadMaterialThemeFrom` and wrap its `builder` in a `ShadAppBuilder`:
 
 ```dart
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 class MyApp extends StatelessWidget {
@@ -124,14 +141,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShadApp.custom(
-      themeMode: ThemeMode.dark,
+      themeMode: ShadThemeMode.dark,
       darkTheme: ShadThemeData(
         brightness: Brightness.dark,
         colorScheme: const ShadSlateColorScheme.dark(),
       ),
       appBuilder: (context) {
         return MaterialApp(
-          theme: Theme.of(context),
+          theme: shadMaterialThemeFrom(ShadTheme.of(context)),
           localizationsDelegates: const [
             GlobalShadLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -146,4 +163,4 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-`Theme.of(context)` inside `appBuilder` already carries a `ThemeData` derived from the `ShadThemeData` (color scheme, typography, and common widget themes), so Material widgets on the same page pick up matching colors without extra work. Use `CupertinoApp` and `CupertinoTheme.of(context)` the same way for Cupertino. If the app needs the `Router` API, use `MaterialApp.router` or `CupertinoApp.router` inside `appBuilder`.
+If the app needs the `Router` API, use `MaterialApp.router` or `CupertinoApp.router` inside `appBuilder`.

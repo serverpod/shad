@@ -5,6 +5,7 @@ import 'package:example/common/theme_editor/preview_panel.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 void main() {
@@ -25,7 +26,10 @@ void main() {
           themeConfigProvider,
           themeEditorOpenProvider,
         ],
-        child: const ShadApp(home: AppShell()),
+        child: ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const AppShell(),
+        ),
       ),
     );
     // Doc previews contain spinners and skeletons that animate forever, so

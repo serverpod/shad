@@ -18,9 +18,9 @@ jobs:
           echo "Checking for prohibited Material and Cupertino imports in lib directory..."
 
           # Define excluded files
+          # The opt-in interop library, package:shad/material.dart.
           EXCLUDED_FILES=(
-            "lib/src/app.dart"
-            "lib/src/theme/theme_scope.dart"
+            "lib/material.dart"
           )
 
           # Build grep exclusion pattern

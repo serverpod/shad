@@ -293,7 +293,7 @@ void main() {
       expect(previewTheme(tester).brightness, Brightness.light);
 
       themeModeProvider.of(tester.element(find.byType(AppShell))).value =
-          ThemeMode.dark;
+          ShadThemeMode.dark;
       for (var i = 0; i < 12; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }

@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/sheet.dart';
 import 'package:shad/src/components/sidebar.dart';
@@ -22,6 +23,7 @@ void main() {
     Widget child = const Text('content'),
   }) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(
         body: ShadSidebarScaffold(
           controller: controller,
@@ -482,6 +484,7 @@ void main() {
 
       await tester.pumpWidget(
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: ValueListenableBuilder<bool>(
             valueListenable: show,
             builder: (context, value, _) => value
@@ -552,6 +555,7 @@ void main() {
       await pumpDesktop(
         tester,
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: Center(
             child: SizedBox(
               width: 700,
@@ -582,6 +586,7 @@ void main() {
       ShadSidebarCollapsible collapsible = ShadSidebarCollapsible.icon,
     }) {
       return ShadApp(
+        builder: (context, child) => ShadMaterial(child: child!),
         home: Scaffold(
           body: ShadSidebarScaffold(
             controller: controller,
@@ -662,6 +667,7 @@ void main() {
       await pumpDesktop(
         tester,
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: Scaffold(
             body: ShadSidebarScaffold(
               controller: controller,
@@ -726,6 +732,7 @@ void main() {
       await pumpDesktop(
         tester,
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: Scaffold(
             body: ShadSidebarScaffold(
               sidebar: ShadSidebar(

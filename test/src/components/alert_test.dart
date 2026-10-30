@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/alert.dart';
 import 'package:shad/src/theme/data.dart';
@@ -9,6 +10,7 @@ import 'package:shad/src/theme/style.dart';
 void main() {
   Widget createTestWidget(Widget child) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(
         body: child,
       ),

@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: const ShadZincColorScheme.dark(),
         style: ShadStyleTokens.nova,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: ShadThemeMode.system,
       home: const HomePage(),
     );
   }

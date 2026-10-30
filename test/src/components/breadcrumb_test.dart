@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/components/breadcrumb.dart';
 import 'package:shad/src/components/button.dart';
@@ -11,6 +12,7 @@ void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
   Widget createTestWidget(Widget child) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(
         body: child,
       ),
@@ -23,8 +25,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadApp(
-            home: ShadBreadcrumb(
+          ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
+            home: const ShadBreadcrumb(
               children: [
                 Text('Home'),
                 Text('Library'),
@@ -52,8 +55,9 @@ void main() {
     testWidgets('renders with custom separator', (WidgetTester tester) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadApp(
-            home: ShadBreadcrumb(
+          ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
+            home: const ShadBreadcrumb(
               separator: Icon(Icons.arrow_forward_ios),
               children: [
                 Text('Home'),
@@ -78,6 +82,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             home: ShadBreadcrumb(
               children: [
                 ShadBreadcrumbLink(
@@ -108,8 +113,9 @@ void main() {
     testWidgets('renders ellipsis correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadApp(
-            home: ShadBreadcrumb(
+          ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
+            home: const ShadBreadcrumb(
               children: [
                 Text('Home'),
                 ShadBreadcrumbEllipsis(),
@@ -130,8 +136,9 @@ void main() {
     ) async {
       await tester.pumpWidget(
         createTestWidget(
-          const ShadApp(
-            home: ShadBreadcrumb(
+          ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
+            home: const ShadBreadcrumb(
               textDirection: TextDirection.rtl,
               children: [
                 Text('Home'),
@@ -157,6 +164,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             home: ShadBreadcrumbLink(
               onPressed: () => wasTapped = true,
               child: const Text('Clickable'),
@@ -177,6 +185,7 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             home: ShadBreadcrumbLink(
               onPressed: () {},
               child: const Text('Hoverable'),
@@ -227,8 +236,9 @@ void main() {
   group('ShadBreadcrumbDropdown', () {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Item 1')),
@@ -244,8 +254,9 @@ void main() {
 
     testWidgets('displays chevron down icon', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Item 1')),
@@ -261,8 +272,9 @@ void main() {
 
     testWidgets('shows popover when clicked', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Item 1')),
@@ -289,8 +301,9 @@ void main() {
 
     testWidgets('hides popover when clicked again', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Item 1')),
@@ -314,8 +327,9 @@ void main() {
 
     testWidgets('displays multiple dropdown items', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Components')),
@@ -341,6 +355,7 @@ void main() {
 
       await tester.pumpWidget(
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           theme: ShadThemeData(
             brightness: Brightness.light,
             breadcrumbTheme: const ShadBreadcrumbTheme(
@@ -364,8 +379,9 @@ void main() {
 
     testWidgets('controller is disposed properly', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
                 ShadBreadcrumbDropMenuItem(child: Text('Item 1')),
@@ -387,8 +403,9 @@ void main() {
   group('ShadBreadcrumbDropMenuItem', () {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               child: Text('Menu Item'),
             ),
@@ -404,6 +421,7 @@ void main() {
 
       await tester.pumpWidget(
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               onPressed: () => wasPressed = true,
@@ -421,8 +439,9 @@ void main() {
 
     testWidgets('does not call onPressed when null', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               child: Text('Non-clickable Item'),
             ),
@@ -439,8 +458,9 @@ void main() {
 
     testWidgets('applies default padding', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               child: Text('Item'),
             ),
@@ -459,8 +479,9 @@ void main() {
       const customPadding = EdgeInsets.all(12);
 
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               itemPadding: customPadding,
               child: Text('Item'),
@@ -475,8 +496,9 @@ void main() {
 
     testWidgets('uses ghost button variant', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               child: Text('Item'),
             ),
@@ -490,8 +512,9 @@ void main() {
 
     testWidgets('renders complex child widget', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropMenuItem(
               child: Row(
                 children: [
@@ -516,6 +539,7 @@ void main() {
 
       await tester.pumpWidget(
         ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
           home: Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [
@@ -547,8 +571,9 @@ void main() {
 
     testWidgets('works with empty children list', (tester) async {
       await tester.pumpWidget(
-        const ShadApp(
-          home: Scaffold(
+        ShadApp(
+          builder: (context, child) => ShadMaterial(child: child!),
+          home: const Scaffold(
             body: ShadBreadcrumbDropdown(
               items: [],
               child: Text('Empty'),

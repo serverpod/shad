@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/shad.dart';
 
 // Returns the Positioned widget that directly anchors the sheet's close
@@ -23,7 +24,10 @@ Positioned findClosePositioned(WidgetTester tester) {
 void main() {
   // Helper method to create a test widget wrapped in ShadApp and Scaffold
   Widget createTestWidget(Widget child) {
-    return ShadApp(home: Scaffold(body: child));
+    return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
+      home: Scaffold(body: child),
+    );
   }
 
   // Fixes the test view to a known size so the ratio-based expandable
@@ -77,6 +81,7 @@ void main() {
     ShadPosition? closeIconPosition,
   }) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(
         body: ShadSheetInheritedWidget(
           side: side,
@@ -915,6 +920,7 @@ void main() {
 
         await tester.pumpWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             theme: ShadThemeData(
               brightness: Brightness.light,
               colorScheme: const ShadZincColorScheme.light(),
@@ -954,6 +960,7 @@ void main() {
 
         await tester.pumpWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             theme: ShadThemeData(
               brightness: Brightness.light,
               colorScheme: const ShadZincColorScheme.light(),

@@ -1,6 +1,6 @@
 import 'package:example/docs/docs.dart';
 import 'package:example/docs/registry.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shad/shad.dart';
 
 /// The documentation browser: a [ShadSidebar] of every doc page next to the

@@ -2,10 +2,53 @@
 
 Most apps migrate in three steps:
 
-1. Bump the constraint to `shad: ^1.0.0`.
+1. Bump the constraint to `shad: ^1.0.1`.
 2. Run `dart fix --apply`. Data-driven fixes rename everything that was
    renamed (see the table below).
 3. Choose a font (see "Fonts"), and handle the few manual items below.
+
+## Material and Cupertino are opt-in (1.0.1)
+
+`package:shad/shad.dart` no longer imports Material or Cupertino. Flutter is
+moving both out of the SDK into the `material_ui` and `cupertino_ui`
+packages. This applies to 1.0.0 users too.
+
+| Before | Now |
+| --- | --- |
+| `ShadApp(themeMode: ThemeMode.dark)` | `ShadApp(themeMode: ShadThemeMode.dark)` |
+| Material widgets work below `ShadApp` | wrap them in `ShadMaterial` (below) |
+| `ShadApp(materialThemeBuilder: f)` | `ShadMaterial(themeBuilder: f)` |
+| `shadMaterialThemeFrom` from `package:shad/shad.dart` | from `package:shad/material.dart` |
+| `ShadThemeScope(applyMaterialTheme: ...)` | a `ShadMaterial` inside the scope |
+| `ShadApp.custom` + `MaterialApp(theme: Theme.of(context))` | `MaterialApp(theme: shadMaterialThemeFrom(ShadTheme.of(context)))` |
+| pages pushed with `MaterialPageRoute` by default | `ShadPageRoute` (a fade); pass `pageRouteBuilder` for the platform transitions |
+
+If your app uses any Material or Cupertino widget (`Scaffold`, `TextField`,
+`Slider`, `InkWell`, `SelectionArea`, `CupertinoSwitch` and so on), add this
+once:
+
+```dart
+import 'package:shad/material.dart';
+
+ShadApp(
+  builder: (context, child) => ShadMaterial(child: child!),
+  // ...
+)
+```
+
+Without it those widgets fail with "No MaterialLocalizations found" or "No
+Material widget found", or render with Material's default colours. Tests
+that pump their own `ShadApp` need the same `builder`.
+
+`ThemeMode` from your own state converts with a `switch`:
+
+```dart
+ShadThemeMode toShad(ThemeMode mode) => switch (mode) {
+  ThemeMode.system => ShadThemeMode.system,
+  ThemeMode.light => ShadThemeMode.light,
+  ThemeMode.dark => ShadThemeMode.dark,
+};
+```
 
 ## Breaking changes
 

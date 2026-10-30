@@ -2,12 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shad/material.dart';
 import 'package:shad/src/app.dart';
 import 'package:shad/src/raw_components/portal.dart';
 
 void main() {
   Widget createTestWidget(Widget child) {
     return ShadApp(
+      builder: (context, child) => ShadMaterial(child: child!),
       home: Scaffold(body: Center(child: child)),
     );
   }
@@ -192,6 +194,7 @@ void main() {
 
         await tester.pumpWidget(
           ShadApp(
+            builder: (context, child) => ShadMaterial(child: child!),
             home: Scaffold(
               body: Align(
                 alignment: Alignment.bottomCenter,

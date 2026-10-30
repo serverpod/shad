@@ -6,7 +6,7 @@ import 'package:shad/shad.dart';
 /// it is open restyles it too. It used to keep the theme it was opened with.
 void main() {
   testWidgets('an open dialog follows a light/dark switch', (tester) async {
-    final mode = ValueNotifier(ThemeMode.light);
+    final mode = ValueNotifier(ShadThemeMode.light);
     addTearDown(mode.dispose);
     Brightness? seen;
 
@@ -49,7 +49,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(seen, Brightness.light);
 
-    mode.value = ThemeMode.dark;
+    mode.value = ShadThemeMode.dark;
     await tester.pumpAndSettle();
     expect(find.text('content'), findsOneWidget);
     expect(seen, Brightness.dark);
