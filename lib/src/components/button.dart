@@ -1155,7 +1155,13 @@ class _ShadButtonState extends State<ShadButton> {
 
           var child = widget.child;
 
-          if (widget.child != null && effectiveExpands) {
+          // A child that is already Flexible (or Expanded) brings its own
+          // flex. Wrapping it in Expanded would put it under the Expanded
+          // instead of directly under the Row, which Flutter rejects as an
+          // incorrect use of ParentDataWidget.
+          if (widget.child != null &&
+              effectiveExpands &&
+              widget.child is! Flexible) {
             child = Expanded(child: widget.child!);
           }
 

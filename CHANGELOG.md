@@ -34,6 +34,20 @@ would otherwise have stayed until 2.0.
 and the text selection colours from the shad theme, which the Material
 theme used to do. See MIGRATION.md.
 
+### Fixes
+
+- **Tapping a tooltip's trigger works again.** 1.0.0 put a non-opaque
+  `MouseRegion` around the trigger so that tooltips show on disabled
+  buttons. A non-opaque `MouseRegion` always reports a miss from its hit
+  test, so a `GestureDetector` around a `ShadTooltip` never received taps
+  on the trigger, and taps reached widgets behind it. The region now
+  defers to its child. Tooltips on disabled buttons still show.
+- **An expanding `ShadButton` accepts a `Flexible` or `Expanded` child.**
+  With `expands: true` the button wrapped its child in `Expanded`, so a
+  `Flexible(child: Text(..., overflow: TextOverflow.ellipsis))` child threw
+  "Incorrect use of ParentDataWidget". A child that is already flexible is
+  now used as it is.
+
 ## 1.0.0
 
 The first stable release. From here on `shad` follows semantic versioning:

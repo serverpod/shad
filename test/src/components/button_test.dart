@@ -18,6 +18,31 @@ void main() {
   }
 
   group('ShadButton', () {
+    testWidgets('an expanding button keeps a Flexible child as it is', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const SizedBox(
+            width: 120,
+            child: ShadButton(
+              width: double.infinity,
+              expands: true,
+              child: Flexible(
+                child: Text(
+                  'A label far too long for the button',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Expanded), findsNothing);
+    });
+
     testWidgets('renders primary variant correctly', (
       WidgetTester tester,
     ) async {
