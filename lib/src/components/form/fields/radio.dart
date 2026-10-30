@@ -4,7 +4,10 @@ import 'package:shad/src/components/radio.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 
-class ShadRadioGroupFormField<T> extends ShadFormBuilderField<T> {
+/// A [ShadRadioGroup] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadRadioGroupFormField<T> extends ShadFormField<T> {
+  /// Creates a radio group form field.
   ShadRadioGroupFormField({
     super.id,
     super.key,
@@ -14,11 +17,6 @@ class ShadRadioGroupFormField<T> extends ShadFormBuilderField<T> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -56,7 +54,7 @@ class ShadRadioGroupFormField<T> extends ShadFormBuilderField<T> {
              const ShadDecoration(),
          initialValue: controller?.value ?? initialValue,
          builder: (state) {
-           state as ShadFormBuilderRadioGroupState<T>;
+           state as ShadRadioGroupFormFieldState<T>;
            return ShadRadioGroup(
              items: items,
              onChanged: state.didChange,
@@ -73,17 +71,21 @@ class ShadRadioGroupFormField<T> extends ShadFormBuilderField<T> {
          },
        );
 
+  /// {@macro ShadRadioGroup.controller}
   final ShadRadioController<T>? controller;
 
   @override
-  ShadFormBuilderFieldState<ShadRadioGroupFormField<T>, T> createState() =>
-      ShadFormBuilderRadioGroupState<T>();
+  ShadFormFieldState<ShadRadioGroupFormField<T>, T> createState() =>
+      ShadRadioGroupFormFieldState<T>();
 }
 
-class ShadFormBuilderRadioGroupState<T>
-    extends ShadFormBuilderFieldState<ShadRadioGroupFormField<T>, T> {
+/// The state of a [ShadRadioGroupFormField].
+class ShadRadioGroupFormFieldState<T>
+    extends ShadFormFieldState<ShadRadioGroupFormField<T>, T> {
   ShadRadioController<T>? _controller;
 
+  /// The controller in use: [ShadRadioGroupFormField.controller] when given,
+  /// otherwise an internal one.
   ShadRadioController<T> get controller => widget.controller ?? _controller!;
 
   @override
@@ -109,12 +111,17 @@ class ShadFormBuilderRadioGroupState<T>
   @override
   void didUpdateWidget(covariant ShadRadioGroupFormField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller == null && widget.controller != null) {
+    if (widget.controller == oldWidget.controller) return;
+    // Move the listener with the controller. It used to stay on the old one,
+    // and dispose() then removed it from the wrong controller.
+    (oldWidget.controller ?? _controller)?.removeListener(onControllerChanged);
+    if (widget.controller != null) {
       _controller?.dispose();
+      _controller = null;
+    } else {
+      _controller = ShadRadioController<T>(value: value, enabled: enabled);
     }
-    if (oldWidget.controller != null && widget.controller == null) {
-      _controller = ShadRadioController(value: value, enabled: enabled);
-    }
+    controller.addListener(onControllerChanged);
   }
 
   @override
@@ -130,6 +137,8 @@ class ShadFormBuilderRadioGroupState<T>
     super.dispose();
   }
 
+  /// Copies the controller's value into the field's value and calls
+  /// [ShadFormField.onChanged].
   void onControllerChanged() {
     if (controller.value != value) {
       didChange(controller.value);
@@ -137,3 +146,10 @@ class ShadFormBuilderRadioGroupState<T>
     }
   }
 }
+
+/// The old name of [ShadRadioGroupFormFieldState].
+@Deprecated(
+  'Use ShadRadioGroupFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderRadioGroupState<T> = ShadRadioGroupFormFieldState<T>;

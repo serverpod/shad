@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Τέλος"
+
+dialog:
+  close: "Κλείσιμο"
+  dismiss: "Παράβλεψη"

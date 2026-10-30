@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "მზადაა"
+
+dialog:
+  close: "დახურვა"
+  dismiss: "დახურვა"

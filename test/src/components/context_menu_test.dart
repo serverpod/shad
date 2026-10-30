@@ -239,7 +239,7 @@ void main() {
           ),
         );
 
-        expect(
+        await expectLater(
           find.byType(ShadContextMenuRegion),
           matchesGoldenFile('goldens/context_menu_region.png'),
         );

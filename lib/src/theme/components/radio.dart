@@ -5,9 +5,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'radio.g.theme.dart';
 
+/// {@template ShadRadioTheme}
+/// Theme for the `ShadRadio` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadRadioTheme with _$ShadRadioTheme {
+  /// {@macro ShadRadioTheme}
   const ShadRadioTheme({
     bool canMerge = true,
     this.color,
@@ -78,6 +82,7 @@ class ShadRadioTheme with _$ShadRadioTheme {
   /// {@macro ShadRadio.radioPadding}
   final EdgeInsetsGeometry? radioPadding;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadRadioTheme? lerp(
     ShadRadioTheme? a,
     ShadRadioTheme? b,

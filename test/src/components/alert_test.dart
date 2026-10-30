@@ -219,7 +219,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadAlert),
         matchesGoldenFile('goldens/alert.png'),
       );
@@ -236,7 +236,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadAlert),
         matchesGoldenFile('goldens/alert_destructive.png'),
       );

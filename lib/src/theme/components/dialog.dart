@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -6,9 +7,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'dialog.g.theme.dart';
 
+/// {@template ShadDialogTheme}
+/// Theme for the `ShadDialog` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadDialogTheme with _$ShadDialogTheme {
+  /// {@macro ShadDialogTheme}
   const ShadDialogTheme({
     bool canMerge = true,
     this.closeIconData,
@@ -73,10 +78,12 @@ class ShadDialogTheme with _$ShadDialogTheme {
   /// {@macro ShadDialog.gap}
   final double? gap;
 
-  /// {@macro ShadDialog.animateIn}
+  /// The effects played when the dialog appears. Defaults to a fade and
+  /// zoom in.
   final List<Effect<dynamic>>? animateIn;
 
-  /// {@macro ShadDialog.animateOut}
+  /// The effects played when the dialog disappears. Defaults to a fade and
+  /// zoom out.
   final List<Effect<dynamic>>? animateOut;
 
   /// {@macro ShadDialog.constraints}
@@ -145,15 +152,43 @@ class ShadDialogTheme with _$ShadDialogTheme {
   /// {@macro ShadDialog.actionsPinned}
   final bool? actionsPinned;
 
-  /// {@macro ShadDialog.barrierColor}
+  /// The colour of the barrier behind the dialog. Defaults to shadcn's
+  /// `bg-black/10`, which reads because the barrier is also blurred.
   final Color? barrierColor;
 
   /// {@macro ShadDialog.barrierBlurSigma}
   final double? barrierBlurSigma;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadDialogTheme? lerp(
     ShadDialogTheme? a,
     ShadDialogTheme? b,
     double t,
   ) => _$ShadDialogTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadDialogTheme &&
+      listEquals(animateIn, other.animateIn) &&
+      listEquals(animateOut, other.animateOut) &&
+      listEquals(shadows, other.shadows) &&
+      super ==
+          other.copyWith(
+            animateIn: animateIn,
+            animateOut: animateOut,
+            shadows: shadows,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(animateIn ?? const []),
+    Object.hashAll(animateOut ?? const []),
+    Object.hashAll(shadows ?? const []),
+  );
 }

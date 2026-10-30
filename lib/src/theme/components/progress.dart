@@ -3,9 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'progress.g.theme.dart';
 
+/// {@template ShadProgressTheme}
+/// Theme for the `ShadProgress` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadProgressTheme with _$ShadProgressTheme {
+  /// {@macro ShadProgressTheme}
   const ShadProgressTheme({
     bool canMerge = true,
     this.backgroundColor,
@@ -36,6 +40,7 @@ class ShadProgressTheme with _$ShadProgressTheme {
   /// {@macro ShadProgress.minHeight}
   final double? minHeight;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadProgressTheme? lerp(
     ShadProgressTheme? a,
     ShadProgressTheme? b,

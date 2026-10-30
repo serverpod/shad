@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ተከናውኗል"
+
+dialog:
+  close: "ዝጋ"
+  dismiss: "አሰናብት"

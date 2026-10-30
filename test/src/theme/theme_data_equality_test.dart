@@ -266,4 +266,46 @@ void main() {
       reason: 'the theme should not be animated when it did not change',
     );
   });
+
+  group('list fields compare by value', () {
+    // A theme built inline allocates fresh lists on every build; the
+    // generated `==` alone compared them by identity.
+    List<BoxShadow> shadows() => [
+      const BoxShadow(blurRadius: 3, color: Color(0x11000000)),
+    ];
+
+    test('component themes with equal, non-identical lists are equal', () {
+      final a = ShadPopoverTheme(shadows: shadows());
+      final b = ShadPopoverTheme(shadows: shadows());
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(
+        ShadCardTheme(shadows: shadows()),
+        ShadCardTheme(shadows: shadows()),
+      );
+      // Deliberately non-const: const lists would be identical anyway.
+      expect(
+        // ignore: prefer_const_constructors, prefer_const_literals_to_create_immutables
+        ShadSheetTheme(snapSizes: [0.5, 1]),
+        // ignore: prefer_const_constructors, prefer_const_literals_to_create_immutables
+        ShadSheetTheme(snapSizes: [0.5, 1]),
+      );
+    });
+
+    test('different lists still differ', () {
+      expect(
+        ShadPopoverTheme(shadows: shadows()),
+        isNot(const ShadPopoverTheme(shadows: [])),
+      );
+    });
+
+    test('a theme with an inline override equals its rebuild', () {
+      ShadThemeData build() => ShadThemeData(
+        colorScheme: const ShadSlateColorScheme.light(),
+        brightness: Brightness.light,
+        cardTheme: ShadCardTheme(shadows: shadows()),
+      );
+      expect(build(), build());
+    });
+  });
 }

@@ -5,13 +5,15 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/components/disabled.dart';
 import 'package:shad/src/components/input.dart';
 import 'package:shad/src/theme/components/decorator.dart';
-import 'package:shad/src/theme/text_theme/text_styles_default.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/provider.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
 import 'package:shad/src/utils/text_editing_controller.dart';
 
+/// A zero-width space. An empty slot holds it, so that a backspace in an
+/// empty slot still changes the text and can move focus to the previous
+/// slot.
 const kInvisibleCharCode = '\u200b';
 
 /// A customizable one-time password (OTP) input widget with multiple fields.
@@ -88,7 +90,12 @@ class ShadInputOTP extends StatefulWidget {
   State<ShadInputOTP> createState() => ShadInputOTPState();
 }
 
+/// The state of a [ShadInputOTP].
+///
+/// Its slots and groups register with it to share the value and to move
+/// focus between slots.
 class ShadInputOTPState extends State<ShadInputOTP> {
+  /// The focus node and controller of each registered slot, in order.
   final registeredOTPs =
       <({FocusNode focusNode, TextEditingController controller})>[];
 
@@ -117,12 +124,15 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     }
   }
 
-  late Listenable listenable;
-
+  /// The character in each slot. An empty slot holds an empty string or a
+  /// space.
   late final values = List<String>.filled(widget.maxLength, '');
 
+  /// The value of all slots together, padded with spaces to
+  /// [ShadInputOTP.maxLength]. A change calls [ShadInputOTP.onChanged].
   late final ValueNotifier<String> result;
 
+  /// The number of registered [ShadInputOTPGroup]s.
   int groups = 0;
 
   @override
@@ -146,6 +156,8 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   }
 
   // Call this method to register a slot, returns the index of the slot
+  /// Registers a slot and returns its index. The slot takes its character
+  /// from [ShadInputOTP.initialValue].
   int registerSlot({
     required FocusNode focusNode,
     required TextEditingController controller,
@@ -194,6 +206,7 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   }
 
   // Call this method to register a group, returns the index of the group
+  /// Registers a group and returns its index; the pair of [unregisterGroup].
   int registerGroup() {
     groups++;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -207,6 +220,8 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     if (groups > 0) groups--;
   }
 
+  /// Starts copying the text of the slot at [index] into [values] and
+  /// [result].
   void listenToSlot(int index) {
     final slot = registeredOTPs[index];
 
@@ -234,6 +249,9 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     slot.controller.addListener(listener);
   }
 
+  /// Focuses the slot at [index], and empties it when [clear] is true.
+  ///
+  /// Does nothing when [ShadInputOTP.jumpToNextWhenFilled] is false.
   void jumpToSlot(int index, {bool clear = false}) {
     if (!widget.jumpToNextWhenFilled) return;
     if (index < registeredOTPs.length) {
@@ -243,6 +261,7 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     }
   }
 
+  /// Moves focus to the slot after the focused one.
   void jumpToNextSlot() {
     final focusedSlotIndex = registeredOTPs.indexWhere(
       (slot) => slot.focusNode.hasFocus,
@@ -251,6 +270,8 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     jumpToSlot(focusedSlotIndex + 1);
   }
 
+  /// Moves focus to the slot before the focused one, and empties it when
+  /// [clear] is true.
   void jumpToPreviousSlot({bool clear = false}) {
     final focusedSlotIndex = registeredOTPs.indexWhere(
       (slot) => slot.focusNode.hasFocus,
@@ -259,6 +280,8 @@ class ShadInputOTPState extends State<ShadInputOTP> {
     jumpToSlot(focusedSlotIndex - 1, clear: clear);
   }
 
+  /// Writes [values] into the slots, one character each, from the first slot.
+  /// Used when a whole code is pasted into the first slot.
   void setValues(String values) {
     for (var i = 0; i < values.length; i++) {
       final slot = registeredOTPs[i];
@@ -289,12 +312,16 @@ class ShadInputOTPState extends State<ShadInputOTP> {
   }
 }
 
+/// A run of [ShadInputOTPSlot]s in a [ShadInputOTP], drawn as one joined
+/// strip. shadcn's `InputOTPGroup`.
 class ShadInputOTPGroup extends StatefulWidget {
+  /// Creates a group of [children].
   const ShadInputOTPGroup({
     super.key,
     required this.children,
   });
 
+  /// The slots in the group, usually [ShadInputOTPSlot]s.
   final List<Widget> children;
 
   @override
@@ -326,7 +353,9 @@ class _ShadInputOTPGroupState extends State<ShadInputOTPGroup> {
   }
 }
 
+/// A box for one character of a [ShadInputOTP]. shadcn's `InputOTPSlot`.
 class ShadInputOTPSlot extends StatefulWidget {
+  /// Creates a slot. It must be inside a [ShadInputOTP].
   const ShadInputOTPSlot({
     super.key,
     this.focusNode,
@@ -371,10 +400,12 @@ class ShadInputOTPSlot extends StatefulWidget {
   /// The style for the input of the slot, defaults to
   /// ```dart
   /// textTheme.muted.copyWith(
-  ///    color: theme.colorScheme.foreground,
-  ///    fontFamily: kDefaultFontFamilyMono,
-  ///  )
+  ///   color: theme.colorScheme.foreground,
+  ///   fontFeatures: const [FontFeature.tabularFigures()],
+  /// )
   /// ```
+  /// Tabular figures keep every digit the same width without a monospace
+  /// font, as the reference's slots do.
   /// {@endtemplate}
   final TextStyle? style;
 
@@ -528,7 +559,7 @@ class _ShadInputOTPSlotState extends State<ShadInputOTPSlot> {
         theme.inputOTPTheme.style ??
         theme.textTheme.muted.copyWith(
           color: theme.colorScheme.foreground,
-          fontFamily: kDefaultFontFamilyMono,
+          fontFeatures: const [FontFeature.tabularFigures()],
         );
 
     final firstRadius =

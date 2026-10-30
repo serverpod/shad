@@ -31,9 +31,17 @@ class ShadSpacing {
 
   /// Named steps, for the common cases.
   double get xs => call(1);
+
+  /// Two steps, 8px by default.
   double get sm => call(2);
+
+  /// Four steps, 16px by default.
   double get md => call(4);
+
+  /// Six steps, 24px by default.
   double get lg => call(6);
+
+  /// Eight steps, 32px by default.
   double get xl => call(8);
 
   /// `EdgeInsets.all`, in steps.
@@ -72,8 +80,10 @@ class ShadSpacing {
     bottom: call(bottom),
   );
 
+  /// Creates a copy of this scale with the given [step].
   ShadSpacing copyWith({double? step}) => ShadSpacing(step: step ?? this.step);
 
+  /// Linearly interpolates the step between [a] and [b] by [t].
   static ShadSpacing lerp(ShadSpacing a, ShadSpacing b, double t) =>
       ShadSpacing(step: a.step + (b.step - a.step) * t);
 

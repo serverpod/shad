@@ -43,6 +43,7 @@ class ShadLocalizationsDataUg extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ug datePicker = _ShadLocalizationsData$datePicker$ug._(_root);
 	@override late final _ShadLocalizationsData$input$ug input = _ShadLocalizationsData$input$ug._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ug keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ug._(_root);
+	@override late final _ShadLocalizationsData$dialog$ug dialog = _ShadLocalizationsData$dialog$ug._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ug extends ShadLocalizationsData$ke
 	@override String get done => 'تامام';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ug extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ug._(ShadLocalizationsDataUg root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataUg _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'يېپىش';
+	@override String get dismiss => 'بىكار قىلىش';
+}
+
 /// The flat map containing all translations for locale <ug>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataUg {
 			'input.paste' => 'چاپلا',
 			'input.selectAll' => 'ھەممىنى تاللا',
 			'keyboardToolbar.done' => 'تامام',
+			'dialog.close' => 'يېپىش',
+			'dialog.dismiss' => 'بىكار قىلىش',
 			_ => null,
 		};
 	}

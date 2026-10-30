@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `yellow` theme: a neutral base with a yellow primary.
+///
+/// Kept for compatibility. In v4, apply `ShadAccentScheme.yellowLight` or
+/// `ShadAccentScheme.yellowDark` to a base colour scheme instead.
 @immutable
 class ShadYellowColorScheme extends ShadColorScheme {
+  /// Creates a [ShadYellowColorScheme] from explicit colours.
+  ///
+  /// Use [ShadYellowColorScheme.light] or [ShadYellowColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadYellowColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadYellowColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadYellowColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadYellowColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff0c0a09),
@@ -51,6 +62,9 @@ class ShadYellowColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadYellowColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadYellowColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfffafaf9),

@@ -74,10 +74,11 @@ The component must exist on [ui.shadcn.com](https://ui.shadcn.com/docs/component
 2. Create `lib/src/components/<name>.dart`. Name the widget class `Shad<Name>`, for example `ShadAvatar` or `ShadDialog`.
 3. Create its theme at `lib/src/theme/components/<name>.dart`, following the pattern of an existing component theme.
 4. Export both files from `lib/shad.dart`.
-5. Add the component's default values to both theme variants: `lib/src/theme/themes/default_theme_variant.dart` and `default_theme_no_secondary_border_variant.dart`. The two variants should differ only in how the component's decoration handles the secondary (outward) border.
-6. Add a documentation page: an example under `example/lib/docs/examples/<slug>/`, a `ComponentDoc` in `example/lib/docs/pages/<slug>.dart`, and an entry in `example/lib/docs/registry.dart`.
-7. Regenerate the component's skill page: `dart run scripts/generate_skills.dart`.
-8. Add tests under `test/src/components/`.
+5. Add the component's default values to `lib/src/theme/themes/default_theme_variant.dart`. `ShadDefaultThemeNoSecondaryBorderVariant` subclasses it and overrides only the focus treatment, so touch the subclass only when the change is about focus geometry.
+6. Add the theme to `test/src/theme/theme_data_equality_test.dart`.
+7. Add a documentation page: an example under `example/lib/docs/examples/<slug>/`, a `ComponentDoc` in `example/lib/docs/pages/<slug>.dart`, and an entry in `example/lib/docs/registry.dart`.
+8. Regenerate the component's skill page: `dart run scripts/generate_skills.dart`.
+9. Add tests under `test/src/components/`.
 
 ### Component parameters
 
@@ -115,9 +116,9 @@ class ShadAlert extends StatelessWidget {
 
 ## Code style
 
-- Run `dart format .` before committing.
+- Run `dart format lib test example/lib example/test` before committing. CI fails on unformatted files.
 - `flutter analyze` must report no issues. The package follows `very_good_analysis`; see `analysis_options.yaml` for project-specific overrides.
-- Nothing under `lib/` may import `material.dart`, `cupertino.dart`, or the package's own barrel (`package:shad/shad.dart`). `lib/src/app.dart` is the only exception. CI enforces this.
+- Nothing under `lib/` may import `material.dart`, `cupertino.dart`, or the package's own barrel (`package:shad/shad.dart`). `lib/src/app.dart` and `lib/src/theme/theme_scope.dart` are the only exceptions (Material and Cupertino interop). CI enforces this.
 - Add or update a doc comment (`///`) on every public member you add or change.
 - Do not add comments that only restate what the code does. Add a comment when the code cannot explain its own intent, a trade-off, or a constraint.
 
@@ -133,8 +134,8 @@ class ShadAlert extends StatelessWidget {
 1. Fork the repository and create a branch for your change.
 2. Make your change, following the conventions above.
 3. Update `CHANGELOG.md` with a summary of your change, under the pattern already used at the top of the file.
-4. Bump the version in `pubspec.yaml`. Until the package reaches 1.0, the second number is the effective major version and the third is the effective minor version: a breaking change or a new feature bumps the second number (`0.18.0` to `0.19.0`), a fix or a chore bumps the third (`0.18.0` to `0.18.1`).
+4. Do not bump the version in `pubspec.yaml`; maintainers do that when they cut a release. The package follows [semantic versioning](https://semver.org/): breaking changes only in a major version, new features in a minor, fixes in a patch. To rename or remove public API, keep the old name with `@Deprecated('Use X instead. Will be removed in the next major version.')` and add an entry to `lib/fix_data.yaml`, so `dart fix` migrates callers.
 5. Open a pull request describing what changed and why, and link the issue it fixes, if any.
 6. Make sure CI passes. It runs `flutter analyze` and `flutter test` against the package and the example app, plus an import check and a check that generated files are up to date.
 
-A maintainer merges your pull request once it is approved and CI passes. Publishing to pub.dev and deploying the example app to GitHub Pages happen automatically from `main`.
+A maintainer merges your pull request once it is approved and CI passes. The example app deploys to GitHub Pages from `main`. A release is published when a maintainer bumps the version: the tests pass on `main`, `create-release.yaml` tags `v<version>`, and `publish.yaml` publishes that tag to pub.dev.

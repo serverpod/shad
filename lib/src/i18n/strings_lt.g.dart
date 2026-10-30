@@ -43,6 +43,7 @@ class ShadLocalizationsDataLt extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$lt datePicker = _ShadLocalizationsData$datePicker$lt._(_root);
 	@override late final _ShadLocalizationsData$input$lt input = _ShadLocalizationsData$input$lt._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$lt keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$lt._(_root);
+	@override late final _ShadLocalizationsData$dialog$lt dialog = _ShadLocalizationsData$dialog$lt._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$lt extends ShadLocalizationsData$ke
 	@override String get done => 'Atlikta';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$lt extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$lt._(ShadLocalizationsDataLt root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataLt _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Uždaryti';
+	@override String get dismiss => 'Atsisakyti';
+}
+
 /// The flat map containing all translations for locale <lt>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataLt {
 			'input.paste' => 'Įklijuoti',
 			'input.selectAll' => 'Pasirinkti viską',
 			'keyboardToolbar.done' => 'Atlikta',
+			'dialog.close' => 'Uždaryti',
+			'dialog.dismiss' => 'Atsisakyti',
 			_ => null,
 		};
 	}

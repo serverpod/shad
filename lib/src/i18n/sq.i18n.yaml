@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "U krye"
+
+dialog:
+  close: "Mbyll"
+  dismiss: "Hiq"

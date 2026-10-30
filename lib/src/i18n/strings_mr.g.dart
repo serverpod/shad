@@ -43,6 +43,7 @@ class ShadLocalizationsDataMr extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$mr datePicker = _ShadLocalizationsData$datePicker$mr._(_root);
 	@override late final _ShadLocalizationsData$input$mr input = _ShadLocalizationsData$input$mr._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$mr keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$mr._(_root);
+	@override late final _ShadLocalizationsData$dialog$mr dialog = _ShadLocalizationsData$dialog$mr._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$mr extends ShadLocalizationsData$ke
 	@override String get done => 'पूर्ण';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$mr extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$mr._(ShadLocalizationsDataMr root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataMr _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'बंद करा';
+	@override String get dismiss => 'डिसमिस करा';
+}
+
 /// The flat map containing all translations for locale <mr>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataMr {
 			'input.paste' => 'पेस्ट',
 			'input.selectAll' => 'सर्व निवडा',
 			'keyboardToolbar.done' => 'पूर्ण',
+			'dialog.close' => 'बंद करा',
+			'dialog.dismiss' => 'डिसमिस करा',
 			_ => null,
 		};
 	}

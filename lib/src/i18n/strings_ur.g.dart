@@ -43,6 +43,7 @@ class ShadLocalizationsDataUr extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ur datePicker = _ShadLocalizationsData$datePicker$ur._(_root);
 	@override late final _ShadLocalizationsData$input$ur input = _ShadLocalizationsData$input$ur._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ur keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ur._(_root);
+	@override late final _ShadLocalizationsData$dialog$ur dialog = _ShadLocalizationsData$dialog$ur._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ur extends ShadLocalizationsData$ke
 	@override String get done => 'ہو گیا';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ur extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ur._(ShadLocalizationsDataUr root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataUr _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'بند کریں';
+	@override String get dismiss => 'برخاست کریں';
+}
+
 /// The flat map containing all translations for locale <ur>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataUr {
 			'input.paste' => 'چسپاں کریں',
 			'input.selectAll' => 'سب منتخب کریں',
 			'keyboardToolbar.done' => 'ہو گیا',
+			'dialog.close' => 'بند کریں',
+			'dialog.dismiss' => 'برخاست کریں',
 			_ => null,
 		};
 	}

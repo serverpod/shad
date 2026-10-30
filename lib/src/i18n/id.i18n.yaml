@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Selesai"
+
+dialog:
+  close: "Tutup"
+  dismiss: "Tutup"

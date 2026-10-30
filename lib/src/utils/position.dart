@@ -1,7 +1,14 @@
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/widgets.dart';
 
+/// The distances of a widget from the edges of a [Stack], as in [Positioned].
+///
+/// Used to place toasts, sheets and dialogs. A null side is not constrained.
 @immutable
 class ShadPosition {
+  /// Creates a position from distances to the top, left, right and bottom
+  /// edges.
   const ShadPosition({
     this.top,
     this.left,
@@ -9,6 +16,9 @@ class ShadPosition {
     this.bottom,
   });
 
+  /// Creates a position from distances to the start and end edges.
+  ///
+  /// [textDirection] decides whether start is the left or the right edge.
   factory ShadPosition.directional({
     double? top,
     double? bottom,
@@ -28,11 +38,19 @@ class ShadPosition {
     );
   }
 
+  /// The distance from the top edge.
   final double? top;
+
+  /// The distance from the left edge.
   final double? left;
+
+  /// The distance from the right edge.
   final double? right;
+
+  /// The distance from the bottom edge.
   final double? bottom;
 
+  /// Returns a copy with the given fields replaced.
   ShadPosition copyWith({
     double? top,
     double? left,
@@ -47,17 +65,26 @@ class ShadPosition {
     );
   }
 
+  /// Returns [b] for every [t].
+  ///
+  /// It does not interpolate the distances, so a theme animation jumps to the
+  /// new position.
   static ShadPosition? lerp(
     ShadPosition? a,
     ShadPosition? b,
     double t,
   ) {
     if (identical(a, b)) return a;
+    // Sides set on both ends interpolate; a side set on only one end cannot,
+    // so it switches halfway.
+    double? side(double? from, double? to) => from != null && to != null
+        ? lerpDouble(from, to, t)
+        : (t < .5 ? from : to);
     return ShadPosition(
-      top: b?.top,
-      left: b?.left,
-      right: b?.right,
-      bottom: b?.bottom,
+      top: side(a?.top, b?.top),
+      left: side(a?.left, b?.left),
+      right: side(a?.right, b?.right),
+      bottom: side(a?.bottom, b?.bottom),
     );
   }
 
@@ -82,7 +109,9 @@ class ShadPosition {
   int get hashCode => Object.hashAll([top, left, right, bottom]);
 }
 
+/// Wraps a widget in a [Positioned] widget.
 extension PositionedExt on Widget {
+  /// Wraps this widget in a [Positioned] with the distances of [position].
   Widget positionedWith(ShadPosition position) {
     return Positioned(
       top: position.top,

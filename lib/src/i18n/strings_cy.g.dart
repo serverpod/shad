@@ -43,6 +43,7 @@ class ShadLocalizationsDataCy extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$cy datePicker = _ShadLocalizationsData$datePicker$cy._(_root);
 	@override late final _ShadLocalizationsData$input$cy input = _ShadLocalizationsData$input$cy._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$cy keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$cy._(_root);
+	@override late final _ShadLocalizationsData$dialog$cy dialog = _ShadLocalizationsData$dialog$cy._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$cy extends ShadLocalizationsData$ke
 	@override String get done => 'Gorffen';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$cy extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$cy._(ShadLocalizationsDataCy root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataCy _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Cau';
+	@override String get dismiss => 'Diystyru';
+}
+
 /// The flat map containing all translations for locale <cy>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataCy {
 			'input.paste' => 'Gludo',
 			'input.selectAll' => 'Dewis y cyfan',
 			'keyboardToolbar.done' => 'Gorffen',
+			'dialog.close' => 'Cau',
+			'dialog.dismiss' => 'Diystyru',
 			_ => null,
 		};
 	}

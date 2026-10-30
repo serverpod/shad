@@ -43,6 +43,7 @@ class ShadLocalizationsDataLo extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$lo datePicker = _ShadLocalizationsData$datePicker$lo._(_root);
 	@override late final _ShadLocalizationsData$input$lo input = _ShadLocalizationsData$input$lo._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$lo keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$lo._(_root);
+	@override late final _ShadLocalizationsData$dialog$lo dialog = _ShadLocalizationsData$dialog$lo._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$lo extends ShadLocalizationsData$ke
 	@override String get done => 'ສຳເລັດ';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$lo extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$lo._(ShadLocalizationsDataLo root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataLo _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'ປິດ';
+	@override String get dismiss => 'ປິດໄວ້';
+}
+
 /// The flat map containing all translations for locale <lo>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataLo {
 			'input.paste' => 'ວາງ',
 			'input.selectAll' => 'ເລືອກທັງໝົດ',
 			'keyboardToolbar.done' => 'ສຳເລັດ',
+			'dialog.close' => 'ປິດ',
+			'dialog.dismiss' => 'ປິດໄວ້',
 			_ => null,
 		};
 	}

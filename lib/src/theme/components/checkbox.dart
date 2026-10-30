@@ -5,9 +5,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'checkbox.g.theme.dart';
 
+/// {@template ShadCheckboxTheme}
+/// Theme for the `ShadCheckbox` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadCheckboxTheme with _$ShadCheckboxTheme {
+  /// {@macro ShadCheckboxTheme}
   const ShadCheckboxTheme({
     bool canMerge = true,
     this.color,
@@ -56,6 +60,7 @@ class ShadCheckboxTheme with _$ShadCheckboxTheme {
   /// {@macro ShadCheckbox.checkboxPadding}
   final EdgeInsetsGeometry? checkboxPadding;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadCheckboxTheme? lerp(
     ShadCheckboxTheme? a,
     ShadCheckboxTheme? b,

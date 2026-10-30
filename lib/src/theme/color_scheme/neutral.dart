@@ -7,6 +7,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// value to sRGB.
 @immutable
 class ShadNeutralColorScheme extends ShadColorScheme {
+  /// Creates a [ShadNeutralColorScheme] from explicit colours.
+  ///
+  /// Use [ShadNeutralColorScheme.light] or [ShadNeutralColorScheme.dark] for
+  /// the shadcn/ui values.
   const ShadNeutralColorScheme({
     required super.background,
     required super.foreground,
@@ -44,6 +48,9 @@ class ShadNeutralColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadNeutralColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadNeutralColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff0a0a0a),
@@ -81,6 +88,9 @@ class ShadNeutralColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadNeutralColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadNeutralColorScheme.dark({
     super.background = const Color(0xff0a0a0a),
     super.foreground = const Color(0xfffafafa),

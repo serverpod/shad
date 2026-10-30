@@ -43,6 +43,7 @@ class ShadLocalizationsDataTh extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$th datePicker = _ShadLocalizationsData$datePicker$th._(_root);
 	@override late final _ShadLocalizationsData$input$th input = _ShadLocalizationsData$input$th._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$th keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$th._(_root);
+	@override late final _ShadLocalizationsData$dialog$th dialog = _ShadLocalizationsData$dialog$th._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$th extends ShadLocalizationsData$ke
 	@override String get done => 'เสร็จสิ้น';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$th extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$th._(ShadLocalizationsDataTh root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataTh _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'ปิด';
+	@override String get dismiss => 'ปิด';
+}
+
 /// The flat map containing all translations for locale <th>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataTh {
 			'input.paste' => 'วาง',
 			'input.selectAll' => 'เลือกทั้งหมด',
 			'keyboardToolbar.done' => 'เสร็จสิ้น',
+			'dialog.close' => 'ปิด',
+			'dialog.dismiss' => 'ปิด',
 			_ => null,
 		};
 	}

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ပြီးပြီ"
+
+dialog:
+  close: "ပိတ်ရန်"
+  dismiss: "ပယ်ရန်"

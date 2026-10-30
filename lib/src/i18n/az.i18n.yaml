@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Hazır"
+
+dialog:
+  close: "Bağlayın"
+  dismiss: "İmtina edin"

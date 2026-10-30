@@ -22,7 +22,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadToast),
         matchesGoldenFile('goldens/toast.png'),
       );

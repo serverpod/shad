@@ -1,6 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/theme.dart';
 
+/// Asserts that [context] has a [ShadTheme] ancestor.
+///
+/// Throws a [FlutterError] in debug mode when there is none. Always returns
+/// true, so call it inside an `assert`.
 bool debugCheckHasShadTheme(BuildContext context) {
   assert(() {
     if (context.widget is! ShadInheritedTheme &&

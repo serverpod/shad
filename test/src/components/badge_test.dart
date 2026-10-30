@@ -250,7 +250,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadBadge),
         matchesGoldenFile('goldens/badge.png'),
       );
@@ -263,7 +263,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadBadge),
         matchesGoldenFile('goldens/badge_secondary.png'),
       );
@@ -276,7 +276,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadBadge),
         matchesGoldenFile('goldens/badge_outline.png'),
       );
@@ -289,7 +289,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadBadge),
         matchesGoldenFile('goldens/badge_destructive.png'),
       );

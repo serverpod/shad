@@ -43,6 +43,7 @@ class ShadLocalizationsDataSi extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$si datePicker = _ShadLocalizationsData$datePicker$si._(_root);
 	@override late final _ShadLocalizationsData$input$si input = _ShadLocalizationsData$input$si._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$si keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$si._(_root);
+	@override late final _ShadLocalizationsData$dialog$si dialog = _ShadLocalizationsData$dialog$si._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$si extends ShadLocalizationsData$ke
 	@override String get done => 'සිදු විය';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$si extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$si._(ShadLocalizationsDataSi root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataSi _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'වසන්න';
+	@override String get dismiss => 'ඉවත ලන්න';
+}
+
 /// The flat map containing all translations for locale <si>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataSi {
 			'input.paste' => 'අලවන්න',
 			'input.selectAll' => 'සියල්ල තෝරන්න',
 			'keyboardToolbar.done' => 'සිදු විය',
+			'dialog.close' => 'වසන්න',
+			'dialog.dismiss' => 'ඉවත ලන්න',
 			_ => null,
 		};
 	}

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/border.dart';
@@ -6,9 +7,18 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'decorator.g.theme.dart';
 
+/// {@template ShadDecoration}
+/// The border, fill and label styling of a control, applied by [ShadDecorator].
+///
+/// A control has a primary border drawn on its edge and an optional secondary
+/// border drawn outside it, which is how the focus ring is painted. Each has a
+/// normal, focused and error form. The label, description and error fields
+/// style the text around form fields.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadDecoration with _$ShadDecoration {
+  /// {@macro ShadDecoration}
   const ShadDecoration({
     bool canMerge = true,
     this.border,
@@ -42,6 +52,8 @@ class ShadDecoration with _$ShadDecoration {
   @override
   bool get canMerge => _canMerge;
 
+  /// A decoration with no borders that replaces, rather than merges into, the
+  /// decoration it is merged with.
   static const ShadDecoration none = ShadDecoration(
     canMerge: false,
     border: ShadBorder.none,
@@ -52,26 +64,73 @@ class ShadDecoration with _$ShadDecoration {
     secondaryErrorBorder: ShadBorder.none,
   );
 
+  /// The text style of a field's label.
   final TextStyle? labelStyle;
+
+  /// The text style of a field's label while the field has an error. See
+  /// [fallbackToLabelStyle].
   final TextStyle? errorLabelStyle;
+
+  /// The border drawn on the control's edge.
   final ShadBorder? border;
+
+  /// The border drawn on the control's edge while it has focus.
   final ShadBorder? focusedBorder;
+
+  /// The border drawn on the control's edge while [hasError] is true.
   final ShadBorder? errorBorder;
+
+  /// The border drawn outside the control, such as shadcn's `ring-*`.
   final ShadBorder? secondaryBorder;
+
+  /// The outer border while the control has focus. This is the focus ring.
   final ShadBorder? secondaryFocusedBorder;
+
+  /// The outer border while [hasError] is true.
   final ShadBorder? secondaryErrorBorder;
+
+  /// The text style of a field's error message.
   final TextStyle? errorStyle;
+
+  /// The text style of a field's description.
   final TextStyle? descriptionStyle;
+
+  /// The padding around a field's label. Defaults to 8 below it.
   final EdgeInsetsGeometry? labelPadding;
+
+  /// The padding around a field's description. Defaults to 8 above it.
   final EdgeInsetsGeometry? descriptionPadding;
+
+  /// The padding around a field's error message. Defaults to 8 above it.
   final EdgeInsetsGeometry? errorPadding;
+
+  /// The fill colour of the control.
   final Color? color;
+
+  /// An image painted inside the control.
   final DecorationImage? image;
+
+  /// The shadows painted outside the control.
+  ///
+  /// They are clipped to the area outside the control's outline, as CSS does.
   final List<BoxShadow>? shadows;
+
+  /// A gradient painted inside the control, instead of [color].
   final Gradient? gradient;
+
+  /// The blend mode of [color] or [gradient] with the content behind the
+  /// control.
   final BlendMode? backgroundBlendMode;
+
+  /// The shape of the control. Defaults to [BoxShape.rectangle].
   final BoxShape? shape;
+
+  /// Whether the control shows its error borders and error label style.
+  /// Defaults to false.
   final bool? hasError;
+
+  /// Whether to skip the secondary borders. Defaults to
+  /// `ShadThemeData.disableSecondaryBorder`.
   final bool? disableSecondaryBorder;
 
   /// Whether to fallback to the [border] if no [focusedBorder] or [errorBorder]
@@ -84,6 +143,7 @@ class ShadDecoration with _$ShadDecoration {
   /// provided, defaults to true.
   final bool? fallbackToLabelStyle;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadDecoration? lerp(
     ShadDecoration? a,
     ShadDecoration? b,
@@ -94,9 +154,32 @@ class ShadDecoration with _$ShadDecoration {
   String toString() {
     return '''ShadDecoration(border: $border, focusedBorder: $focusedBorder, errorBorder: $errorBorder, secondaryBorder: $secondaryBorder, secondaryFocusedBorder: $secondaryFocusedBorder, secondaryErrorBorder: $secondaryErrorBorder, labelStyle: $labelStyle, errorLabelStyle: $errorLabelStyle, errorStyle: $errorStyle, descriptionStyle: $descriptionStyle, labelPadding: $labelPadding, descriptionPadding: $descriptionPadding, errorPadding: $errorPadding, fallbackToBorder: $fallbackToBorder, color: $color, image: $image, shadows: $shadows, gradient: $gradient, backgroundBlendMode: $backgroundBlendMode, shape: $shape, hasError: $hasError, fallbackToLabelStyle: $fallbackToLabelStyle, disableSecondaryBorder: $disableSecondaryBorder)''';
   }
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadDecoration &&
+      listEquals(shadows, other.shadows) &&
+      super == other.copyWith(shadows: shadows);
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(shadows ?? const []),
+  );
 }
 
+/// Paints a [ShadDecoration] around [child].
+///
+/// Picks the normal, focused or error form of each border from [focused] and
+/// `decoration.hasError`, and merges [decoration] over
+/// `ShadThemeData.decoration`.
 class ShadDecorator extends StatelessWidget {
+  /// Creates a decorator.
   const ShadDecorator({
     super.key,
     this.child,

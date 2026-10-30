@@ -3,7 +3,13 @@ import 'package:shad/src/theme/components/separator.dart';
 import 'package:shad/src/theme/theme.dart';
 
 /// Variants available for the [ShadSeparator] widget.
-enum ShadSeparatorVariant { vertical, horizontal }
+enum ShadSeparatorVariant {
+  /// A vertical line, used between items in a row.
+  vertical,
+
+  /// A horizontal line, used between items in a column.
+  horizontal,
+}
 
 /// A customizable widget that supports horizontal and vertical separators.
 ///

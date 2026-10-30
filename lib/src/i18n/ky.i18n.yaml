@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Даяр"
+
+dialog:
+  close: "Жабуу"
+  dismiss: "Жабуу"

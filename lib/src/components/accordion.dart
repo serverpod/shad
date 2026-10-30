@@ -24,6 +24,8 @@ class ShadAccordionController<T> extends ValueNotifier<List<T>> {
     : _variant = ShadAccordionVariant.single,
       super(List<T>.unmodifiable([?value]));
 
+  /// Creates a controller for [ShadAccordion.multiple], where any number of
+  /// items can be open at once. [value] lists the items open at the start.
   ShadAccordionController.multiple([List<T>? value])
     : _variant = ShadAccordionVariant.multiple,
       super(List<T>.unmodifiable(value ?? <T>[]));
@@ -60,7 +62,10 @@ class ShadAccordionController<T> extends ValueNotifier<List<T>> {
 
 /// Variants available for the [ShadAccordion] widget.
 enum ShadAccordionVariant {
+  /// Only one item can be open at a time. Opening an item closes the others.
   single,
+
+  /// Any number of items can be open at once.
   multiple,
 }
 
@@ -137,9 +142,15 @@ class ShadAccordion<T> extends StatefulWidget {
   State<ShadAccordion<T>> createState() => ShadAccordionState<T>();
 }
 
+/// The state of a [ShadAccordion].
+///
+/// Its items find it in the widget tree to read the controller and
+/// [maintainState].
 class ShadAccordionState<T> extends State<ShadAccordion<T>> {
   ShadAccordionController<T>? _controller;
 
+  /// The controller in use: [ShadAccordion.controller] when given, otherwise
+  /// an internal one created from [ShadAccordion.initialValue].
   ShadAccordionController<T> get effectiveController {
     if (widget.controller != null) return widget.controller!;
     if (_controller != null) return _controller!;
@@ -178,6 +189,9 @@ class ShadAccordionState<T> extends State<ShadAccordion<T>> {
     }
   }
 
+  /// Whether closed items stay in the tree.
+  ///
+  /// Resolves [ShadAccordion.maintainState], then the theme, then false.
   bool get maintainState {
     return widget.maintainState ??
         ShadTheme.of(context, listen: false).accordionTheme.maintainState ??
@@ -223,6 +237,7 @@ class ShadAccordionItem<T> extends StatefulWidget {
     this.duration,
     this.focusNode,
     this.effects,
+    this.trailing,
   });
 
   /// {@template ShadAccordionItem.value}
@@ -314,6 +329,12 @@ class ShadAccordionItem<T> extends StatefulWidget {
   /// Defaults to padding, slide, and size effects if not specified.
   /// {@endtemplate}
   final List<Effect<dynamic>>? effects;
+
+  /// {@template ShadAccordionItem.trailing}
+  /// An action in the header, between the title and the chevron: a
+  /// "Reset" link or a count badge. Taps on it do not toggle the item.
+  /// {@endtemplate}
+  final Widget? trailing;
 
   @override
   State<ShadAccordionItem<T>> createState() => _ShadAccordionItemState<T>();
@@ -518,6 +539,20 @@ class _ShadAccordionItemState<T> extends State<ShadAccordionItem<T>>
                             ),
                           ),
                         ),
+                        if (widget.trailing != null)
+                          Padding(
+                            padding: const EdgeInsetsDirectional.only(
+                              start: 8,
+                              end: 8,
+                            ),
+                            // Its own gesture arena entry, so a tap on the
+                            // action does not also toggle the item.
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {},
+                              child: widget.trailing,
+                            ),
+                          ),
                         ShadAnimate(
                           target: expanded ? 1 : 0,
                           effects: effectiveIconEffects,

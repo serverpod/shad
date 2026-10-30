@@ -56,6 +56,7 @@ class ShadKbdTheme with _$ShadKbdTheme {
   /// inside a button, a table row, or a line of prose.
   final double? height;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadKbdTheme? lerp(ShadKbdTheme? a, ShadKbdTheme? b, double t) =>
       _$ShadKbdTheme.lerp(a, b, t);
 }

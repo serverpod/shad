@@ -43,6 +43,7 @@ class ShadLocalizationsDataSq extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$sq datePicker = _ShadLocalizationsData$datePicker$sq._(_root);
 	@override late final _ShadLocalizationsData$input$sq input = _ShadLocalizationsData$input$sq._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$sq keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$sq._(_root);
+	@override late final _ShadLocalizationsData$dialog$sq dialog = _ShadLocalizationsData$dialog$sq._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$sq extends ShadLocalizationsData$ke
 	@override String get done => 'U krye';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$sq extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$sq._(ShadLocalizationsDataSq root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataSq _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Mbyll';
+	@override String get dismiss => 'Hiq';
+}
+
 /// The flat map containing all translations for locale <sq>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataSq {
 			'input.paste' => 'Ngjit',
 			'input.selectAll' => 'Zgjidh të gjitha',
 			'keyboardToolbar.done' => 'U krye',
+			'dialog.close' => 'Mbyll',
+			'dialog.dismiss' => 'Hiq',
 			_ => null,
 		};
 	}

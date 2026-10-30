@@ -43,6 +43,7 @@ class ShadLocalizationsDataKy extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ky datePicker = _ShadLocalizationsData$datePicker$ky._(_root);
 	@override late final _ShadLocalizationsData$input$ky input = _ShadLocalizationsData$input$ky._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ky keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ky._(_root);
+	@override late final _ShadLocalizationsData$dialog$ky dialog = _ShadLocalizationsData$dialog$ky._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ky extends ShadLocalizationsData$ke
 	@override String get done => 'Даяр';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ky extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ky._(ShadLocalizationsDataKy root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataKy _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Жабуу';
+	@override String get dismiss => 'Жабуу';
+}
+
 /// The flat map containing all translations for locale <ky>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataKy {
 			'input.paste' => 'Чаптоо',
 			'input.selectAll' => 'Баарын тандоо',
 			'keyboardToolbar.done' => 'Даяр',
+			'dialog.close' => 'Жабуу',
+			'dialog.dismiss' => 'Жабуу',
 			_ => null,
 		};
 	}

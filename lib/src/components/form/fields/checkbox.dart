@@ -4,7 +4,10 @@ import 'package:shad/src/components/form/field.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 
-class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
+/// A [ShadCheckbox] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadCheckboxFormField extends ShadFormField<bool> {
+  /// Creates a checkbox form field.
   ShadCheckboxFormField({
     super.id,
     super.key,
@@ -14,11 +17,6 @@ class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
     super.error,
     super.description,
     void Function(bool)? onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -31,7 +29,7 @@ class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
     /// {@macro ShadCheckbox.decoration}
     ShadDecoration? decoration,
 
-    /// {@macro ShadFormBuilderField.validator}
+    /// Returns an error message for the value, or null when it is valid.
     String? Function(bool)? validator,
 
     /// {@macro ShadCheckbox.size}
@@ -46,10 +44,10 @@ class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
     /// {@macro ShadCheckbox.color}
     Color? color,
 
-    /// {@macro ShadCheckbox.inputLabel}
+    /// {@macro ShadCheckbox.label}
     Widget? inputLabel,
 
-    /// {@macro ShadCheckbox.inputSublabel}
+    /// {@macro ShadCheckbox.sublabel}
     Widget? inputSublabel,
 
     /// {@macro ShadCheckbox.padding}
@@ -71,7 +69,7 @@ class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderCheckboxState;
+           state as ShadCheckboxFormFieldState;
            return ShadCheckbox(
              value: state.value!,
              onChanged: state.didChange,
@@ -93,9 +91,17 @@ class ShadCheckboxFormField extends ShadFormBuilderField<bool> {
        );
 
   @override
-  ShadFormBuilderFieldState<ShadCheckboxFormField, bool> createState() =>
-      ShadFormBuilderCheckboxState();
+  ShadFormFieldState<ShadCheckboxFormField, bool> createState() =>
+      ShadCheckboxFormFieldState();
 }
 
-class ShadFormBuilderCheckboxState
-    extends ShadFormBuilderFieldState<ShadCheckboxFormField, bool> {}
+/// The state of a [ShadCheckboxFormField].
+class ShadCheckboxFormFieldState
+    extends ShadFormFieldState<ShadCheckboxFormField, bool> {}
+
+/// The old name of [ShadCheckboxFormFieldState].
+@Deprecated(
+  'Use ShadCheckboxFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderCheckboxState = ShadCheckboxFormFieldState;

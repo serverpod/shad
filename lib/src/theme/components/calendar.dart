@@ -7,9 +7,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'calendar.g.theme.dart';
 
+/// {@template ShadCalendarTheme}
+/// Theme for the `ShadCalendar` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadCalendarTheme with _$ShadCalendarTheme {
+  /// {@macro ShadCalendarTheme}
   const ShadCalendarTheme({
     bool canMerge = true,
     this.hideNavigation,
@@ -55,7 +59,12 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
     this.weekdaysTextAlign,
     this.gridMainAxisSpacing,
     this.gridCrossAxisSpacing,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.captionLayout,
     this.hideWeekdayNames,
     this.showOutsideDays,
@@ -69,7 +78,10 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
     this.allowDeselection,
     this.dropdownFormatMonth,
     this.dropdownFormatYear,
-  }) : _canMerge = canMerge;
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       _canMerge = canMerge;
 
   @ignore
   final bool _canMerge;
@@ -210,8 +222,16 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
   /// {@macro ShadCalendar.dayButtonOutsideMonthVariant}
   final ShadButtonVariant? dayButtonOutsideMonthVariant;
 
-  /// {@macro ShadCalendar.selectedDayButtonOusideMonthVariant}
-  final ShadButtonVariant? selectedDayButtonOusideMonthVariant;
+  /// {@macro ShadCalendar.selectedDayButtonOutsideMonthVariant}
+  final ShadButtonVariant? selectedDayButtonOutsideMonthVariant;
+
+  /// The old, misspelled name of [selectedDayButtonOutsideMonthVariant].
+  @Deprecated(
+    'Use selectedDayButtonOutsideMonthVariant. '
+    'Will be removed in the next major version.',
+  )
+  ShadButtonVariant? get selectedDayButtonOusideMonthVariant =>
+      selectedDayButtonOutsideMonthVariant;
 
   /// {@macro ShadCalendar.captionLayout}
   final ShadCalendarCaptionLayout? captionLayout;
@@ -252,6 +272,7 @@ class ShadCalendarTheme with _$ShadCalendarTheme {
   /// {@macro ShadCalendar.allowDeselection}
   final bool? allowDeselection;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadCalendarTheme? lerp(
     ShadCalendarTheme? a,
     ShadCalendarTheme? b,

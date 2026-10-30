@@ -3,9 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'slider.g.theme.dart';
 
+/// {@template ShadSliderTheme}
+/// Theme for the `ShadSlider` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadSliderTheme with _$ShadSliderTheme {
+  /// {@macro ShadSliderTheme}
   const ShadSliderTheme({
     bool canMerge = true,
     this.min,
@@ -72,6 +76,7 @@ class ShadSliderTheme with _$ShadSliderTheme {
   /// {@macro ShadSlider.thumbRadius}
   final double? thumbRadius;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSliderTheme? lerp(
     ShadSliderTheme? a,
     ShadSliderTheme? b,

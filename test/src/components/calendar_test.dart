@@ -462,7 +462,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar.png'),
       );
@@ -482,7 +482,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_no_hide_navigation.png'),
       );
@@ -500,7 +500,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_show_week_numbers.png'),
       );
@@ -519,7 +519,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_fixed_weeks.png'),
       );
@@ -540,7 +540,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_hide_weekday_names.png'),
       );
@@ -560,7 +560,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_multiple.png'),
       );
@@ -580,7 +580,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadCalendar),
         matchesGoldenFile('goldens/calendar_range.png'),
       );

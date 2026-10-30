@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shad/shad.dart';
 
-import '../../tolerant_golden_comparator.dart';
-
 // Returns the Positioned widget that directly anchors the sheet's close
 // ShadIconButton. find.ancestor yields ancestors nearest-first, so .first
 // is the immediate Positioned parent — the one set by ShadDialog's
@@ -169,7 +167,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadSheet),
         matchesGoldenFile('goldens/sheet.png'),
       );
@@ -226,20 +224,7 @@ void main() {
   });
 
   group('ShadSheet expandable', () {
-    GoldenFileComparator? previousComparator;
-
-    setUpAll(() {
-      previousComparator = goldenFileComparator;
-      goldenFileComparator = TolerantGoldenFileComparator(
-        Uri.parse('test/src/components/sheet_test.dart'),
-        // Linux CI and macOS dev machines differ slightly in text metrics.
-        precisionTolerance: 0.005,
-      );
-    });
-
-    tearDownAll(() {
-      goldenFileComparator = previousComparator!;
-    });
+    // Goldens use the tolerant comparator from test/flutter_test_config.dart.
 
     // No resize handle unless expandable is explicitly true (false and the
     // null default both omit it).

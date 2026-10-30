@@ -26,7 +26,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadTooltip),
         matchesGoldenFile('goldens/tooltip.png'),
       );

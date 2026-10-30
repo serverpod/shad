@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Feito"
+
+dialog:
+  close: "Pechar"
+  dismiss: "Pechar"

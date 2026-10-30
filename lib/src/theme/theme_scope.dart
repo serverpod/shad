@@ -87,6 +87,7 @@ class ShadThemeScope extends StatelessWidget {
   /// The theme to apply to [child].
   final ShadThemeData data;
 
+  /// The widget below this widget in the tree.
   final Widget child;
 
   /// Whether to install the derived Material [Theme] as well.

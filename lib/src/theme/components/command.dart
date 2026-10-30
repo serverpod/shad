@@ -140,6 +140,7 @@ class ShadCommandTheme with _$ShadCommandTheme {
   /// `[&_svg:not([class*='size-'])]:size-4`.
   final double? itemIconSize;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadCommandTheme? lerp(
     ShadCommandTheme? a,
     ShadCommandTheme? b,

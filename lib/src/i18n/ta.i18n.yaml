@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "முடிந்தது"
+
+dialog:
+  close: "மூடுக"
+  dismiss: "நிராகரிக்கும்"

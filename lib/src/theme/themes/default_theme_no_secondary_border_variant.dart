@@ -25,6 +25,8 @@ import 'package:shad/src/utils/border.dart';
 /// Everything else — colours, metrics, menu handling — is inherited, so a
 /// reference fix in the default variant lands here too.
 class ShadDefaultThemeNoSecondaryBorderVariant extends ShadDefaultThemeVariant {
+  /// Creates the variant. The arguments are the same as for
+  /// [ShadDefaultThemeVariant.new].
   ShadDefaultThemeNoSecondaryBorderVariant({
     required super.colorScheme,
     required super.radius,
@@ -245,22 +247,23 @@ class ShadDefaultThemeNoSecondaryBorderVariant extends ShadDefaultThemeVariant {
     );
   }
 
+  /// The text theme used when the caller gives none: the [ShadTextDefaultTheme]
+  /// styles in the platform font.
   static ShadTextTheme get defaultTextTheme {
     return ShadTextTheme.custom(
-      h1Large: ShadTextDefaultTheme.h1Large(family: kDefaultFontFamily),
-      h1: ShadTextDefaultTheme.h1(family: kDefaultFontFamily),
-      h2: ShadTextDefaultTheme.h2(family: kDefaultFontFamily),
-      h3: ShadTextDefaultTheme.h3(family: kDefaultFontFamily),
-      h4: ShadTextDefaultTheme.h4(family: kDefaultFontFamily),
-      p: ShadTextDefaultTheme.p(family: kDefaultFontFamily),
-      blockquote: ShadTextDefaultTheme.blockquote(family: kDefaultFontFamily),
-      table: ShadTextDefaultTheme.table(family: kDefaultFontFamily),
-      list: ShadTextDefaultTheme.list(family: kDefaultFontFamily),
-      lead: ShadTextDefaultTheme.lead(family: kDefaultFontFamily),
-      large: ShadTextDefaultTheme.large(family: kDefaultFontFamily),
-      small: ShadTextDefaultTheme.small(family: kDefaultFontFamily),
-      muted: ShadTextDefaultTheme.muted(family: kDefaultFontFamily),
-      family: kDefaultFontFamily,
+      h1Large: ShadTextDefaultTheme.h1Large(),
+      h1: ShadTextDefaultTheme.h1(),
+      h2: ShadTextDefaultTheme.h2(),
+      h3: ShadTextDefaultTheme.h3(),
+      h4: ShadTextDefaultTheme.h4(),
+      p: ShadTextDefaultTheme.p(),
+      blockquote: ShadTextDefaultTheme.blockquote(),
+      table: ShadTextDefaultTheme.table(),
+      list: ShadTextDefaultTheme.list(),
+      lead: ShadTextDefaultTheme.lead(),
+      large: ShadTextDefaultTheme.large(),
+      small: ShadTextDefaultTheme.small(),
+      muted: ShadTextDefaultTheme.muted(),
     );
   }
 }

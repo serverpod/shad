@@ -1,16 +1,28 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/data.dart';
 
+/// Provides a [ShadThemeData] to its descendants.
+///
+/// `ShadApp` inserts one. Use [ShadTheme.merge] to override part of the theme
+/// for a subtree.
 class ShadTheme extends StatelessWidget {
+  /// Creates a widget that applies [data] to [child].
   const ShadTheme({
     super.key,
     required this.data,
     required this.child,
   });
 
+  /// The theme for descendant widgets.
   final ShadThemeData data;
+
+  /// The widget below this widget in the tree.
   final Widget child;
 
+  /// Returns the nearest [ShadThemeData].
+  ///
+  /// Throws a [FlutterError] when there is no [ShadTheme] ancestor. When
+  /// [listen] is true, [context] rebuilds when the theme changes.
   static ShadThemeData of(BuildContext context, {bool listen = true}) {
     final provider = maybeOf(context, listen: listen);
     if (provider == null) {
@@ -37,6 +49,7 @@ class ShadTheme extends StatelessWidget {
     required Widget child,
   }) {
     return Builder(
+      key: key,
       builder: (BuildContext context) {
         final parent = ShadTheme.of(context);
         return ShadTheme(data: parent.merge(data), child: child);
@@ -44,6 +57,10 @@ class ShadTheme extends StatelessWidget {
     );
   }
 
+  /// Returns the nearest [ShadThemeData], or null when there is no [ShadTheme]
+  /// ancestor.
+  ///
+  /// When [listen] is true, [context] rebuilds when the theme changes.
   static ShadThemeData? maybeOf(
     BuildContext context, {
     bool listen = true,
@@ -70,13 +87,18 @@ class ShadTheme extends StatelessWidget {
   }
 }
 
+/// The inherited widget that [ShadTheme] inserts.
+///
+/// It lets [InheritedTheme.capture] carry the theme into routes and overlays.
 class ShadInheritedTheme extends InheritedTheme {
+  /// Creates an inherited theme for [theme].
   const ShadInheritedTheme({
     super.key,
     required this.theme,
     required super.child,
   });
 
+  /// The [ShadTheme] that inserted this widget.
   final ShadTheme theme;
 
   @override

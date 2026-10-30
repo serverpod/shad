@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Lokið"
+
+dialog:
+  close: "Loka"
+  dismiss: "Hunsa"

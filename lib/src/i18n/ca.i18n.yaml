@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Fet"
+
+dialog:
+  close: "Tanca"
+  dismiss: "Ignora"

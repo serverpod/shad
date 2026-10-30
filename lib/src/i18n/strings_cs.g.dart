@@ -43,6 +43,7 @@ class ShadLocalizationsDataCs extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$cs datePicker = _ShadLocalizationsData$datePicker$cs._(_root);
 	@override late final _ShadLocalizationsData$input$cs input = _ShadLocalizationsData$input$cs._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$cs keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$cs._(_root);
+	@override late final _ShadLocalizationsData$dialog$cs dialog = _ShadLocalizationsData$dialog$cs._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$cs extends ShadLocalizationsData$ke
 	@override String get done => 'Hotovo';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$cs extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$cs._(ShadLocalizationsDataCs root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataCs _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Zavřít';
+	@override String get dismiss => 'Zavřít';
+}
+
 /// The flat map containing all translations for locale <cs>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataCs {
 			'input.paste' => 'Vložit',
 			'input.selectAll' => 'Vybrat vše',
 			'keyboardToolbar.done' => 'Hotovo',
+			'dialog.close' => 'Zavřít',
+			'dialog.dismiss' => 'Zavřít',
 			_ => null,
 		};
 	}

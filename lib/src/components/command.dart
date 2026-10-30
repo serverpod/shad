@@ -17,6 +17,7 @@ import 'package:shad/src/utils/gesture_detector.dart';
 /// filtering, highlighting and keyboard navigation stay in one place.
 @immutable
 class ShadCommandItem {
+  /// Creates an item. Only [label] is required.
   const ShadCommandItem({
     required this.label,
     this.onSelected,
@@ -57,6 +58,7 @@ class ShadCommandItem {
 /// A titled run of [ShadCommandItem]s.
 @immutable
 class ShadCommandGroup {
+  /// Creates a group of [items] under an optional [heading].
   const ShadCommandGroup({
     required this.items,
     this.heading,
@@ -66,6 +68,7 @@ class ShadCommandGroup {
   /// out are hidden along with their heading.
   final String? heading;
 
+  /// The items in the group, in display order.
   final List<ShadCommandItem> items;
 }
 
@@ -217,9 +220,12 @@ class ShadCommand extends StatefulWidget {
   State<ShadCommand> createState() => ShadCommandState();
 }
 
+/// The state of a [ShadCommand].
 class ShadCommandState extends State<ShadCommand> {
   TextEditingController? _internalController;
 
+  /// The controller of the search field: [ShadCommand.controller] when given,
+  /// otherwise an internal one.
   TextEditingController get searchController =>
       widget.controller ?? _internalController!;
 
@@ -686,7 +692,7 @@ Future<T?> showShadCommandDialog<T>({
           radius: radius,
           padding: EdgeInsets.zero,
           scrollable: false,
-          shadows: Shadows.none,
+          shadows: ShadShadows.none,
           closeIcon: const SizedBox.shrink(),
           child: ShadCommand(
             groups: groups,

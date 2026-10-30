@@ -43,6 +43,7 @@ class ShadLocalizationsDataTa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ta datePicker = _ShadLocalizationsData$datePicker$ta._(_root);
 	@override late final _ShadLocalizationsData$input$ta input = _ShadLocalizationsData$input$ta._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ta keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ta._(_root);
+	@override late final _ShadLocalizationsData$dialog$ta dialog = _ShadLocalizationsData$dialog$ta._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ta extends ShadLocalizationsData$ke
 	@override String get done => 'முடிந்தது';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ta extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ta._(ShadLocalizationsDataTa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataTa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'மூடுக';
+	@override String get dismiss => 'நிராகரிக்கும்';
+}
+
 /// The flat map containing all translations for locale <ta>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataTa {
 			'input.paste' => 'ஒட்டு',
 			'input.selectAll' => 'அனைத்தையும் தேர்ந்தெடு',
 			'keyboardToolbar.done' => 'முடிந்தது',
+			'dialog.close' => 'மூடுக',
+			'dialog.dismiss' => 'நிராகரிக்கும்',
 			_ => null,
 		};
 	}

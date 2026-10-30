@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Tamam"
+
+dialog:
+  close: "Kapat"
+  dismiss: "Kapat"

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Valmis"
+
+dialog:
+  close: "Sulje"
+  dismiss: "Ohita"

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Gatavs"
+
+dialog:
+  close: "Aizvērt"
+  dismiss: "Nerādīt"

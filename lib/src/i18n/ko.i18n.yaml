@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "완료"
+
+dialog:
+  close: "닫기"
+  dismiss: "닫기"

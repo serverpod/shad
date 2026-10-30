@@ -232,13 +232,32 @@ class ShadIndeterminateProgress extends StatelessWidget {
     required this.borderRadius,
   });
 
+  /// Drives the animation. When null, the animation runs on its own.
   final AnimationController? controller;
+
+  /// The length of one animation cycle, in milliseconds.
   final int indeterminateLinearDuration;
+
+  /// Maps the cycle progress to the position of the first bar's start edge,
+  /// as a fraction of the width.
   final Curve line1TailCurve;
+
+  /// Maps the cycle progress to the position of the first bar's end edge, as a
+  /// fraction of the width.
   final Curve line1HeadCurve;
+
+  /// Maps the cycle progress to the position of the second bar's start edge,
+  /// as a fraction of the width.
   final Curve line2TailCurve;
+
+  /// Maps the cycle progress to the position of the second bar's end edge, as
+  /// a fraction of the width.
   final Curve line2HeadCurve;
+
+  /// The color of the bars.
   final Color color;
+
+  /// The corner radius of the bars.
   final BorderRadius borderRadius;
 
   @override
@@ -273,8 +292,8 @@ class ShadIndeterminateProgress extends StatelessWidget {
                     if (w <= 0) {
                       return const SizedBox.shrink();
                     }
-                    return Positioned(
-                      left: start,
+                    return PositionedDirectional(
+                      start: start,
                       top: 0,
                       bottom: 0,
                       width: w,
@@ -303,8 +322,8 @@ class ShadIndeterminateProgress extends StatelessWidget {
                     if (w <= 0) {
                       return const SizedBox.shrink();
                     }
-                    return Positioned(
-                      left: start,
+                    return PositionedDirectional(
+                      start: start,
                       top: 0,
                       bottom: 0,
                       width: w,
@@ -334,15 +353,21 @@ class ShadDeterminateProgress extends StatelessWidget {
     required this.borderRadius,
   });
 
+  /// The filled fraction, from 0 to 1. Values outside that range are clamped.
   final double value;
+
+  /// The color of the filled part.
   final Color color;
+
+  /// The corner radius of the filled part.
   final BorderRadius borderRadius;
 
   @override
   Widget build(BuildContext context) {
     final clampedValue = value.clamp(0, 1).toDouble();
     return FractionallySizedBox(
-      alignment: Alignment.centerLeft,
+      // Fills from the start edge, so the bar grows right-to-left in RTL.
+      alignment: AlignmentDirectional.centerStart,
       widthFactor: clampedValue,
       child: Container(
         decoration: BoxDecoration(

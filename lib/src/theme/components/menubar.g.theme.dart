@@ -91,6 +91,7 @@ mixin _$ShadMenubarTheme {
         t,
       ),
       buttonShadows: t < 0.5 ? a.buttonShadows : b.buttonShadows,
+      stripShadows: t < 0.5 ? a.stripShadows : b.stripShadows,
       buttonGradient: Gradient.lerp(a.buttonGradient, b.buttonGradient, t),
       buttonTextDecoration: t < 0.5
           ? a.buttonTextDecoration
@@ -152,6 +153,7 @@ mixin _$ShadMenubarTheme {
     Color? buttonPressedBackgroundColor,
     Color? buttonPressedForegroundColor,
     List<BoxShadow>? buttonShadows,
+    List<BoxShadow>? stripShadows,
     Gradient? buttonGradient,
     TextDecoration? buttonTextDecoration,
     TextDecoration? buttonHoverTextDecoration,
@@ -200,6 +202,7 @@ mixin _$ShadMenubarTheme {
       buttonPressedForegroundColor:
           buttonPressedForegroundColor ?? _this.buttonPressedForegroundColor,
       buttonShadows: buttonShadows ?? _this.buttonShadows,
+      stripShadows: stripShadows ?? _this.stripShadows,
       buttonGradient: buttonGradient ?? _this.buttonGradient,
       buttonTextDecoration: buttonTextDecoration ?? _this.buttonTextDecoration,
       buttonHoverTextDecoration:
@@ -257,6 +260,7 @@ mixin _$ShadMenubarTheme {
       buttonPressedBackgroundColor: other.buttonPressedBackgroundColor,
       buttonPressedForegroundColor: other.buttonPressedForegroundColor,
       buttonShadows: other.buttonShadows,
+      stripShadows: other.stripShadows,
       buttonGradient: other.buttonGradient,
       buttonTextDecoration: other.buttonTextDecoration,
       buttonHoverTextDecoration: other.buttonHoverTextDecoration,
@@ -315,6 +319,7 @@ mixin _$ShadMenubarTheme {
         _other.buttonPressedForegroundColor ==
             _this.buttonPressedForegroundColor &&
         _other.buttonShadows == _this.buttonShadows &&
+        _other.stripShadows == _this.stripShadows &&
         _other.buttonGradient == _this.buttonGradient &&
         _other.buttonTextDecoration == _this.buttonTextDecoration &&
         _other.buttonHoverTextDecoration == _this.buttonHoverTextDecoration &&
@@ -360,6 +365,7 @@ mixin _$ShadMenubarTheme {
       _this.buttonPressedBackgroundColor,
       _this.buttonPressedForegroundColor,
       _this.buttonShadows,
+      _this.stripShadows,
       _this.buttonGradient,
       _this.buttonTextDecoration,
       _this.buttonHoverTextDecoration,

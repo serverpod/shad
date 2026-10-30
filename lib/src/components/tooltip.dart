@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shad/src/components/popover.dart';
@@ -9,6 +8,7 @@ import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/data.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/animate.dart';
+import 'package:shad/src/utils/dismiss_shortcut.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/mouse_area.dart';
 
@@ -325,14 +325,14 @@ class _ShadTooltipState extends State<ShadTooltip>
     return ListenableBuilder(
       listenable: controller,
       builder: (context, child) {
-        return CallbackShortcuts(
-          // Radix dismisses a tooltip on Escape; without this a keyboard user
-          // who focused the trigger had no way to get rid of it.
-          bindings: {
-            const SingleActivator(LogicalKeyboardKey.escape): () {
-              hovered = false;
-              controller.hide();
-            },
+        // Radix dismisses a tooltip on Escape; without this a keyboard user
+        // who focused the trigger had no way to get rid of it. Only while it
+        // is shown, so Escape still reaches an enclosing dialog otherwise.
+        return ShadDismissShortcut(
+          isActive: () => controller.isOpen,
+          onDismiss: () {
+            hovered = false;
+            controller.hide();
           },
           child: ShadPortal(
             visible: controller.isOpen,
@@ -420,9 +420,19 @@ class _ShadTooltipState extends State<ShadTooltip>
             },
             child: ShadMouseArea(
               groupId: 'tooltip',
-              child: ShadTheme(
-                data: _childTheme,
-                child: widget.child,
+              // The child reports hover through the theme's hover strategies,
+              // but a disabled button stops reporting, so its tooltip never
+              // showed. Radix wraps disabled triggers for the same reason.
+              // Listening here too covers any child; onHoverChange ignores
+              // the duplicate when both report.
+              child: MouseRegion(
+                opaque: false,
+                onEnter: (_) => onHoverChange(true),
+                onExit: (_) => onHoverChange(false),
+                child: ShadTheme(
+                  data: _childTheme,
+                  child: widget.child,
+                ),
               ),
             ),
           ),

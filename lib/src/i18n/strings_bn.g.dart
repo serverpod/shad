@@ -43,6 +43,7 @@ class ShadLocalizationsDataBn extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$bn datePicker = _ShadLocalizationsData$datePicker$bn._(_root);
 	@override late final _ShadLocalizationsData$input$bn input = _ShadLocalizationsData$input$bn._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$bn keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$bn._(_root);
+	@override late final _ShadLocalizationsData$dialog$bn dialog = _ShadLocalizationsData$dialog$bn._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$bn extends ShadLocalizationsData$ke
 	@override String get done => 'সম্পন্ন';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$bn extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$bn._(ShadLocalizationsDataBn root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataBn _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'বন্ধ করুন';
+	@override String get dismiss => 'খারিজ করুন';
+}
+
 /// The flat map containing all translations for locale <bn>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataBn {
 			'input.paste' => 'পেস্ট',
 			'input.selectAll' => 'সব নির্বাচন করুন',
 			'keyboardToolbar.done' => 'সম্পন্ন',
+			'dialog.close' => 'বন্ধ করুন',
+			'dialog.dismiss' => 'খারিজ করুন',
 			_ => null,
 		};
 	}

@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:shad/src/components/button.dart';
 import 'package:shad/src/components/calendar.dart';
 import 'package:shad/src/raw_components/portal.dart';
@@ -13,9 +13,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'date_picker.g.theme.dart';
 
+/// {@template ShadDatePickerTheme}
+/// Theme for the `ShadDatePicker` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadDatePickerTheme with _$ShadDatePickerTheme {
+  /// {@macro ShadDatePickerTheme}
   const ShadDatePickerTheme({
     bool canMerge = true,
     this.hideNavigation,
@@ -59,7 +63,12 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
     this.weekdaysTextAlign,
     this.gridMainAxisSpacing,
     this.gridCrossAxisSpacing,
-    this.selectedDayButtonOusideMonthVariant,
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
+    ShadButtonVariant? selectedDayButtonOusideMonthVariant,
     this.captionLayout,
     this.hideWeekdayNames,
     this.showOutsideDays,
@@ -79,6 +88,11 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
     this.filter,
     this.cursor,
     this.size,
+    @Deprecated(
+      'Has no effect: the date picker button takes its sizes from '
+      'ShadThemeData.buttonSizesTheme. Will be removed in the next major '
+      'version.',
+    )
     this.sizesTheme,
     this.buttonVariant,
     this.backgroundColor,
@@ -87,6 +101,10 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
     this.hoverForegroundColor,
     this.pressedBackgroundColor,
     this.pressedForegroundColor,
+    @Deprecated(
+      'Has no effect: the date picker button has no disabled background. '
+      'Will be removed in the next major version.',
+    )
     this.disabledBackgroundColor,
     this.buttonShadows,
     this.gradient,
@@ -108,7 +126,10 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
     this.expands,
     this.popoverReverseDuration,
     this.buttonTextStyle,
-  }) : _canMerge = canMerge;
+  }) : selectedDayButtonOutsideMonthVariant =
+           selectedDayButtonOutsideMonthVariant ??
+           selectedDayButtonOusideMonthVariant,
+       _canMerge = canMerge;
 
   @ignore
   final bool _canMerge;
@@ -252,8 +273,16 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   /// {@macro ShadCalendar.dayButtonOutsideMonthVariant}
   final ShadButtonVariant? dayButtonOutsideMonthVariant;
 
-  /// {@macro ShadCalendar.selectedDayButtonOusideMonthVariant}
-  final ShadButtonVariant? selectedDayButtonOusideMonthVariant;
+  /// {@macro ShadCalendar.selectedDayButtonOutsideMonthVariant}
+  final ShadButtonVariant? selectedDayButtonOutsideMonthVariant;
+
+  /// The old, misspelled name of [selectedDayButtonOutsideMonthVariant].
+  @Deprecated(
+    'Use selectedDayButtonOutsideMonthVariant. '
+    'Will be removed in the next major version.',
+  )
+  ShadButtonVariant? get selectedDayButtonOusideMonthVariant =>
+      selectedDayButtonOutsideMonthVariant;
 
   /// {@macro ShadCalendar.captionLayout}
   final ShadCalendarCaptionLayout? captionLayout;
@@ -292,22 +321,22 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   // POPOVER
   // ---
 
-  /// {@macro popover.effects}
+  /// {@macro ShadPopover.effects}
   final List<Effect<dynamic>>? effects;
 
-  /// {@macro popover.shadows}
+  /// {@macro ShadPopover.shadows}
   final List<BoxShadow>? shadows;
 
-  /// {@macro popover.padding}
+  /// {@macro ShadPopover.padding}
   final EdgeInsetsGeometry? popoverPadding;
 
-  /// {@macro popover.decoration}
+  /// {@macro ShadPopover.decoration}
   final ShadDecoration? popoverDecoration;
 
-  /// {@macro popover.anchor}
+  /// {@macro ShadPopover.anchor}
   final ShadAnchorBase? anchor;
 
-  /// {@macro popover.filter}
+  /// {@macro ShadPopover.filter}
   final ImageFilter? filter;
 
   /// {@macro ShadPopover.reverseDuration}
@@ -323,13 +352,19 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   /// {@macro ShadButton.size}
   final ShadButtonSize? size;
 
-  /// {@macro ShadButton.sizesTheme}
+  /// Has no effect: the date picker button takes its sizes from
+  /// `ShadThemeData.buttonSizesTheme`.
+  @Deprecated(
+    'Has no effect: the date picker button takes its sizes from '
+    'ShadThemeData.buttonSizesTheme. Will be removed in the next major '
+    'version.',
+  )
   final ShadButtonSizesTheme? sizesTheme;
 
   /// {@macro ShadButton.variant}
   final ShadButtonVariant? buttonVariant;
 
-  /// {@macro ShadButton.bakcgroundColor}
+  /// {@macro ShadButton.backgroundColor}
   final Color? backgroundColor;
 
   /// {@macro ShadButton.hoverBackgroundColor}
@@ -347,7 +382,11 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   /// {@macro ShadButton.pressedForegroundColor}
   final Color? pressedForegroundColor;
 
-  /// {@macro ShadButton.disabledBackgroundColor}
+  /// Has no effect: the date picker's button has no disabled background.
+  @Deprecated(
+    'Has no effect: the date picker button has no disabled background. '
+    'Will be removed in the next major version.',
+  )
   final Color? disabledBackgroundColor;
 
   /// {@macro ShadButton.shadows}
@@ -368,7 +407,7 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   /// {@macro ShadButton.width}
   final double? width;
 
-  /// {@macro ShadowButton.height}
+  /// {@macro ShadButton.height}
   final double? height;
 
   /// {@macro ShadButton.longPressDuration}
@@ -398,9 +437,36 @@ class ShadDatePickerTheme with _$ShadDatePickerTheme {
   /// {@macro ShadButton.textStyle}
   final TextStyle? buttonTextStyle;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadDatePickerTheme? lerp(
     ShadDatePickerTheme? a,
     ShadDatePickerTheme? b,
     double t,
   ) => _$ShadDatePickerTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadDatePickerTheme &&
+      listEquals(effects, other.effects) &&
+      listEquals(shadows, other.shadows) &&
+      listEquals(buttonShadows, other.buttonShadows) &&
+      super ==
+          other.copyWith(
+            effects: effects,
+            shadows: shadows,
+            buttonShadows: buttonShadows,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(effects ?? const []),
+    Object.hashAll(shadows ?? const []),
+    Object.hashAll(buttonShadows ?? const []),
+  );
 }

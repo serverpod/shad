@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "થઈ ગયું"
+
+dialog:
+  close: "બંધ કરો"
+  dismiss: "છોડી દો"

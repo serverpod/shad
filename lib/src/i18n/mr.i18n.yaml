@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "पूर्ण"
+
+dialog:
+  close: "बंद करा"
+  dismiss: "डिसमिस करा"

@@ -106,6 +106,7 @@ class ShadTimeOfDay {
     return s += ')';
   }
 
+  /// Returns a copy with the given fields replaced.
   ShadTimeOfDay copyWith({
     int? hour,
     int? minute,
@@ -132,86 +133,103 @@ class ShadTimePickerController extends ChangeNotifier {
   ///
   /// Allows specifying initial hour, minute, second, and period.
   ShadTimePickerController({
-    this.hour,
-    this.minute,
-    this.second,
-    this.period,
-  });
+    int? hour,
+    int? minute,
+    int? second,
+    ShadDayPeriod? period,
+  }) : _currentHour = hour,
+       _currentMinute = minute,
+       _currentSecond = second,
+       _currentPeriod = period;
 
   /// Creates a [ShadTimePickerController] initialized with a [ShadTimeOfDay]
   /// object.
   ShadTimePickerController.fromTimeOfDay(ShadTimeOfDay? timeOfDay)
-    : hour = timeOfDay?.hour,
-      minute = timeOfDay?.minute,
-      second = timeOfDay?.second,
-      period = timeOfDay?.period;
+    : _currentHour = timeOfDay?.hour,
+      _currentMinute = timeOfDay?.minute,
+      _currentSecond = timeOfDay?.second,
+      _currentPeriod = timeOfDay?.period;
+
+  int? _currentHour;
+  int? _currentMinute;
+  int? _currentSecond;
+  ShadDayPeriod? _currentPeriod;
 
   /// {@template ShadTimePickerController.hour}
-  /// The selected hour.
+  /// The selected hour. Setting it notifies listeners.
   /// {@endtemplate}
-  int? hour;
+  int? get hour => _currentHour;
+  set hour(int? value) => setHour(value);
 
   /// {@template ShadTimePickerController.minute}
-  /// The selected minute.
+  /// The selected minute. Setting it notifies listeners.
   /// {@endtemplate}
-  int? minute;
+  int? get minute => _currentMinute;
+  set minute(int? value) => setMinute(value);
 
   /// {@template ShadTimePickerController.second}
-  /// The selected second.
+  /// The selected second. Setting it notifies listeners.
   /// {@endtemplate}
-  int? second;
+  int? get second => _currentSecond;
+  set second(int? value) => setSecond(value);
 
   /// {@template ShadTimePickerController.period}
-  /// The selected day period (AM/PM).
+  /// The selected day period (AM/PM). Setting it notifies listeners.
   /// {@endtemplate}
-  ShadDayPeriod? period;
+  ShadDayPeriod? get period => _currentPeriod;
+  set period(ShadDayPeriod? value) => setDayPeriod(value);
 
   /// Returns the current [ShadTimeOfDay] value from the controller.
   ///
   /// Returns `null` if any of hour, minute, or second are null.
   ShadTimeOfDay? get value {
+    final (hour, minute, second) = (
+      _currentHour,
+      _currentMinute,
+      _currentSecond,
+    );
     if (hour == null || minute == null || second == null) return null;
     return ShadTimeOfDay(
-      hour: hour!,
-      minute: minute!,
-      second: second!,
-      period: period,
+      hour: hour,
+      minute: minute,
+      second: second,
+      period: _currentPeriod,
     );
   }
 
   set value(ShadTimeOfDay? value) {
-    hour = value?.hour;
-    minute = value?.minute;
-    second = value?.second;
-    period = value?.period;
+    _currentHour = value?.hour;
+    _currentMinute = value?.minute;
+    _currentSecond = value?.second;
+    _currentPeriod = value?.period;
     notifyListeners();
   }
 
   /// Sets the hour and notifies listeners.
   void setHour(int? hour) {
-    if (this.hour == hour) return;
-    this.hour = hour;
+    if (_currentHour == hour) return;
+    _currentHour = hour;
     notifyListeners();
   }
 
   /// Sets the minute and notifies listeners.
   void setMinute(int? minute) {
-    if (this.minute == minute) return;
-    this.minute = minute;
+    if (_currentMinute == minute) return;
+    _currentMinute = minute;
     notifyListeners();
   }
 
   /// Sets the second and notifies listeners.
   void setSecond(int? second) {
-    if (this.second == second) return;
-    this.second = second;
+    if (_currentSecond == second) return;
+    _currentSecond = second;
     notifyListeners();
   }
 
   /// Sets the day period (AM/PM) and notifies listeners.
   void setDayPeriod(ShadDayPeriod? period) {
-    if (this.period == period) return;
-    this.period = period;
+    if (_currentPeriod == period) return;
+    _currentPeriod = period;
     notifyListeners();
   }
 }
@@ -822,8 +840,9 @@ class _ShadTimePickerState extends State<ShadTimePicker> {
     // hardcoded all-sides border here would resurface under styles whose
     // fields underline instead of outlining.
     final effectiveFieldDecoration =
-        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration())
-            .merge(widget.fieldDecoration);
+        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration()).merge(
+          widget.fieldDecoration,
+        );
 
     final effectivePeriodDecoration =
         (theme.timePickerTheme.periodDecoration ?? const ShadDecoration())
@@ -1116,13 +1135,12 @@ class _ShadTimePickerFieldState extends State<ShadTimePickerField> {
     final effectiveWidth =
         (widget.width ?? theme.timePickerTheme.fieldWidth ?? 48) * textScale;
     final effectivePadding =
-        widget.padding ??
-        theme.timePickerTheme.fieldPadding ??
-        EdgeInsets.zero;
+        widget.padding ?? theme.timePickerTheme.fieldPadding ?? EdgeInsets.zero;
 
     final effectiveDecoration =
-        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration())
-            .merge(widget.decoration);
+        (theme.timePickerTheme.fieldDecoration ?? const ShadDecoration()).merge(
+          widget.decoration,
+        );
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -1272,6 +1290,11 @@ class ShadTimePickerTextEditingController extends TextEditingController {
     );
   }
 
+  /// Returns [newText] as a valid value for the field.
+  ///
+  /// When the text has three characters, only the last one is kept, so typing
+  /// into a full field starts a new value. Text that is not a number becomes
+  /// empty, and numbers outside [min] and [max] are clamped.
   String adjustText(String newText) {
     var effectiveText = newText;
     if (effectiveText.length == 3) {
@@ -1285,6 +1308,7 @@ class ShadTimePickerTextEditingController extends TextEditingController {
     return effectiveText;
   }
 
+  /// Returns a copy with the given fields replaced.
   ShadTimePickerTextEditingController copyWith({
     String? text,
     int? min,

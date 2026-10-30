@@ -5,9 +5,13 @@ import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
 part 'table.g.theme.dart';
 
+/// {@template ShadTableTheme}
+/// Theme for the `ShadTable` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadTableTheme with _$ShadTableTheme {
+  /// {@macro ShadTableTheme}
   const ShadTableTheme({
     bool canMerge = true,
     this.diagonalDragBehavior,
@@ -44,24 +48,27 @@ class ShadTableTheme with _$ShadTableTheme {
   /// {@macro ShadTable.rowBuilder}
   final TableSpanBuilder? rowBuilder;
 
-  /// {@macro ShadTable.cellAlignment}
+  /// {@macro ShadTableCell.alignment}
   final Alignment? cellAlignment;
 
-  /// {@macro ShadTable.cellHeight}
+  /// {@macro ShadTableCell.height}
   final double? cellHeight;
 
-  /// {@macro ShadTable.cellPadding}
+  /// {@macro ShadTableCell.padding}
   final EdgeInsetsGeometry? cellPadding;
 
-  /// {@macro ShadTable.cellHeaderStyle}
+  /// Text style of header cells. Defaults to the text theme's `muted` at
+  /// medium weight.
   final TextStyle? cellHeaderStyle;
 
-  /// {@macro ShadTable.cellStyle}
+  /// Text style of body cells. Defaults to the text theme's `muted`.
   final TextStyle? cellStyle;
 
-  /// {@macro ShadTable.cellFooterStyle}
+  /// Text style of footer cells. Defaults to the text theme's `muted` at
+  /// medium weight.
   final TextStyle? cellFooterStyle;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTableTheme? lerp(
     ShadTableTheme? a,
     ShadTableTheme? b,

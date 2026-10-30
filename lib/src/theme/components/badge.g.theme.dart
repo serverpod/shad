@@ -37,6 +37,7 @@ mixin _$ShadBadgeTheme {
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       cursor: t < 0.5 ? a.cursor : b.cursor,
       textStyle: TextStyle.lerp(a.textStyle, b.textStyle, t),
+      iconSize: lerpDouble$(a.iconSize, b.iconSize, t),
     );
   }
 
@@ -48,6 +49,7 @@ mixin _$ShadBadgeTheme {
     EdgeInsetsGeometry? padding,
     MouseCursor? cursor,
     TextStyle? textStyle,
+    double? iconSize,
   }) {
     final _this = (this as ShadBadgeTheme);
 
@@ -59,6 +61,7 @@ mixin _$ShadBadgeTheme {
       padding: padding ?? _this.padding,
       cursor: cursor ?? _this.cursor,
       textStyle: textStyle ?? _this.textStyle,
+      iconSize: iconSize ?? _this.iconSize,
     );
   }
 
@@ -81,6 +84,7 @@ mixin _$ShadBadgeTheme {
       padding: other.padding,
       cursor: other.cursor,
       textStyle: _this.textStyle?.merge(other.textStyle) ?? other.textStyle,
+      iconSize: other.iconSize,
     );
   }
 
@@ -103,7 +107,8 @@ mixin _$ShadBadgeTheme {
         _other.foregroundColor == _this.foregroundColor &&
         _other.padding == _this.padding &&
         _other.cursor == _this.cursor &&
-        _other.textStyle == _this.textStyle;
+        _other.textStyle == _this.textStyle &&
+        _other.iconSize == _this.iconSize;
   }
 
   @override
@@ -119,6 +124,7 @@ mixin _$ShadBadgeTheme {
       _this.padding,
       _this.cursor,
       _this.textStyle,
+      _this.iconSize,
     );
   }
 }

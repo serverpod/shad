@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "រួចរាល់"
+
+dialog:
+  close: "បិទ"
+  dismiss: "ច្រាន​ចោល"

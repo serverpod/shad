@@ -30,7 +30,7 @@ mixin _$ShadToastTheme {
       closeIconData: t < 0.5 ? a.closeIconData : b.closeIconData,
       alignment: Alignment.lerp(a.alignment, b.alignment, t),
       offset: Offset.lerp(a.offset, b.offset, t),
-      duration: lerpDuration$(a.duration, b.duration, t),
+      displayDuration: lerpDuration$(a.displayDuration, b.displayDuration, t),
       animateIn: t < 0.5 ? a.animateIn : b.animateIn,
       animateOut: t < 0.5 ? a.animateOut : b.animateOut,
       textDirection: t < 0.5 ? a.textDirection : b.textDirection,
@@ -70,7 +70,7 @@ mixin _$ShadToastTheme {
     IconData? closeIconData,
     Alignment? alignment,
     Offset? offset,
-    Duration? duration,
+    Duration? displayDuration,
     List<Effect<dynamic>>? animateIn,
     List<Effect<dynamic>>? animateOut,
     TextDirection? textDirection,
@@ -96,7 +96,7 @@ mixin _$ShadToastTheme {
       closeIconData: closeIconData ?? _this.closeIconData,
       alignment: alignment ?? _this.alignment,
       offset: offset ?? _this.offset,
-      duration: duration ?? _this.duration,
+      displayDuration: displayDuration ?? _this.displayDuration,
       animateIn: animateIn ?? _this.animateIn,
       animateOut: animateOut ?? _this.animateOut,
       textDirection: textDirection ?? _this.textDirection,
@@ -134,7 +134,7 @@ mixin _$ShadToastTheme {
       closeIconData: other.closeIconData,
       alignment: other.alignment,
       offset: other.offset,
-      duration: other.duration,
+      displayDuration: other.displayDuration,
       animateIn: other.animateIn,
       animateOut: other.animateOut,
       textDirection: other.textDirection,
@@ -174,7 +174,7 @@ mixin _$ShadToastTheme {
         _other.closeIconData == _this.closeIconData &&
         _other.alignment == _this.alignment &&
         _other.offset == _this.offset &&
-        _other.duration == _this.duration &&
+        _other.displayDuration == _this.displayDuration &&
         _other.animateIn == _this.animateIn &&
         _other.animateOut == _this.animateOut &&
         _other.textDirection == _this.textDirection &&
@@ -205,7 +205,7 @@ mixin _$ShadToastTheme {
       _this.closeIconData,
       _this.alignment,
       _this.offset,
-      _this.duration,
+      _this.displayDuration,
       _this.animateIn,
       _this.animateOut,
       _this.textDirection,

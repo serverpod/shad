@@ -44,6 +44,7 @@ class ShadPaginationTheme with _$ShadPaginationTheme {
   /// The style of the ellipsis shown in place of skipped pages.
   final TextStyle? ellipsisTextStyle;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadPaginationTheme? lerp(
     ShadPaginationTheme? a,
     ShadPaginationTheme? b,

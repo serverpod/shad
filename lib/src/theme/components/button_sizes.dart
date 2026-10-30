@@ -4,9 +4,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'button_sizes.g.theme.dart';
 
+/// {@template ShadButtonSizeTheme}
+/// The metrics of one `ShadButton` size: its height, padding and icon size.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
+  /// {@macro ShadButtonSizeTheme}
   const ShadButtonSizeTheme({
     bool canMerge = true,
     required this.height,
@@ -21,8 +25,14 @@ class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
   @override
   bool get canMerge => _canMerge;
 
+  /// The button's height.
   final double height;
+
+  /// The padding around the button's content.
   final EdgeInsetsGeometry padding;
+
+  /// A fixed width. The icon sizes set it to make a square button. Null lets
+  /// the button size itself to its content.
   final double? width;
 
   /// Size handed to icons inside the button, shadcn's
@@ -32,6 +42,7 @@ class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
   /// size always wins, as the `:not` in the reference selector does.
   final double? iconSize;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadButtonSizeTheme? lerp(
     ShadButtonSizeTheme? a,
     ShadButtonSizeTheme? b,
@@ -47,6 +58,7 @@ class ShadButtonSizeTheme with _$ShadButtonSizeTheme {
 @themeGen
 @immutable
 class ShadButtonSizesTheme with _$ShadButtonSizesTheme {
+  /// {@macro ShadButtonSizesTheme}
   const ShadButtonSizesTheme({
     bool canMerge = true,
     this.regular,
@@ -63,8 +75,13 @@ class ShadButtonSizesTheme with _$ShadButtonSizesTheme {
   @override
   bool get canMerge => _canMerge;
 
+  /// The default size, shadcn's `size-default`.
   final ShadButtonSizeTheme? regular;
+
+  /// The small size, shadcn's `size-sm`.
   final ShadButtonSizeTheme? sm;
+
+  /// The large size, shadcn's `size-lg`.
   final ShadButtonSizeTheme? lg;
 
   /// The square sizes, shadcn's `size-icon`, `size-icon-sm` and
@@ -73,9 +90,14 @@ class ShadButtonSizesTheme with _$ShadButtonSizesTheme {
   /// Separate from [sm]/[lg] because the reference sizes an icon button's
   /// glyph independently of a text button's at the same step.
   final ShadButtonSizeTheme? icon;
+
+  /// The small square size, shadcn's `size-icon-sm`. See [icon].
   final ShadButtonSizeTheme? iconSm;
+
+  /// The large square size, shadcn's `size-icon-lg`. See [icon].
   final ShadButtonSizeTheme? iconLg;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadButtonSizesTheme? lerp(
     ShadButtonSizesTheme? a,
     ShadButtonSizesTheme? b,

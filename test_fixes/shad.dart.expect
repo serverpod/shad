@@ -1,0 +1,30 @@
+import 'package:flutter/widgets.dart';
+import 'package:shad/shad.dart';
+
+void main() {
+  // Types.
+  const List<BoxShadow> shadows = ShadShadows.sm;
+  ShadFontBuilder? builder;
+  ShadFormField<String>? field;
+  ShadInputFormFieldState? inputState;
+  ShadToValueTransformer<int>? toValue;
+  ShadRestorableTabsController<int>? restorable;
+
+  // Enum value.
+  const variant = ShadToggleVariant.primary;
+
+  // Constructor parameters.
+  const ShadToast(displayDuration: Duration(seconds: 1));
+  const ShadToast.destructive(displayDuration: Duration(seconds: 1));
+  const ShadAvatar('', fallback: Text('AB'));
+  const ShadSonner(maxVisibleToasts: 2, child: SizedBox());
+  ShadInput(onLineCountChanged: (_) {});
+  const ShadCalendar(
+    selectedDayButtonOutsideMonthVariant: ShadButtonVariant.secondary,
+  );
+  ShadInputFormField(toValueTransformer: (v) => v);
+
+  // Members.
+  const toast = ShadToast();
+  toast.displayDuration;
+}

@@ -43,6 +43,7 @@ class ShadLocalizationsDataOr extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$or datePicker = _ShadLocalizationsData$datePicker$or._(_root);
 	@override late final _ShadLocalizationsData$input$or input = _ShadLocalizationsData$input$or._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$or keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$or._(_root);
+	@override late final _ShadLocalizationsData$dialog$or dialog = _ShadLocalizationsData$dialog$or._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$or extends ShadLocalizationsData$ke
 	@override String get done => 'ସମ୍ପନ୍ନ';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$or extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$or._(ShadLocalizationsDataOr root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataOr _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'ବନ୍ଦ କରନ୍ତୁ';
+	@override String get dismiss => 'ଖାରଜ କରନ୍ତୁ';
+}
+
 /// The flat map containing all translations for locale <or>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataOr {
 			'input.paste' => 'ପେଷ୍ଟ',
 			'input.selectAll' => 'ସବୁ ଚୟନ କରନ୍ତୁ',
 			'keyboardToolbar.done' => 'ସମ୍ପନ୍ନ',
+			'dialog.close' => 'ବନ୍ଦ କରନ୍ତୁ',
+			'dialog.dismiss' => 'ଖାରଜ କରନ୍ତୁ',
 			_ => null,
 		};
 	}

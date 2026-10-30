@@ -43,6 +43,7 @@ class ShadLocalizationsDataSr extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$sr datePicker = _ShadLocalizationsData$datePicker$sr._(_root);
 	@override late final _ShadLocalizationsData$input$sr input = _ShadLocalizationsData$input$sr._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$sr keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$sr._(_root);
+	@override late final _ShadLocalizationsData$dialog$sr dialog = _ShadLocalizationsData$dialog$sr._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$sr extends ShadLocalizationsData$ke
 	@override String get done => 'Gotovo';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$sr extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$sr._(ShadLocalizationsDataSr root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataSr _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Затвори';
+	@override String get dismiss => 'Одбаци';
+}
+
 /// The flat map containing all translations for locale <sr>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataSr {
 			'input.paste' => 'Nalepi',
 			'input.selectAll' => 'Izaberi sve',
 			'keyboardToolbar.done' => 'Gotovo',
+			'dialog.close' => 'Затвори',
+			'dialog.dismiss' => 'Одбаци',
 			_ => null,
 		};
 	}

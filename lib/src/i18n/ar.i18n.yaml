@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "تم"
+
+dialog:
+  close: "الإغلاق"
+  dismiss: "رفض"

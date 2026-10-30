@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ସମ୍ପନ୍ନ"
+
+dialog:
+  close: "ବନ୍ଦ କରନ୍ତୁ"
+  dismiss: "ଖାରଜ କରନ୍ତୁ"

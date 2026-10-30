@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "ສຳເລັດ"
+
+dialog:
+  close: "ປິດ"
+  dismiss: "ປິດໄວ້"

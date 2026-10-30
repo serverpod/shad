@@ -43,6 +43,7 @@ class ShadLocalizationsDataMy extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$my datePicker = _ShadLocalizationsData$datePicker$my._(_root);
 	@override late final _ShadLocalizationsData$input$my input = _ShadLocalizationsData$input$my._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$my keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$my._(_root);
+	@override late final _ShadLocalizationsData$dialog$my dialog = _ShadLocalizationsData$dialog$my._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$my extends ShadLocalizationsData$ke
 	@override String get done => 'ပြီးပြီ';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$my extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$my._(ShadLocalizationsDataMy root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataMy _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'ပိတ်ရန်';
+	@override String get dismiss => 'ပယ်ရန်';
+}
+
 /// The flat map containing all translations for locale <my>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataMy {
 			'input.paste' => 'ကူးထည့်',
 			'input.selectAll' => 'အားလုံးရွေးချယ်',
 			'keyboardToolbar.done' => 'ပြီးပြီ',
+			'dialog.close' => 'ပိတ်ရန်',
+			'dialog.dismiss' => 'ပယ်ရန်',
 			_ => null,
 		};
 	}

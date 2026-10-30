@@ -43,7 +43,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadInputOTP),
         matchesGoldenFile('goldens/input_otp.png'),
       );

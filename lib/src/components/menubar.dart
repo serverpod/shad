@@ -47,7 +47,17 @@ class ShadMenubar extends StatefulWidget {
     this.backgroundColor,
     this.border,
     this.selectOnHover,
+    this.stripShadows,
   });
+
+  /// {@template ShadMenubar.stripShadows}
+  /// The shadow of the menubar strip itself. Defaults to the style's control
+  /// shadow (`shadow-xs` in the styles that shadow their controls); pass an
+  /// empty list for a flat strip.
+  ///
+  /// `ShadMenubarTheme.shadows` is the shadow of the menus that open from it.
+  /// {@endtemplate}
+  final List<BoxShadow>? stripShadows;
 
   /// {@template ShadMenubar.items}
   /// The items of the menubar
@@ -142,9 +152,11 @@ class _ShadMenubarState extends State<ShadMenubar> {
           border: effectiveBorder.toBorder(),
           borderRadius: effectiveRadius,
           // The strip's `shadow-xs`; only styles that shadow their controls
-          // keep it. `ShadMenubarTheme.shadows` belongs to the item popovers,
-          // so the strip reads the token directly.
-          shadows: theme.style.controlShadow,
+          // keep it. `ShadMenubarTheme.shadows` belongs to the item popovers.
+          shadows:
+              widget.stripShadows ??
+              theme.menubarTheme.stripShadows ??
+              theme.style.controlShadow,
         ),
         padding: effectivePadding,
         child: Row(

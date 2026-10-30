@@ -43,6 +43,7 @@ class ShadLocalizationsDataVi extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$vi datePicker = _ShadLocalizationsData$datePicker$vi._(_root);
 	@override late final _ShadLocalizationsData$input$vi input = _ShadLocalizationsData$input$vi._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$vi keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$vi._(_root);
+	@override late final _ShadLocalizationsData$dialog$vi dialog = _ShadLocalizationsData$dialog$vi._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$vi extends ShadLocalizationsData$ke
 	@override String get done => 'Xong';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$vi extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$vi._(ShadLocalizationsDataVi root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataVi _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Đóng';
+	@override String get dismiss => 'Bỏ qua';
+}
+
 /// The flat map containing all translations for locale <vi>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataVi {
 			'input.paste' => 'Dán',
 			'input.selectAll' => 'Chọn tất cả',
 			'keyboardToolbar.done' => 'Xong',
+			'dialog.close' => 'Đóng',
+			'dialog.dismiss' => 'Bỏ qua',
 			_ => null,
 		};
 	}

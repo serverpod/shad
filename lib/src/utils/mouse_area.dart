@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+/// A registry of [ShadMouseAreaRenderBox]es that a pointer can be inside or
+/// outside of.
 abstract class MouseAreaRegistry {
   /// Register the given [ShadMouseAreaRenderBox] with the registry.
   void registerMouseArea(ShadMouseAreaRenderBox region);
@@ -41,6 +43,12 @@ MouseRegionRegistry.of() was called with a context that does not contain a Mouse
   }
 }
 
+/// The render object of a [ShadMouseAreaSurface].
+///
+/// On each pointer event it receives, it calls `onEnter` on the registered
+/// areas under the pointer, and on all other areas of their groups, and
+/// `onExit` on the rest. The callbacks run on every event, not only when the
+/// state changes.
 class MouseAreaSurfaceRenderBox extends RenderProxyBoxWithHitTestBehavior
     implements MouseAreaRegistry {
   final Expando<BoxHitTestResult> _cachedResults = Expando<BoxHitTestResult>();
@@ -203,6 +211,12 @@ class MouseAreaSurfaceRenderBox extends RenderProxyBoxWithHitTestBehavior
   }
 }
 
+/// Reports whether a pointer is inside or outside of its child, through the
+/// nearest [ShadMouseAreaSurface].
+///
+/// Areas with the same [groupId] act as one area. The popover, the tooltip
+/// and the context menu use it to stay open while the pointer moves between
+/// the trigger and the overlay.
 class ShadMouseArea extends SingleChildRenderObjectWidget {
   /// Creates a const [ShadMouseArea].
   ///
@@ -215,6 +229,10 @@ class ShadMouseArea extends SingleChildRenderObjectWidget {
     this.groupId,
     this.onEnter,
     this.onExit,
+    @Deprecated(
+      'Has no effect; wrap the child in a MouseRegion. '
+      'Will be removed in the next major version.',
+    )
     this.cursor = MouseCursor.defer,
     String? debugLabel,
   }) : debugLabel = kReleaseMode ? null : debugLabel;
@@ -246,14 +264,13 @@ class ShadMouseArea extends SingleChildRenderObjectWidget {
   /// Triggered when a pointer exits the region.
   final PointerExitEventListener? onExit;
 
-  /// The mouse cursor for mouse pointers that are hovering over the region.
-  ///
-  /// When a mouse enters the region, its cursor will be changed to the [cursor]
-  /// When the mouse leaves the region, the cursor will be decided by the region
-  /// found at the new location.
-  ///
-  /// The [cursor] defaults to [MouseCursor.defer], deferring the choice of
-  /// cursor to the next region behind it in hit-test order.
+  /// Has no effect: the area's render object does not take part in mouse
+  /// tracking, so it never sets the cursor. Wrap the child in a
+  /// `MouseRegion` to change the cursor.
+  @Deprecated(
+    'Has no effect; wrap the child in a MouseRegion. '
+    'Will be removed in the next major version.',
+  )
   final MouseCursor cursor;
 
   /// An optional debug label to help with debugging in debug mode.
@@ -271,6 +288,7 @@ class ShadMouseArea extends SingleChildRenderObjectWidget {
       debugLabel: debugLabel,
       onEnter: onEnter,
       onExit: onExit,
+      // ignore: deprecated_member_use_from_same_package
       cursor: cursor,
     );
   }
@@ -324,6 +342,7 @@ class ShadMouseArea extends SingleChildRenderObjectWidget {
   }
 }
 
+/// The render object of a [ShadMouseArea].
 class ShadMouseAreaRenderBox extends RenderProxyBoxWithHitTestBehavior {
   /// Creates a [ShadMouseAreaRenderBox].
   ShadMouseAreaRenderBox({
@@ -355,9 +374,19 @@ class ShadMouseAreaRenderBox extends RenderProxyBoxWithHitTestBehavior {
   bool _validForMouseTracker;
 
   MouseCursor _cursor;
+
+  /// Called when a pointer event lands inside this area or another area of its
+  /// group.
   PointerEnterEventListener? onEnter;
+
+  /// Called when a pointer event lands outside this area and the other areas
+  /// of its group.
   PointerExitEventListener? onExit;
 
+  /// The cursor of the area.
+  ///
+  /// It is stored but not shown, because this render object does not take part
+  /// in mouse tracking.
   MouseCursor get cursor => _cursor;
   set cursor(MouseCursor value) {
     if (_cursor != value) {
@@ -418,6 +447,7 @@ class ShadMouseAreaRenderBox extends RenderProxyBoxWithHitTestBehavior {
     }
   }
 
+  /// Whether the render object is attached. It is false after [detach].
   bool get validForMouseTracker => _validForMouseTracker;
 
   @override
@@ -493,7 +523,7 @@ class ShadMouseAreaRenderBox extends RenderProxyBoxWithHitTestBehavior {
 /// registered regions, grouped by [ShadMouseArea.groupId], without
 /// participating in the [gesture disambiguation](https://flutter.dev/to/gesture-disambiguation) system.
 class ShadMouseAreaSurface extends SingleChildRenderObjectWidget {
-  /// Creates a const [RenderTapRegionSurface].
+  /// Creates a const [ShadMouseAreaSurface].
   ///
   /// The [child] attribute is required.
   const ShadMouseAreaSurface({

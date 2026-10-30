@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Gorffen"
+
+dialog:
+  close: "Cau"
+  dismiss: "Diystyru"

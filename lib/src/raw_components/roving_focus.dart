@@ -20,6 +20,10 @@ enum ShadRovingFocusOrientation {
 /// Radix: the collection is a single tab stop, and the arrow keys move an
 /// internal highlight between items rather than moving focus item by item.
 class ShadRovingFocusController extends ChangeNotifier {
+  /// Creates a controller for [itemCount] items.
+  ///
+  /// Nothing is highlighted unless [highlightedIndex] is given. [loop]
+  /// defaults to true.
   ShadRovingFocusController({
     int itemCount = 0,
     int? highlightedIndex,
@@ -80,11 +84,13 @@ class ShadRovingFocusController extends ChangeNotifier {
     }
   }
 
+  /// Highlights the first item. Does nothing when there are no items.
   void moveToFirst() {
     if (_itemCount == 0) return;
     highlightedIndex = 0;
   }
 
+  /// Highlights the last item. Does nothing when there are no items.
   void moveToLast() {
     if (_itemCount == 0) return;
     highlightedIndex = _itemCount - 1;
@@ -102,6 +108,7 @@ class ShadRovingFocusController extends ChangeNotifier {
 /// highlight and reacting to activation is up to the caller, which reads
 /// [ShadRovingFocusController.highlightedIndex].
 class ShadRovingFocus extends StatefulWidget {
+  /// Creates a roving-focus group around [child].
   const ShadRovingFocus({
     super.key,
     required this.controller,
@@ -119,6 +126,7 @@ class ShadRovingFocus extends StatefulWidget {
   /// The controller holding the highlighted index.
   final ShadRovingFocusController controller;
 
+  /// The widget below this widget in the tree, which shows the items.
   final Widget child;
 
   /// Which arrow keys move the highlight.
@@ -142,7 +150,11 @@ class ShadRovingFocus extends StatefulWidget {
   /// How long typed characters accumulate before the buffer resets.
   final Duration typeaheadResetDelay;
 
+  /// Whether to take focus when first built, if nothing else has focus.
+  /// Defaults to false.
   final bool autofocus;
+
+  /// The focus node of the group. When null, the widget creates its own.
   final FocusNode? focusNode;
 
   @override

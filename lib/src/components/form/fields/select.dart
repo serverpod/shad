@@ -8,7 +8,12 @@ import 'package:shad/src/raw_components/portal.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 
-class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
+/// A single-choice [ShadSelect] that takes part in a `ShadForm`, with a
+/// label, a description and validation.
+///
+/// For a field that holds several values, use [ShadSelectMultipleFormField].
+class ShadSelectFormField<T> extends ShadFormField<T> {
+  /// Creates a select form field, like [ShadSelect.new].
   ShadSelectFormField({
     super.id,
     super.key,
@@ -18,11 +23,6 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -81,7 +81,7 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     /// {@macro ShadSelect.anchor}
     ShadAnchorBase? anchor,
 
-    /// {@macro ShadSelect.filter}
+    /// {@macro ShadPopover.filter}
     ImageFilter? filter,
 
     /// {@macro ShadSelect.popoverController}
@@ -120,7 +120,7 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectState<T>;
+           state as ShadSelectFormFieldState<T>;
 
            return ShadSelect<T>(
              options: options,
@@ -158,6 +158,8 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
          },
        );
 
+  /// Creates a select form field with a search input, like
+  /// [ShadSelect.withSearch].
   ShadSelectFormField.withSearch({
     super.id,
     super.key,
@@ -167,11 +169,6 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.description,
     super.onChanged,
     super.forceErrorText,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -209,10 +206,10 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     bool? clearSearchOnClose,
     ShadPopoverController? popoverController,
 
-    /// {@macro select.header}
+    /// {@macro ShadSelect.header}
     Widget? header,
 
-    /// {@macro select.footer}
+    /// {@macro ShadSelect.footer}
     Widget? footer,
     bool allowDeselection = false,
     bool closeOnSelect = true,
@@ -246,7 +243,7 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectState<T>;
+           state as ShadSelectFormFieldState<T>;
 
            return ShadSelect<T>.withSearch(
              options: options,
@@ -293,6 +290,9 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
          },
        );
 
+  /// Creates a select form field with an explicit [variant], like
+  /// [ShadSelect.raw]. [variant] must be [ShadSelectVariant.primary] or
+  /// [ShadSelectVariant.search].
   ShadSelectFormField.raw({
     super.id,
     super.key,
@@ -301,11 +301,6 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -344,10 +339,10 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
     bool? clearSearchOnClose,
     ShadPopoverController? popoverController,
 
-    /// {@macro select.header}
+    /// {@macro ShadSelect.header}
     Widget? header,
 
-    /// {@macro select.footer}
+    /// {@macro ShadSelect.footer}
     Widget? footer,
     bool allowDeselection = false,
     bool closeOnSelect = true,
@@ -386,7 +381,7 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectState<T>;
+           state as ShadSelectFormFieldState<T>;
 
            return ShadSelect<T>.raw(
              variant: variant,
@@ -437,14 +432,17 @@ class ShadSelectFormField<T> extends ShadFormBuilderField<T> {
   final ShadSelectController<T>? controller;
 
   @override
-  ShadFormBuilderFieldState<ShadSelectFormField<T>, T> createState() =>
-      ShadFormBuilderSelectState<T>();
+  ShadFormFieldState<ShadSelectFormField<T>, T> createState() =>
+      ShadSelectFormFieldState<T>();
 }
 
-class ShadFormBuilderSelectState<T>
-    extends ShadFormBuilderFieldState<ShadSelectFormField<T>, T> {
+/// The state of a [ShadSelectFormField].
+class ShadSelectFormFieldState<T>
+    extends ShadFormFieldState<ShadSelectFormField<T>, T> {
   ShadSelectController<T>? _controller;
 
+  /// The controller in use: [ShadSelectFormField.controller] when given,
+  /// otherwise an internal one created from the initial value.
   ShadSelectController<T> get controller =>
       widget.controller ??
       (_controller ??= ShadSelectController<T>(
@@ -470,6 +468,7 @@ class ShadFormBuilderSelectState<T>
     super.dispose();
   }
 
+  /// Copies the controller's selection into the field's value.
   void onControllerChange() {
     if (controller.value.firstOrNull != value) {
       didChange(controller.value.firstOrNull);
@@ -483,7 +482,11 @@ class ShadFormBuilderSelectState<T>
   }
 }
 
-class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
+/// A multiple-choice [ShadSelect] that takes part in a `ShadForm`, with a
+/// label, a description and validation. Its value is the set of selected
+/// options.
+class ShadSelectMultipleFormField<T> extends ShadFormField<Set<T>> {
+  /// Creates a multiple select form field, like [ShadSelect.multiple].
   ShadSelectMultipleFormField({
     super.id,
     super.key,
@@ -492,11 +495,6 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -553,7 +551,7 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectMultipleState<T>;
+           state as ShadSelectMultipleFormFieldState<T>;
 
            return ShadSelect<T>.multiple(
              options: options,
@@ -588,6 +586,8 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
          },
        );
 
+  /// Creates a multiple select form field with a search input, like
+  /// [ShadSelect.multipleWithSearch].
   ShadSelectMultipleFormField.withSearch({
     super.id,
     super.key,
@@ -596,11 +596,6 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -639,10 +634,10 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     bool? clearSearchOnClose,
     ShadPopoverController? popoverController,
 
-    /// {@macro select.header}
+    /// {@macro ShadSelect.header}
     Widget? header,
 
-    /// {@macro select.footer}
+    /// {@macro ShadSelect.footer}
     Widget? footer,
     bool closeOnSelect = true,
 
@@ -670,7 +665,7 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectMultipleState<T>;
+           state as ShadSelectMultipleFormFieldState<T>;
 
            return ShadSelect<T>.multipleWithSearch(
              options: options,
@@ -714,6 +709,9 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
          },
        );
 
+  /// Creates a multiple select form field with an explicit [variant], like
+  /// [ShadSelect.raw]. [variant] must be [ShadSelectVariant.multiple] or
+  /// [ShadSelectVariant.multipleWithSearch].
   ShadSelectMultipleFormField.raw({
     super.id,
     super.key,
@@ -722,11 +720,6 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     super.error,
     super.description,
     super.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -765,10 +758,10 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
     bool? clearSearchOnClose,
     ShadPopoverController? popoverController,
 
-    /// {@macro select.header}
+    /// {@macro ShadSelect.header}
     Widget? header,
 
-    /// {@macro select.footer}
+    /// {@macro ShadSelect.footer}
     Widget? footer,
     bool allowDeselection = true,
     bool closeOnSelect = true,
@@ -799,7 +792,7 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderSelectMultipleState<T>;
+           state as ShadSelectMultipleFormFieldState<T>;
 
            return ShadSelect<T>.raw(
              variant: variant,
@@ -848,14 +841,17 @@ class ShadSelectMultipleFormField<T> extends ShadFormBuilderField<Set<T>> {
   final ShadSelectController<T>? controller;
 
   @override
-  ShadFormBuilderFieldState<ShadSelectMultipleFormField<T>, Set<T>>
-  createState() => ShadFormBuilderSelectMultipleState<T>();
+  ShadFormFieldState<ShadSelectMultipleFormField<T>, Set<T>> createState() =>
+      ShadSelectMultipleFormFieldState<T>();
 }
 
-class ShadFormBuilderSelectMultipleState<T>
-    extends ShadFormBuilderFieldState<ShadSelectMultipleFormField<T>, Set<T>> {
+/// The state of a [ShadSelectMultipleFormField].
+class ShadSelectMultipleFormFieldState<T>
+    extends ShadFormFieldState<ShadSelectMultipleFormField<T>, Set<T>> {
   ShadSelectController<T>? _controller;
 
+  /// The controller in use: [ShadSelectMultipleFormField.controller] when
+  /// given, otherwise an internal one created from the initial value.
   ShadSelectController<T> get controller =>
       widget.controller ??
       (_controller ??= ShadSelectController<T>(initialValue: initialValue));
@@ -879,6 +875,7 @@ class ShadFormBuilderSelectMultipleState<T>
     super.dispose();
   }
 
+  /// Copies the controller's selection into the field's value.
   void onControllerChange() {
     if (controller.value != value) {
       didChange(controller.value.toSet());
@@ -891,3 +888,18 @@ class ShadFormBuilderSelectMultipleState<T>
     controller.value = initialValue ?? {};
   }
 }
+
+/// The old name of [ShadSelectMultipleFormFieldState].
+@Deprecated(
+  'Use ShadSelectMultipleFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderSelectMultipleState<T> =
+    ShadSelectMultipleFormFieldState<T>;
+
+/// The old name of [ShadSelectFormFieldState].
+@Deprecated(
+  'Use ShadSelectFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderSelectState<T> = ShadSelectFormFieldState<T>;

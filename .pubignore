@@ -1,8 +1,23 @@
-build
-android
-ios
-macos
-web
-linux
-fonts.zip
-reference
+# .pubignore replaces .gitignore for `pub publish`, so everything that must
+# stay out of the archive is listed here, including what .gitignore covers.
+/build/
+/android/
+/ios/
+/macos/
+/web/
+/linux/
+/windows/
+/reference/
+/specs/
+/scripts/
+/test_fixes/
+/CLAUDE.md
+/build.yaml
+/coverage/
+failures/
+example/build/
+example/fonts/
+example/macos/
+example/web/
+example/test_driver/
+.DS_Store

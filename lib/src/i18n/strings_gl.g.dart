@@ -43,6 +43,7 @@ class ShadLocalizationsDataGl extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$gl datePicker = _ShadLocalizationsData$datePicker$gl._(_root);
 	@override late final _ShadLocalizationsData$input$gl input = _ShadLocalizationsData$input$gl._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$gl keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$gl._(_root);
+	@override late final _ShadLocalizationsData$dialog$gl dialog = _ShadLocalizationsData$dialog$gl._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$gl extends ShadLocalizationsData$ke
 	@override String get done => 'Feito';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$gl extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$gl._(ShadLocalizationsDataGl root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataGl _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Pechar';
+	@override String get dismiss => 'Pechar';
+}
+
 /// The flat map containing all translations for locale <gl>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataGl {
 			'input.paste' => 'Pegar',
 			'input.selectAll' => 'Seleccionar todo',
 			'keyboardToolbar.done' => 'Feito',
+			'dialog.close' => 'Pechar',
+			'dialog.dismiss' => 'Pechar',
 			_ => null,
 		};
 	}

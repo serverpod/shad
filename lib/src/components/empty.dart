@@ -89,6 +89,8 @@ class ShadEmpty extends StatelessWidget {
   /// {@endtemplate}
   final MainAxisAlignment? mainAxisAlignment;
 
+  /// How much height the content takes when the height is unbounded. Defaults
+  /// to [MainAxisSize.min]. With a bounded height, the content always fills it.
   final MainAxisSize mainAxisSize;
 
   @override

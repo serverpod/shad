@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `orange` theme: a neutral base with a orange primary.
+///
+/// Kept for compatibility. In v4, apply `ShadAccentScheme.orangeLight` or
+/// `ShadAccentScheme.orangeDark` to a base colour scheme instead.
 @immutable
 class ShadOrangeColorScheme extends ShadColorScheme {
+  /// Creates a [ShadOrangeColorScheme] from explicit colours.
+  ///
+  /// Use [ShadOrangeColorScheme.light] or [ShadOrangeColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadOrangeColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadOrangeColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadOrangeColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadOrangeColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff0c0a09),
@@ -51,6 +62,9 @@ class ShadOrangeColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadOrangeColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadOrangeColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfffafaf9),

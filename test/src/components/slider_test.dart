@@ -20,7 +20,7 @@ void main() {
         createTestWidget(const ShadSlider(initialValue: 33, max: 100)),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadSlider),
         matchesGoldenFile('goldens/slider.png'),
       );

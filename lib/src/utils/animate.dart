@@ -49,6 +49,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 /// See [SwapEffect] for one approach to work around this.
 // ignore: must_be_immutable
 class ShadAnimate extends Animate {
+  /// Creates an animation with the given [effects] for [child].
+  ///
+  /// See [Animate.new] for the parameters.
   ShadAnimate({
     super.key,
     super.child = const SizedBox.shrink(),

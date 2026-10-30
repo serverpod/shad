@@ -4,7 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/text_theme/text_styles_default.dart';
 import 'package:shad/src/theme/themes/default_theme_variant.dart';
 
+/// Strips the font family from a [TextStyle].
 extension OmitFamilyAndPackageExtension on TextStyle {
+  /// A copy of this style without its `fontFamily` and `package`.
+  ///
+  /// Every other property is kept. Used to hand a style to a [ShadFontBuilder],
+  /// which supplies the family itself.
   TextStyle get omitFamilyAndPackage {
     return TextStyle(
       inherit: inherit,
@@ -35,7 +40,9 @@ extension OmitFamilyAndPackageExtension on TextStyle {
   }
 }
 
-typedef GoogleFontBuilder =
+/// Builds a [TextStyle] in a given font, with the same signature as the
+/// `google_fonts` style functions such as `GoogleFonts.inter`.
+typedef ShadFontBuilder =
     TextStyle Function({
       TextStyle? textStyle,
       Color? color,
@@ -58,9 +65,20 @@ typedef GoogleFontBuilder =
       double? decorationThickness,
     });
 
-// Workaround for google fonts, see https://github.com/material-foundation/flutter-packages/issues/35
-class GoogleFontTextStyle extends TextStyle {
-  GoogleFontTextStyle(
+/// A [TextStyle] whose family follows its weight and style through a
+/// [ShadFontBuilder].
+///
+/// Font sources such as `google_fonts` register one family per weight
+/// (`Inter_700`), so a plain `copyWith(fontWeight: ...)` would keep the old
+/// weight's family. This style asks the builder for the family again whenever
+/// the weight or style changes. See
+/// https://github.com/material-foundation/flutter-packages/issues/35.
+class ShadBuilderTextStyle extends TextStyle {
+  /// Wraps [textStyle] so that its family comes from [builder].
+  ///
+  /// When [overrideFamilyWithBuilder] is false, the builder supplies the family
+  /// only if [textStyle] has none.
+  ShadBuilderTextStyle(
     TextStyle textStyle, {
     required this.builder,
     this.overrideFamilyWithBuilder = false,
@@ -104,7 +122,11 @@ class GoogleFontTextStyle extends TextStyle {
          overflow: textStyle.overflow,
        );
 
-  final GoogleFontBuilder builder;
+  /// Resolves the family for a weight and style.
+  final ShadFontBuilder builder;
+
+  /// Whether the builder's family replaces the style's own family even when
+  /// the style names one.
   final bool overrideFamilyWithBuilder;
 
   @override
@@ -136,15 +158,25 @@ class GoogleFontTextStyle extends TextStyle {
     String? package,
     TextOverflow? overflow,
   }) {
+    // The family is per weight and style, so ask for the one this copy will
+    // have: a changed weight with the current style, or the reverse.
+    // Passing only the new values lost the other one (an italic turned
+    // upright when its weight changed, and an overriding style fell back to
+    // the regular face on any copy).
+    final effectiveWeight = fontWeight ?? this.fontWeight;
+    final effectiveStyle = fontStyle ?? this.fontStyle;
     var family =
         fontFamily ??
         ((fontWeight != null || fontStyle != null)
-            ? builder(fontWeight: fontWeight, fontStyle: fontStyle).fontFamily
+            ? builder(
+                fontWeight: effectiveWeight,
+                fontStyle: effectiveStyle,
+              ).fontFamily
             : null);
     if (overrideFamilyWithBuilder) {
       family = builder(
-        fontWeight: fontWeight,
-        fontStyle: fontStyle,
+        fontWeight: effectiveWeight,
+        fontStyle: effectiveStyle,
       ).fontFamily;
     }
     return super.copyWith(
@@ -178,8 +210,18 @@ class GoogleFontTextStyle extends TextStyle {
   }
 }
 
+/// The text styles of a theme, one per shadcn/ui typography element.
+///
+/// Components read these styles, and the theme variant applies its style's text
+/// roles to [small], [muted], [p], [list] and [large]. Use
+/// [ShadTextTheme.fromGoogleFont] to set every style in one font.
 @immutable
 class ShadTextTheme {
+  /// Creates a text theme.
+  ///
+  /// A null style takes the [ShadTextDefaultTheme] value in [family]. [package]
+  /// prefixes [family] as `packages/<package>/<family>`. [family] defaults to
+  /// null, which uses the platform font.
   factory ShadTextTheme({
     TextStyle? h1Large,
     TextStyle? h1,
@@ -196,11 +238,13 @@ class ShadTextTheme {
     TextStyle? muted,
     String? family,
     String? package,
-    GoogleFontBuilder? googleFontBuilder,
+    ShadFontBuilder? googleFontBuilder,
     Map<String, TextStyle> custom = const {},
   }) {
-    var effectiveFamily = family ?? kDefaultFontFamily;
-    if (package != null && package != '') {
+    // With no family, text uses the platform font. A package only qualifies
+    // a family the caller named.
+    var effectiveFamily = family;
+    if (effectiveFamily != null && package != null && package != '') {
       effectiveFamily = 'packages/$package/$effectiveFamily';
     }
 
@@ -226,6 +270,10 @@ class ShadTextTheme {
     );
   }
 
+  /// Creates a text theme from explicit styles. Nothing is filled in.
+  ///
+  /// Set [canMerge] to false so that merging this theme into another one
+  /// returns it unchanged.
   const ShadTextTheme.custom({
     this.canMerge = true,
     required this.h1Large,
@@ -241,71 +289,75 @@ class ShadTextTheme {
     required this.large,
     required this.small,
     required this.muted,
-    required this.family,
+    this.family,
     this.custom = const {},
     this.googleFontBuilder,
   });
 
+  /// Creates a text theme in the font that [fontBuilder] builds.
+  ///
+  /// The sizes and weights come from [textTheme], or from the default text
+  /// theme when it is null. [custom] styles are added to the result.
   factory ShadTextTheme.fromGoogleFont(
-    GoogleFontBuilder fontBuilder, {
+    ShadFontBuilder fontBuilder, {
     ShadTextTheme? textTheme,
     Map<String, TextStyle> custom = const {},
   }) {
     final effectiveTextTheme =
         textTheme ?? ShadDefaultThemeVariant.defaultTextTheme;
 
-    final p = GoogleFontTextStyle(
+    final p = ShadBuilderTextStyle(
       effectiveTextTheme.p.omitFamilyAndPackage,
       builder: fontBuilder,
     );
 
     return ShadTextTheme(
-      h1Large: GoogleFontTextStyle(
+      h1Large: ShadBuilderTextStyle(
         effectiveTextTheme.h1Large.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      h1: GoogleFontTextStyle(
+      h1: ShadBuilderTextStyle(
         effectiveTextTheme.h1.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      h2: GoogleFontTextStyle(
+      h2: ShadBuilderTextStyle(
         effectiveTextTheme.h2.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      h3: GoogleFontTextStyle(
+      h3: ShadBuilderTextStyle(
         effectiveTextTheme.h3.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      h4: GoogleFontTextStyle(
+      h4: ShadBuilderTextStyle(
         effectiveTextTheme.h4.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
       p: p,
-      blockquote: GoogleFontTextStyle(
+      blockquote: ShadBuilderTextStyle(
         effectiveTextTheme.blockquote.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      table: GoogleFontTextStyle(
+      table: ShadBuilderTextStyle(
         effectiveTextTheme.table.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      list: GoogleFontTextStyle(
+      list: ShadBuilderTextStyle(
         effectiveTextTheme.list.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      lead: GoogleFontTextStyle(
+      lead: ShadBuilderTextStyle(
         effectiveTextTheme.lead.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      large: GoogleFontTextStyle(
+      large: ShadBuilderTextStyle(
         effectiveTextTheme.large.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      small: GoogleFontTextStyle(
+      small: ShadBuilderTextStyle(
         effectiveTextTheme.small.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
-      muted: GoogleFontTextStyle(
+      muted: ShadBuilderTextStyle(
         effectiveTextTheme.muted.omitFamilyAndPackage,
         builder: fontBuilder,
       ),
@@ -313,12 +365,12 @@ class ShadTextTheme {
       googleFontBuilder: fontBuilder,
       custom: {
         for (final e in effectiveTextTheme.custom.entries)
-          e.key: GoogleFontTextStyle(
+          e.key: ShadBuilderTextStyle(
             e.value.omitFamilyAndPackage,
             builder: fontBuilder,
           ),
         for (final e in custom.entries)
-          e.key: GoogleFontTextStyle(
+          e.key: ShadBuilderTextStyle(
             e.value.omitFamilyAndPackage,
             builder: fontBuilder,
           ),
@@ -326,28 +378,69 @@ class ShadTextTheme {
     );
   }
 
+  /// The display heading style, larger than [h1].
   final TextStyle h1Large;
+
+  /// The `h1` heading style.
   final TextStyle h1;
+
+  /// The `h2` heading style.
   final TextStyle h2;
+
+  /// The `h3` heading style.
   final TextStyle h3;
+
+  /// The `h4` heading style.
   final TextStyle h4;
+
+  /// The paragraph style.
   final TextStyle p;
+
+  /// The blockquote style.
   final TextStyle blockquote;
+
+  /// The table text style.
   final TextStyle table;
+
+  /// The list item style.
   final TextStyle list;
+
+  /// The lead paragraph style, larger than [p].
   final TextStyle lead;
+
+  /// The large text style.
   final TextStyle large;
+
+  /// The small text style. Labels use it.
   final TextStyle small;
+
+  /// The muted text style, for descriptions and supporting text.
   final TextStyle muted;
+
+  /// Extra styles an app defines, by name.
+  ///
+  /// [lerp], [merge] and [apply] carry them along. Empty by default.
   final Map<String, TextStyle> custom;
 
   /// The font family of the theme.
-  final String family;
+  ///
+  /// Null means the platform font. shad bundles no fonts: set this to a
+  /// family your app declares under `flutter: fonts:`, or build the theme
+  /// with [ShadTextTheme.fromGoogleFont].
+  final String? family;
 
+  /// Whether this theme combines with the one it is merged into.
+  ///
+  /// When false, `other.merge(this)` returns this theme unchanged.
   final bool canMerge;
 
-  final GoogleFontBuilder? googleFontBuilder;
+  /// The builder that [ShadTextTheme.fromGoogleFont] used, or null.
+  final ShadFontBuilder? googleFontBuilder;
 
+  /// Creates a copy of this theme with the given fields replaced.
+  ///
+  /// [package] prefixes the family as `packages/<package>/<family>`, unless it
+  /// is prefixed already.
   ShadTextTheme copyWith({
     TextStyle? h1Large,
     TextStyle? h1,
@@ -364,12 +457,12 @@ class ShadTextTheme {
     TextStyle? muted,
     String? family,
     String? package,
-    GoogleFontBuilder? googleFontBuilder,
+    ShadFontBuilder? googleFontBuilder,
     Map<String, TextStyle>? custom,
   }) {
     final baseFamily = family ?? this.family;
-    late final String effectiveFamily;
-    if (package != null && package.isNotEmpty) {
+    late final String? effectiveFamily;
+    if (baseFamily != null && package != null && package.isNotEmpty) {
       final alreadyPrefixed = baseFamily.startsWith('packages/');
       effectiveFamily =
           !alreadyPrefixed //
@@ -400,6 +493,10 @@ class ShadTextTheme {
     );
   }
 
+  /// Merges [other] into this theme, style by style.
+  ///
+  /// Returns this theme when [other] is null, and [other] when its [canMerge]
+  /// is false. [other]'s family and custom styles take precedence.
   ShadTextTheme merge(ShadTextTheme? other) {
     if (other == null) return this;
     if (!other.canMerge) return other;
@@ -423,6 +520,10 @@ class ShadTextTheme {
     );
   }
 
+  /// Applies the same changes to every style, like [TextStyle.apply].
+  ///
+  /// [displayColor] colours the headings, from [h1Large] to [h4]. [bodyColor]
+  /// colours every other style and the custom styles.
   ShadTextTheme apply({
     String? family,
     List<String>? fontFamilyFallback,
@@ -600,6 +701,7 @@ class ShadTextTheme {
     );
   }
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTextTheme? lerp(
     ShadTextTheme? a,
     ShadTextTheme? b,
@@ -690,3 +792,15 @@ class ShadTextTheme {
     );
   }
 }
+
+/// The old name of [ShadFontBuilder].
+@Deprecated(
+  'Use ShadFontBuilder. Will be removed in the next major version.',
+)
+typedef GoogleFontBuilder = ShadFontBuilder;
+
+/// The old name of [ShadBuilderTextStyle].
+@Deprecated(
+  'Use ShadBuilderTextStyle. Will be removed in the next major version.',
+)
+typedef GoogleFontTextStyle = ShadBuilderTextStyle;

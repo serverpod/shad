@@ -23,7 +23,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadPopover),
         matchesGoldenFile('goldens/popover.png'),
       );

@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Kuqediwe"
+
+dialog:
+  close: "Vala"
+  dismiss: "Cashisa"

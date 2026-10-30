@@ -29,47 +29,45 @@ Text(
 
 Every component that shows text (buttons, badges, cards, alerts, menus, and so on) reads its own style from a component theme instead of these roles directly. Those styles derive from the active style preset (see [styles.md](styles.md)) but can be overridden the same way as any other component theme, see [theming.md](theming.md).
 
-## Custom font family
+## Fonts
 
-By default `shad` uses [Geist](https://vercel.com/font) as the default font family. To change it, add the font to your project, for example under a `/fonts` directory, then declare it in `pubspec.yaml`:
+`shad` bundles no fonts. Text uses the platform font (SF on Apple platforms, Roboto on Android, Segoe UI on Windows) until you choose one.
+
+### Your own font files
+
+Add the font to your project, for example under a `/fonts` directory, then declare it in `pubspec.yaml`:
 
 ```yaml
 flutter:
   fonts:
-    - family: UbuntuMono
+    - family: Inter
       fonts:
-        - asset: fonts/UbuntuMono-Regular.ttf
-        - asset: fonts/UbuntuMono-Italic.ttf
-          style: italic
-        - asset: fonts/UbuntuMono-Bold.ttf
-          weight: 700
-        - asset: fonts/UbuntuMono-BoldItalic.ttf
-          weight: 700
-          style: italic
+        - asset: fonts/Inter[opsz,wght].ttf
 ```
 
-Then pass a `ShadTextTheme` with the new family to `ShadThemeData`:
+Then name the family in a `ShadTextTheme`:
 
 ```dart
 ShadThemeData(
   colorScheme: const ShadZincColorScheme.light(),
-  textTheme: ShadTextTheme(
-    colorScheme: const ShadZincColorScheme.light(),
-    family: 'UbuntuMono',
-  ),
+  textTheme: ShadTextTheme(family: 'Inter'),
 )
 ```
 
-## Google Fonts
+### Google Fonts
 
 Add the [google_fonts](https://pub.dev/packages/google_fonts) package, then build the text theme from one of its fonts:
 
 ```dart
 ShadThemeData(
   colorScheme: const ShadZincColorScheme.light(),
-  textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.poppins),
+  textTheme: ShadTextTheme.fromGoogleFont(GoogleFonts.inter),
 )
 ```
+
+Pass a static tear-off such as `GoogleFonts.inter`. A closure around `GoogleFonts.getFont(name)` must be created once and reused: a new closure on every build makes the theme unequal to itself, and the theme transition restarts on every rebuild.
+
+shadcn/ui's default font is Inter; Geist and Geist Mono give the Vercel look.
 
 ## Custom styles
 

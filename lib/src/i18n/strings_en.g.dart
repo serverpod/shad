@@ -41,6 +41,7 @@ class ShadLocalizationsData with BaseTranslations<ShadLocale, ShadLocalizationsD
 	late final ShadLocalizationsData$empty$en empty = ShadLocalizationsData$empty$en.internal(_root);
 	late final ShadLocalizationsData$command$en command = ShadLocalizationsData$command$en.internal(_root);
 	late final ShadLocalizationsData$pagination$en pagination = ShadLocalizationsData$pagination$en.internal(_root);
+	late final ShadLocalizationsData$dialog$en dialog = ShadLocalizationsData$dialog$en.internal(_root);
 }
 
 // Path: timePicker
@@ -157,6 +158,21 @@ class ShadLocalizationsData$pagination$en {
 	String get page => 'Page';
 }
 
+// Path: dialog
+class ShadLocalizationsData$dialog$en {
+	ShadLocalizationsData$dialog$en.internal(this._root);
+
+	final ShadLocalizationsData _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Close'
+	String get close => 'Close';
+
+	/// en: 'Dismiss'
+	String get dismiss => 'Dismiss';
+}
+
 /// The flat map containing all translations for locale <en>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -182,6 +198,8 @@ extension on ShadLocalizationsData {
 			'pagination.next' => 'Next',
 			'pagination.morePages' => 'More pages',
 			'pagination.page' => 'Page',
+			'dialog.close' => 'Close',
+			'dialog.dismiss' => 'Dismiss',
 			_ => null,
 		};
 	}

@@ -43,6 +43,7 @@ class ShadLocalizationsDataGa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ga datePicker = _ShadLocalizationsData$datePicker$ga._(_root);
 	@override late final _ShadLocalizationsData$input$ga input = _ShadLocalizationsData$input$ga._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ga keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ga._(_root);
+	@override late final _ShadLocalizationsData$dialog$ga dialog = _ShadLocalizationsData$dialog$ga._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ga extends ShadLocalizationsData$ke
 	@override String get done => 'Déanta';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ga extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ga._(ShadLocalizationsDataGa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataGa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Dún';
+	@override String get dismiss => 'Ruaig';
+}
+
 /// The flat map containing all translations for locale <ga>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataGa {
 			'input.paste' => 'Greamaigh',
 			'input.selectAll' => 'Roghnaigh uile',
 			'keyboardToolbar.done' => 'Déanta',
+			'dialog.close' => 'Dún',
+			'dialog.dismiss' => 'Ruaig',
 			_ => null,
 		};
 	}

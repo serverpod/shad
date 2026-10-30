@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Listo"
+
+dialog:
+  close: "Cerrar"
+  dismiss: "Cerrar"

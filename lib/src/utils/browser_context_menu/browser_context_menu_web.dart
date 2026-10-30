@@ -29,6 +29,8 @@ void _onContextMenu(web.Event event) {
   }
 }
 
+/// Stops the browser from showing its own context menu for the next
+/// `contextmenu` event, if that event comes within 500 milliseconds.
 void suppressBrowserContextMenu() {
   _ensureInitialized();
   _armedAt = DateTime.now();

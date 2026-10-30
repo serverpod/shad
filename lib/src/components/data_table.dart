@@ -40,15 +40,20 @@ class _RemainingMinusTrailingFixedExtent extends TableSpanExtent {
 
 /// The direction a [ShadDataTable] is sorted in.
 enum ShadSortDirection {
+  /// Smallest first, in the order the column's `compare` gives.
   ascending,
+
+  /// Largest first, the reverse of [ascending].
   descending;
 
+  /// The opposite direction.
   ShadSortDirection get flipped => this == ascending ? descending : ascending;
 }
 
 /// A column definition for a [ShadDataTable].
 @immutable
 class ShadDataTableColumn<T> {
+  /// Creates a column definition.
   const ShadDataTableColumn({
     required this.id,
     required this.header,
@@ -91,6 +96,7 @@ class ShadDataTableColumn<T> {
   /// Whether the column is shown.
   final bool visible;
 
+  /// Whether the column can be sorted, which is when [compare] is set.
   bool get sortable => compare != null;
 }
 
@@ -99,6 +105,10 @@ class ShadDataTableColumn<T> {
 /// The controller owns the source rows and derives [visibleRows] from them, so
 /// sorting or filtering never mutates what the caller passed in.
 class ShadDataTableController<T> extends ChangeNotifier {
+  /// Creates a controller over [rows].
+  ///
+  /// [sortColumnId] and [sortDirection] set the initial sort, and [filter] the
+  /// initial filter.
   ShadDataTableController({
     List<T> rows = const [],
     this.pageSize,
@@ -133,10 +143,15 @@ class ShadDataTableController<T> extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// The id of the column the rows are sorted by, or null when unsorted.
   String? get sortColumnId => _sortColumnId;
 
+  /// The direction of the current sort.
   ShadSortDirection get sortDirection => _sortDirection;
 
+  /// Returns true for the rows to keep. Null keeps every row.
+  ///
+  /// Setting it goes back to the first page.
   bool Function(T row)? get filter => _filter;
 
   set filter(bool Function(T row)? value) {
@@ -185,6 +200,8 @@ class ShadDataTableController<T> extends ChangeNotifier {
     );
   }
 
+  /// The number of pages after filtering. It is at least 1, and 1 when paging
+  /// is off.
   int get pageCount {
     if (pageSize == null) return 1;
     final total = _filter == null ? _rows.length : _rows.where(_filter!).length;
@@ -231,8 +248,10 @@ class ShadDataTableController<T> extends ChangeNotifier {
   /// of data without depending on `==` over the row objects.
   Set<Object> get selectedKeys => Set.unmodifiable(_selectedKeys);
 
+  /// Whether the row with [key] is selected.
   bool isSelected(Object key) => _selectedKeys.contains(key);
 
+  /// Selects or deselects the row with [key].
   void setSelected(Object key, {required bool selected}) {
     final changed = selected
         ? _selectedKeys.add(key)
@@ -240,15 +259,18 @@ class ShadDataTableController<T> extends ChangeNotifier {
     if (changed) notifyListeners();
   }
 
+  /// Flips the selection of the row with [key].
   void toggleSelected(Object key) =>
       setSelected(key, selected: !_selectedKeys.contains(key));
 
+  /// Adds every key in [keys] to the selection.
   void selectAll(Iterable<Object> keys) {
     final before = _selectedKeys.length;
     _selectedKeys.addAll(keys);
     if (_selectedKeys.length != before) notifyListeners();
   }
 
+  /// Deselects every row.
   void clearSelection() {
     if (_selectedKeys.isEmpty) return;
     _selectedKeys.clear();
@@ -325,7 +347,11 @@ class ShadDataTable<T> extends StatefulWidget {
   /// docs.
   final double? height;
 
+  /// The height of each body row. Defaults to the table theme's cell height,
+  /// then 48.
   final double? rowHeight;
+
+  /// The height of the header row. Defaults like [rowHeight].
   final double? headerHeight;
 
   /// Builds the widget shown when there are no rows after filtering.

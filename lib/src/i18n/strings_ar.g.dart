@@ -43,6 +43,7 @@ class ShadLocalizationsDataAr extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ar datePicker = _ShadLocalizationsData$datePicker$ar._(_root);
 	@override late final _ShadLocalizationsData$input$ar input = _ShadLocalizationsData$input$ar._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ar keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ar._(_root);
+	@override late final _ShadLocalizationsData$dialog$ar dialog = _ShadLocalizationsData$dialog$ar._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ar extends ShadLocalizationsData$ke
 	@override String get done => 'تم';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ar extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ar._(ShadLocalizationsDataAr root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'الإغلاق';
+	@override String get dismiss => 'رفض';
+}
+
 /// The flat map containing all translations for locale <ar>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataAr {
 			'input.paste' => 'لصق',
 			'input.selectAll' => 'تحديد الكل',
 			'keyboardToolbar.done' => 'تم',
+			'dialog.close' => 'الإغلاق',
+			'dialog.dismiss' => 'رفض',
 			_ => null,
 		};
 	}

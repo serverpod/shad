@@ -35,6 +35,11 @@ mixin _$ShadThemeData {
         t,
       )!,
       kbdTheme: ShadKbdTheme.lerp(a.kbdTheme, b.kbdTheme, t)!,
+      scrollAreaTheme: ShadScrollAreaTheme.lerp(
+        a.scrollAreaTheme,
+        b.scrollAreaTheme,
+        t,
+      )!,
       spinnerTheme: ShadSpinnerTheme.lerp(a.spinnerTheme, b.spinnerTheme, t)!,
       toggleTheme: ShadToggleTheme.lerp(a.toggleTheme, b.toggleTheme, t)!,
       outlineToggleTheme: ShadToggleTheme.lerp(
@@ -238,6 +243,7 @@ mixin _$ShadThemeData {
     ShadSidebarTheme? sidebarTheme,
     ShadSkeletonTheme? skeletonTheme,
     ShadKbdTheme? kbdTheme,
+    ShadScrollAreaTheme? scrollAreaTheme,
     ShadSpinnerTheme? spinnerTheme,
     ShadToggleTheme? toggleTheme,
     ShadToggleTheme? outlineToggleTheme,
@@ -307,6 +313,7 @@ mixin _$ShadThemeData {
       sidebarTheme: sidebarTheme ?? _this.sidebarTheme,
       skeletonTheme: skeletonTheme ?? _this.skeletonTheme,
       kbdTheme: kbdTheme ?? _this.kbdTheme,
+      scrollAreaTheme: scrollAreaTheme ?? _this.scrollAreaTheme,
       spinnerTheme: spinnerTheme ?? _this.spinnerTheme,
       toggleTheme: toggleTheme ?? _this.toggleTheme,
       outlineToggleTheme: outlineToggleTheme ?? _this.outlineToggleTheme,
@@ -393,6 +400,7 @@ mixin _$ShadThemeData {
       sidebarTheme: _this.sidebarTheme.merge(other.sidebarTheme),
       skeletonTheme: _this.skeletonTheme.merge(other.skeletonTheme),
       kbdTheme: _this.kbdTheme.merge(other.kbdTheme),
+      scrollAreaTheme: _this.scrollAreaTheme.merge(other.scrollAreaTheme),
       spinnerTheme: _this.spinnerTheme.merge(other.spinnerTheme),
       toggleTheme: _this.toggleTheme.merge(other.toggleTheme),
       outlineToggleTheme: _this.outlineToggleTheme.merge(
@@ -496,6 +504,7 @@ mixin _$ShadThemeData {
         _other.sidebarTheme == _this.sidebarTheme &&
         _other.skeletonTheme == _this.skeletonTheme &&
         _other.kbdTheme == _this.kbdTheme &&
+        _other.scrollAreaTheme == _this.scrollAreaTheme &&
         _other.spinnerTheme == _this.spinnerTheme &&
         _other.toggleTheme == _this.toggleTheme &&
         _other.outlineToggleTheme == _this.outlineToggleTheme &&
@@ -569,6 +578,7 @@ mixin _$ShadThemeData {
       _this.sidebarTheme,
       _this.skeletonTheme,
       _this.kbdTheme,
+      _this.scrollAreaTheme,
       _this.spinnerTheme,
       _this.toggleTheme,
       _this.outlineToggleTheme,

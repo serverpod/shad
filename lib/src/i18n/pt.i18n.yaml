@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Concluído"
+
+dialog:
+  close: "Fechar"
+  dismiss: "Dispensar"

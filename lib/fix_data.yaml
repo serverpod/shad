@@ -1,0 +1,753 @@
+# Data-driven fixes: `dart fix --apply` rewrites code that uses a renamed or
+# removed shad API. See
+# https://github.com/flutter/flutter/blob/main/docs/contributing/Data-driven-Fixes.md
+# Tested by test_fixes/ (`dart fix --compare-to-golden test_fixes`).
+version: 1
+transforms:
+
+  # Types renamed for 1.0. The old names stay as deprecated typedefs.
+  - title: "Rename to 'ShadShadows'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'Shadows'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadShadows'
+  - title: "Rename to 'ShadFontBuilder'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'GoogleFontBuilder'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadFontBuilder'
+  - title: "Rename to 'ShadBuilderTextStyle'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'GoogleFontTextStyle'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadBuilderTextStyle'
+  - title: "Rename to 'ShadAnimEffect'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'AnimateEffect'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadAnimEffect'
+  - title: "Rename to 'ShadFormField'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderField'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadFormField'
+  - title: "Rename to 'ShadFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderFieldState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadFormFieldState'
+  - title: "Rename to 'ShadCheckboxFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderCheckboxState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadCheckboxFormFieldState'
+  - title: "Rename to 'ShadDatePickerFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderDatePickerState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadDatePickerFormFieldState'
+  - title: "Rename to 'ShadDateRangePickerFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderDateRangePickerState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadDateRangePickerFormFieldState'
+  - title: "Rename to 'ShadInputOTPFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderInputOTPState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadInputOTPFormFieldState'
+  - title: "Rename to 'ShadInputFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderInputState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadInputFormFieldState'
+  - title: "Rename to 'ShadRadioGroupFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderRadioGroupState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadRadioGroupFormFieldState'
+  - title: "Rename to 'ShadSelectMultipleFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderSelectMultipleState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSelectMultipleFormFieldState'
+  - title: "Rename to 'ShadSelectFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderSelectState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSelectFormFieldState'
+  - title: "Rename to 'ShadSwitchFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderSwitchState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSwitchFormFieldState'
+  - title: "Rename to 'ShadTextareaFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderTextareaState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadTextareaFormFieldState'
+  - title: "Rename to 'ShadTimePickerFormFieldState'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ShadFormBuilderTimePickerState'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadTimePickerFormFieldState'
+
+  # Typedefs deprecated in 0.x and removed in 1.0.
+  - title: "Rename to 'ShadFocusWidgetBuilder'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'FocusWidgetBuilder'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadFocusWidgetBuilder'
+  - title: "Rename to 'ShadUpperCaseTextInputFormatter'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'UpperCaseTextInputFormatter'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadUpperCaseTextInputFormatter'
+  - title: "Rename to 'ShadLowerCaseTextInputFormatter'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'LowerCaseTextInputFormatter'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadLowerCaseTextInputFormatter'
+  - title: "Rename to 'ShadAnimEffect'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'AnimEffect'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadAnimEffect'
+  - title: "Rename to 'ShadSizeEffect'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'SizeEffect'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSizeEffect'
+  - title: "Rename to 'ShadPaddingEffect'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'PaddingEffect'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadPaddingEffect'
+  - title: "Rename to 'ShadResponsiveWidgetBuilder'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ResponsiveWidgetBuilder'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadResponsiveWidgetBuilder'
+  - title: "Rename to 'ShadPasteFilesCallback'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'PasteFilesCallback'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadPasteFilesCallback'
+  - title: "Rename to 'ShadPasteFilesErrorCallback'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'PasteFilesErrorCallback'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadPasteFilesErrorCallback'
+  - title: "Rename to 'ShadRestorableTabsController'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'RestorableShadTabsController'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadRestorableTabsController'
+  - title: "Rename to 'ShadSheetDragStartHandler'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'SheetDragStartHandler'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSheetDragStartHandler'
+  - title: "Rename to 'ShadSheetDragEndHandler'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'SheetDragEndHandler'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadSheetDragEndHandler'
+  - title: "Rename to 'ShadToValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'ToValueTransformer'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadToValueTransformer'
+  - title: "Rename to 'ShadFromValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      typedef: 'FromValueTransformer'
+    changes:
+      - kind: 'rename'
+        newName: 'ShadFromValueTransformer'
+
+  # Members.
+  - title: "Rename to 'displayDuration'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'duration'
+      inClass: 'ShadToast'
+    changes:
+      - kind: 'rename'
+        newName: 'displayDuration'
+  - title: "Rename to 'fallback'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'placeholder'
+      inClass: 'ShadAvatar'
+    changes:
+      - kind: 'rename'
+        newName: 'fallback'
+  - title: "Rename to 'maxVisibleToasts'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'visibleToastsAmount'
+      inClass: 'ShadSonner'
+    changes:
+      - kind: 'rename'
+        newName: 'maxVisibleToasts'
+  - title: "Rename to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'onLineCountChange'
+      inClass: 'ShadInput'
+    changes:
+      - kind: 'rename'
+        newName: 'onLineCountChanged'
+  - title: "Rename to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'onLineCountChange'
+      inClass: 'ShadTextarea'
+    changes:
+      - kind: 'rename'
+        newName: 'onLineCountChanged'
+  - title: "Rename to 'hideTemporarily'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      method: 'hideTemporarely'
+      inClass: 'ShadSonnerState'
+    changes:
+      - kind: 'rename'
+        newName: 'hideTemporarily'
+  - title: "Rename to 'primary'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constant: 'default_'
+      inEnum: 'ShadToggleVariant'
+    changes:
+      - kind: 'rename'
+        newName: 'primary'
+  - title: "Rename to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'selectedDayButtonOusideMonthVariant'
+      inClass: 'ShadCalendar'
+    changes:
+      - kind: 'rename'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'selectedDayButtonOusideMonthVariant'
+      inClass: 'ShadDatePicker'
+    changes:
+      - kind: 'rename'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'selectedDayButtonOusideMonthVariant'
+      inClass: 'ShadCalendarTheme'
+    changes:
+      - kind: 'rename'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      getter: 'selectedDayButtonOusideMonthVariant'
+      inClass: 'ShadDatePickerTheme'
+    changes:
+      - kind: 'rename'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+
+  # Constructor parameters.
+  - title: "Rename 'duration' to 'displayDuration'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadToast'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'duration'
+        newName: 'displayDuration'
+  - title: "Rename 'duration' to 'displayDuration'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'destructive'
+      inClass: 'ShadToast'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'duration'
+        newName: 'displayDuration'
+  - title: "Rename 'duration' to 'displayDuration'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadToast'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'duration'
+        newName: 'displayDuration'
+  - title: "Rename 'duration' to 'displayDuration'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadToastTheme'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'duration'
+        newName: 'displayDuration'
+  - title: "Rename 'placeholder' to 'fallback'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadAvatar'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'placeholder'
+        newName: 'fallback'
+  - title: "Rename 'visibleToastsAmount' to 'maxVisibleToasts'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadSonner'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'visibleToastsAmount'
+        newName: 'maxVisibleToasts'
+  - title: "Rename 'visibleToastsAmount' to 'maxVisibleToasts'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadSonnerTheme'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'visibleToastsAmount'
+        newName: 'maxVisibleToasts'
+  - title: "Rename 'onLineCountChange' to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadInput'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'onLineCountChange'
+        newName: 'onLineCountChanged'
+  - title: "Rename 'onLineCountChange' to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadTextarea'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'onLineCountChange'
+        newName: 'onLineCountChanged'
+  - title: "Rename 'onLineCountChange' to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadInputFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'onLineCountChange'
+        newName: 'onLineCountChanged'
+  - title: "Rename 'onLineCountChange' to 'onLineCountChanged'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadTextareaFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'onLineCountChange'
+        newName: 'onLineCountChanged'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadCalendar'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'multiple'
+      inClass: 'ShadCalendar'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'range'
+      inClass: 'ShadCalendar'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadCalendar'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDatePicker'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'range'
+      inClass: 'ShadDatePicker'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadDatePicker'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadCalendarTheme'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDatePickerTheme'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDatePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+  - title: "Rename 'selectedDayButtonOusideMonthVariant' to 'selectedDayButtonOutsideMonthVariant'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDateRangePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'selectedDayButtonOusideMonthVariant'
+        newName: 'selectedDayButtonOutsideMonthVariant'
+
+  # valueTransformer was deprecated in 0.44 and removed in 1.0.
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadInputFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadTextareaFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadCheckboxFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadSwitchFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadRadioGroupFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadInputOTPFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDatePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadDateRangePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadSelectFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'withSearch'
+      inClass: 'ShadSelectFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadSelectFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadSelectMultipleFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'withSearch'
+      inClass: 'ShadSelectMultipleFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadSelectMultipleFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: ''
+      inClass: 'ShadTimePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'period'
+      inClass: 'ShadTimePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'
+  - title: "Rename 'valueTransformer' to 'toValueTransformer'"
+    date: 2026-10-29
+    element:
+      uris: ['package:shad/shad.dart']
+      constructor: 'raw'
+      inClass: 'ShadTimePickerFormField'
+    changes:
+      - kind: 'renameParameter'
+        oldName: 'valueTransformer'
+        newName: 'toValueTransformer'

@@ -192,6 +192,7 @@ class ShadPadding extends StatelessWidget {
        _left = null,
        _right = null;
 
+  /// The widget to pad.
   final Widget child;
 
   final double? _left;
@@ -226,6 +227,7 @@ class ShadPadding extends StatelessWidget {
 ///
 /// Equivalent to shadcn's `flex flex-col gap-N`.
 class ShadColumn extends StatelessWidget {
+  /// Creates a column with [spacing] steps between its [children].
   const ShadColumn({
     super.key,
     this.spacing = 0,
@@ -240,12 +242,31 @@ class ShadColumn extends StatelessWidget {
 
   /// The gap between children, in steps.
   final double spacing;
+
+  /// How the children are placed vertically. Defaults to
+  /// [MainAxisAlignment.start].
   final MainAxisAlignment mainAxisAlignment;
+
+  /// How much height the column takes. Defaults to [MainAxisSize.max].
   final MainAxisSize mainAxisSize;
+
+  /// How the children are placed horizontally. Defaults to
+  /// [CrossAxisAlignment.center].
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// The direction used to resolve `start` and `end` in [crossAxisAlignment].
+  /// Defaults to the ambient [Directionality].
   final TextDirection? textDirection;
+
+  /// The order the children are laid out in. Defaults to
+  /// [VerticalDirection.down].
   final VerticalDirection verticalDirection;
+
+  /// The baseline to align to when [crossAxisAlignment] is
+  /// [CrossAxisAlignment.baseline].
   final TextBaseline? textBaseline;
+
+  /// The widgets in the column.
   final List<Widget> children;
 
   @override
@@ -267,6 +288,7 @@ class ShadColumn extends StatelessWidget {
 ///
 /// Equivalent to shadcn's `flex items-center gap-N`.
 class ShadRow extends StatelessWidget {
+  /// Creates a row with [spacing] steps between its [children].
   const ShadRow({
     super.key,
     this.spacing = 0,
@@ -281,12 +303,31 @@ class ShadRow extends StatelessWidget {
 
   /// The gap between children, in steps.
   final double spacing;
+
+  /// How the children are placed horizontally. Defaults to
+  /// [MainAxisAlignment.start].
   final MainAxisAlignment mainAxisAlignment;
+
+  /// How much width the row takes. Defaults to [MainAxisSize.max].
   final MainAxisSize mainAxisSize;
+
+  /// How the children are placed vertically. Defaults to
+  /// [CrossAxisAlignment.center].
   final CrossAxisAlignment crossAxisAlignment;
+
+  /// The order the children are laid out in. Defaults to the ambient
+  /// [Directionality].
   final TextDirection? textDirection;
+
+  /// The direction used to resolve `start` and `end` in [crossAxisAlignment].
+  /// Defaults to [VerticalDirection.down].
   final VerticalDirection verticalDirection;
+
+  /// The baseline to align to when [crossAxisAlignment] is
+  /// [CrossAxisAlignment.baseline].
   final TextBaseline? textBaseline;
+
+  /// The widgets in the row.
   final List<Widget> children;
 
   @override

@@ -3,9 +3,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'default_keyboard_toolbar.g.theme.dart';
 
+/// {@template ShadDefaultKeyboardToolbarTheme}
+/// Theme for the `ShadDefaultKeyboardToolbar` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadDefaultKeyboardToolbarTheme with _$ShadDefaultKeyboardToolbarTheme {
+  /// {@macro ShadDefaultKeyboardToolbarTheme}
   const ShadDefaultKeyboardToolbarTheme({
     bool canMerge = true,
     this.backgroundColor,
@@ -40,6 +44,7 @@ class ShadDefaultKeyboardToolbarTheme with _$ShadDefaultKeyboardToolbarTheme {
   /// {@macro ShadKeyboardToolbar.hideThreshold}
   final double? hideThreshold;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadDefaultKeyboardToolbarTheme? lerp(
     ShadDefaultKeyboardToolbarTheme? a,
     ShadDefaultKeyboardToolbarTheme? b,

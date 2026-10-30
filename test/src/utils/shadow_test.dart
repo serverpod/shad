@@ -52,7 +52,7 @@ void main() {
         ShadShadowDecoration.box(
           color: const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(10),
-          shadows: Shadows.lg,
+          shadows: ShadShadows.lg,
         ),
       );
 
@@ -98,7 +98,7 @@ void main() {
     final pixels = await _render(
       ShadShadowDecoration.box(
         borderRadius: BorderRadius.circular(10),
-        shadows: Shadows.xl2,
+        shadows: ShadShadows.xl2,
       ),
     );
 

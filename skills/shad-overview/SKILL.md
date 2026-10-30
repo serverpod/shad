@@ -45,6 +45,7 @@ The least obvious part of the API: use `ShadPadding` instead of Flutter's `Paddi
 | Data Table | A table with sorting, selection, filtering, and pagination, driven by a controller. | [data-table.md](components/data-table.md) |
 | Date Picker | A date picker with the calendar in a popover. | [date-picker.md](components/date-picker.md) |
 | Dialog | A modal window overlaid on the page, rendering the content underneath inert. | [dialog.md](components/dialog.md) |
+| Dropdown Menu | A menu that opens from a trigger. It flips to stay on screen, scrolls when long, and supports keyboard navigation and type-ahead. | [dropdown-menu.md](components/dropdown-menu.md) |
 | Empty | A placeholder for an empty state: icon, title, description, and actions. | [empty.md](components/empty.md) |
 | Icon Button | A square button holding a single icon. | [icon-button.md](components/icon-button.md) |
 | Input | Displays a form input field. | [input.md](components/input.md) |
@@ -57,6 +58,7 @@ The least obvious part of the API: use `ShadPadding` instead of Flutter's `Paddi
 | Progress | An indicator that shows how much of a task is complete. | [progress.md](components/progress.md) |
 | Radio Group | A set of checkable buttons where only one can be checked at a time. | [radio-group.md](components/radio-group.md) |
 | Resizable | Resizable panel groups and layouts, with nesting and drag handles. | [resizable.md](components/resizable.md) |
+| Scroll Area | Scrolls its content with a thin themed scrollbar. ShadScrollbar puts the same scrollbar on any scrollable. | [scroll-area.md](components/scroll-area.md) |
 | Select | Displays a list of options for the user to pick from, triggered by a button. | [select.md](components/select.md) |
 | Separator | Visually or semantically separates content. | [separator.md](components/separator.md) |
 | Sheet | Extends the dialog to display content that complements the main content of the screen, sliding in from any edge. | [sheet.md](components/sheet.md) |
@@ -65,6 +67,7 @@ The least obvious part of the API: use `ShadPadding` instead of Flutter's `Paddi
 | Slider | An input where the user selects a value from within a given range. | [slider.md](components/slider.md) |
 | Sonner | An opinionated toast stack: notifications collect and expand on hover. | [sonner.md](components/sonner.md) |
 | Spinner | An animated loading indicator. | [spinner.md](components/spinner.md) |
+| Surface | The popover and menu chrome as a widget, for floating UI shad has no component for, and a popover anchored to any rectangle. | [surface.md](components/surface.md) |
 | Switch | A control that allows the user to toggle between checked and not checked. | [switch.md](components/switch.md) |
 | Table | A responsive table component with header and footer rows. | [table.md](components/table.md) |
 | Tabs | A set of layered sections of content displayed one at a time. | [tabs.md](components/tabs.md) |

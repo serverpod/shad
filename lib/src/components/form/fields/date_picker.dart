@@ -13,7 +13,10 @@ import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 import 'package:shad/src/utils/states_controller.dart';
 
-class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
+/// A [ShadDatePicker] that takes part in a `ShadForm`, with a label, a
+/// description and validation.
+class ShadDatePickerFormField extends ShadFormField<DateTime> {
+  /// Creates a form field that picks a single date.
   ShadDatePickerFormField({
     super.id,
     super.key,
@@ -34,11 +37,6 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
     super.focusNode,
     super.validator,
     super.initialValue,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
 
@@ -75,7 +73,10 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
     /// {@macro ShadCalendar.multipleSelected}
     List<DateTime>? multipleSelected,
 
-    /// {@macro ShadCalendar.onMultipleChanged}
+    @Deprecated(
+      'The date picker has no multiple-selection mode, so this is never '
+      'called. Will be removed in the next major version.',
+    )
     ValueChanged<List<DateTime>>? onMultipleChanged,
 
     /// {@macro ShadCalendar.showOutsideDays}
@@ -249,7 +250,12 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
     /// {@macro ShadCalendar.dayButtonOutsideMonthVariant}
     ShadButtonVariant? dayButtonOutsideMonthVariant,
 
-    /// {@macro ShadCalendar.selectedDayButtonOusideMonthVariant}
+    /// {@macro ShadCalendar.selectedDayButtonOutsideMonthVariant}
+    ShadButtonVariant? selectedDayButtonOutsideMonthVariant,
+    @Deprecated(
+      'Use selectedDayButtonOutsideMonthVariant. '
+      'Will be removed in the next major version.',
+    )
     ShadButtonVariant? selectedDayButtonOusideMonthVariant,
 
     // ---
@@ -435,7 +441,7 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
     TextStyle? buttonTextStyle,
   }) : super(
          builder: (state) {
-           state as ShadFormBuilderDatePickerState;
+           state as ShadDatePickerFormFieldState;
            return ShadDatePicker(
              onChanged: state.didChange,
              enabled: state.enabled,
@@ -454,7 +460,6 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
              calendarDecoration: calendarDecoration,
              popoverPadding: popoverPadding,
              multipleSelected: multipleSelected,
-             onMultipleChanged: onMultipleChanged,
              showOutsideDays: showOutsideDays,
              initialMonth: initialMonth,
              formatMonthYear: formatMonthYear,
@@ -512,7 +517,8 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
              gridCrossAxisSpacing: gridCrossAxisSpacing,
              dayButtonOutsideMonthTextStyle: dayButtonOutsideMonthTextStyle,
              dayButtonOutsideMonthVariant: dayButtonOutsideMonthVariant,
-             selectedDayButtonOusideMonthVariant:
+             selectedDayButtonOutsideMonthVariant:
+                 selectedDayButtonOutsideMonthVariant ??
                  selectedDayButtonOusideMonthVariant,
              closeOnTapOutside: closeOnTapOutside,
              anchor: anchor,
@@ -576,9 +582,17 @@ class ShadDatePickerFormField extends ShadFormBuilderField<DateTime> {
        );
 
   @override
-  ShadFormBuilderFieldState<ShadDatePickerFormField, DateTime> createState() =>
-      ShadFormBuilderDatePickerState();
+  ShadFormFieldState<ShadDatePickerFormField, DateTime> createState() =>
+      ShadDatePickerFormFieldState();
 }
 
-class ShadFormBuilderDatePickerState
-    extends ShadFormBuilderFieldState<ShadDatePickerFormField, DateTime> {}
+/// The state of a [ShadDatePickerFormField].
+class ShadDatePickerFormFieldState
+    extends ShadFormFieldState<ShadDatePickerFormField, DateTime> {}
+
+/// The old name of [ShadDatePickerFormFieldState].
+@Deprecated(
+  'Use ShadDatePickerFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderDatePickerState = ShadDatePickerFormFieldState;

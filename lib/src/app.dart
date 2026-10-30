@@ -18,11 +18,26 @@ import 'package:shad/src/theme/theme_scope.dart';
 import 'package:shad/src/utils/mouse_area.dart';
 import 'package:shad/src/utils/mouse_cursor_provider.dart';
 
+// ShadApp.themeMode is typed with Material's ThemeMode. Re-exported so an
+// app that uses only shad never has to import material.dart for it.
+export 'package:flutter/material.dart' show ThemeMode;
+
+/// The kind of app that [ShadApp] builds.
 enum ShadAppType {
+  /// Builds a [WidgetsApp] with shad defaults. Used by [ShadApp.new] and
+  /// [ShadApp.router].
   shadcn,
+
+  /// Calls [ShadApp.appBuilder], so you can build your own app widget, for
+  /// example a `MaterialApp`. Used by [ShadApp.custom].
   custom,
 }
 
+/// The root widget of a shad app.
+///
+/// It provides the [ShadTheme], the Material theme, the localizations, the
+/// toaster and the sonner. Below them it builds a [WidgetsApp], or calls
+/// [appBuilder] for [ShadApp.custom].
 class ShadApp extends StatefulWidget {
   /// Creates a [ShadApp] providing a [ShadTheme].
   const ShadApp({
@@ -64,6 +79,7 @@ class ShadApp extends StatefulWidget {
        routerDelegate = null,
        backButtonDispatcher = null,
        routerConfig = null,
+       // ignore: deprecated_member_use_from_same_package
        cupertinoThemeBuilder = null,
        appBuilder = null,
        type = ShadAppType.shadcn;
@@ -108,21 +124,30 @@ class ShadApp extends StatefulWidget {
        routes = null,
        initialRoute = null,
        pageRouteBuilder = null,
+       // ignore: deprecated_member_use_from_same_package
        cupertinoThemeBuilder = null,
        appBuilder = null,
        type = ShadAppType.shadcn;
 
+  /// Creates a [ShadApp] that provides the theme but calls [appBuilder] to
+  /// build the app widget.
+  ///
+  /// Use it to put a `MaterialApp` or a `CupertinoApp` below the shad theme.
+  /// Return a [ShadAppBuilder] from that app's `builder` to get the toaster
+  /// and the sonner.
   const ShadApp.custom({
     super.key,
     required WidgetBuilder this.appBuilder,
     this.theme,
     this.darkTheme,
     this.themeMode,
+    this.materialThemeBuilder,
   }) : actions = null,
        backButtonDispatcher = null,
        onNavigationNotification = null,
        builder = null,
        color = null,
+       // ignore: deprecated_member_use_from_same_package
        cupertinoThemeBuilder = null,
        debugShowCheckedModeBanner = false,
        home = null,
@@ -131,7 +156,6 @@ class ShadApp extends StatefulWidget {
        localeListResolutionCallback = null,
        localeResolutionCallback = null,
        localizationsDelegates = null,
-       materialThemeBuilder = null,
        navigatorKey = null,
        navigatorObservers = null,
        onGenerateInitialRoutes = null,
@@ -207,10 +231,15 @@ class ShadApp extends StatefulWidget {
   /// The default value is [ThemeMode.system].
   final ThemeMode? themeMode;
 
-  /// {@macro flutter.widgets.widgetsApp.navigatorKey}
+  /// A key for the [Navigator] that the app creates.
+  ///
+  /// Use it to push or pop routes without a [BuildContext].
+  /// See [WidgetsApp.navigatorKey].
   final GlobalKey<NavigatorState>? navigatorKey;
 
-  /// {@macro flutter.widgets.widgetsApp.home}
+  /// The widget shown at the default route (`/`).
+  ///
+  /// See [WidgetsApp.home].
   final Widget? home;
 
   /// The application's top-level routing table.
@@ -220,41 +249,69 @@ class ShadApp extends StatefulWidget {
   /// [WidgetBuilder] is used to construct a [MaterialPageRoute] that performs
   /// an appropriate transition, including [Hero] animations, to the new route.
   ///
-  /// {@macro flutter.widgets.widgetsApp.routes}
+  /// See [WidgetsApp.routes].
   final Map<String, WidgetBuilder>? routes;
 
-  /// {@macro flutter.widgets.widgetsApp.initialRoute}
+  /// The name of the first route to show, when the app starts with a
+  /// [Navigator].
+  ///
+  /// See [WidgetsApp.initialRoute].
   final String? initialRoute;
 
-  /// {@macro flutter.widgets.widgetsApp.onGenerateRoute}
+  /// Builds a route for a named route that is not in [routes].
+  ///
+  /// See [WidgetsApp.onGenerateRoute].
   final RouteFactory? onGenerateRoute;
 
-  /// {@macro flutter.widgets.widgetsApp.onGenerateInitialRoutes}
+  /// Builds the first routes from [initialRoute].
+  ///
+  /// See [WidgetsApp.onGenerateInitialRoutes].
   final InitialRouteListFactory? onGenerateInitialRoutes;
 
-  /// {@macro flutter.widgets.widgetsApp.onUnknownRoute}
+  /// Builds a route when [onGenerateRoute] does not give one.
+  ///
+  /// See [WidgetsApp.onUnknownRoute].
   final RouteFactory? onUnknownRoute;
 
-  /// {@macro flutter.widgets.widgetsApp.onNavigationNotification}
+  /// Called when a [NavigationNotification] reaches the app.
+  ///
+  /// See [WidgetsApp.onNavigationNotification].
   final NotificationListenerCallback<NavigationNotification>?
   onNavigationNotification;
 
-  /// {@macro flutter.widgets.widgetsApp.navigatorObservers}
+  /// The observers for the [Navigator] that the app creates.
+  ///
+  /// See [WidgetsApp.navigatorObservers].
   final List<NavigatorObserver>? navigatorObservers;
 
-  /// {@macro flutter.widgets.widgetsApp.routeInformationProvider}
+  /// Gives route information to the [Router]. Used by [ShadApp.router].
+  ///
+  /// See [WidgetsApp.routeInformationProvider].
   final RouteInformationProvider? routeInformationProvider;
 
-  /// {@macro flutter.widgets.widgetsApp.routeInformationParser}
+  /// Parses route information into a configuration for [routerDelegate].
+  /// Used by [ShadApp.router].
+  ///
+  /// See [WidgetsApp.routeInformationParser].
   final RouteInformationParser<Object>? routeInformationParser;
 
-  /// {@macro flutter.widgets.widgetsApp.routerDelegate}
+  /// Builds the [Navigator] from the route configuration. Used by
+  /// [ShadApp.router].
+  ///
+  /// See [WidgetsApp.routerDelegate].
   final RouterDelegate<Object>? routerDelegate;
 
-  /// {@macro flutter.widgets.widgetsApp.backButtonDispatcher}
+  /// Tells the [Router] when the system back button is pressed. Used by
+  /// [ShadApp.router].
+  ///
+  /// See [WidgetsApp.backButtonDispatcher].
   final BackButtonDispatcher? backButtonDispatcher;
 
-  /// {@macro flutter.widgets.widgetsApp.routerConfig}
+  /// A single object that holds the router delegates, as an alternative to
+  /// [routeInformationProvider], [routeInformationParser], [routerDelegate] and
+  /// [backButtonDispatcher]. Used by [ShadApp.router].
+  ///
+  /// See [WidgetsApp.routerConfig].
   final RouterConfig<Object>? routerConfig;
 
   /// The [PageRoute] generator callback used when the app is navigated to a
@@ -280,39 +337,58 @@ class ShadApp extends StatefulWidget {
   /// ```
   final PageRouteFactory? pageRouteBuilder;
 
-  /// {@macro flutter.widgets.widgetsApp.builder}
+  /// Wraps the widget below the [Navigator] or [Router].
+  ///
+  /// Use it to insert widgets above every route, such as an inherited widget.
+  /// The child it receives already contains the toaster and the sonner.
+  /// See [WidgetsApp.builder].
   final TransitionBuilder? builder;
 
-  /// {@macro flutter.widgets.widgetsApp.title}
+  /// A one-line description of the app, used by the operating system, for
+  /// example in the task switcher.
   ///
   /// This value is passed unmodified to [WidgetsApp.title].
   final String title;
 
-  /// {@macro flutter.widgets.widgetsApp.onGenerateTitle}
+  /// Builds the [title] from a context that has the app's [Localizations].
+  /// Use it to localize the title.
   ///
   /// This value is passed unmodified to [WidgetsApp.onGenerateTitle].
   final GenerateAppTitle? onGenerateTitle;
 
-  /// {@macro flutter.widgets.widgetsApp.color}
+  /// The primary color of the app, used by the operating system, for example
+  /// in the task switcher. Defaults to blue.
+  ///
+  /// See [WidgetsApp.color].
   final Color? color;
 
-  /// {@macro flutter.widgets.widgetsApp.locale}
+  /// The initial locale of the app. When null, the app uses the system locale.
+  ///
+  /// See [WidgetsApp.locale].
   final Locale? locale;
 
-  /// {@macro flutter.widgets.widgetsApp.localizationsDelegates}
+  /// Extra localization delegates for the app.
+  ///
+  /// The app always adds the shad, Material, Cupertino and widgets delegates
+  /// after these. See [WidgetsApp.localizationsDelegates].
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
 
-  /// {@macro flutter.widgets.widgetsApp.localeListResolutionCallback}
+  /// Selects the app locale from the list of system locales.
+  ///
+  /// See [WidgetsApp.localeListResolutionCallback].
   ///
   /// This callback is passed along to the [WidgetsApp] built by this widget.
   final LocaleListResolutionCallback? localeListResolutionCallback;
 
-  /// {@macro flutter.widgets.LocaleResolutionCallback}
+  /// Selects the app locale from one system locale, when
+  /// [localeListResolutionCallback] is null.
   ///
   /// This callback is passed along to the [WidgetsApp] built by this widget.
   final LocaleResolutionCallback? localeResolutionCallback;
 
-  /// {@macro flutter.widgets.widgetsApp.supportedLocales}
+  /// The locales that the app supports. Defaults to `en_US`.
+  ///
+  /// See [WidgetsApp.supportedLocales].
   ///
   /// It is passed along unmodified to the [WidgetsApp] built by this widget.
   final Iterable<Locale> supportedLocales;
@@ -328,10 +404,14 @@ class ShadApp extends StatefulWidget {
   /// reported by the framework.
   final bool showSemanticsDebugger;
 
-  /// {@macro flutter.widgets.widgetsApp.debugShowCheckedModeBanner}
+  /// Shows a "DEBUG" banner in debug mode. Defaults to false.
+  ///
+  /// See [WidgetsApp.debugShowCheckedModeBanner].
   final bool debugShowCheckedModeBanner;
 
-  /// {@macro flutter.widgets.widgetsApp.shortcuts}
+  /// The default keyboard shortcuts for the app. When null, the app uses
+  /// [WidgetsApp.defaultShortcuts].
+  ///
   /// {@tool snippet}
   /// This example shows how to add a single shortcut for
   /// LogicalKeyboardKey.select to the default shortcuts without needing to
@@ -357,10 +437,15 @@ class ShadApp extends StatefulWidget {
   /// }
   /// ```
   /// {@end-tool}
-  /// {@macro flutter.widgets.widgetsApp.shortcuts.seeAlso}
+  ///
+  /// See also:
+  ///
+  ///  * [WidgetsApp.shortcuts], which this value is passed to.
   final Map<ShortcutActivator, Intent>? shortcuts;
 
-  /// {@macro flutter.widgets.widgetsApp.actions}
+  /// The default actions for the app. When null, the app uses
+  /// [WidgetsApp.defaultActions].
+  ///
   /// {@tool snippet}
   /// This example shows how to add a single action handling an
   /// [ActivateAction] to the default actions without needing to
@@ -390,13 +475,20 @@ class ShadApp extends StatefulWidget {
   /// }
   /// ```
   /// {@end-tool}
-  /// {@macro flutter.widgets.widgetsApp.actions.seeAlso}
+  ///
+  /// See also:
+  ///
+  ///  * [WidgetsApp.actions], which this value is passed to.
   final Map<Type, Action<Intent>>? actions;
 
-  /// {@macro flutter.widgets.widgetsApp.restorationScopeId}
+  /// The restoration scope ID for the app's state restoration. When null,
+  /// state restoration is off.
+  ///
+  /// See [WidgetsApp.restorationScopeId].
   final String? restorationScopeId;
 
-  /// {@macro flutter.material.materialApp.scrollBehavior}
+  /// How [Scrollable] widgets in the app behave. Defaults to
+  /// [ShadScrollBehavior].
   ///
   /// See also:
   ///
@@ -414,9 +506,20 @@ class ShadApp extends StatefulWidget {
   /// {@macro ShadAppBuilder.backgroundColor}
   final Color? backgroundColor;
 
+  /// Changes the Material [ThemeData] that the app derives from the shad theme.
+  ///
+  /// It receives the derived theme and returns the theme to use. The
+  /// [ShadApp.custom] constructor does not take it.
   final ThemeData Function(BuildContext context, ThemeData theme)?
   materialThemeBuilder;
 
+  /// Never set by any constructor, so never called. Cupertino widgets take
+  /// their theme from the Material theme ([materialThemeBuilder]).
+  @Deprecated(
+    'No constructor sets this, so it is never called. Customise Cupertino '
+    'widgets through materialThemeBuilder. '
+    'Will be removed in the next major version.',
+  )
   final CupertinoThemeData Function(
     BuildContext context,
     CupertinoThemeData theme,
@@ -528,6 +631,7 @@ class _ShadAppState extends State<ShadApp> {
     return widget.materialThemeBuilder!(context, mTheme);
   }
 
+  @Deprecated('Unused. Will be removed in the next major version.')
   CupertinoThemeData cupertinoTheme(BuildContext context) {
     final themeData = theme(context);
     final cTheme = CupertinoThemeData(
@@ -653,7 +757,8 @@ class _ShadAppState extends State<ShadApp> {
 
 /// Describes how [Scrollable] widgets behave for [ShadApp]s.
 ///
-/// {@macro flutter.widgets.scrollBehavior}
+/// The behavior decides the scroll physics, the scrollbars and the overscroll
+/// indicator for the [Scrollable] widgets below it.
 ///
 /// When using the desktop platform, if the [Scrollable] widget scrolls in the
 /// [Axis.vertical], a [Scrollbar] is applied.
@@ -715,7 +820,10 @@ class ShadAppBuilder extends StatelessWidget {
     this.backgroundColor,
   });
 
+  /// Wraps the child with more widgets. See [WidgetsApp.builder].
   final TransitionBuilder? builder;
+
+  /// The widget below this one, usually the app's [Navigator].
   final Widget? child;
 
   /// {@template ShadAppBuilder.backgroundColor}
@@ -754,83 +862,86 @@ class ShadAppBuilder extends StatelessWidget {
   }
 }
 
+/// Applies [googleFontBuilder] to every style in [textTheme].
+///
+/// Returns [textTheme] unchanged when [googleFontBuilder] is null.
 TextTheme applyGoogleFontToTextTheme(
   TextTheme textTheme, {
-  GoogleFontBuilder? googleFontBuilder,
+  ShadFontBuilder? googleFontBuilder,
 }) {
   if (googleFontBuilder == null) return textTheme;
   return TextTheme(
-    displayLarge: GoogleFontTextStyle(
+    displayLarge: ShadBuilderTextStyle(
       (textTheme.displayLarge ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    displayMedium: GoogleFontTextStyle(
+    displayMedium: ShadBuilderTextStyle(
       (textTheme.displayMedium ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    displaySmall: GoogleFontTextStyle(
+    displaySmall: ShadBuilderTextStyle(
       (textTheme.displaySmall ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    headlineLarge: GoogleFontTextStyle(
+    headlineLarge: ShadBuilderTextStyle(
       (textTheme.headlineLarge ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    headlineMedium: GoogleFontTextStyle(
+    headlineMedium: ShadBuilderTextStyle(
       (textTheme.headlineMedium ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    headlineSmall: GoogleFontTextStyle(
+    headlineSmall: ShadBuilderTextStyle(
       (textTheme.headlineSmall ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    titleLarge: GoogleFontTextStyle(
+    titleLarge: ShadBuilderTextStyle(
       (textTheme.titleLarge ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    titleMedium: GoogleFontTextStyle(
+    titleMedium: ShadBuilderTextStyle(
       (textTheme.titleMedium ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    titleSmall: GoogleFontTextStyle(
+    titleSmall: ShadBuilderTextStyle(
       (textTheme.titleSmall ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    bodyLarge: GoogleFontTextStyle(
+    bodyLarge: ShadBuilderTextStyle(
       (textTheme.bodyLarge ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    bodyMedium: GoogleFontTextStyle(
+    bodyMedium: ShadBuilderTextStyle(
       (textTheme.bodyMedium ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    bodySmall: GoogleFontTextStyle(
+    bodySmall: ShadBuilderTextStyle(
       (textTheme.bodySmall ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    labelLarge: GoogleFontTextStyle(
+    labelLarge: ShadBuilderTextStyle(
       (textTheme.labelLarge ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    labelMedium: GoogleFontTextStyle(
+    labelMedium: ShadBuilderTextStyle(
       (textTheme.labelMedium ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,
     ),
-    labelSmall: GoogleFontTextStyle(
+    labelSmall: ShadBuilderTextStyle(
       (textTheme.labelSmall ?? const TextStyle()).omitFamilyAndPackage,
       builder: googleFontBuilder,
       overrideFamilyWithBuilder: true,

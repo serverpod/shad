@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Terminat"
+
+dialog:
+  close: "Închideți"
+  dismiss: "Închideți"

@@ -43,6 +43,7 @@ class ShadLocalizationsDataNb extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$nb datePicker = _ShadLocalizationsData$datePicker$nb._(_root);
 	@override late final _ShadLocalizationsData$input$nb input = _ShadLocalizationsData$input$nb._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$nb keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$nb._(_root);
+	@override late final _ShadLocalizationsData$dialog$nb dialog = _ShadLocalizationsData$dialog$nb._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$nb extends ShadLocalizationsData$ke
 	@override String get done => 'Ferdig';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$nb extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$nb._(ShadLocalizationsDataNb root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataNb _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Lukk';
+	@override String get dismiss => 'Avvis';
+}
+
 /// The flat map containing all translations for locale <nb>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataNb {
 			'input.paste' => 'Lim inn',
 			'input.selectAll' => 'Merk alt',
 			'keyboardToolbar.done' => 'Ferdig',
+			'dialog.close' => 'Lukk',
+			'dialog.dismiss' => 'Avvis',
 			_ => null,
 		};
 	}

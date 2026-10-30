@@ -1,52 +1,63 @@
 const _daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+/// Calendar helpers on [DateTime].
+///
+/// The returned dates are in local time.
 extension ShadDateTime on DateTime {
+  /// Whether the year [value] is a leap year. It does not read this date.
   bool isLeapYear(int value) =>
       value % 400 == 0 || (value % 4 == 0 && value % 100 != 0);
 
+  /// The number of days in the month of this date.
   int get daysInMonth {
     var result = _daysInMonth[month - 1];
     if (month == 2 && isLeapYear(year)) result++;
     return result;
   }
 
+  /// Whether [other] has the same year, month and day as this date.
   bool isSameDay(DateTime other) =>
       year == other.year && month == other.month && day == other.day;
 
+  /// Whether [other] is on the same day as this date, or this date is after
+  /// [other].
   bool isSameDayOrGreater(DateTime other) => isSameDay(other) || isAfter(other);
 
-  @Deprecated(
-    'Spelling fix: use isSameDayOrGreater. '
-    'This name will be removed in v1.0.0.',
-  )
-  bool isSameDayOrGreatier(DateTime other) => isSameDayOrGreater(other);
-
+  /// Whether [other] is on the same day as this date, or this date is before
+  /// [other].
   bool isSameDayOrLower(DateTime other) => isSameDay(other) || isBefore(other);
 
+  /// This date at midnight.
   DateTime get startOfDay {
     return DateTime(year, month, day);
   }
 
+  /// The last millisecond of this date, at 23:59:59.999.
   DateTime get endOfDay {
     return DateTime(year, month, day, 23, 59, 59, 999);
   }
 
+  /// The Monday of this date's ISO week, at midnight.
   DateTime get startOfWeek {
-    return DateTime(year, month, day - day % 7);
+    return DateTime(year, month, day - (weekday - DateTime.monday));
   }
 
+  /// The Sunday of this date's ISO week, at midnight.
   DateTime get endOfWeek {
-    return DateTime(year, month, day - day % 7 + 6);
+    return DateTime(year, month, day - (weekday - DateTime.monday) + 6);
   }
 
+  /// The first day of the month of this date, at midnight.
   DateTime get startOfMonth {
     return DateTime(year, month);
   }
 
+  /// The last day of the month of this date, at midnight.
   DateTime get endOfMonth {
     return DateTime(year, month, daysInMonth);
   }
 
+  /// The day before this date, at the same time of day.
   DateTime get previousDay {
     if (day == 1) {
       final previousMonth = DateTime(
@@ -82,6 +93,7 @@ extension ShadDateTime on DateTime {
     );
   }
 
+  /// The day after this date, at the same time of day.
   DateTime get nextDay {
     if (day == daysInMonth) {
       final nextMonth = DateTime(year, month + 1);
@@ -128,48 +140,27 @@ extension ShadDateTime on DateTime {
     return DateTime(newDate.year, newDate.month, newDate.day);
   }
 
-  DateTime get previousMonth {
-    if (month == 1) {
-      return DateTime(
-        year - 1,
-        12,
-        day,
-        hour,
-        minute,
-        second,
-        millisecond,
-        microsecond,
-      );
-    }
-    return DateTime(
-      year,
-      month - 1,
-      day,
-      hour,
-      minute,
-      second,
-      millisecond,
-      microsecond,
-    );
-  }
+  /// The same day and time in the previous month.
+  ///
+  /// The day is not clamped: March 31 gives March 3 (or 2 in a leap year),
+  /// because February has no day 31.
+  DateTime get previousMonth => _addMonths(-1);
 
-  DateTime get nextMonth {
-    if (month == 12) {
-      return DateTime(
-        year + 1,
-        1,
-        day,
-        hour,
-        minute,
-        second,
-        millisecond,
-        microsecond,
-      );
-    }
+  /// The same day and time in the next month.
+  ///
+  /// The day is not clamped: January 31 gives March 3 (or 2 in a leap year),
+  /// because February has no day 31.
+  DateTime get nextMonth => _addMonths(1);
+
+  /// This date [months] months away, with the day clamped to the target
+  /// month's length: Jan 31 + 1 month is Feb 28 (29), not Mar 3.
+  DateTime _addMonths(int months) {
+    final first = DateTime(year, month + months);
+    final lastDay = first.daysInMonth;
     return DateTime(
-      year,
-      month + 1,
-      day,
+      first.year,
+      first.month,
+      day > lastDay ? lastDay : day,
       hour,
       minute,
       second,
@@ -215,6 +206,8 @@ extension ShadDateTime on DateTime {
     return offsets[month - 1] + day + (isLeapYear(year) && month > 2 ? 1 : 0);
   }
 
+  /// Returns the day of the month with its English ordinal suffix, for example
+  /// `1st`, `2nd` or `11th`.
   String getOrdinalDay() {
     if (day >= 11 && day <= 13) {
       return '${day}th';

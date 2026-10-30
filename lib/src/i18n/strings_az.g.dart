@@ -43,6 +43,7 @@ class ShadLocalizationsDataAz extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$az datePicker = _ShadLocalizationsData$datePicker$az._(_root);
 	@override late final _ShadLocalizationsData$input$az input = _ShadLocalizationsData$input$az._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$az keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$az._(_root);
+	@override late final _ShadLocalizationsData$dialog$az dialog = _ShadLocalizationsData$dialog$az._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$az extends ShadLocalizationsData$ke
 	@override String get done => 'Hazır';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$az extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$az._(ShadLocalizationsDataAz root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataAz _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Bağlayın';
+	@override String get dismiss => 'İmtina edin';
+}
+
 /// The flat map containing all translations for locale <az>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataAz {
 			'input.paste' => 'Yapışdır',
 			'input.selectAll' => 'Hamısını seç',
 			'keyboardToolbar.done' => 'Hazır',
+			'dialog.close' => 'Bağlayın',
+			'dialog.dismiss' => 'İmtina edin',
 			_ => null,
 		};
 	}

@@ -24,6 +24,7 @@ import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 /// See also:
 /// - [resizeHandleBuilder], for customizing the drag handle
 class ShadTextarea extends StatefulWidget {
+  /// Creates a multi-line text field.
   const ShadTextarea({
     super.key,
     this.initialValue,
@@ -95,12 +96,17 @@ class ShadTextarea extends StatefulWidget {
     this.bottom,
     this.leading,
     this.trailing,
-    this.onLineCountChange,
+    ValueChanged<int>? onLineCountChanged,
+    @Deprecated(
+      'Use onLineCountChanged. Will be removed in the next major version.',
+    )
+    ValueChanged<int>? onLineCountChange,
     this.verticalGap,
     this.useBrowserContextMenu,
     this.onPasteFiles,
     this.onPasteFilesError,
-  }) : enableInteractiveSelection = enableInteractiveSelection ?? !readOnly,
+  }) : onLineCountChanged = onLineCountChanged ?? onLineCountChange,
+       enableInteractiveSelection = enableInteractiveSelection ?? !readOnly,
        assert(
          initialValue == null || controller == null,
          'Either initialValue or controller must be specified',
@@ -454,8 +460,14 @@ class ShadTextarea extends StatefulWidget {
   /// {@macro ShadInput.verticalGap}
   final double? verticalGap;
 
-  /// {@macro ShadInput.onLineCountChange}
-  final ValueChanged<int>? onLineCountChange;
+  /// {@macro ShadInput.onLineCountChanged}
+  final ValueChanged<int>? onLineCountChanged;
+
+  /// The old name of [onLineCountChanged].
+  @Deprecated(
+    'Use onLineCountChanged. Will be removed in the next major version.',
+  )
+  ValueChanged<int>? get onLineCountChange => onLineCountChanged;
 
   /// {@macro ShadInput.useBrowserContextMenu}
   final bool? useBrowserContextMenu;
@@ -680,7 +692,7 @@ class _ShadTextareaState extends State<ShadTextarea> {
             bottom: widget.bottom,
             leading: widget.leading,
             trailing: widget.trailing,
-            onLineCountChange: widget.onLineCountChange,
+            onLineCountChanged: widget.onLineCountChanged,
             verticalGap: widget.verticalGap,
             useBrowserContextMenu: widget.useBrowserContextMenu,
             onPasteFiles: widget.onPasteFiles,
@@ -713,6 +725,7 @@ class _ShadTextareaState extends State<ShadTextarea> {
 /// This widget appears in the bottom-right corner and allows
 /// the user to drag and resize the textarea vertically.
 class ShadDefaultResizeGrip extends StatelessWidget {
+  /// Creates the default resize grip.
   const ShadDefaultResizeGrip({super.key});
 
   @override

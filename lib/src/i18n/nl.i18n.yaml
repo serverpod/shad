@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Gereed"
+
+dialog:
+  close: "Sluiten"
+  dismiss: "Sluiten"

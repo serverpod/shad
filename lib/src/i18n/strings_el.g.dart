@@ -43,6 +43,7 @@ class ShadLocalizationsDataEl extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$el datePicker = _ShadLocalizationsData$datePicker$el._(_root);
 	@override late final _ShadLocalizationsData$input$el input = _ShadLocalizationsData$input$el._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$el keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$el._(_root);
+	@override late final _ShadLocalizationsData$dialog$el dialog = _ShadLocalizationsData$dialog$el._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$el extends ShadLocalizationsData$ke
 	@override String get done => 'Τέλος';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$el extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$el._(ShadLocalizationsDataEl root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataEl _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Κλείσιμο';
+	@override String get dismiss => 'Παράβλεψη';
+}
+
 /// The flat map containing all translations for locale <el>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataEl {
 			'input.paste' => 'Επικόλληση',
 			'input.selectAll' => 'Επιλογή όλων',
 			'keyboardToolbar.done' => 'Τέλος',
+			'dialog.close' => 'Κλείσιμο',
+			'dialog.dismiss' => 'Παράβλεψη',
 			_ => null,
 		};
 	}

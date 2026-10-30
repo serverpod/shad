@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 /// pixels — Tailwind's `tracking-wider` is `0.05em`, so at 18px it is 0.9.
 @immutable
 class ShadTextRole {
+  /// Creates a text role. [uppercase] defaults to false.
   const ShadTextRole({
     required this.fontSize,
     this.fontWeight,
@@ -63,6 +64,7 @@ class ShadTextRole {
   /// Transforms [text] according to [uppercase].
   String applyCase(String text) => uppercase ? text.toUpperCase() : text;
 
+  /// Creates a copy of this role with the given fields replaced.
   ShadTextRole copyWith({
     double? fontSize,
     FontWeight? fontWeight,

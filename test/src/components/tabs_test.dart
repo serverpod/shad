@@ -166,7 +166,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadTabs<String>),
         matchesGoldenFile('goldens/tabs.png'),
       );

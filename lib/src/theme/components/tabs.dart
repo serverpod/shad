@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
@@ -8,9 +9,13 @@ import 'package:theme_extensions_builder_annotation/theme_extensions_builder_ann
 
 part 'tabs.g.theme.dart';
 
+/// {@template ShadTabsTheme}
+/// Theme for the `ShadTabs` widget.
+/// {@endtemplate}
 @themeGen
 @immutable
 class ShadTabsTheme with _$ShadTabsTheme {
+  /// {@macro ShadTabsTheme}
   const ShadTabsTheme({
     bool canMerge = true,
     this.gap,
@@ -87,7 +92,7 @@ class ShadTabsTheme with _$ShadTabsTheme {
   /// {@macro ShadTabs.contentConstraints}
   final BoxConstraints? contentConstraints;
 
-  /// {@macro ShadTabs.expandContent}
+  /// {@macro ShadTab.expand}
   final bool? expandContent;
 
   /// {@macro ShadTab.width}
@@ -165,9 +170,33 @@ class ShadTabsTheme with _$ShadTabsTheme {
   /// {@macro ShadButton.longPressDuration}
   final Duration? longPressDuration;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadTabsTheme? lerp(
     ShadTabsTheme? a,
     ShadTabsTheme? b,
     double t,
   ) => _$ShadTabsTheme.lerp(a, b, t);
+
+  // The generated `==` compares lists by identity, so a theme built with a
+  // non-const list would never equal its own rebuild, and ShadAnimatedTheme
+  // would re-lerp on every frame. Compare the lists by value, then let the
+  // generated `==` compare everything else against a copy that shares them.
+  @override
+  bool operator ==(Object other) =>
+      other is ShadTabsTheme &&
+      listEquals(tabShadows, other.tabShadows) &&
+      listEquals(tabSelectedShadows, other.tabSelectedShadows) &&
+      super ==
+          other.copyWith(
+            tabShadows: tabShadows,
+            tabSelectedShadows: tabSelectedShadows,
+          );
+
+  // Equal themes must hash alike, and the lists may differ in identity.
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    Object.hashAll(tabShadows ?? const []),
+    Object.hashAll(tabSelectedShadows ?? const []),
+  );
 }

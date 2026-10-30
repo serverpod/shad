@@ -20,14 +20,14 @@ typedef ShadFromValueTransformer<T> = T Function(dynamic value);
 /// A customizable form field widget with built-in decoration and state
 /// management.
 ///
-/// The [ShadFormBuilderField] extends [FormField] to provide a styled input
+/// The [ShadFormField] extends [FormField] to provide a styled input
 /// field with a label, error display, and description, integrated with
 /// `ShadTheme` via [ShadInputDecorator]. It supports validation, focus
 /// management, and value transformation, designed for use within a [ShadForm].
 @immutable
-class ShadFormBuilderField<T> extends FormField<T> {
+class ShadFormField<T> extends FormField<T> {
   /// Creates a form field widget with a custom builder and optional properties.
-  ShadFormBuilderField({
+  ShadFormField({
     super.key,
     required Widget Function(FormFieldState<T>) builder,
     super.onSaved,
@@ -43,11 +43,6 @@ class ShadFormBuilderField<T> extends FormField<T> {
     this.error,
     this.description,
     this.onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    this.valueTransformer,
     this.toValueTransformer,
     this.fromValueTransformer,
     this.onReset,
@@ -55,7 +50,7 @@ class ShadFormBuilderField<T> extends FormField<T> {
     super.forceErrorText,
   }) : super(
          builder: (state) {
-           state as ShadFormBuilderFieldState<ShadFormBuilderField<T>, T>;
+           state as ShadFormFieldState<ShadFormField<T>, T>;
            final hasError = state.hasError;
 
            final effectiveError = hasError
@@ -73,68 +68,57 @@ class ShadFormBuilderField<T> extends FormField<T> {
          onReset: onReset,
        );
 
-  /// {@template ShadFormBuilderField.id}
+  /// {@template ShadFormField.id}
   /// An optional identifier used to reference the field within a [ShadForm].
   /// Enables form data retrieval or field manipulation post-submission.
   /// {@endtemplate}
   final String? id;
 
-  /// {@template ShadFormBuilderField.focusNode}
+  /// {@template ShadFormField.focusNode}
   /// The focus node for keyboard navigation and focus handling.
   /// If null, an internal focus node is created by the state.
   /// {@endtemplate}
   final FocusNode? focusNode;
 
-  /// {@template ShadFormBuilderField.label}
+  /// {@template ShadFormField.label}
   /// The label widget displayed above the field.
   /// Typically a [Text] widget, providing context for the field’s purpose.
   /// {@endtemplate}
   final Widget? label;
 
-  /// {@template ShadFormBuilderField.error}
+  /// {@template ShadFormField.error}
   /// A function that returns a custom error widget based on the error text.
   /// Called when validation fails; defaults to a [Text] widget if null.
   /// {@endtemplate}
   final Widget Function(String error)? error;
 
-  /// {@template ShadFormBuilderField.description}
+  /// {@template ShadFormField.description}
   /// The description widget displayed below the field.
   /// Typically a [Text] widget, offering additional field information.
   /// {@endtemplate}
   final Widget? description;
 
-  /// {@template ShadFormBuilderField.onChanged}
+  /// {@template ShadFormField.onChanged}
   /// Callback invoked when the field’s value changes.
   /// Provides the new value, complementing form state updates.
   /// {@endtemplate}
   final ValueChanged<T?>? onChanged;
 
-  /// {@template ShadFormBuilderField.valueTransformer}
-  /// A function to transform the field’s value before saving or processing.
-  /// Useful for formatting or converting data; defaults to null
-  /// (no transformation).
-  /// {@endtemplate}
-  @Deprecated(
-    'Use toValueTransformer instead. This parameter was deprecated '
-    'after v0.44.0 and will be removed in v1.0.0.',
-  )
-  final ShadToValueTransformer<T?>? valueTransformer;
-
-  /// {@template ShadFormBuilderField.toValueTransformer}
+  /// {@template ShadFormField.toValueTransformer}
   /// A function to transform the field’s value before saving or processing.
   /// Useful for formatting or converting data; defaults to null
   /// (no transformation).
   /// {@endtemplate}
   final ShadToValueTransformer<T?>? toValueTransformer;
 
-  /// {@template ShadFormBuilderField.fromValueTransformer}
+  /// {@template ShadFormField.fromValueTransformer}
   /// A function to transform a value into the field’s expected type.
   /// Useful for converting data before populating the field; defaults to null
   /// (no transformation).
   /// {@endtemplate}
   final ShadFromValueTransformer<T?>? fromValueTransformer;
 
-  /// {@template ShadFormBuilderField.onReset}
+  /// {@template ShadFormField.onReset}
   /// Callback invoked when the field is reset to its initial value.
   /// Allows additional reset logic; defaults to null.
   /// {@endtemplate}
@@ -142,31 +126,31 @@ class ShadFormBuilderField<T> extends FormField<T> {
   // ignore: overridden_fields
   final VoidCallback? onReset;
 
-  /// {@template ShadFormBuilderField.decorationBuilder}
+  /// {@template ShadFormField.decorationBuilder}
   /// A function that builds a custom [ShadDecoration] for the field.
   /// Overrides the default decoration; merged with error state if provided.
   /// {@endtemplate}
   final ShadDecoration? Function(BuildContext context)? decorationBuilder;
 
-  /// {@template ShadFormBuilderField.readOnly}
+  /// {@template ShadFormField.readOnly}
   /// Whether the field is read-only.
   /// Defaults to false; if true, prevents editing but allows focus.
   /// {@endtemplate}
   final bool readOnly;
 
   @override
-  ShadFormBuilderFieldState<ShadFormBuilderField<T>, T> createState() =>
-      ShadFormBuilderFieldState<ShadFormBuilderField<T>, T>();
+  ShadFormFieldState<ShadFormField<T>, T> createState() =>
+      ShadFormFieldState<ShadFormField<T>, T>();
 }
 
-/// The state class for [ShadFormBuilderField], managing field state and form
+/// The state class for [ShadFormField], managing field state and form
 /// integration.
 ///
 /// Extends [FormFieldState] to handle value changes, focus, and form
 /// registration.
 /// Provides methods for focusing, ensuring visibility, and updating the parent
 /// form.
-class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
+class ShadFormFieldState<F extends ShadFormField<T>, T>
     extends FormFieldState<T> {
   final String _internalId = UniqueKey().toString();
   FocusNode? _focusNode;
@@ -182,13 +166,17 @@ class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
 
   String? _forceErrorText;
 
+  /// The error shown whatever the validator returns: [FormField.forceErrorText]
+  /// when set, otherwise the text passed to [setError].
   String? get forceErrorText => widget.forceErrorText ?? _forceErrorText;
 
   @override
-  String? get errorText => forceErrorText ?? super.errorText;
+  String? get errorText =>
+      _skipsValidation ? null : forceErrorText ?? super.errorText;
 
   @override
-  bool get hasError => forceErrorText != null || super.hasError;
+  bool get hasError =>
+      !_skipsValidation && (forceErrorText != null || super.hasError);
 
   /// Sets an internal error message that overrides validation errors.
   void setError(String? error) {
@@ -217,6 +205,17 @@ class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
   /// Whether the field is enabled, factoring in parent form state.
   bool get enabled => widget.enabled && (_parentForm?.enabled ?? true);
 
+  /// Whether validation is skipped: the field is disabled and its form was
+  /// built with [ShadForm.skipDisabled].
+  bool get _skipsValidation =>
+      !enabled && (_parentForm?.widget.skipDisabled ?? false);
+
+  @override
+  bool validate() => _skipsValidation || super.validate();
+
+  @override
+  bool get isValid => _skipsValidation || super.isValid;
+
   /// The effective identifier for the field, using the provided ID or an
   /// auto-generated one.
   String get effectiveId => widget.id ?? _internalId;
@@ -233,7 +232,7 @@ class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
   }
 
   @override
-  void didUpdateWidget(covariant ShadFormBuilderField<T> oldWidget) {
+  void didUpdateWidget(covariant ShadFormField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.id != oldWidget.id) {
       if (oldWidget.id != null) {
@@ -306,8 +305,7 @@ class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
 
   /// Registers the field’s value transformer with the provided map.
   void registerToValueTransformer(Map<String, Function> map) {
-    // ignore: deprecated_member_use_from_same_package
-    final fun = widget.valueTransformer ?? widget.toValueTransformer;
+    final fun = widget.toValueTransformer;
     if (fun != null) map[effectiveId] = fun;
   }
 
@@ -318,12 +316,13 @@ class ShadFormBuilderFieldState<F extends ShadFormBuilderField<T>, T>
   }
 }
 
-@Deprecated(
-  'Renamed to ShadToValueTransformer. This name will be removed in v1.0.0.',
-)
-typedef ToValueTransformer<T> = ShadToValueTransformer<T>;
+/// The old name of [ShadFormField].
+@Deprecated('Use ShadFormField. Will be removed in the next major version.')
+typedef ShadFormBuilderField<T> = ShadFormField<T>;
 
+/// The old name of [ShadFormFieldState].
 @Deprecated(
-  'Renamed to ShadFromValueTransformer. This name will be removed in v1.0.0.',
+  'Use ShadFormFieldState. Will be removed in the next major version.',
 )
-typedef FromValueTransformer<T> = ShadFromValueTransformer<T>;
+typedef ShadFormBuilderFieldState<F extends ShadFormField<T>, T> =
+    ShadFormFieldState<F, T>;

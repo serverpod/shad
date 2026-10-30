@@ -43,6 +43,7 @@ class ShadLocalizationsDataUz extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$uz datePicker = _ShadLocalizationsData$datePicker$uz._(_root);
 	@override late final _ShadLocalizationsData$input$uz input = _ShadLocalizationsData$input$uz._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$uz keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$uz._(_root);
+	@override late final _ShadLocalizationsData$dialog$uz dialog = _ShadLocalizationsData$dialog$uz._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$uz extends ShadLocalizationsData$ke
 	@override String get done => 'Tayyor';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$uz extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$uz._(ShadLocalizationsDataUz root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataUz _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Yopish';
+	@override String get dismiss => 'Yopish';
+}
+
 /// The flat map containing all translations for locale <uz>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataUz {
 			'input.paste' => 'Joylashtirish',
 			'input.selectAll' => 'Hammasini tanlash',
 			'keyboardToolbar.done' => 'Tayyor',
+			'dialog.close' => 'Yopish',
+			'dialog.dismiss' => 'Yopish',
 			_ => null,
 		};
 	}

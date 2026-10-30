@@ -453,6 +453,7 @@ class ShadIconButton extends StatelessWidget {
   /// {@macro ShadButton.onFocusChange}
   final ValueChanged<bool>? onFocusChange;
 
+  /// The button theme for [variant], read from [theme].
   ShadButtonTheme buttonTheme(ShadThemeData theme) {
     return switch (variant) {
       ShadButtonVariant.primary => theme.primaryButtonTheme,

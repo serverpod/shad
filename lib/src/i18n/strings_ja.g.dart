@@ -43,6 +43,7 @@ class ShadLocalizationsDataJa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ja datePicker = _ShadLocalizationsData$datePicker$ja._(_root);
 	@override late final _ShadLocalizationsData$input$ja input = _ShadLocalizationsData$input$ja._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ja keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ja._(_root);
+	@override late final _ShadLocalizationsData$dialog$ja dialog = _ShadLocalizationsData$dialog$ja._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ja extends ShadLocalizationsData$ke
 	@override String get done => '完了';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ja extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ja._(ShadLocalizationsDataJa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => '閉じる';
+	@override String get dismiss => '閉じる';
+}
+
 /// The flat map containing all translations for locale <ja>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataJa {
 			'input.paste' => 'ペースト',
 			'input.selectAll' => 'すべて選択',
 			'keyboardToolbar.done' => '完了',
+			'dialog.close' => '閉じる',
+			'dialog.dismiss' => '閉じる',
 			_ => null,
 		};
 	}

@@ -3,10 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// A [GoldenFileComparator] that allows a small fraction of pixels to differ.
 ///
-/// CI runs on Linux while goldens are often regenerated on macOS; bundled
-/// fonts can differ by a fraction of a percent between platforms. Sheet
-/// expandable goldens use [expectLater], so they are the ones that actually
-/// enforce the comparison.
+/// Installed for every test by `test/flutter_test_config.dart`. Goldens are
+/// generated on Linux in CI, and anti-aliasing differs by a fraction of a
+/// percent between platforms and Flutter versions.
 class TolerantGoldenFileComparator extends LocalFileComparator {
   TolerantGoldenFileComparator(
     super.testFile, {

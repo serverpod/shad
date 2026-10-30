@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shad/src/components/button.dart';
+import 'package:shad/src/components/select.dart';
 import 'package:shad/src/raw_components/portal.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 import 'package:shad/src/theme/components/accordion.dart';
@@ -36,6 +37,7 @@ import 'package:shad/src/theme/components/popover.dart';
 import 'package:shad/src/theme/components/progress.dart';
 import 'package:shad/src/theme/components/radio.dart';
 import 'package:shad/src/theme/components/resizable.dart';
+import 'package:shad/src/theme/components/scroll_area.dart';
 import 'package:shad/src/theme/components/select.dart';
 import 'package:shad/src/theme/components/separator.dart';
 import 'package:shad/src/theme/components/sheet.dart';
@@ -64,7 +66,17 @@ import 'package:shad/src/utils/border.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/gesture_detector.dart';
 
+/// The default [ShadThemeVariant]: shadcn/ui's v4 components, rendered in one
+/// of its styles.
+///
+/// Shows focus as an outward ring. `ShadThemeData` uses it unless
+/// `disableSecondaryBorder` is true.
 class ShadDefaultThemeVariant extends ShadThemeVariant {
+  /// Creates the variant.
+  ///
+  /// [style] defaults to [ShadStyleTokens.nova], [spacing] to the 4px step and
+  /// [menuTranslucent] to false. A null [menuColorScheme] makes menus follow
+  /// [colorScheme].
   ShadDefaultThemeVariant({
     required this.colorScheme,
     required this.radius,
@@ -311,6 +323,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     inner: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
   );
 
+  /// The backdrop filter of menu surfaces: a blur and saturation boost when
+  /// [menuTranslucent] is true, otherwise null.
   ImageFilter? get menuFilter => menuTranslucent ? _menuBackdropFilter : null;
 
   /// A menu row's height: its vertical padding around one line of body text.
@@ -352,6 +366,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
           radius: radii.resolve(style.textareaRadius),
         );
 
+  /// The border a single-line field draws: `border-input` on the control
+  /// radius, or a bottom rule only in the underlined styles.
   ShadBorder get fieldBorder => style.underlinedFields
       ? ShadBorder(
           bottom: ShadBorderSide(width: 1, color: colorScheme.input),
@@ -615,6 +631,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     // No hover: the reference only restyles badges rendered as links
     // (`[a]:hover:bg-primary/80`); a plain badge is inert.
     return ShadBadgeTheme(
+      // `[&>svg]:size-3`.
+      iconSize: scaled(style.badgeIconSize),
       backgroundColor: colorScheme.primary,
       hoverBackgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.primaryForeground,
@@ -630,6 +648,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       return _flatBadgeTheme(colorScheme.mutedForeground);
     }
     return ShadBadgeTheme(
+      // `[&>svg]:size-3`.
+      iconSize: scaled(style.badgeIconSize),
       backgroundColor: colorScheme.secondary,
       hoverBackgroundColor: colorScheme.secondary,
       foregroundColor: colorScheme.secondaryForeground,
@@ -647,6 +667,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     // A soft tint like the destructive button:
     // `bg-destructive/10 text-destructive dark:bg-destructive/20`.
     return ShadBadgeTheme(
+      // `[&>svg]:size-3`.
+      iconSize: scaled(style.badgeIconSize),
       backgroundColor: _wash(colorScheme.destructive, _isDark ? .2 : .1),
       hoverBackgroundColor: _wash(colorScheme.destructive, _isDark ? .2 : .1),
       foregroundColor: colorScheme.destructive,
@@ -662,6 +684,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       return _flatBadgeTheme(colorScheme.foreground);
     }
     return ShadBadgeTheme(
+      // `[&>svg]:size-3`.
+      iconSize: scaled(style.badgeIconSize),
       foregroundColor: colorScheme.foreground,
       shape: _badgeShape is StadiumBorder
           ? StadiumBorder(side: BorderSide(color: colorScheme.border))
@@ -682,6 +706,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
 
   /// `sera`'s badges are bare uppercase captions: no fill, border or padding.
   ShadBadgeTheme _flatBadgeTheme(Color foreground) => ShadBadgeTheme(
+    // `[&>svg]:size-3`.
+    iconSize: scaled(style.badgeIconSize),
     foregroundColor: foreground,
     shape: const RoundedRectangleBorder(),
     padding: EdgeInsets.zero,
@@ -889,30 +915,31 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     );
   }
 
+  /// The text theme used when the caller gives none: the [ShadTextDefaultTheme]
+  /// styles in the platform font.
   static ShadTextTheme get defaultTextTheme {
     return ShadTextTheme.custom(
-      h1Large: ShadTextDefaultTheme.h1Large(family: kDefaultFontFamily),
-      h1: ShadTextDefaultTheme.h1(family: kDefaultFontFamily),
-      h2: ShadTextDefaultTheme.h2(family: kDefaultFontFamily),
-      h3: ShadTextDefaultTheme.h3(family: kDefaultFontFamily),
-      h4: ShadTextDefaultTheme.h4(family: kDefaultFontFamily),
-      p: ShadTextDefaultTheme.p(family: kDefaultFontFamily),
-      blockquote: ShadTextDefaultTheme.blockquote(family: kDefaultFontFamily),
-      table: ShadTextDefaultTheme.table(family: kDefaultFontFamily),
-      list: ShadTextDefaultTheme.list(family: kDefaultFontFamily),
-      lead: ShadTextDefaultTheme.lead(family: kDefaultFontFamily),
-      large: ShadTextDefaultTheme.large(family: kDefaultFontFamily),
-      small: ShadTextDefaultTheme.small(family: kDefaultFontFamily),
-      muted: ShadTextDefaultTheme.muted(family: kDefaultFontFamily),
-      family: kDefaultFontFamily,
+      h1Large: ShadTextDefaultTheme.h1Large(),
+      h1: ShadTextDefaultTheme.h1(),
+      h2: ShadTextDefaultTheme.h2(),
+      h3: ShadTextDefaultTheme.h3(),
+      h4: ShadTextDefaultTheme.h4(),
+      p: ShadTextDefaultTheme.p(),
+      blockquote: ShadTextDefaultTheme.blockquote(),
+      table: ShadTextDefaultTheme.table(),
+      list: ShadTextDefaultTheme.list(),
+      lead: ShadTextDefaultTheme.lead(),
+      large: ShadTextDefaultTheme.large(),
+      small: ShadTextDefaultTheme.small(),
+      muted: ShadTextDefaultTheme.muted(),
     );
   }
 
   @override
   ShadSelectTheme selectTheme() {
     return ShadSelectTheme(
-      minWidth: kDefaultSelectMinWidth,
-      maxHeight: kDefaultSelectMaxHeight,
+      minWidth: ShadSelect.defaultMinWidth,
+      maxHeight: ShadSelect.defaultMaxHeight,
       // The reference pins the trigger at the field height
       // (`data-[size=default]:h-9` and friends), which is what keeps it level
       // with inputs and buttons on a row; its `py-2` never gets to act on a
@@ -1319,7 +1346,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       // and the palette behind it stays recognisable in both modes.
       barrierColor: const Color(0x1a000000),
       barrierBlurSigma: 2,
-      shadows: style.dialogShadow.isEmpty ? Shadows.lg : style.dialogShadow,
+      shadows: style.dialogShadow.isEmpty ? ShadShadows.lg : style.dialogShadow,
       padding: EdgeInsets.all(scaled(style.dialogPadding)),
       gap: scaled(style.dialogGap),
       titleStyle: style.title.apply(effectiveTextTheme.large),
@@ -1353,7 +1380,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       // and the palette behind it stays recognisable in both modes.
       barrierColor: const Color(0x1a000000),
       barrierBlurSigma: 2,
-      shadows: style.dialogShadow.isEmpty ? Shadows.lg : style.dialogShadow,
+      shadows: style.dialogShadow.isEmpty ? ShadShadows.lg : style.dialogShadow,
       padding: EdgeInsets.all(scaled(style.dialogPadding)),
       gap: scaled(style.dialogGap),
       titleStyle: style.title.apply(effectiveTextTheme.large),
@@ -1688,7 +1715,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
     dayButtonVariant: ShadButtonVariant.ghost,
     todayButtonVariant: ShadButtonVariant.secondary,
     selectedDayButtonVariant: ShadButtonVariant.primary,
-    selectedDayButtonOusideMonthVariant: ShadButtonVariant.secondary,
+    selectedDayButtonOutsideMonthVariant: ShadButtonVariant.secondary,
     insideRangeDayButtonVariant: ShadButtonVariant.secondary,
     weekdaysTextStyle: textTheme().muted.copyWith(fontSize: 12.8),
     weekdaysTextAlign: TextAlign.center,
@@ -1755,7 +1782,7 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       height: scaled(style.inputHeight),
       style: effectiveTextTheme.muted.copyWith(
         color: colorScheme.foreground,
-        fontFamily: kDefaultFontFamilyMono,
+        fontFeatures: const [FontFeature.tabularFigures()],
       ),
       // shadcn rounds only the outer corners of the strip, at the control
       // radius: `first:rounded-l-md last:rounded-r-md`.
@@ -1895,6 +1922,26 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
   }
 
   @override
+  ShadScrollAreaTheme scrollAreaTheme() {
+    // `.cn-scroll-area-scrollbar` is `w-2.5 p-px border-l border-transparent`:
+    // a 10px track holding a 7px thumb, inset 1px from the edge.
+    // `.cn-scroll-area-thumb` is `rounded-full bg-border`, square in the
+    // styles whose items are square (lyra, sera).
+    return ShadScrollAreaTheme(
+      thickness: scaled(10) - 3,
+      crossAxisMargin: 1,
+      mainAxisMargin: 1,
+      radius: style.itemRadius == ShadRadiusToken.none
+          ? Radius.zero
+          : const Radius.circular(999),
+      thumbColor: colorScheme.border,
+      fadeDuration: const Duration(milliseconds: 300),
+      // Radix's `scrollHideDelay`.
+      timeToFade: const Duration(milliseconds: 600),
+    );
+  }
+
+  @override
   ShadKbdTheme kbdTheme() {
     return ShadKbdTheme(
       backgroundColor: colorScheme.muted,
@@ -1954,6 +2001,8 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       textStyle: style.label.apply(effectiveTextTheme.small),
       gap: scaled(style.buttonGap),
       height: scaled(style.buttonHeight),
+      // `[&_svg:not([class*='size-'])]:size-4`.
+      iconSize: scaled(style.toggleIconSize),
     );
   }
 
@@ -2074,10 +2123,10 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       curve: Curves.linear,
       floatingMargin: EdgeInsets.all(scaled(8)),
       floatingRadius: _sidebarSurfaceRadius,
-      floatingShadows: Shadows.sm,
+      floatingShadows: ShadShadows.sm,
       insetMargin: EdgeInsets.all(scaled(8)),
       insetRadius: _sidebarSurfaceRadius,
-      insetShadows: Shadows.sm,
+      insetShadows: ShadShadows.sm,
     );
   }
 

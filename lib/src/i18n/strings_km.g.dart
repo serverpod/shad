@@ -43,6 +43,7 @@ class ShadLocalizationsDataKm extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$km datePicker = _ShadLocalizationsData$datePicker$km._(_root);
 	@override late final _ShadLocalizationsData$input$km input = _ShadLocalizationsData$input$km._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$km keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$km._(_root);
+	@override late final _ShadLocalizationsData$dialog$km dialog = _ShadLocalizationsData$dialog$km._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$km extends ShadLocalizationsData$ke
 	@override String get done => 'រួចរាល់';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$km extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$km._(ShadLocalizationsDataKm root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataKm _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'បិទ';
+	@override String get dismiss => 'ច្រាន​ចោល';
+}
+
 /// The flat map containing all translations for locale <km>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataKm {
 			'input.paste' => 'បិទភ្ជាប់',
 			'input.selectAll' => 'ជ្រើសរើសទាំងអស់',
 			'keyboardToolbar.done' => 'រួចរាល់',
+			'dialog.close' => 'បិទ',
+			'dialog.dismiss' => 'ច្រាន​ចោល',
 			_ => null,
 		};
 	}

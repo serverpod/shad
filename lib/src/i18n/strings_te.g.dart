@@ -43,6 +43,7 @@ class ShadLocalizationsDataTe extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$te datePicker = _ShadLocalizationsData$datePicker$te._(_root);
 	@override late final _ShadLocalizationsData$input$te input = _ShadLocalizationsData$input$te._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$te keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$te._(_root);
+	@override late final _ShadLocalizationsData$dialog$te dialog = _ShadLocalizationsData$dialog$te._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$te extends ShadLocalizationsData$ke
 	@override String get done => 'పూర్తయింది';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$te extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$te._(ShadLocalizationsDataTe root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataTe _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'మూసివేయండి';
+	@override String get dismiss => 'విస్మరించు';
+}
+
 /// The flat map containing all translations for locale <te>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataTe {
 			'input.paste' => 'అతికించు',
 			'input.selectAll' => 'అన్నీ ఎంచుకో',
 			'keyboardToolbar.done' => 'పూర్తయింది',
+			'dialog.close' => 'మూసివేయండి',
+			'dialog.dismiss' => 'విస్మరించు',
 			_ => null,
 		};
 	}

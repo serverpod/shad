@@ -7,8 +7,10 @@ import 'package:shad/src/utils/provider.dart';
 /// widget.
 @immutable
 class ShadProviderIndex {
+  /// Creates an index holder.
   const ShadProviderIndex(this.index);
 
+  /// The index.
   final int index;
 }
 
@@ -23,7 +25,10 @@ class ShadIndexProvider extends StatelessWidget {
     required this.child,
   });
 
+  /// The index to provide.
   final int index;
+
+  /// The widget below this widget in the tree.
   final Widget child;
 
   @override

@@ -33,7 +33,7 @@ void main() {
         ),
       );
 
-      expect(
+      await expectLater(
         find.byType(ShadSelect<String>),
         matchesGoldenFile('goldens/select.png'),
       );

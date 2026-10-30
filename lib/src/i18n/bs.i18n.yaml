@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Gotovo"
+
+dialog:
+  close: "Zatvori"
+  dismiss: "Odbaci"

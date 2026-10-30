@@ -1,8 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:shad/src/theme/color_scheme/base.dart';
 
+/// The shadcn/ui v3 `green` theme: a neutral base with a green primary.
+///
+/// Kept for compatibility. In v4, apply `ShadAccentScheme.greenLight` or
+/// `ShadAccentScheme.greenDark` to a base colour scheme instead.
 @immutable
 class ShadGreenColorScheme extends ShadColorScheme {
+  /// Creates a [ShadGreenColorScheme] from explicit colours.
+  ///
+  /// Use [ShadGreenColorScheme.light] or [ShadGreenColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadGreenColorScheme({
     required super.background,
     required super.foreground,
@@ -27,6 +35,9 @@ class ShadGreenColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadGreenColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadGreenColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff09090b),
@@ -51,6 +62,9 @@ class ShadGreenColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadGreenColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadGreenColorScheme.dark({
     super.background = const Color(0xff0c0a09),
     super.foreground = const Color(0xfff2f2f2),

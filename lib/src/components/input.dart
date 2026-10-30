@@ -14,16 +14,11 @@ import 'package:shad/src/i18n/localizations_delegate.dart';
 import 'package:shad/src/i18n/strings.g.dart';
 import 'package:shad/src/raw_components/keyboard_toolbar.dart';
 import 'package:shad/src/raw_components/portal.dart';
-import 'package:shad/src/theme/color_scheme/base.dart';
 import 'package:shad/src/theme/components/decorator.dart';
-import 'package:shad/src/theme/data.dart';
-import 'package:shad/src/theme/text_theme/theme.dart';
 import 'package:shad/src/theme/theme.dart';
-import 'package:shad/src/theme/themes/shadows.dart';
 import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 import 'package:shad/src/utils/extensions/text_style.dart';
 import 'package:shad/src/utils/separated_iterable.dart';
-import 'package:shad/src/utils/shadow.dart';
 
 String? _localizedLabel(
   ContextMenuButtonType type,
@@ -127,13 +122,18 @@ class ShadInput extends StatefulWidget {
     this.keyboardToolbarBuilder,
     this.top,
     this.bottom,
-    this.onLineCountChange,
+    ValueChanged<int>? onLineCountChanged,
+    @Deprecated(
+      'Use onLineCountChanged. Will be removed in the next major version.',
+    )
+    ValueChanged<int>? onLineCountChange,
     this.editableTextSize,
     this.verticalGap,
     this.useBrowserContextMenu,
     this.onPasteFiles,
     this.onPasteFilesError,
-  }) : smartDashesType =
+  }) : onLineCountChanged = onLineCountChanged ?? onLineCountChange,
+       smartDashesType =
            smartDashesType ??
            (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
        smartQuotesType =
@@ -488,7 +488,10 @@ class ShadInput extends StatefulWidget {
   /// {@endtemplate}
   final bool scribbleEnabled;
 
-  /// {@macro flutter.widgets.editableText.stylusHandwritingEnabled}
+  /// {@template ShadInput.stylusHandwritingEnabled}
+  /// Whether a stylus can write text into the field on platforms that
+  /// support it. Defaults to [EditableText.defaultStylusHandwritingEnabled].
+  /// {@endtemplate}
   final bool stylusHandwritingEnabled;
 
   /// {@template ShadInput.enableIMEPersonalizedLearning}
@@ -607,16 +610,26 @@ class ShadInput extends StatefulWidget {
   /// {@endtemplate}
   final BoxConstraints? constraints;
 
-  /// {@template ShadInput.onLineCountChange}
+  /// {@template ShadInput.onLineCountChanged}
   /// The callback that is called when the line count changes.
   /// The current line count is passed as an argument.
   ///
   /// **NOTE**: If the input doesn't get an higher height, this callback won't be called.
   /// For example, if the [maxLines] limit has been reached.
   /// {@endtemplate}
-  final ValueChanged<int>? onLineCountChange;
+  final ValueChanged<int>? onLineCountChanged;
 
-  /// {@macro flutter.widgets.editableText.groupId}
+  /// The old name of [onLineCountChanged].
+  @Deprecated(
+    'Use onLineCountChanged. Will be removed in the next major version.',
+  )
+  ValueChanged<int>? get onLineCountChange => onLineCountChanged;
+
+  /// {@template ShadInput.groupId}
+  /// The tap-region group of the field. A tap inside any region of the same
+  /// group does not count as a tap outside the field. Defaults to a group of
+  /// the field's own.
+  /// {@endtemplate}
   final Object? groupId;
 
   /// {@template ShadInput.scrollbarPadding}
@@ -676,14 +689,23 @@ class ShadInput extends StatefulWidget {
   State<ShadInput> createState() => ShadInputState();
 }
 
+/// The state of a [ShadInput].
+///
+/// Reach it with a `GlobalKey<ShadInputState>` to read the controllers and
+/// focus node in use.
 class ShadInputState extends State<ShadInput>
     with RestorationMixin
     implements TextSelectionGestureDetectorBuilderDelegate {
   FocusNode? _focusNode;
 
+  /// The focus node in use: [ShadInput.focusNode] when given, otherwise an
+  /// internal one.
   FocusNode get effectiveFocusNode =>
       widget.focusNode ??
       (_focusNode ??= FocusNode(canRequestFocus: !widget.readOnly));
+
+  /// Whether the field has focus. Updated by [onFocusChange].
+  @protected
   final hasFocus = ValueNotifier(false);
 
   /// Whether the field is empty, i.e. whether the placeholder should show.
@@ -698,6 +720,8 @@ class ShadInputState extends State<ShadInput>
 
   RestorableTextEditingController? _controller;
 
+  /// The text controller in use: [ShadInput.controller] when given, otherwise
+  /// an internal one that supports state restoration.
   TextEditingController get effectiveController =>
       widget.controller ?? _controller!.value;
   bool _showSelectionHandles = false;
@@ -705,9 +729,12 @@ class ShadInputState extends State<ShadInput>
 
   ScrollController? _scrollController;
 
+  /// The scroll controller in use: [ShadInput.scrollController] when given,
+  /// otherwise an internal one.
   ScrollController get effectiveScrollController =>
       widget.scrollController ?? _scrollController!;
 
+  /// Whether the text is longer than the field, so that it can scroll.
   bool get isScrollable {
     if (!effectiveScrollController.hasClients) {
       return false;
@@ -725,10 +752,10 @@ class ShadInputState extends State<ShadInput>
     }
     if (widget.scrollController == null) _scrollController = ScrollController();
     if (widget.onPasteFiles != null && kIsWeb) {
-      addPasteFilesListener(_onPasteFiles);
+      ShadClipboard.addPasteFilesListener(_onPasteFiles);
     }
     if (widget.onPasteFilesError != null && kIsWeb) {
-      addPasteFilesErrorListener(_onPasteFilesError);
+      ShadClipboard.addPasteFilesErrorListener(_onPasteFilesError);
     }
     // NOTE: _syncIsEmptySource is deliberately not called here. For the local
     // controller, `effectiveController` reads RestorableTextEditingController
@@ -768,19 +795,19 @@ class ShadInputState extends State<ShadInput>
 
     if (kIsWeb && widget.onPasteFiles != oldWidget.onPasteFiles) {
       if (oldWidget.onPasteFiles != null) {
-        removePasteFilesListener(_onPasteFiles);
+        ShadClipboard.removePasteFilesListener(_onPasteFiles);
       }
       if (widget.onPasteFiles != null) {
-        addPasteFilesListener(_onPasteFiles);
+        ShadClipboard.addPasteFilesListener(_onPasteFiles);
       }
     }
 
     if (kIsWeb && widget.onPasteFilesError != oldWidget.onPasteFilesError) {
       if (oldWidget.onPasteFilesError != null) {
-        removePasteFilesErrorListener(_onPasteFilesError);
+        ShadClipboard.removePasteFilesErrorListener(_onPasteFilesError);
       }
       if (widget.onPasteFilesError != null) {
-        addPasteFilesErrorListener(_onPasteFilesError);
+        ShadClipboard.addPasteFilesErrorListener(_onPasteFilesError);
       }
     }
 
@@ -801,10 +828,10 @@ class ShadInputState extends State<ShadInput>
     _isEmpty.dispose();
     effectiveFocusNode.removeListener(onFocusChange);
     if (kIsWeb && widget.onPasteFiles != null) {
-      removePasteFilesListener(_onPasteFiles);
+      ShadClipboard.removePasteFilesListener(_onPasteFiles);
     }
     if (kIsWeb && widget.onPasteFilesError != null) {
-      removePasteFilesErrorListener(_onPasteFilesError);
+      ShadClipboard.removePasteFilesErrorListener(_onPasteFilesError);
     }
     if (widget.focusNode == null) effectiveFocusNode.dispose();
     _controller?.dispose();
@@ -827,6 +854,7 @@ class ShadInputState extends State<ShadInput>
     }
   }
 
+  /// Copies the focus node's state into [hasFocus].
   void onFocusChange() {
     hasFocus.value = effectiveFocusNode.hasFocus;
   }
@@ -854,6 +882,7 @@ class ShadInputState extends State<ShadInput>
 
   EditableTextState? get _editableText => editableTextKey.currentState;
 
+  /// Whether [ShadInput.maxLines] is anything other than 1.
   bool get isMultiline => widget.maxLines != 1;
 
   @override
@@ -945,6 +974,9 @@ class ShadInputState extends State<ShadInput>
 
   int? _previousLineCount;
 
+  /// Measures [text] at the field's width and calls
+  /// [ShadInput.onLineCountChanged] when the line count differs from the last
+  /// call.
   void fireOnLineCountChange(
     String text, {
     required BoxConstraints constraints,
@@ -953,7 +985,7 @@ class ShadInputState extends State<ShadInput>
     required double effectiveCursorWidth,
   }) {
     // Do nothing if the callback is null
-    if (widget.onLineCountChange == null) {
+    if (widget.onLineCountChanged == null) {
       return;
     }
     final span = TextSpan(
@@ -982,12 +1014,16 @@ class ShadInputState extends State<ShadInput>
     // Only fire callback if line count changed
     if (numLines != _previousLineCount) {
       _previousLineCount = numLines;
-      widget.onLineCountChange!(
+      widget.onLineCountChanged!(
         numLines,
       );
     }
   }
 
+  /// The default text selection menu: a [ShadContextMenu] with localized cut,
+  /// copy, paste and select-all items.
+  ///
+  /// Items that would do nothing, such as copy with no selection, are left out.
   static Widget defaultContextMenuBuilder(
     BuildContext context,
     EditableTextState editableTextState,
@@ -1269,10 +1305,10 @@ class ShadInputState extends State<ShadInput>
                       ),
                     );
 
-                    if (widget.onLineCountChange != null) {
+                    if (widget.onLineCountChanged != null) {
                       editableText = LayoutBuilder(
                         builder: (context, constraints) {
-                          /// Fire onLineCountChange after the frame is rendered
+                          /// Fire onLineCountChanged after the frame is rendered
                           /// This ensures that the line count is accurate, even for
                           /// resizes that happen outside of text changes.
                           WidgetsBinding.instance.addPostFrameCallback((
@@ -1435,166 +1471,5 @@ class _InputSelectionGestureDetectorBuilder
           Feedback.forLongPress(_state.context);
       }
     }
-  }
-}
-
-/// A simple text-selection toolbar that shows copy/cut/paste buttons styled
-/// with [ShadTheme]. Used as the default [ShadInput.contextMenuBuilder].
-@Deprecated(
-  'Use ShadContextMenu with ShadContextMenuItem instead. '
-  'This widget was deprecated after v0.51.0 and will be removed in v1.0.0.',
-)
-class ShadTextSelectionToolbar extends StatelessWidget {
-  // ignore: deprecated_consistency
-  const ShadTextSelectionToolbar({
-    super.key,
-    required this.anchor,
-    required this.buttonItems,
-    this.backgroundColor,
-    this.border,
-    this.borderRadius,
-    this.shadows,
-  });
-
-  final Offset anchor;
-  final List<ContextMenuButtonItem> buttonItems;
-
-  /// Background color of the toolbar. Defaults to [ShadColorScheme.popover].
-  final Color? backgroundColor;
-
-  /// Border of the toolbar. Defaults to a 1-px border using [ShadColorScheme.border].
-  final BoxBorder? border;
-
-  /// Border radius of the toolbar. Defaults to [ShadThemeData.radius].
-  final BorderRadiusGeometry? borderRadius;
-
-  /// Shadows of the toolbar. Defaults to [Shadows.md].
-  final List<BoxShadow>? shadows;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-    final l = ShadLocalizations.of(context);
-
-    final effectiveBackgroundColor =
-        backgroundColor ?? theme.colorScheme.popover;
-    final effectiveBorder =
-        border ?? Border.all(color: theme.colorScheme.border);
-    final effectiveBorderRadius = borderRadius ?? theme.radius;
-    final effectiveShadows = shadows ?? Shadows.md;
-
-    return CustomSingleChildLayout(
-      delegate: DesktopTextSelectionToolbarLayoutDelegate(anchor: anchor),
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: ShadShadowDecoration.box(
-          color: effectiveBackgroundColor,
-          border: effectiveBorder,
-          borderRadius: effectiveBorderRadius,
-          shadows: effectiveShadows,
-        ),
-        child: IntrinsicWidth(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final item in buttonItems)
-                ShadToolbarButton(
-                  label: Text(
-                    _localizedLabel(item.type, l) ?? item.label ?? '',
-                  ),
-                  onPressed: item.onPressed,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A button used inside [ShadTextSelectionToolbar].
-///
-/// Displays a [label] widget with an optional hover highlight and
-/// custom styling. The [label] is wrapped in a [DefaultTextStyle] so
-/// plain [Text] widgets pick up the effective style automatically.
-@Deprecated(
-  'Use ShadContextMenuItem instead. '
-  'This widget was deprecated after v0.51.0 and will be removed in v1.0.0.',
-)
-class ShadToolbarButton extends StatefulWidget {
-  // ignore: deprecated_consistency
-  const ShadToolbarButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-    this.padding,
-    this.color,
-    this.hoverColor,
-    this.textStyle,
-  });
-
-  /// The content of the button.
-  final Widget label;
-
-  /// Called when the button is pressed.
-  final VoidCallback? onPressed;
-
-  /// Padding around the button content.
-  /// Defaults to `EdgeInsets.symmetric(horizontal: 8, vertical: 6)`.
-  final EdgeInsetsGeometry? padding;
-
-  /// Background color of the button. Defaults to transparent.
-  final Color? color;
-
-  /// Background color of the button when hovered.
-  /// Defaults to [ShadColorScheme.accent].
-  final Color? hoverColor;
-
-  /// Text style applied to the [label] via [DefaultTextStyle].
-  /// Defaults to [ShadTextTheme.small] with normal weight and
-  /// [ShadColorScheme.foreground] color.
-  final TextStyle? textStyle;
-
-  @override
-  State<ShadToolbarButton> createState() => _ShadToolbarButtonState();
-}
-
-// ignore: deprecated_member_use_from_same_package
-class _ShadToolbarButtonState extends State<ShadToolbarButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
-    final effectiveTextStyle =
-        widget.textStyle ??
-        theme.textTheme.small.copyWith(
-          fontWeight: FontWeight.normal,
-          color: theme.colorScheme.foreground,
-        );
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) {
-          widget.onPressed?.call();
-        },
-        child: Container(
-          padding:
-              widget.padding ??
-              const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          color: _hovered
-              ? (widget.hoverColor ?? theme.colorScheme.accent)
-              : widget.color,
-          child: DefaultTextStyle(
-            style: effectiveTextStyle,
-            child: widget.label,
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -44,6 +44,7 @@ class ShadSkeletonTheme with _$ShadSkeletonTheme {
   /// {@macro ShadSkeleton.animate}
   final bool? animate;
 
+  /// Linearly interpolates between [a] and [b] by [t].
   static ShadSkeletonTheme? lerp(
     ShadSkeletonTheme? a,
     ShadSkeletonTheme? b,

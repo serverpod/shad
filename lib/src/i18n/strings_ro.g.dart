@@ -43,6 +43,7 @@ class ShadLocalizationsDataRo extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ro datePicker = _ShadLocalizationsData$datePicker$ro._(_root);
 	@override late final _ShadLocalizationsData$input$ro input = _ShadLocalizationsData$input$ro._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ro keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ro._(_root);
+	@override late final _ShadLocalizationsData$dialog$ro dialog = _ShadLocalizationsData$dialog$ro._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ro extends ShadLocalizationsData$ke
 	@override String get done => 'Terminat';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ro extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ro._(ShadLocalizationsDataRo root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataRo _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Închideți';
+	@override String get dismiss => 'Închideți';
+}
+
 /// The flat map containing all translations for locale <ro>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataRo {
 			'input.paste' => 'Lipește',
 			'input.selectAll' => 'Selectează tot',
 			'keyboardToolbar.done' => 'Terminat',
+			'dialog.close' => 'Închideți',
+			'dialog.dismiss' => 'Închideți',
 			_ => null,
 		};
 	}

@@ -9,7 +9,10 @@ import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/utils/clipboard/clipboard_service.dart';
 
-class ShadInputFormField extends ShadFormBuilderField<String> {
+/// A [ShadInput] that takes part in a `ShadForm`, with a label, a description
+/// and validation.
+class ShadInputFormField extends ShadFormField<String> {
+  /// Creates a text input form field.
   ShadInputFormField({
     super.id,
     super.key,
@@ -25,11 +28,6 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
     super.error,
     super.description,
     void Function(String)? onChanged,
-    @Deprecated(
-      'Use toValueTransformer instead. This parameter was deprecated '
-      'after v0.44.0 and will be removed in v1.0.0.',
-    )
-    super.valueTransformer,
     super.toValueTransformer,
     super.fromValueTransformer,
     super.onReset,
@@ -96,7 +94,7 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
     /// {@macro ShadInput.expands}
     bool expands = false,
 
-    /// {@macro ShadFormBuilderField.readOnly}
+    /// {@macro ShadFormField.readOnly}
     super.readOnly,
 
     /// {@macro ShadInput.showCursor}
@@ -234,7 +232,7 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
     /// {@macro ShadInput.constraints}
     BoxConstraints? constraints,
 
-    /// {@macro flutter.widgets.editableText.groupId}
+    /// {@macro ShadInput.groupId}
     Object? groupId,
 
     /// {@macro ShadKeyboardToolbar.toolbarBuilder}
@@ -246,7 +244,11 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
     /// {@macro ShadInput.bottom}
     Widget? bottom,
 
-    /// {@macro ShadInput.onLineCountChange}
+    /// {@macro ShadInput.onLineCountChanged}
+    ValueChanged<int>? onLineCountChanged,
+    @Deprecated(
+      'Use onLineCountChanged. Will be removed in the next major version.',
+    )
     ValueChanged<int>? onLineCountChange,
 
     /// {@macro ShadInput.editableTextSize}
@@ -269,7 +271,7 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
                      const ShadDecoration())
                  .merge(decoration),
          builder: (state) {
-           state as ShadFormBuilderInputState;
+           state as ShadInputFormFieldState;
            return ShadInput(
              key: state.inputKey,
              controller: state.controller,
@@ -346,7 +348,7 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
              keyboardToolbarBuilder: keyboardToolbarBuilder,
              top: top,
              bottom: bottom,
-             onLineCountChange: onLineCountChange,
+             onLineCountChanged: onLineCountChanged ?? onLineCountChange,
              editableTextSize: editableTextSize,
              useBrowserContextMenu: useBrowserContextMenu,
              onPasteFiles: onPasteFiles,
@@ -355,18 +357,24 @@ class ShadInputFormField extends ShadFormBuilderField<String> {
          },
        );
 
+  /// Controls the text. When null, the field creates its own controller.
   final TextEditingController? controller;
 
   @override
-  ShadFormBuilderFieldState<ShadInputFormField, String> createState() =>
-      ShadFormBuilderInputState();
+  ShadFormFieldState<ShadInputFormField, String> createState() =>
+      ShadInputFormFieldState();
 }
 
-class ShadFormBuilderInputState
-    extends ShadFormBuilderFieldState<ShadInputFormField, String> {
+/// The state of a [ShadInputFormField].
+class ShadInputFormFieldState
+    extends ShadFormFieldState<ShadInputFormField, String> {
   TextEditingController? _controller;
 
+  /// The controller in use: [ShadInputFormField.controller] when given,
+  /// otherwise an internal one.
   TextEditingController get controller => widget.controller ?? _controller!;
+
+  /// The key of the inner [ShadInput], for reaching its [ShadInputState].
   final GlobalKey<ShadInputState> inputKey = GlobalKey<ShadInputState>();
 
   @override
@@ -389,12 +397,17 @@ class ShadFormBuilderInputState
   @override
   void didUpdateWidget(covariant ShadInputFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller == null && widget.controller != null) {
+    if (widget.controller == oldWidget.controller) return;
+    // Move the listener with the controller. It used to stay on the old one,
+    // and dispose() then removed it from the wrong controller.
+    (oldWidget.controller ?? _controller)?.removeListener(onControllerChanged);
+    if (widget.controller != null) {
       _controller?.dispose();
-    }
-    if (oldWidget.controller != null && widget.controller == null) {
+      _controller = null;
+    } else {
       _controller = TextEditingController(text: value);
     }
+    controller.addListener(onControllerChanged);
   }
 
   @override
@@ -411,9 +424,17 @@ class ShadFormBuilderInputState
     super.dispose();
   }
 
+  /// Copies the controller's text into the field's value.
   void onControllerChanged() {
     if (controller.text != value) {
       didChange(controller.text);
     }
   }
 }
+
+/// The old name of [ShadInputFormFieldState].
+@Deprecated(
+  'Use ShadInputFormFieldState. '
+  'Will be removed in the next major version.',
+)
+typedef ShadFormBuilderInputState = ShadInputFormFieldState;

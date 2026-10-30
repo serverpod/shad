@@ -43,6 +43,7 @@ class ShadLocalizationsDataGsw extends ShadLocalizationsData with BaseTranslatio
 	@override late final _ShadLocalizationsData$datePicker$gsw datePicker = _ShadLocalizationsData$datePicker$gsw._(_root);
 	@override late final _ShadLocalizationsData$input$gsw input = _ShadLocalizationsData$input$gsw._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$gsw keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$gsw._(_root);
+	@override late final _ShadLocalizationsData$dialog$gsw dialog = _ShadLocalizationsData$dialog$gsw._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$gsw extends ShadLocalizationsData$k
 	@override String get done => 'Fertig';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$gsw extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$gsw._(ShadLocalizationsDataGsw root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataGsw _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Schließen';
+	@override String get dismiss => 'Schließen';
+}
+
 /// The flat map containing all translations for locale <gsw>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataGsw {
 			'input.paste' => 'Iifüege',
 			'input.selectAll' => 'Alles uswähle',
 			'keyboardToolbar.done' => 'Fertig',
+			'dialog.close' => 'Schließen',
+			'dialog.dismiss' => 'Schließen',
 			_ => null,
 		};
 	}

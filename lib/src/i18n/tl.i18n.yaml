@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "Tapos na"
+
+dialog:
+  close: "Isara"
+  dismiss: "I-dismiss"

@@ -1,19 +1,20 @@
 import 'dart:ui';
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shad/src/components/surface.dart';
 import 'package:shad/src/raw_components/portal.dart';
 import 'package:shad/src/theme/components/decorator.dart';
 import 'package:shad/src/theme/theme.dart';
 import 'package:shad/src/theme/themes/shadows.dart';
 import 'package:shad/src/utils/animate.dart';
 import 'package:shad/src/utils/border.dart';
+import 'package:shad/src/utils/dismiss_shortcut.dart';
 import 'package:shad/src/utils/mouse_area.dart';
-import 'package:shad/src/utils/shadow.dart';
 
 /// Controls the visibility of a [ShadPopover].
 class ShadPopoverController extends ChangeNotifier {
+  /// Creates a controller. The popover starts hidden unless [isOpen] is true.
   ShadPopoverController({bool isOpen = false}) : _isOpen = isOpen;
 
   bool _isOpen = false;
@@ -35,6 +36,7 @@ class ShadPopoverController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Shows the popover when [open] is true and hides it otherwise.
   void setOpen(bool open) {
     if (_isOpen == open) return;
     _isOpen = open;
@@ -45,7 +47,11 @@ class ShadPopoverController extends ChangeNotifier {
   void toggle() => _isOpen ? hide() : show();
 }
 
+/// Shows a floating panel next to its [child], shadcn/ui's `Popover`.
+///
+/// Control the visibility with a [ShadPopoverController] or with [visible].
 class ShadPopover extends StatefulWidget {
+  /// Creates a popover that shows [popover] next to [child].
   const ShadPopover({
     super.key,
     required this.child,
@@ -117,7 +123,7 @@ class ShadPopover extends StatefulWidget {
 
   /// {@template ShadPopover.shadows}
   /// The shadows applied to the [popover], defaults to
-  /// [Shadows.md].
+  /// [ShadShadows.md].
   /// {@endtemplate}
   final List<BoxShadow>? shadows;
 
@@ -316,63 +322,16 @@ class _ShadPopoverState extends State<ShadPopover>
 
     final effectiveFilter = widget.filter ?? theme.popoverTheme.filter;
 
-    final effectiveFilterRadius =
-        effectiveDecoration.border?.radius ?? BorderRadius.zero;
-
     Widget popover = ShadMouseArea(
       groupId: widget.areaGroupId,
-      child: ShadDecorator(
+      child: ShadSurfacePainter(
         decoration: effectiveDecoration,
-        child: Padding(
-          padding: effectivePadding,
-          child: IconTheme.merge(
-            // Icons follow the popover's own foreground. They used to inherit
-            // the page's, which is the wrong colour the moment the menu
-            // surface differs from the page — an inverted menu rendered its
-            // icons in the surface colour, i.e. invisibly.
-            data: IconThemeData(color: theme.colorScheme.popoverForeground),
-            child: DefaultTextStyle(
-              style:
-                  (widget.textStyle ??
-                          theme.popoverTheme.textStyle ??
-                          const TextStyle())
-                      .copyWith(color: theme.colorScheme.popoverForeground),
-              // Deliberately not centred. A popover is mostly a menu or a
-              // form, and shadcn/ui aligns that content to the start; forcing
-              // TextAlign.center centred every select option and menu item.
-              // Callers wanting centred content can wrap it themselves.
-              textAlign: TextAlign.start,
-              child: Builder(
-                builder: widget.popover,
-              ),
-            ),
-          ),
-        ),
+        padding: effectivePadding,
+        filter: effectiveFilter,
+        textStyle: widget.textStyle ?? theme.popoverTheme.textStyle,
+        child: Builder(builder: widget.popover),
       ),
     );
-
-    if (effectiveFilter != null) {
-      popover = ClipRRect(
-        borderRadius: effectiveFilterRadius,
-        child: BackdropFilter(
-          filter: effectiveFilter,
-          child: popover,
-        ),
-      );
-      // The clip that bounds the backdrop filter also cuts off the surface's
-      // own drop shadow (painted outside the box), so it is re-painted
-      // outside the clip.
-      final shadows = effectiveDecoration.shadows;
-      if (shadows != null && shadows.isNotEmpty) {
-        popover = DecoratedBox(
-          decoration: ShadShadowDecoration.box(
-            borderRadius: effectiveFilterRadius,
-            shadows: shadows,
-          ),
-          child: popover,
-        );
-      }
-    }
 
     if (effectiveEffects.isNotEmpty) {
       popover = ShadAnimate(
@@ -392,12 +351,9 @@ class _ShadPopoverState extends State<ShadPopover>
       );
     }
 
-    Widget child = CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.escape): () {
-          controller.hide();
-        },
-      },
+    Widget child = ShadDismissShortcut(
+      isActive: () => controller.isOpen,
+      onDismiss: controller.hide,
       child: ValueListenableBuilder(
         valueListenable: _portalVisible,
         builder: (context, visible, _) {

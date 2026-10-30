@@ -43,6 +43,7 @@ class ShadLocalizationsDataKa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$ka datePicker = _ShadLocalizationsData$datePicker$ka._(_root);
 	@override late final _ShadLocalizationsData$input$ka input = _ShadLocalizationsData$input$ka._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$ka keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$ka._(_root);
+	@override late final _ShadLocalizationsData$dialog$ka dialog = _ShadLocalizationsData$dialog$ka._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$ka extends ShadLocalizationsData$ke
 	@override String get done => 'მზადაა';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$ka extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$ka._(ShadLocalizationsDataKa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataKa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'დახურვა';
+	@override String get dismiss => 'დახურვა';
+}
+
 /// The flat map containing all translations for locale <ka>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataKa {
 			'input.paste' => 'ჩასმა',
 			'input.selectAll' => 'ყველაფრის მონიშვნა',
 			'keyboardToolbar.done' => 'მზადაა',
+			'dialog.close' => 'დახურვა',
+			'dialog.dismiss' => 'დახურვა',
 			_ => null,
 		};
 	}

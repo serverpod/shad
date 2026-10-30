@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "འགྲུབ།"
+
+dialog:
+  close: "སྒོ་རྒྱག་པ།"
+  dismiss: "འདོར་བ།"

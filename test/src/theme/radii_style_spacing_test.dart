@@ -333,11 +333,11 @@ void main() {
     });
 
     test('shadows differ per style', () {
-      expect(ShadStyleTokens.vega.cardShadow, Shadows.xs);
-      expect(ShadStyleTokens.nova.cardShadow, Shadows.none);
-      expect(ShadStyleTokens.luma.cardShadow, Shadows.md);
-      expect(ShadStyleTokens.maia.popoverShadow, Shadows.xl2);
-      expect(ShadStyleTokens.rhea.dialogShadow, Shadows.xl);
+      expect(ShadStyleTokens.vega.cardShadow, ShadShadows.xs);
+      expect(ShadStyleTokens.nova.cardShadow, ShadShadows.none);
+      expect(ShadStyleTokens.luma.cardShadow, ShadShadows.md);
+      expect(ShadStyleTokens.maia.popoverShadow, ShadShadows.xl2);
+      expect(ShadStyleTokens.rhea.dialogShadow, ShadShadows.xl);
     });
 
     test('copyWith and equality', () {

@@ -18,16 +18,20 @@ import 'package:shad/src/utils/states_controller.dart';
 /// changes.
 class ShadTabsController<T> extends ChangeNotifier {
   /// Creates a [ShadTabsController] with an initial selected value.
-  ShadTabsController({required T value}) : selected = value;
+  ShadTabsController({required T value}) : _selected = value;
 
-  T selected;
+  T _selected;
+
+  /// The selected tab's value. Setting it selects that tab, as [select] does.
+  T get selected => _selected;
+  set selected(T value) => select(value);
 
   /// Selects the given [value].
   ///
   /// Returns true if the value was changed, false otherwise.
   bool select(T value) {
-    if (value == selected) return false;
-    selected = value;
+    if (value == _selected) return false;
+    _selected = value;
     notifyListeners();
     return true;
   }
@@ -46,6 +50,10 @@ class ShadRestorableTabsController<T>
   /// Creates a [ShadRestorableTabsController] from a given value.
   ShadRestorableTabsController.fromValue(T value) : selected = value;
 
+  /// The value used to create the default controller and saved for state
+  /// restoration.
+  ///
+  /// It is the initial value. Selecting another tab does not change it.
   T selected;
 
   @override
@@ -60,12 +68,18 @@ class ShadRestorableTabsController<T>
 
   @override
   Object? toPrimitives() {
-    return selected;
+    // The live selection; `selected` is only the initial value, so
+    // restoration always brought back the first tab.
+    return value.selected;
   }
 }
 
 /// {@template ShadTabs}
 /// A widget that displays a horizontal series of tabs with associated content.
+///
+/// When no [ShadTab] has `content`, only the tab list is shown, with no gap
+/// below it. That is the standalone tabs list, or segmented control, that
+/// switches something elsewhere on the page through `onChanged`.
 ///
 /// Supports scrollable and non-scrollable layouts, custom styling, and state
 /// management.
@@ -199,22 +213,30 @@ class ShadTabs<T> extends StatefulWidget implements PreferredSizeWidget {
   }
 }
 
+/// The state of a [ShadTabs].
 class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
   late List<GlobalKey> _tabKeys;
 
+  /// The values of the tabs, in the order of [ShadTabs.tabs].
+  @protected
   late List<T> orderedValues;
 
   ShadRestorableTabsController<T>? _controller;
 
+  /// The controller in use: [ShadTabs.controller], or an internal restorable
+  /// one when that is null.
   ShadTabsController<T> get controller =>
       widget.controller ?? _controller!.value;
 
+  /// Scrolls the tab list when [scrollable] is true.
+  @protected
   late final scrollController = ScrollController();
 
   /// Whether the tabs share the full width of the bar.
   bool expandTabs(BuildContext context) =>
       widget.expandTabs ?? ShadTheme.of(context).tabsTheme.expandTabs ?? false;
 
+  /// Whether the tab list scrolls horizontally. Defaults to false.
   bool get scrollable => widget.scrollable ?? false;
 
   @override
@@ -360,12 +382,18 @@ class ShadTabsState<T> extends State<ShadTabs<T>> with RestorationMixin {
       child: ListenableBuilder(
         listenable: controller,
         builder: (context, _) {
+          final decoratedBar = ShadDecorator(
+            decoration: effectiveDecoration,
+            child: tabBar,
+          );
+          // With no panels, ShadTabs is just its list: shadcn's TabsList on
+          // its own, the segmented control of a toolbar or settings row.
+          if (widget.tabs.every((tab) => tab.content == null)) {
+            return decoratedBar;
+          }
           return Column(
             children: [
-              ShadDecorator(
-                decoration: effectiveDecoration,
-                child: tabBar,
-              ),
+              decoratedBar,
               SizedBox(height: effectiveGap),
               ...List<Widget>.generate(widget.tabs.length, (int index) {
                 final tab = widget.tabs[index];
@@ -603,14 +631,14 @@ class ShadTab<T> extends StatefulWidget implements PreferredSizeWidget {
   /// {@template ShadTab.shadows}
   /// Shadows for the tab when unselected.
   ///
-  /// Defaults to small shadows ([Shadows.sm]).
+  /// Defaults to small shadows ([ShadShadows.sm]).
   /// {@endtemplate}
   final List<BoxShadow>? shadows;
 
   /// {@template ShadTab.selectedShadows}
   /// Shadows for the tab when selected.
   ///
-  /// Defaults to small shadows ([Shadows.sm]).
+  /// Defaults to small shadows ([ShadShadows.sm]).
   /// {@endtemplate}
   final List<BoxShadow>? selectedShadows;
 
@@ -850,7 +878,9 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
 
     final effectiveShadows = widget.shadows ?? tabsTheme.tabShadows;
     final effectiveSelectedShadows =
-        widget.selectedShadows ?? tabsTheme.tabSelectedShadows ?? Shadows.sm;
+        widget.selectedShadows ??
+        tabsTheme.tabSelectedShadows ??
+        ShadShadows.sm;
 
     final effectiveMainAxisAlignment =
         widget.mainAxisAlignment ?? tabsTheme.tabMainAxisAlignment;
@@ -916,7 +946,8 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
                   ? tabsTheme.tabSelectedDecoration ?? tabsTheme.tabDecoration
                   : tabsTheme.tabDecoration,
             )
-            .merge(widget.decoration);
+            .merge(widget.decoration)
+            .merge(selected ? widget.selectedDecoration : null);
 
         return ShadButton.secondary(
           canRequestFocus: selected,
@@ -987,9 +1018,3 @@ class _ShadTabState<T> extends State<ShadTab<T>> {
     return tab;
   }
 }
-
-@Deprecated(
-  'Renamed to ShadRestorableTabsController. '
-  'This name will be removed in v1.0.0.',
-)
-typedef RestorableShadTabsController<T> = ShadRestorableTabsController<T>;

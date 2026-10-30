@@ -44,7 +44,11 @@ class ShadSonner extends StatefulWidget {
   const ShadSonner({
     super.key,
     required this.child,
-    this.visibleToastsAmount,
+    int? maxVisibleToasts,
+    @Deprecated(
+      'Use maxVisibleToasts. Will be removed in the next major version.',
+    )
+    int? visibleToastsAmount,
     this.alignment,
     this.padding,
     this.expandedGap,
@@ -52,7 +56,7 @@ class ShadSonner extends StatefulWidget {
     this.scaleFactor,
     this.animationDuration,
     this.animationCurve,
-  });
+  }) : maxVisibleToasts = maxVisibleToasts ?? visibleToastsAmount;
 
   /// The widget below the toaster in the tree, over which toasts are displayed.
   /// Typically the main app content.
@@ -63,7 +67,13 @@ class ShadSonner extends StatefulWidget {
   ///
   /// Defaults to 3 if not provided.
   /// {@endtemplate}
-  final int? visibleToastsAmount;
+  final int? maxVisibleToasts;
+
+  /// The old name of [maxVisibleToasts].
+  @Deprecated(
+    'Use maxVisibleToasts. Will be removed in the next major version.',
+  )
+  int? get visibleToastsAmount => maxVisibleToasts;
 
   /// {@template ShadSonner.alignment}
   /// The alignment of the toasts within the widget.
@@ -146,51 +156,80 @@ class ShadSonner extends StatefulWidget {
   }
 }
 
+/// The state of one toast in a [ShadSonner].
 class ShadToastInfo {
+  /// Creates the state of a toast. The toast starts visible.
   ShadToastInfo({
     required this.id,
     required this.toast,
     required this.controller,
     this.visible = true,
-    this.temporarelyHide = false,
+    this.temporarilyHide = false,
   });
 
+  /// The identifier of the toast.
   final Object id;
+
+  /// The toast to show.
   final ShadToast toast;
+
+  /// Drives the enter and exit animation of the toast.
   final AnimationController controller;
+
+  /// Whether the toast is shown. It becomes false when the toast starts to
+  /// hide.
   bool visible;
-  bool temporarelyHide;
+
+  /// Whether the toast is off screen because too many toasts are visible.
+  bool temporarilyHide;
+
+  /// Hides the toast when its display duration ends. Cancelled while the
+  /// pointer is over the toasts.
   Timer? timer;
 }
 
+/// The state of a [ShadSonner]. Use it to show and hide toasts.
+///
+/// Get it with `ShadSonner.of(context)`.
 class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
+  /// The sonner theme of the current [ShadTheme].
   ShadSonnerTheme get sonnerTheme =>
       ShadTheme.of(context, listen: false).sonnerTheme;
 
-  int get visibleToastsAmount =>
-      widget.visibleToastsAmount ?? sonnerTheme.visibleToastsAmount ?? 3;
+  /// How many toasts are on screen at once.
+  int get maxVisibleToasts =>
+      widget.maxVisibleToasts ?? sonnerTheme.maxVisibleToasts ?? 3;
 
   final _temporarelyHiddenToasts = <ShadToastInfo>[];
   final _toasts = <ShadToastInfo>[];
 
+  /// How long a toast takes to enter and exit. Defaults to 300 milliseconds.
   Duration get animationDuration =>
       widget.animationDuration ??
       sonnerTheme.animationDuration ??
       const Duration(milliseconds: 300);
 
+  /// The curve of the enter and exit animation. Defaults to an ease-out cubic
+  /// curve.
   Curve get animationCurve =>
       widget.animationCurve ??
       sonnerTheme.animationCurve ??
       const Cubic(0.215, 0.61, 0.355, 1);
 
+  /// Expands the stack of toasts while the pointer is over it.
+  @protected
   late final animationController = AnimationController(
     vsync: this,
     duration: animationDuration,
   );
+
+  /// The expansion of the stack of toasts, from 0 (stacked) to 1 (expanded).
   late final animation = Tween<double>(begin: 0, end: 1).animate(
     CurvedAnimation(curve: animationCurve, parent: animationController),
   );
 
+  /// Whether the pointer is over the toasts.
+  @protected
   final hovered = ValueNotifier(false);
 
   /// The theme published to the toast subtree, memoized on the ambient theme.
@@ -242,7 +281,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
   @override
   void dispose() {
     animationController.dispose();
-    // Toasts queued beyond [visibleToastsAmount] live in
+    // Toasts queued beyond [maxVisibleToasts] live in
     // [_temporarelyHiddenToasts], not [_toasts]. Draining only the latter
     // leaked an AnimationController (and its ticker) plus a Timer per queued
     // toast.
@@ -258,7 +297,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
   }
 
   /// Shows the provided [ShadToast] and returns an identifier for the toast.
-
+  ///
   /// The identifier will match the provided [ShadToast.id] if it is not null,
   /// otherwise it will be a [UniqueKey].
   Object? show(
@@ -279,8 +318,8 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     );
 
     final newToastsLength = _toasts.length + 1;
-    if (newToastsLength > visibleToastsAmount) {
-      hideTemporarely(_toasts.first.id);
+    if (newToastsLength > maxVisibleToasts) {
+      hideTemporarily(_toasts.first.id);
     }
     setState(() {
       append ? _toasts.add(toastInfo) : _toasts.insert(0, toastInfo);
@@ -288,8 +327,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
 
     controller.forward();
 
-    final effectiveDuration = toast.duration ?? kDefaultToastDuration;
-    toastInfo.timer = Timer(effectiveDuration, () {
+    toastInfo.timer = Timer(toast.resolveDisplayDuration(context), () {
       hide(effectiveId);
     });
     return effectiveId;
@@ -314,7 +352,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     setState(() {
       _toasts.remove(toastInfo);
       if (_temporarelyHiddenToasts.isNotEmpty &&
-          _toasts.length < visibleToastsAmount) {
+          _toasts.length < maxVisibleToasts) {
         final hiddenToast = _temporarelyHiddenToasts.removeLast();
         // show() mints a fresh controller for the requeued toast, so the one
         // this entry carried while hidden has to go — it is never reachable
@@ -326,10 +364,15 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     });
   }
 
+  /// The old, misspelled name of [hideTemporarily].
+  @Deprecated('Use hideTemporarily. Will be removed in the next major version.')
+  Future<void> hideTemporarely(Object? id) => hideTemporarily(id);
+
   /// Temporarily hides the toast with the provided [id]entifier.
   ///
-  /// The hidden toast will be shown again when there is space for it.
-  Future<void> hideTemporarely(Object? id) async {
+  /// The toast leaves the screen but stays in the queue, and is shown again
+  /// when there is space for it.
+  Future<void> hideTemporarily(Object? id) async {
     final toastInfo = _toasts.firstWhereOrNull((toast) => toast.id == id);
     if (toastInfo == null) return;
 
@@ -337,7 +380,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     await toastInfo.controller.forward();
     if (!mounted) return;
     setState(() {
-      toastInfo.temporarelyHide = true;
+      toastInfo.temporarilyHide = true;
       // A queued toast must not count down while it is off screen; show()
       // gives it a fresh timer when it comes back.
       toastInfo.timer?.cancel();
@@ -347,6 +390,8 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     });
   }
 
+  /// Expands the stack and pauses the timers of the toasts.
+  @protected
   void onEnter(PointerEnterEvent event) {
     if (hovered.value) return;
     hovered.value = true;
@@ -355,12 +400,13 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
     }
   }
 
+  /// Collapses the stack and restarts the timers of the toasts.
+  @protected
   void onExit(PointerExitEvent event) {
     if (!hovered.value) return;
     hovered.value = false;
     for (final toast in _toasts) {
-      final effectiveDuration = toast.toast.duration ?? kDefaultToastDuration;
-      toast.timer = Timer(effectiveDuration, () {
+      toast.timer = Timer(toast.toast.resolveDisplayDuration(context), () {
         hide(toast.id);
       });
     }
@@ -556,7 +602,7 @@ class ShadSonnerState extends State<ShadSonner> with TickerProviderStateMixin {
                                   child: ShadAnimate(
                                     autoPlay: false,
                                     controller: toastInfo.controller,
-                                    effects: toastInfo.temporarelyHide
+                                    effects: toastInfo.temporarilyHide
                                         ? effectiveAnimateOut
                                         : effectiveAnimateIn,
                                     child: ClipRect(
@@ -687,6 +733,3 @@ class _SonnerBoxy extends BoxyDelegate {
     return Size(maxWidth, currentHeight);
   }
 }
-
-@Deprecated('Renamed to ShadToastInfo. This name will be removed in v1.0.0.')
-typedef ToastInfo = ShadToastInfo;

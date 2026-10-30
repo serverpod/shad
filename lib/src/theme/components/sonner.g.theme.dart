@@ -30,9 +30,7 @@ mixin _$ShadSonnerTheme {
     }
 
     return ShadSonnerTheme(
-      visibleToastsAmount: t < 0.5
-          ? a.visibleToastsAmount
-          : b.visibleToastsAmount,
+      maxVisibleToasts: t < 0.5 ? a.maxVisibleToasts : b.maxVisibleToasts,
       alignment: AlignmentGeometry.lerp(a.alignment, b.alignment, t),
       padding: EdgeInsetsGeometry.lerp(a.padding, b.padding, t),
       expandedGap: lerpDouble$(a.expandedGap, b.expandedGap, t),
@@ -48,7 +46,7 @@ mixin _$ShadSonnerTheme {
   }
 
   ShadSonnerTheme copyWith({
-    int? visibleToastsAmount,
+    int? maxVisibleToasts,
     AlignmentGeometry? alignment,
     EdgeInsetsGeometry? padding,
     double? expandedGap,
@@ -60,7 +58,7 @@ mixin _$ShadSonnerTheme {
     final _this = (this as ShadSonnerTheme);
 
     return ShadSonnerTheme(
-      visibleToastsAmount: visibleToastsAmount ?? _this.visibleToastsAmount,
+      maxVisibleToasts: maxVisibleToasts ?? _this.maxVisibleToasts,
       alignment: alignment ?? _this.alignment,
       padding: padding ?? _this.padding,
       expandedGap: expandedGap ?? _this.expandedGap,
@@ -83,7 +81,7 @@ mixin _$ShadSonnerTheme {
     }
 
     return copyWith(
-      visibleToastsAmount: other.visibleToastsAmount,
+      maxVisibleToasts: other.maxVisibleToasts,
       alignment: other.alignment,
       padding: other.padding,
       expandedGap: other.expandedGap,
@@ -107,7 +105,7 @@ mixin _$ShadSonnerTheme {
     final _this = (this as ShadSonnerTheme);
     final _other = (other as ShadSonnerTheme);
 
-    return _other.visibleToastsAmount == _this.visibleToastsAmount &&
+    return _other.maxVisibleToasts == _this.maxVisibleToasts &&
         _other.alignment == _this.alignment &&
         _other.padding == _this.padding &&
         _other.expandedGap == _this.expandedGap &&
@@ -123,7 +121,7 @@ mixin _$ShadSonnerTheme {
 
     return Object.hash(
       runtimeType,
-      _this.visibleToastsAmount,
+      _this.maxVisibleToasts,
       _this.alignment,
       _this.padding,
       _this.expandedGap,

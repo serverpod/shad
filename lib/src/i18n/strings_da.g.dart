@@ -43,6 +43,7 @@ class ShadLocalizationsDataDa extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$da datePicker = _ShadLocalizationsData$datePicker$da._(_root);
 	@override late final _ShadLocalizationsData$input$da input = _ShadLocalizationsData$input$da._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$da keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$da._(_root);
+	@override late final _ShadLocalizationsData$dialog$da dialog = _ShadLocalizationsData$dialog$da._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$da extends ShadLocalizationsData$ke
 	@override String get done => 'Færdig';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$da extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$da._(ShadLocalizationsDataDa root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataDa _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Luk';
+	@override String get dismiss => 'Luk';
+}
+
 /// The flat map containing all translations for locale <da>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataDa {
 			'input.paste' => 'Sæt ind',
 			'input.selectAll' => 'Vælg alt',
 			'keyboardToolbar.done' => 'Færdig',
+			'dialog.close' => 'Luk',
+			'dialog.dismiss' => 'Luk',
 			_ => null,
 		};
 	}

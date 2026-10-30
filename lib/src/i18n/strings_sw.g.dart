@@ -43,6 +43,7 @@ class ShadLocalizationsDataSw extends ShadLocalizationsData with BaseTranslation
 	@override late final _ShadLocalizationsData$datePicker$sw datePicker = _ShadLocalizationsData$datePicker$sw._(_root);
 	@override late final _ShadLocalizationsData$input$sw input = _ShadLocalizationsData$input$sw._(_root);
 	@override late final _ShadLocalizationsData$keyboardToolbar$sw keyboardToolbar = _ShadLocalizationsData$keyboardToolbar$sw._(_root);
+	@override late final _ShadLocalizationsData$dialog$sw dialog = _ShadLocalizationsData$dialog$sw._(_root);
 }
 
 // Path: timePicker
@@ -92,6 +93,17 @@ class _ShadLocalizationsData$keyboardToolbar$sw extends ShadLocalizationsData$ke
 	@override String get done => 'Imekamilika';
 }
 
+// Path: dialog
+class _ShadLocalizationsData$dialog$sw extends ShadLocalizationsData$dialog$en {
+	_ShadLocalizationsData$dialog$sw._(ShadLocalizationsDataSw root) : this._root = root, super.internal(root);
+
+	final ShadLocalizationsDataSw _root; // ignore: unused_field
+
+	// Translations
+	@override String get close => 'Funga';
+	@override String get dismiss => 'Ondoa';
+}
+
 /// The flat map containing all translations for locale <sw>.
 /// Only for edge cases! For simple maps, use the map function of this library.
 ///
@@ -111,6 +123,8 @@ extension on ShadLocalizationsDataSw {
 			'input.paste' => 'Bandika',
 			'input.selectAll' => 'Chagua yote',
 			'keyboardToolbar.done' => 'Imekamilika',
+			'dialog.close' => 'Funga',
+			'dialog.dismiss' => 'Ondoa',
 			_ => null,
 		};
 	}

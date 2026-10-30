@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "പൂർത്തിയായി"
+
+dialog:
+  close: "അടയ്ക്കുക"
+  dismiss: "നിരസിക്കുക"

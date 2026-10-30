@@ -16,3 +16,7 @@ input:
 
 keyboardToolbar:
   done: "เสร็จสิ้น"
+
+dialog:
+  close: "ปิด"
+  dismiss: "ปิด"

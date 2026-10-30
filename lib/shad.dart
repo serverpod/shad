@@ -1,7 +1,6 @@
 // App
 // ignore: no_leading_underscores_for_library_prefixes
 import 'package:flutter_animate/flutter_animate.dart' as _animate show Effect;
-import 'package:intl/intl.dart' as intl show TextDirection;
 
 // External libraries.
 //
@@ -38,7 +37,7 @@ export 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart'
         TableVicinity,
         TableViewCell;
 
-export 'src/app.dart';
+export 'src/app.dart' hide applyGoogleFontToTextTheme;
 // Components
 export 'src/components/accordion.dart';
 export 'src/components/alert.dart';
@@ -46,17 +45,19 @@ export 'src/components/avatar.dart';
 export 'src/components/badge.dart';
 export 'src/components/breadcrumb.dart';
 export 'src/components/button.dart';
-export 'src/components/calendar.dart';
+export 'src/components/calendar.dart' hide ShadCalendarModel;
 export 'src/components/card.dart';
 export 'src/components/checkbox.dart';
 export 'src/components/collapsible.dart';
 export 'src/components/command.dart';
-export 'src/components/context_menu.dart';
+export 'src/components/context_menu.dart'
+    hide ShadContextMenuItemController, kContextMenuGroupId;
 export 'src/components/data_table.dart';
 export 'src/components/date_picker.dart';
 export 'src/components/default_keyboard_toolbar.dart';
 export 'src/components/dialog.dart';
 export 'src/components/disabled.dart';
+export 'src/components/dropdown_menu.dart';
 export 'src/components/empty.dart';
 export 'src/components/form/field.dart';
 export 'src/components/form/fields/checkbox.dart';
@@ -72,7 +73,7 @@ export 'src/components/form/fields/time_picker.dart';
 export 'src/components/form/form.dart';
 export 'src/components/icon_button.dart';
 export 'src/components/input.dart';
-export 'src/components/input_otp.dart';
+export 'src/components/input_otp.dart' hide kInvisibleCharCode;
 export 'src/components/kbd.dart';
 export 'src/components/layout.dart';
 export 'src/components/menubar.dart';
@@ -81,25 +82,37 @@ export 'src/components/popover.dart';
 export 'src/components/progress.dart';
 export 'src/components/radio.dart';
 export 'src/components/resizable.dart';
+export 'src/components/scroll_area.dart';
 export 'src/components/select.dart';
 export 'src/components/separator.dart';
-export 'src/components/sheet.dart' hide RenderSheetLayoutWithSizeListener;
+export 'src/components/sheet.dart'
+    hide
+        RenderSheetLayoutWithSizeListener,
+        ShadSheetGestureDetector,
+        ShadSheetLayoutWithSizeListener,
+        ShadSizeChangeCallback;
 export 'src/components/sidebar.dart';
 export 'src/components/skeleton.dart';
 export 'src/components/slider.dart';
-export 'src/components/sonner.dart';
+export 'src/components/sonner.dart' hide ShadToastInfo;
 export 'src/components/spinner.dart';
+export 'src/components/surface.dart';
 export 'src/components/switch.dart';
 export 'src/components/table.dart';
 export 'src/components/tabs.dart';
 export 'src/components/textarea.dart' hide ShadResizeGripPainter;
-export 'src/components/time_picker.dart';
+export 'src/components/time_picker.dart'
+    hide ShadTimePickerTextEditingController;
 export 'src/components/toast.dart';
 export 'src/components/toggle.dart';
 export 'src/components/tooltip.dart';
 // Localizations
 export 'src/i18n/localizations_delegate.dart';
-export 'src/i18n/strings.g.dart';
+// The generated strings file re-exports all of slang and declares an
+// unprefixed AppLocaleUtils; neither is part of this package's API, and
+// AppLocaleUtils collides with the one slang generates in an app.
+export 'src/i18n/strings.g.dart'
+    show ShadLocale, ShadLocalizationsData, ShadLocalizationsDataEn;
 // Raw Components
 export 'src/raw_components/focusable.dart';
 export 'src/raw_components/keyboard_toolbar.dart';
@@ -154,6 +167,7 @@ export 'src/theme/components/popover.dart';
 export 'src/theme/components/progress.dart';
 export 'src/theme/components/radio.dart';
 export 'src/theme/components/resizable.dart';
+export 'src/theme/components/scroll_area.dart';
 export 'src/theme/components/select.dart';
 export 'src/theme/components/separator.dart';
 export 'src/theme/components/sheet.dart';
@@ -176,16 +190,14 @@ export 'src/theme/spacing.dart';
 export 'src/theme/style.dart';
 export 'src/theme/text_role.dart';
 export 'src/theme/text_theme/text_styles_default.dart';
-export 'src/theme/text_theme/theme.dart';
-export 'src/theme/theme.dart';
+export 'src/theme/text_theme/theme.dart' hide OmitFamilyAndPackageExtension;
+export 'src/theme/theme.dart' hide ShadInheritedTheme;
 export 'src/theme/theme_scope.dart';
 export 'src/theme/themes/base.dart';
 export 'src/theme/themes/default_theme_no_secondary_border_variant.dart';
 export 'src/theme/themes/default_theme_variant.dart';
 export 'src/theme/themes/shadows.dart';
 // Utils
-export 'src/utils/animate.dart';
-export 'src/utils/animation_builder.dart';
 export 'src/utils/border.dart';
 export 'src/utils/clipboard/clipboard_service.dart';
 export 'src/utils/effects.dart';
@@ -194,18 +206,14 @@ export 'src/utils/effects.dart';
 // methods — and, for Duration, `+ - * /` operator overloads — to every type in
 // every file that imported this package. They remain internal.
 export 'src/utils/extensions/breakpoints.dart';
-export 'src/utils/extensions/date_time.dart';
 export 'src/utils/gesture_detector.dart';
 export 'src/utils/input_formatters.dart';
 export 'src/utils/mouse_area.dart' show ShadMouseArea, ShadMouseAreaSurface;
-export 'src/utils/mouse_cursor_provider.dart';
-export 'src/utils/position.dart';
-export 'src/utils/provider.dart' hide ProviderReadExt, ProviderWatchExt;
-export 'src/utils/provider_index.dart';
+export 'src/utils/position.dart' hide PositionedExt;
 export 'src/utils/responsive.dart';
-export 'src/utils/shadow.dart';
+export 'src/utils/shadow.dart' hide paintOuterShadows;
 export 'src/utils/states_controller.dart';
-export 'src/utils/text_editing_controller.dart';
 
+/// The old name of `ShadAnimEffect`, flutter_animate's `Effect`.
+@Deprecated('Use ShadAnimEffect. Will be removed in the next major version.')
 typedef AnimateEffect<T> = _animate.Effect<T>;
-typedef IntlTextDirection = intl.TextDirection;

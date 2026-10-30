@@ -7,6 +7,10 @@ import 'package:shad/src/theme/color_scheme/base.dart';
 /// value to sRGB.
 @immutable
 class ShadZincColorScheme extends ShadColorScheme {
+  /// Creates a [ShadZincColorScheme] from explicit colours.
+  ///
+  /// Use [ShadZincColorScheme.light] or [ShadZincColorScheme.dark] for the
+  /// shadcn/ui values.
   const ShadZincColorScheme({
     required super.background,
     required super.foreground,
@@ -44,6 +48,9 @@ class ShadZincColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the light variant of [ShadZincColorScheme].
+  ///
+  /// Every colour defaults to its light-mode value.
   const ShadZincColorScheme.light({
     super.background = const Color(0xffffffff),
     super.foreground = const Color(0xff09090b),
@@ -81,6 +88,9 @@ class ShadZincColorScheme extends ShadColorScheme {
     super.custom,
   });
 
+  /// Creates the dark variant of [ShadZincColorScheme].
+  ///
+  /// Every colour defaults to its dark-mode value.
   const ShadZincColorScheme.dark({
     super.background = const Color(0xff09090b),
     super.foreground = const Color(0xfffafafa),
