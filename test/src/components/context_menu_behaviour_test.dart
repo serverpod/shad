@@ -258,4 +258,47 @@ void main() {
     // Beside the parent on its left, not slid over it.
     expect(submenu.right, lessThanOrEqualTo(parent.left + 9));
   });
+
+  testWidgets('a submenu closes on time while the pointer keeps moving', (
+    tester,
+  ) async {
+    final controller = ShadContextMenuController();
+    addTearDown(controller.dispose);
+    await pumpMenu(
+      tester,
+      controller: controller,
+      items: const [
+        ShadContextMenuItem(
+          items: [ShadContextMenuItem(child: Text('First nested'))],
+          child: Text('First'),
+        ),
+        ShadContextMenuItem(
+          items: [ShadContextMenuItem(child: Text('Second nested'))],
+          child: Text('Second'),
+        ),
+      ],
+    );
+    controller.showAt(const Offset(100, 100));
+    await tester.pumpAndSettle();
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: Offset.zero);
+    await mouse.moveTo(tester.getCenter(find.text('First')));
+    await tester.pumpAndSettle();
+    expect(find.text('First nested'), findsOneWidget);
+
+    // Every pointer event outside an area reports an exit again. Those
+    // repeats must not restart the grace period, or the first item stays
+    // highlighted, its submenu open, for as long as the pointer moves.
+    final second = tester.getCenter(find.text('Second'));
+    for (var i = 0; i < 20; i++) {
+      await mouse.moveTo(second + Offset(i.isEven ? 1 : -1, 0));
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    // Checked before the pointer rests: 400ms of movement is well past the
+    // grace period and the close animation.
+    expect(find.text('First nested'), findsNothing);
+    expect(find.text('Second nested'), findsOneWidget);
+  });
 }

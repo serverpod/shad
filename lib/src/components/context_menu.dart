@@ -1115,11 +1115,16 @@ class _ShadContextMenuItemState extends State<ShadContextMenuItem> {
   Timer? _unhoverTimer;
 
   void _onHoverArea(bool hovered, Duration grace) {
-    _unhoverTimer?.cancel();
     if (hovered || grace == Duration.zero) {
+      _unhoverTimer?.cancel();
+      _unhoverTimer = null;
       controller.setHovered(hovered);
       return;
     }
+    // The mouse area reports an exit on every pointer event outside it, not
+    // once. Restarting the timer on each would keep the item highlighted,
+    // and its submenu open, for as long as the pointer moves.
+    if (!controller.hovered || (_unhoverTimer?.isActive ?? false)) return;
     _unhoverTimer = Timer(grace, () {
       if (mounted) controller.setHovered(false);
     });
